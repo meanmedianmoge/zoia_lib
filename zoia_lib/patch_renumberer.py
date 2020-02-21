@@ -103,15 +103,18 @@ class Renumber:
         """initializes Renumber class"""
 
         # get starting path and folder
-        os.chdir(path)
-        folder = path
-        files = os.listdir(folder)
+        self.path = path
+        self.folder, self.files = self.get_folder_and_files()
 
         # set class attributes
-        self.path = folder
-        self.files = files
         self.start = 0
         self.invert = invert
+
+    def get_folder_and_files(self):
+        os.chdir(self.path)
+        folder = os.getcwd()
+        files = os.listdir()
+        return folder, files
 
     def loop_it(self,
                 fls: list):
@@ -124,35 +127,31 @@ class Renumber:
                 dst = "0" + str(self.start) + '_zoia_' + fname
 
             src = num + '_zoia_' + fname
-            os.rename(os.path.join(self.path, src),
-                      os.path.join(self.path, dst))
+            os.rename(os.path.join(self.folder, src),
+                      os.path.join(self.folder, dst))
             self.start += 1
 
-    def strip_header(self,
-                     fls: list):
+    @staticmethod
+    def strip_header(fls: list):
         """remove header ***_zoia_ from files for better lists"""
 
-        self.files = zip([s.split('_zoia_')[0] for s in fls],
-                         [s[3:].split('_zoia_')[1] for s in fls])
-
-        return self.files
+        return zip([s.split('_zoia_')[0] for s in fls],
+                   [s[3:].split('_zoia_')[1] for s in fls])
 
     def renumber(self,
                  sort: str):
         """applies the renumbering"""
 
-        if sort == 'alpha':
-            self.files = self.alpha()
-            return self.loop_it(self.files)
-        if sort == 'by_tag':
-            self.files = self.by_tag()
-            return self.loop_it(self.files)
-        if sort == 'random':
-            self.files = self.random()
-            return self.loop_it(self.files)
+        sort_options = {
+            'alpha': self.alpha,
+            'by_tag': self.by_tag,
+            'random': self.random
+        }
+        self.files = sort_options.get(sort)()
+        return self.loop_it(self.files)
 
     def alpha(self):
-        """renumbers files alphabetically"""
+        """renumbers self.files alphabetically"""
 
         # sort alpha, ignore case
         self.files = sorted(self.strip_header(self.files), key=lambda x: x[1])
@@ -164,42 +163,52 @@ class Renumber:
         return self.files
 
     def by_tag(self):
-        """renumbers files by tag"""
+        """renumbers self.files by tag"""
 
-        type = ['Patches',
-                'Questions',
-                'Tutorials']
+        _type = [
+            'Patches',
+            'Questions',
+            'Tutorials'
+        ]
 
-        primary = ['Composition',
-                    'Effect',
-                    'Game',
-                    'Other',
-                    'Sampler',
-                    'Sequencer',
-                    'Sound',
-                    'Synthesizer',
-                    'Utility',
-                    'Video']
+        primary = [
+            'Composition',
+            'Effect',
+            'Game',
+            'Other',
+            'Sampler',
+            'Sequencer',
+            'Sound',
+            'Synthesizer',
+            'Utility',
+            'Video'
+        ]
 
-        secondary = ['delay',
-                     'glitch',
-                     'granular',
-                     '']
+        secondary = [
+            'delay',
+            'glitch',
+            'granular',
+            ''
+        ]
 
-        state = ['Help Needed',
-                 'Inactive',
-                 'Ready to Go',
-                 'Work in Progress']
+        state = [
+            'Help Needed',
+            'Inactive',
+            'Ready to Go',
+            'Work in Progress'
+        ]
 
-        sort_by = ['Date',
-                   'Views',
-                   'Likes',
-                   'Downloads']
+        sort_by = [
+            'Date',
+            'Views',
+            'Likes',
+            'Downloads'
+        ]
 
         return self.files
 
     def random(self):
-        """renumbers files randomly"""
+        """renumbers self.files randomly"""
 
         self.files = sorted(self.strip_header(self.files), key=lambda x: x[1])
         random.shuffle(self.files)
