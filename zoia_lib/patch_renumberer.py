@@ -114,6 +114,8 @@ class Renumber:
         os.chdir(self.path)
         folder = os.getcwd()
         files = os.listdir()
+        # ignore hidden files (pesky .DS_Store)
+        files = [f for f in files if not f.startswith('.')]
         return folder, files
 
     def loop_it(self,
