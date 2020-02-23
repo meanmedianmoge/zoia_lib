@@ -61,6 +61,28 @@ class TestRenumber(unittest.TestCase):
         ]
         self.assertListEqual(result, expected)
 
+    def test_handles_dupes_after_multiple_sorts(self):
+        test_filenames = [
+            '007_zoia_Afterneath_V4.bin',
+            '056_zoia_Fading_Dream1_1.bin',
+            '003_zoia_some_other_file_name.bin',
+            '004_zoia_file_name.bin'
+        ]
+        [open(os.path.join(PATH, f), 'a').close() for f in test_filenames]
+        renumber = Renumber(path=RENUMBER_RELATIVE_PATH)
+        renumber.renumber(sort='alpha')
+        renumber.renumber(sort='alpha')
+        result = sorted([f for f in os.listdir(PATH) if not f.startswith('.')])
+        expected = [
+            '000_zoia_Afterneath_V4.bin',
+            '001_zoia_Afterneath_V4.bin',
+            '002_zoia_Fading_Dream1_1.bin',
+            '003_zoia_Fading_Dream1_1.bin',
+            '004_zoia_file_name.bin',
+            '005_zoia_some_other_file_name.bin'
+        ]
+        self.assertListEqual(result, expected)
+
     def test_renumber_random(self):
         renumber = Renumber(path=RENUMBER_RELATIVE_PATH)
         # reorder test files

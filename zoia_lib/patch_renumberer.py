@@ -166,20 +166,20 @@ class Renumber:
             'by_tag': self.by_tag,
             'random': self.random
         }
-        self.files = sort_options.get(sort)()
-        return self.loop_it(self.files)
+        sorted_files = sort_options.get(sort)()
+        self.loop_it(sorted_files)
 
     def alpha(self):
         """renumbers self.files alphabetically"""
 
         # sort alpha, ignore case
-        self.files = sorted(self.strip_header(self.files), key=lambda x: x[1])
+        sorted_files = sorted(self.strip_header(self.files), key=lambda x: x[1])
 
         # invert if desired
         if self.invert:
-            zip(*sorted(self.files, reverse=True))
+            zip(*sorted(sorted_files, reverse=True))
 
-        return self.files
+        return sorted_files
 
     def by_tag(self):
         """renumbers self.files by tag"""
@@ -229,7 +229,8 @@ class Renumber:
     def random(self):
         """renumbers self.files randomly"""
 
-        self.files = sorted(self.strip_header(self.files), key=lambda x: x[1])
-        random.shuffle(self.files)
-
-        return self.files
+        sorted_files = sorted(
+            self.strip_header(self.files),
+            key=lambda x: x[1]
+        )
+        return random.shuffle(sorted_files)
