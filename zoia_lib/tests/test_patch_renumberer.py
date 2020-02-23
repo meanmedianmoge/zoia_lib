@@ -25,7 +25,7 @@ class TestRenumber(unittest.TestCase):
         # reset directory
         os.chdir(START_PATH)
         os.chdir(TEST_PATH)
-        # remove renamed files
+        # remove renamed files -- this is pretty janky if the path isn't right!
         [os.remove(f)for f in os.listdir()]
 
     def test_renumber_alpha(self):
@@ -39,6 +39,28 @@ class TestRenumber(unittest.TestCase):
             '001_zoia_Fading_Dream1_1.bin'
         ]
         self.assertListEqual(result, expected_result)
+
+    def test_handles_duplicate_filenames(self):
+        # add some more files including dupes
+        test_filenames = [
+            '007_zoia_Afterneath_V4.bin',
+            '056_zoia_Fading_Dream1_1.bin'
+            '003_zoia_some_other_file_name.bin',
+            '004_zoia_file_name.bin'
+        ]
+        [open(f'{TEST_PATH}{f}', 'a').close() for f in test_filenames]
+        renumber = Renumber(path=TEST_PATH)
+        renumber.renumber(sort='alpha')
+        result = sorted(os.listdir())
+        expected = [
+            '000_zoia_Afterneath_V4.bin',
+            '001_zoia_Afterneath_V4.bin',
+            '002_zoia_Fading_Dream1_1.bin',
+            '003_zoia_Fading_Dream1_1.bin',
+            '004_zoia_file_name.bin',
+            '005_zoia_some_other_file_name.bin'
+        ]
+        self.assertListEqual(result, expected)
 
     def test_renumber_random(self):
         renumber = Renumber(path=TEST_PATH)
