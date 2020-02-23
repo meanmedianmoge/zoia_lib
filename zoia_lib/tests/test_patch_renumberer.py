@@ -28,7 +28,9 @@ class TestRenumber(unittest.TestCase):
         # reorder test files
         renumber.renumber(sort='alpha')
         # get results
-        result = sorted(os.listdir(PATH))
+        # os.listdir() does not return directory contents in any order.
+        # the list comprehension is to exclude any hidden files (.DS_Store)
+        result = sorted([f for f in os.listdir(PATH) if not f.startswith('.')])
         expected_result = [
             '000_zoia_Afterneath_V4.bin',
             '001_zoia_Fading_Dream1_1.bin'
@@ -46,7 +48,9 @@ class TestRenumber(unittest.TestCase):
         [open(os.path.join(PATH, f), 'a').close() for f in test_filenames]
         renumber = Renumber(path=RENUMBER_RELATIVE_PATH)
         renumber.renumber(sort='alpha')
-        result = sorted(os.listdir(PATH))
+        # os.listdir() does not return directory contents in any order.
+        # the list comprehension is to exclude any hidden files (.DS_Store)
+        result = sorted([f for f in os.listdir(PATH) if not f.startswith('.')])
         expected = [
             '000_zoia_Afterneath_V4.bin',
             '001_zoia_Afterneath_V4.bin',
@@ -61,8 +65,9 @@ class TestRenumber(unittest.TestCase):
         renumber = Renumber(path=RENUMBER_RELATIVE_PATH)
         # reorder test files
         renumber.renumber(sort='random')
-        # get results
-        result = sorted(os.listdir(PATH))
+        # os.listdir() does not return directory contents in any order.
+        # the list comprehension is to exclude any hidden files (.DS_Store)
+        result = sorted([f for f in os.listdir(PATH) if not f.startswith('.')])
         # we can't assert that the results are truly random, but we can
         # at least make sure the numbering worked :)
         self.assertEqual('000', result[0].split('_')[0])
