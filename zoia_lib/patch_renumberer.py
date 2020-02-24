@@ -32,11 +32,13 @@ would likely help a lot.
 """
 
 import os
-import struct
 import random
+import struct
 import zipfile
+
 import requests
 
+from zoia_lib.common import errors
 
 # https://patchstorage.com/docs/
 def get_patch():
@@ -102,21 +104,36 @@ class Renumber:
                  invert: bool = False):
         """initializes Renumber class"""
 
-        # get starting path and folder
+        # get absolute path to files
         self.path = path
-        self.folder, self.files = self.get_folder_and_files()
-
+        self.files = self.get_files()
         # set class attributes
         self.start = 0
         self.invert = invert
 
-    def get_folder_and_files(self):
-        os.chdir(self.path)
-        folder = os.getcwd()
-        files = os.listdir()
-        # ignore hidden files (pesky .DS_Store)
-        files = [f for f in files if not f.startswith('.')]
-        return folder, files
+    @property
+    def path(self):
+        return self._path
+
+    @path.setter
+    def path(self, path):
+        if os.path.isdir(path):
+            self._path = os.path.abspath(path)
+            return
+        root_path = os.path.dirname(__file__)
+        _path = os.path.join(root_path, path)
+        if os.path.isdir(_path):
+            self._path = _path
+            return
+        else:
+            raise errors.BadPathError(
+                f'Supplied path {path} is not a child of '
+                f'current directory.'
+            )
+
+    def get_files(self):
+        raw_files = os.listdir(self.path)
+        return [f for f in raw_files if not f.startswith('.')]
 
     def loop_it(self,
                 fls: list):
@@ -129,8 +146,8 @@ class Renumber:
                 dst = "0" + str(self.start) + '_zoia_' + fname
 
             src = num + '_zoia_' + fname
-            os.rename(os.path.join(self.folder, src),
-                      os.path.join(self.folder, dst))
+            os.rename(os.path.join(self.path, src),
+                      os.path.join(self.path, dst))
             self.start += 1
 
     @staticmethod
