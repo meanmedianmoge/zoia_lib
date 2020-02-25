@@ -2,7 +2,7 @@
 """
 Created: 9:47 PM on 2/23/20
 Author: Mike Moger
-Usage: 
+Usage: https://patchstorage.com/docs/
 """
 
 import os
@@ -16,7 +16,7 @@ class PatchStorage:
 
         # set defaults for query params
         self.url = 'https://patchstorage.com/api/alpha'
-        self.platform = 'zoia'
+        self.platform = 'zoia'  # PS stores platforms with an integer, unsure which one maps to zoia
 
     def endpoint(self,
                  endpoint: str):
@@ -25,21 +25,20 @@ class PatchStorage:
         return os.path.join(self.url, endpoint)
 
     def get_patch(self,
-                  **kwargs):
+                  download: bool = True):
         """get Patch object"""
 
-        patch = requests.get(url=self.endpoint('patches'),
-                             params=[('platform', self.platform)],
-                             **kwargs).json()
+        endpoint = self.endpoint('patches')
 
+        patch = requests.get(url=endpoint,
+                             params=[('platform', self.platform)]
+                             ).json()
         idx = str(patch.id)
 
-        mn = self.endpoint('patches')
-        dl = requests.get(url=os.path.join(mn, idx)).json().files.url
-
-        return dl
-
-# https://patchstorage.com/docs/
+        if download:
+            return requests.get(url=os.path.join(endpoint, idx)).json().files[0].url
+        else:
+            return idx
 
 
 def get_patch():
