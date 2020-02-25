@@ -108,12 +108,12 @@ class Ui_main_window(object):
         self.tabWidget.addTab(self.local_tab, "")
         self.sd_tab = QWidget()
         self.sd_tab.setObjectName(u"sd_tab")
-        self.gridLayout_9 = QGridLayout(self.sd_tab)
-        self.gridLayout_9.setObjectName(u"gridLayout_9")
+        self.gridLayout_3 = QGridLayout(self.sd_tab)
+        self.gridLayout_3.setObjectName(u"gridLayout_3")
         self.sd_filter_text = QLineEdit(self.sd_tab)
         self.sd_filter_text.setObjectName(u"sd_filter_text")
 
-        self.gridLayout_9.addWidget(self.sd_filter_text, 0, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.sd_filter_text, 0, 0, 1, 1)
 
         self.sd_filter_refresh = QPushButton(self.sd_tab)
         self.sd_filter_refresh.setObjectName(u"sd_filter_refresh")
@@ -121,15 +121,25 @@ class Ui_main_window(object):
         self.sd_filter_refresh.setIconSize(QSize(27, 24))
         self.sd_filter_refresh.setFlat(False)
 
-        self.gridLayout_9.addWidget(self.sd_filter_refresh, 0, 1, 1, 1)
+        self.gridLayout_3.addWidget(self.sd_filter_refresh, 0, 1, 1, 1)
 
         self.sd_tableview = QTableView(self.sd_tab)
         self.sd_tableview.setObjectName(u"sd_tableview")
+        self.sd_tableview.setShowGrid(False)
+        self.sd_tableview.setGridStyle(Qt.NoPen)
+        self.sd_tableview.setSortingEnabled(True)
+        self.sd_tableview.setWordWrap(False)
+        self.sd_tableview.setCornerButtonEnabled(False)
         self.sd_tableview.horizontalHeader().setCascadingSectionResizes(True)
-        self.sd_tableview.horizontalHeader().setProperty("showSortIndicator", True)
+        self.sd_tableview.horizontalHeader().setMinimumSectionSize(64)
+        self.sd_tableview.horizontalHeader().setDefaultSectionSize(120)
         self.sd_tableview.horizontalHeader().setStretchLastSection(True)
+        self.sd_tableview.verticalHeader().setVisible(False)
+        self.sd_tableview.verticalHeader().setCascadingSectionResizes(True)
+        self.sd_tableview.verticalHeader().setHighlightSections(False)
+        self.sd_tableview.verticalHeader().setStretchLastSection(False)
 
-        self.gridLayout_9.addWidget(self.sd_tableview, 1, 0, 1, 2)
+        self.gridLayout_3.addWidget(self.sd_tableview, 1, 0, 1, 2)
 
         self.tabWidget.addTab(self.sd_tab, "")
 
@@ -157,12 +167,15 @@ class Ui_main_window(object):
         self.menubar.setGeometry(QRect(0, 0, 900, 22))
         self.file_menu = QMenu(self.menubar)
         self.file_menu.setObjectName(u"file_menu")
+        self.sdcard_menu = QMenu(self.menubar)
+        self.sdcard_menu.setObjectName(u"sdcard_menu")
         main_window.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(main_window)
         self.statusbar.setObjectName(u"statusbar")
         main_window.setStatusBar(self.statusbar)
 
         self.menubar.addAction(self.file_menu.menuAction())
+        self.menubar.addAction(self.sdcard_menu.menuAction())
         self.file_menu.addAction(self.action_connect_to_PatchStorage)
         self.file_menu.addAction(self.action_update_files)
         self.file_menu.addAction(self.action_upload_file)
@@ -171,7 +184,7 @@ class Ui_main_window(object):
 
         self.retranslateUi(main_window)
 
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(2)
         self.ps_filter_refresh.setDefault(False)
         self.local_filter_refresh.setDefault(False)
         self.sd_filter_refresh.setDefault(False)
@@ -200,5 +213,6 @@ class Ui_main_window(object):
         self.sd_filter_refresh.setText("")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.sd_tab), QCoreApplication.translate("main_window", u"SD Card Patches", None))
         self.file_menu.setTitle(QCoreApplication.translate("main_window", u"File", None))
+        self.sdcard_menu.setTitle(QCoreApplication.translate("main_window", u"SD Cards", None))
     # retranslateUi
 
