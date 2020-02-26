@@ -20,8 +20,8 @@ class Ui_main_window(object):
     def setupUi(self, main_window):
         if main_window.objectName():
             main_window.setObjectName(u"main_window")
-        main_window.resize(900, 714)
-        main_window.setMinimumSize(QSize(900, 700))
+        main_window.resize(1200, 800)
+        main_window.setMinimumSize(QSize(1200, 800))
         self.action_connect_to_PatchStorage = QAction(main_window)
         self.action_connect_to_PatchStorage.setObjectName(u"action_connect_to_PatchStorage")
         self.action_update_files = QAction(main_window)
@@ -164,7 +164,7 @@ class Ui_main_window(object):
         main_window.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(main_window)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 900, 22))
+        self.menubar.setGeometry(QRect(0, 0, 1200, 22))
         self.file_menu = QMenu(self.menubar)
         self.file_menu.setObjectName(u"file_menu")
         self.sdcard_menu = QMenu(self.menubar)
@@ -194,7 +194,7 @@ class Ui_main_window(object):
     # setupUi
 
     def retranslateUi(self, main_window):
-        main_window.setWindowTitle(QCoreApplication.translate("main_window", u"MainWindow", None))
+        main_window.setWindowTitle(QCoreApplication.translate("main_window", u"Zoia Library", None))
         self.action_connect_to_PatchStorage.setText(QCoreApplication.translate("main_window", u"Connect to PatchStorage", None))
         self.action_update_files.setText(QCoreApplication.translate("main_window", u"Update Files", None))
         self.action_upload_file.setText(QCoreApplication.translate("main_window", u"Upload File ...", None))

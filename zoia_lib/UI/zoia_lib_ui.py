@@ -30,6 +30,7 @@ class MainWindow(QMainWindow):
         self.ui = ui_mainwin.Ui_main_window()
         self.ui.setupUi(self)
         self.basedirpath = os.path.expanduser('~') + '\\zoia_lib\\'
+        self.sd_path = ""
 
         # file menu setup
         self.ui.action_connect_to_PatchStorage.triggered.connect(
@@ -37,37 +38,55 @@ class MainWindow(QMainWindow):
         self.ui.action_update_files.triggered.connect(self.OnFileMenu_update)
         self.ui.action_upload_file.triggered.connect(self.OnFileMenu_upload)
         self.ui.action_quit.triggered.connect(self.OnFileMenu_quit)
-
-        #SD Card menu set up
+        # SD Card menu set up. We build this menu on the fly when the user
+        # Clicks the menu bar
         self.ui.sdcard_menu.aboutToShow.connect(self.OnSDcard_Menu)
-        #.connect(self.OnSDcard_Menu)
-        
-        # SD tab set up
-        self.ui.sd_filter_text.textChanged.connect(
-            self.on_sd_filtertext_changed)
-        self.sd_model = QFileSystemModel()
-        self.sd_model.setFilter(QtCore.QDir.NoDotAndDotDot
-                                | QtCore.QDir.AllEntries
-                                | QtCore.QDir.Dirs
-                                | QtCore.QDir.Files)
-        # FileSystemModel does all of its work on a seperate thread so we need
-        # to generate a call back funstion
-        self.sd_model.directoryLoaded.connect(self.on_sd_model_directoryLoaded)
-        self.sd_index = self.sd_model.setRootPath(self.basedirpath)
-        # filter the filename column based on the text field using
-        # a proxy model
-        self.sd_proxy_model = QtCore.QSortFilterProxyModel(
-            recursiveFilteringEnabled=True,
-            filterRole=QFileSystemModel.FileNameRole)
-        self.sd_proxy_model.setSourceModel(self.sd_model)
-        self.ui.sd_tableview.setModel(self.sd_proxy_model)
-        self.adjust_sd_root_index_tableview()
+        # Set up both of the Tabs for the fille systems
+        self.setupSDTab()
+        self.setupFSTab()
 
-        # adjust the size of the table data
-        self.ui.sd_tableview.horizontalHeader().setSectionResizeMode(
-            QHeaderView.Stretch)
+    # Set up all of the menu action objects
+    def OnFileMenu_connect_to_PatchStorage(self):
+        """ Stub for the connect to PatchStorge menu entry"""
+        self.ui.statusbar.showMessage("Connecting to PatchStroage.")
 
+    def OnFileMenu_update(self):
+        """ Stub for the connect to update menu entry"""
+        self.ui.statusbar.showMessage(
+            "Updating local patches to Latest version.")
 
+    def OnFileMenu_upload(self):
+        """ Stub for the connect to upload menu entry"""
+        self.ui.statusbar.showMessage(
+            "Uploading selected pacthes to PatchStorage.")
+
+    def OnFileMenu_quit(self):
+        """ Stub for the connect to quit menu entry"""
+        self.close()
+
+    def OnSDcard_Menu(self):
+        """ enumerates all of the mounted USB drives and populates the
+        SD menu with all drives that are formatted FAT32 and are
+        removable.
+        """
+        for disk in psutil.disk_partitions():
+            if disk.fstype == 'FAT32' and "removable" in disk.opts:
+                if len(self.ui.sdcard_menu.actions()) == 0:
+                    act = self.ui.sdcard_menu.addAction(disk.device)
+                    act.setCheckable(True)
+                    act.triggered.connect(self.getSDPathFromMenu)
+                else:
+                    for action in self.ui.sdcard_menu.actions():
+                        if disk.device in action.text():
+                            pass
+                        else:
+                            act = self.ui.sdcard_menu.addAction(disk.device)
+                            act.setCheckable(True)
+                            act.triggered.connect(self.getSDPathFromMenu)
+    
+    def setupFSTab(self):
+        """ Set up the local file system tab
+        """
         # local tab setup
         self.ui.local_filter_text.textChanged.connect(
             self.on_fs_filtertext_changed)
@@ -97,8 +116,12 @@ class MainWindow(QMainWindow):
 
     def on_fs_filtertext_changed(self, text):
         """ Function for the local filesystem filter tab."""
-        self.fs_proxy_model.setFilterWildcard("*{}*".format(text))
-        self.adjust_root_index_tableview()
+                # replace all of our  semicolons with and 'or' 
+        substr = text.replace(";", "|")
+        # build a regex finding any combination of substrings
+        regex = "(?:{})".format(substr)        
+        self.fs_proxy_model.setFilterRegExp(regex)
+        self.adjust_fs_root_index_tableview()
 
     def adjust_fs_root_index_tableview(self):
         """Adjust the root and proxy index for the local tableview """
@@ -116,47 +139,57 @@ class MainWindow(QMainWindow):
             self.fs_model.rootPath(), self.fs_model.rowCount(self.fs_index))
         self.ui.statusbar.showMessage(statusmessage)
 
-    def OnFileMenu_connect_to_PatchStorage(self):
-        """ Stub for the connect to PatchStorge menu entry"""
-        self.ui.statusbar.showMessage("Connecting to PatchStroage.")
+    def setupSDTab(self):
+        """ Set up the SD card Tab
+        """
+        self.ui.sd_filter_text.textChanged.connect(
+            self.on_sd_filtertext_changed)
+        self.sd_model = QFileSystemModel()
+        self.sd_model.setFilter(QtCore.QDir.NoDotAndDotDot
+                                | QtCore.QDir.AllEntries
+                                | QtCore.QDir.Dirs
+                                | QtCore.QDir.Files)
+        # FileSystemModel does all of its work on a seperate thread so we need
+        # to generate a call back funstion
+        self.sd_model.directoryLoaded.connect(self.on_sd_model_directoryLoaded)
+        self.sd_index = self.sd_model.setRootPath(self.getSDPathFromMenu())
+        # filter the filename column based on the text field using
+        # a proxy model
+        self.sd_proxy_model = QtCore.QSortFilterProxyModel(
+            recursiveFilteringEnabled=True,
+            filterRole=QFileSystemModel.FileNameRole)
+        self.sd_proxy_model.setSourceModel(self.sd_model)
+        self.ui.sd_tableview.setModel(self.sd_proxy_model)
+        self.adjust_sd_root_index_tableview()
+        # adjust the size of the table data
+        self.ui.sd_tableview.horizontalHeader().setSectionResizeMode(
+            QHeaderView.Stretch)
 
-    def OnFileMenu_update(self):
-        """ Stub for the connect to update menu entry"""
-        self.ui.statusbar.showMessage(
-            "Updating local patches to Latest version.")
-
-    def OnFileMenu_upload(self):
-        """ Stub for the connect to upload menu entry"""
-        self.ui.statusbar.showMessage(
-            "Uploading selected pacthes to PatchStorage.")
-
-    def OnFileMenu_quit(self):
-        """ Stub for the connect to quit menu entry"""
-        self.close()
-
-    def OnSDcard_Menu(self):
-        """ enumerates all of the mounted USB drives and returns the first 
-            FAT32 formated disk"""
-        for disk in psutil.disk_partitions():
-            if disk.fstype == 'FAT32':
-                if len(self.ui.sdcard_menu.actions()) == 0:
-                    self.ui.sdcard_menu.addAction(disk.device)
-                else:
-                    for action in self.ui.sdcard_menu.actions():
-                        if disk.device in action.text():
-                            pass
-                        else:
-                            self.ui.sdcard_menu.addAction(disk.device)
-
+    def getSDPathFromMenu(self):
+        """ Enumertates over the SD card menu finding the checked 
+        drive letter and returning it. 
+        
+        The SD card menu should be populated with all of the mounted,
+        Removable, FAT32 drives. It should also have the drive the user
+        intends to read/write to checked.
+        """
+        for action in self.ui.sdcard_menu.actions():
+            if action.isChecked():
+                self.sd_path = action.text()
+                self.adjust_sd_root_index_tableview()
 
     def on_sd_filtertext_changed(self, text):
-        """ Function for the local filesystem filter tab."""
-        self.sd_proxy_model.setFilterWildcard("*{}*".format(text))
+        """ Function for the SD filesystem filter tab."""
+        # replace all of our  semicolons with and 'or' 
+        substr = text.replace(";", "|")
+        # build a regex finding any combination of substrings
+        regex = "(?:{})".format(substr)        
+        self.sd_proxy_model.setFilterRegExp(regex)
         self.adjust_sd_root_index_tableview()
 
     def adjust_sd_root_index_tableview(self):
         """Adjust the root and proxy index for the local tableview """
-        root_index = self.sd_model.index(self.basedirpath)
+        root_index = self.sd_model.index(self.sd_path)
         proxy_index = self.sd_proxy_model.mapFromSource(root_index)
         self.ui.sd_tableview.setRootIndex(proxy_index)
 
