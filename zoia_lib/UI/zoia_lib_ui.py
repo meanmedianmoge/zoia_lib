@@ -18,11 +18,11 @@ from PySide2 import QtGui
 
 if __package__ is None or __package__ == '':
     # uses current directory visibility
-    import UI.ui_main_window as ui_mainwin
+    #import UI.ui_main_window as ui_mainwin
+    from zoia_lib.UI import ui_main_window as ui_mainwin
 else:
     # uses current package visibility
     from . import ui_main_window as ui_mainwin
-
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -38,9 +38,14 @@ class MainWindow(QMainWindow):
         self.ui.action_update_files.triggered.connect(self.OnFileMenu_update)
         self.ui.action_upload_file.triggered.connect(self.OnFileMenu_upload)
         self.ui.action_quit.triggered.connect(self.OnFileMenu_quit)
-        # SD Card menu set up. We build this menu on the fly when the user
-        # Clicks the menu bar
+        # SD Card menu set up. 
+        # We build this menu on the fly when the user selects the menu bar
         self.ui.sdcard_menu.aboutToShow.connect(self.OnSDcard_Menu)
+        # Test menu setup
+        self.ui.action_print_current_SD_table.triggered.connect(
+            self.OnPrintCurrentSDTable)
+        self.ui.action_print_current_FS_table.triggered.connect(
+            self.OnPrintCurrentFSTable)
         # Set up both of the Tabs for the fille systems
         self.setupSDTab()
         self.setupFSTab()
@@ -66,23 +71,34 @@ class MainWindow(QMainWindow):
 
     def OnSDcard_Menu(self):
         """ enumerates all of the mounted USB drives and populates the
-        SD menu with all drives that are formatted FAT32 and are
-        removable.
+        SD menu with all drives that are formatted FAT32. On Windows 10
+        we can look specifically for 'FAT32' using fstype. On OSX psutil 
+        returns 'msdos' for fstype.
+        TODO: Test on linux :)
         """
         for disk in psutil.disk_partitions():
-            if disk.fstype == 'FAT32' and "removable" in disk.opts:
+            if 'FAT32' in disk.fstype or 'msdos' in disk.fstype:# and "removable" in disk.opts:
                 if len(self.ui.sdcard_menu.actions()) == 0:
-                    act = self.ui.sdcard_menu.addAction(disk.device)
+                    act = self.ui.sdcard_menu.addAction(disk.mountpoint)
                     act.setCheckable(True)
                     act.triggered.connect(self.getSDPathFromMenu)
                 else:
                     for action in self.ui.sdcard_menu.actions():
-                        if disk.device in action.text():
+                        if disk.mountpoint in action.text():
                             pass
                         else:
-                            act = self.ui.sdcard_menu.addAction(disk.device)
+                            act = self.ui.sdcard_menu.addAction(disk.mountpoint)
                             act.setCheckable(True)
                             act.triggered.connect(self.getSDPathFromMenu)
+    
+    def OnPrintCurrentSDTable(self):
+        row = 0
+        data = [self.sd_proxy_model.index(row,col).data
+                for col in range(self.sd_proxy_model.columnCount())]
+        print(data)
+
+    def OnPrintCurrentFSTable(self):
+        pass
     
     def setupFSTab(self):
         """ Set up the local file system tab

@@ -30,6 +30,10 @@ class Ui_main_window(object):
         self.action_upload_file.setObjectName(u"action_upload_file")
         self.action_quit = QAction(main_window)
         self.action_quit.setObjectName(u"action_quit")
+        self.action_print_current_SD_table = QAction(main_window)
+        self.action_print_current_SD_table.setObjectName(u"action_print_current_SD_table")
+        self.action_print_current_FS_table = QAction(main_window)
+        self.action_print_current_FS_table.setObjectName(u"action_print_current_FS_table")
         self.centralwidget = QWidget(main_window)
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout_5 = QGridLayout(self.centralwidget)
@@ -169,6 +173,8 @@ class Ui_main_window(object):
         self.file_menu.setObjectName(u"file_menu")
         self.sdcard_menu = QMenu(self.menubar)
         self.sdcard_menu.setObjectName(u"sdcard_menu")
+        self.test_menu = QMenu(self.menubar)
+        self.test_menu.setObjectName(u"test_menu")
         main_window.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(main_window)
         self.statusbar.setObjectName(u"statusbar")
@@ -176,11 +182,14 @@ class Ui_main_window(object):
 
         self.menubar.addAction(self.file_menu.menuAction())
         self.menubar.addAction(self.sdcard_menu.menuAction())
+        self.menubar.addAction(self.test_menu.menuAction())
         self.file_menu.addAction(self.action_connect_to_PatchStorage)
         self.file_menu.addAction(self.action_update_files)
         self.file_menu.addAction(self.action_upload_file)
         self.file_menu.addSeparator()
         self.file_menu.addAction(self.action_quit)
+        self.test_menu.addAction(self.action_print_current_SD_table)
+        self.test_menu.addAction(self.action_print_current_FS_table)
 
         self.retranslateUi(main_window)
 
@@ -199,6 +208,8 @@ class Ui_main_window(object):
         self.action_update_files.setText(QCoreApplication.translate("main_window", u"Update Files", None))
         self.action_upload_file.setText(QCoreApplication.translate("main_window", u"Upload File ...", None))
         self.action_quit.setText(QCoreApplication.translate("main_window", u"Quit", None))
+        self.action_print_current_SD_table.setText(QCoreApplication.translate("main_window", u"Print current SD table", None))
+        self.action_print_current_FS_table.setText(QCoreApplication.translate("main_window", u"Print current FS table", None))
         self.groupBox.setTitle("")
         self.ps_filter_text.setText("")
         self.ps_filter_text.setPlaceholderText(QCoreApplication.translate("main_window", u"Filter <multiple items sperated by a ;>", None))
@@ -214,5 +225,6 @@ class Ui_main_window(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.sd_tab), QCoreApplication.translate("main_window", u"SD Card Patches", None))
         self.file_menu.setTitle(QCoreApplication.translate("main_window", u"File", None))
         self.sdcard_menu.setTitle(QCoreApplication.translate("main_window", u"SD Cards", None))
+        self.test_menu.setTitle(QCoreApplication.translate("main_window", u"Test", None))
     # retranslateUi
 

@@ -309,8 +309,16 @@
      <string>SD Cards</string>
     </property>
    </widget>
+   <widget class="QMenu" name="test_menu">
+    <property name="title">
+     <string>Test</string>
+    </property>
+    <addaction name="action_print_current_SD_table"/>
+    <addaction name="action_print_current_FS_table"/>
+   </widget>
    <addaction name="file_menu"/>
    <addaction name="sdcard_menu"/>
+   <addaction name="test_menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_connect_to_PatchStorage">
@@ -331,6 +339,16 @@
   <action name="action_quit">
    <property name="text">
     <string>Quit</string>
+   </property>
+  </action>
+  <action name="action_print_current_SD_table">
+   <property name="text">
+    <string>Print current SD table</string>
+   </property>
+  </action>
+  <action name="action_print_current_FS_table">
+   <property name="text">
+    <string>Print current FS table</string>
    </property>
   </action>
  </widget>
