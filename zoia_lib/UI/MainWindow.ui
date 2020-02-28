@@ -308,6 +308,7 @@
     <property name="title">
      <string>SD Cards</string>
     </property>
+    <addaction name="action_select_drive"/>
    </widget>
    <widget class="QMenu" name="test_menu">
     <property name="title">
@@ -349,6 +350,19 @@
   <action name="action_print_current_FS_table">
    <property name="text">
     <string>Print current FS table</string>
+   </property>
+  </action>
+  <action name="action_choose_a_card">
+   <property name="text">
+    <string>&lt;choose a card&gt;</string>
+   </property>
+  </action>
+  <action name="action_select_drive">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>&lt;select drive&gt;</string>
    </property>
   </action>
  </widget>

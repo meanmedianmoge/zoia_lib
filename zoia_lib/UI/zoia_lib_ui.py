@@ -74,28 +74,38 @@ class MainWindow(QMainWindow):
         SD menu with all drives that are formatted FAT32. On Windows 10
         we can look specifically for 'FAT32' using fstype. On OSX psutil 
         returns 'msdos' for fstype.
+
+        OSX also refuses to draw an empty menu, so we have added a dummy
+        action item a a label. We need to skip that when iteratating over
+        the action items
+
         TODO: Test on linux :)
         """
         for disk in psutil.disk_partitions():
-            if 'FAT32' in disk.fstype or 'msdos' in disk.fstype:# and "removable" in disk.opts:
-                if len(self.ui.sdcard_menu.actions()) == 0:
+            if 'FAT32' in disk.fstype or 'msdos' in disk.fstype:
+                if len(self.ui.sdcard_menu.actions()) == 1:
                     act = self.ui.sdcard_menu.addAction(disk.mountpoint)
                     act.setCheckable(True)
-                    act.triggered.connect(self.getSDPathFromMenu)
+                    act.setMenuRole(QAction.NoRole)
+                    act.triggered.connect(self.getSDPathFromMenu)  
                 else:
-                    for action in self.ui.sdcard_menu.actions():
-                        if disk.mountpoint in action.text():
+                    actionlist = self.ui.sdcard_menu.actions()
+                    for index in range(1, len(actionlist)):                      
+                        if disk.mountpoint in actionlist[index].text():
                             pass
                         else:
                             act = self.ui.sdcard_menu.addAction(disk.mountpoint)
                             act.setCheckable(True)
+                            act.setMenuRole(QAction.NoRole)
                             act.triggered.connect(self.getSDPathFromMenu)
+                            
     
     def OnPrintCurrentSDTable(self):
-        row = 0
-        data = [self.sd_proxy_model.index(row,col).data
-                for col in range(self.sd_proxy_model.columnCount())]
-        print(data)
+        root_index = self.sd_model.index(self.sd_path)
+        proxy_index = self.sd_proxy_model.mapFromSource(root_index)
+        for row in range(self.sd_proxy_model.rowCount()):
+            text = self.sd_proxy_model.index(row,0).data()
+            print(text)
 
     def OnPrintCurrentFSTable(self):
         pass
@@ -208,6 +218,7 @@ class MainWindow(QMainWindow):
         root_index = self.sd_model.index(self.sd_path)
         proxy_index = self.sd_proxy_model.mapFromSource(root_index)
         self.ui.sd_tableview.setRootIndex(proxy_index)
+        
 
     def on_sd_model_directoryLoaded(self):
         """ Triggered on the callback of the directory being loaded into the 
