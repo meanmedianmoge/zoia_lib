@@ -6,18 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
-    <height>714</height>
+    <width>1200</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>900</width>
-    <height>700</height>
+    <width>1200</width>
+    <height>800</height>
    </size>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Zoia Library</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_5">
@@ -290,7 +290,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>900</width>
+     <width>1200</width>
      <height>22</height>
     </rect>
    </property>
@@ -308,9 +308,18 @@
     <property name="title">
      <string>SD Cards</string>
     </property>
+    <addaction name="action_select_drive"/>
+   </widget>
+   <widget class="QMenu" name="test_menu">
+    <property name="title">
+     <string>Test</string>
+    </property>
+    <addaction name="action_print_current_SD_table"/>
+    <addaction name="action_print_current_FS_table"/>
    </widget>
    <addaction name="file_menu"/>
    <addaction name="sdcard_menu"/>
+   <addaction name="test_menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_connect_to_PatchStorage">
@@ -331,6 +340,29 @@
   <action name="action_quit">
    <property name="text">
     <string>Quit</string>
+   </property>
+  </action>
+  <action name="action_print_current_SD_table">
+   <property name="text">
+    <string>Print current SD table</string>
+   </property>
+  </action>
+  <action name="action_print_current_FS_table">
+   <property name="text">
+    <string>Print current FS table</string>
+   </property>
+  </action>
+  <action name="action_choose_a_card">
+   <property name="text">
+    <string>&lt;choose a card&gt;</string>
+   </property>
+  </action>
+  <action name="action_select_drive">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>&lt;select drive&gt;</string>
    </property>
   </action>
  </widget>
