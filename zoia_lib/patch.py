@@ -6,6 +6,7 @@ Usage:
 """
 
 import os
+import psutil
 import struct
 import zipfile
 from zoia_lib.common import errors
@@ -70,7 +71,8 @@ class ZoiaPatch:
     def strip_header(name: str):
         """remove header ***_zoia_ from files"""
 
-        return name.split('_zoia_')[0], name[3:].split('_zoia_')[1].replace('.bin', '')
+        return name.split('_zoia_')[0].split('/')[-1], \
+            name[3:].split('_zoia_')[1].replace('.bin', '')
 
     def add_tags(self,
                  primary: list,
@@ -87,7 +89,7 @@ class ZoiaPatch:
 
     def patch_notes(self,
                     name: str,
-                    action: str = 'add',
+                    action: str = 'pop',
                     command: str = 'v 1.0'):
         """Add or edit patch notes"""
 
@@ -98,4 +100,45 @@ class ZoiaPatch:
             with open('{}/{} patch notes.txt'.format(self.path, name), 'w') as fl:
                 fl.write('{}'.format(command))
 
-        return fl
+            return fl
+
+        else:
+            return ''
+
+
+def GetPatchesFromSD(path: str):
+    """Create list of ZoiaPatch objects from SD card"""
+
+    for disk in psutil.disk_partitions():
+        if 'FAT32' in disk.fstype or 'msdos' in disk.fstype:
+            mnt = disk.mountpoint
+            break
+        else:
+            mnt = ''
+
+    if mnt == '':
+        raise ValueError('No SD card inserted')
+
+    pth = os.path.join(mnt, path)
+
+    fls = []
+    for alg in os.listdir(pth):
+        if alg.startswith('.'):
+            continue
+        patch = ZoiaPatch(os.path.join(pth, alg))
+        fls.append(patch)
+
+    return fls
+
+
+def GetPatchesFromDir(path: str):
+    """Create list of ZoiaPatch objects from local directory path"""
+
+    fls = []
+    for alg in os.listdir(path):
+        if alg.startswith('.'):
+            continue
+        patch = ZoiaPatch(os.path.join(path, alg))
+        fls.append(patch)
+
+    return fls
