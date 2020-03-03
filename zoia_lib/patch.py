@@ -106,8 +106,8 @@ class ZoiaPatch:
             return ''
 
 
-def GetPatchesFromSD(path: str):
-    """Create list of ZoiaPatch objects from SD card"""
+def check_sd_status():
+    """Check if SD card is inserted"""
 
     for disk in psutil.disk_partitions():
         if 'FAT32' in disk.fstype or 'msdos' in disk.fstype:
@@ -116,7 +116,14 @@ def GetPatchesFromSD(path: str):
         else:
             mnt = ''
 
-    if mnt == '':
+    return None if mnt == '' else mnt
+
+
+def GetPatchesFromSD(path: str):
+    """Create list of ZoiaPatch objects from SD card"""
+
+    mnt = check_sd_status()
+    if not mnt:
         raise ValueError('No SD card inserted')
 
     pth = os.path.join(mnt, path)
@@ -131,6 +138,23 @@ def GetPatchesFromSD(path: str):
     return fls
 
 
+def MakeDictFromSD():
+    """Create dictionary of ZoiaPatch sub-dirs from SD card"""
+
+    mnt = check_sd_status()
+    if not mnt:
+        raise ValueError('No SD card inserted')
+
+    dct = {}
+    for pth in os.listdir(mnt):
+        if pth.startswith('.'):
+            continue
+        dct[pth] = {}
+        dct[pth] = GetPatchesFromSD(os.path.join(mnt, pth))
+
+    return dct
+
+
 def GetPatchesFromDir(path: str):
     """Create list of ZoiaPatch objects from local directory path"""
 
@@ -142,3 +166,17 @@ def GetPatchesFromDir(path: str):
         fls.append(patch)
 
     return fls
+
+
+def MakeDictFromDir(drv: str):
+    """Create dictionary of ZoiaPatch sub-dirs from directory path"""
+
+    dct = {}
+    for pth in os.listdir(drv):
+        if pth.startswith('.') or not os.path.isdir(os.path.join(drv, pth)) \
+                or pth.startswith('_'):
+            continue
+        dct[pth] = {}
+        dct[pth] = GetPatchesFromDir(os.path.join(drv, pth))
+
+    return dct
