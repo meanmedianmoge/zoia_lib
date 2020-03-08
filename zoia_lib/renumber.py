@@ -7,6 +7,8 @@ Usage:
 
 import os
 import random
+import uuid
+
 from zoia_lib.common import errors
 
 
@@ -18,8 +20,14 @@ class Renumber:
 
         # get absolute path to files
         self.path = path
-        # set class attributes
-        self.start = 0
+        # record original state of files so we can revert if needed
+        self.original_files = self.get_files(self.path)
+        self.sort_counts = {
+            'alpha': 0,
+            'alpha_invert': 0,
+            'by_tag': 0,
+            'random': 0
+        }
 
     @property
     def path(self):
@@ -48,25 +56,38 @@ class Renumber:
 
     @staticmethod
     def strip_header(fls: list):
-        """remove header ***_zoia_ from files for better lists"""
+        """Remove header ***_zoia_ from files for better lists.
 
-        return zip([s.split('_zoia_')[0] for s in fls],
-                   [s[3:].split('_zoia_')[1] for s in fls])
+        Returns dictionary mapping current file name
+        to file name with headers stripped.
+        """
+
+        return {s: s[3:].split('_zoia_')[1] for s in fls}
 
     def loop_it(self,
-                fls: list):
+                fls: dict):
         """do the loop"""
-
-        for num, fname in fls:
-            if self.start < 10:
-                dst = "00" + str(self.start) + '_zoia_' + fname
+        dupes = {}
+        start = 0
+        for src, fname in fls.items():
+            if start < 10:
+                dst = "00" + str(start) + '_zoia_' + fname
             else:
-                dst = "0" + str(self.start) + '_zoia_' + fname
+                dst = "0" + str(start) + '_zoia_' + fname
 
-            src = num + '_zoia_' + fname
-            os.rename(os.path.join(self.path, src),
-                      os.path.join(self.path, dst))
-            self.start += 1
+            source_path = os.path.join(self.path, src)
+            dest_path = os.path.join(self.path, dst)
+
+            if os.path.isfile(dest_path) and source_path != dest_path:
+                uuid_str = str(uuid.uuid4())
+                temp_name = f'{dst}_{uuid_str}'
+                dest_path = os.path.join(self.path, temp_name)
+                dupes[temp_name] = fname
+            os.rename(source_path, dest_path)
+            start += 1
+
+        if dupes:
+            return self.loop_it(dupes)
 
     def renumber(self,
                  sort: str):
@@ -81,27 +102,31 @@ class Renumber:
             'by_tag': self.by_tag,
             'random': self.random
         }
-        self.files = sort_options.get(sort)()
-        return self.loop_it(self.files)
+        self.file_mapping = self.strip_header(self.files)
+        self.sorted_mapping = sort_options.get(sort)()
+        # Added this because it might be useful to track
+        self.sort_counts[sort] += 1
+        return self.loop_it(self.sorted_mapping)
 
     def alpha(self):
         """renumbers self.files alphabetically"""
 
         # sort alpha, ignore case
-        self.files = sorted(self.strip_header(self.files),
-                            key=lambda x: x[1])
 
-        return self.files
+        return {k: v for k, v in sorted(
+                    self.file_mapping.items(),
+                    key=lambda item: item[1])
+                }
 
     def alpha_invert(self):
         """renumbers self.files alphabetically in reverse"""
 
         # sort alpha, ignore case
-        self.files = sorted(self.strip_header(self.files),
-                            key=lambda x: x[1],
-                            reverse=True)
-
-        return self.files
+        return {k: v for k, v in sorted(
+                    self.file_mapping.items(),
+                    key=lambda item: item[1],
+                    reverse=True)
+                }
 
     def by_tag(self):
         """renumbers self.files by tag"""
@@ -146,13 +171,17 @@ class Renumber:
             'Downloads'
         ]
 
-        return self.files
+        return self.file_mapping
 
     def random(self):
         """renumbers self.files randomly"""
 
-        self.files = sorted(self.strip_header(self.files),
-                            key=lambda x: x[1])
-        random.shuffle(self.files)
+        sorted_files = self.alpha()
+        # can't random.shuffle dict.items(). Using sample instead:
+        # https://docs.python.org/3/library/random.html#random.shuffle
+        shuffled = random.sample(
+            sorted_files.items(),
+            k=len(sorted_files.items())
+            )
 
-        return self.files
+        return dict(shuffled)
