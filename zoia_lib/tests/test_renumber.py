@@ -2,7 +2,7 @@
 import os
 import unittest
 
-from zoia_lib.patch_renumberer import Renumber
+from zoia_lib.renumber import Renumber
 
 # Renumber changes the pwd so we save where we started here.
 THIS_DIR = os.path.dirname(__file__)
@@ -34,6 +34,20 @@ class TestRenumber(unittest.TestCase):
         expected_result = [
             '000_zoia_Afterneath_V4.bin',
             '001_zoia_Fading_Dream1_1.bin'
+        ]
+        self.assertListEqual(result, expected_result)
+
+    def test_renumber_alpha_invert(self):
+        renumber = Renumber(path=RENUMBER_RELATIVE_PATH)
+        # reorder test files
+        renumber.renumber(sort='alpha_invert')
+        # get results
+        # os.listdir() does not return directory contents in any order.
+        # the list comprehension is to exclude any hidden files (.DS_Store)
+        result = sorted([f for f in os.listdir(PATH) if not f.startswith('.')])
+        expected_result = [
+            '000_zoia_Fading_Dream1_1.bin',
+            '001_zoia_Afterneath_V4.bin'
         ]
         self.assertListEqual(result, expected_result)
 
