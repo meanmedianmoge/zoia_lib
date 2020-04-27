@@ -9,6 +9,7 @@ import os
 import json
 import urllib3
 import certifi
+import datetime
 from furl import furl
 http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',
                            ca_certs=certifi.where())
@@ -153,7 +154,31 @@ class PatchStorage:
         self.url = 'https://patchstorage.com/api/alpha/'
         self.platform = '3003'  # ZOIA
         self.state = '151'  # Ready-to-Go
-        # self.author = '2825'  # Me
+        # self.author = '2825'  # HPC, '2953' CHMJ
+
+    @staticmethod
+    def validate_str(s: str):
+        if type(s) != 'str':
+            return str(s)
+
+    def validate_strlist(self, lst: list):
+        return [self.validate_str(s) for s in lst]
+
+    @staticmethod
+    def validate_int(v: int):
+        if type(v) != 'int':
+            return int(v)
+
+    def validate_intlist(self, lst: list):
+        return [self.validate_int(v) for v in lst]
+
+    @staticmethod
+    def validate_date(date: str):
+        try:
+            date = datetime.datetime.strptime(date, '%Y-%m-%d')
+            return date.isoformat()
+        except ValueError:
+            raise ValueError('Incorrect data format, should be YYYY-MM-DD')
 
     def endpoint(self,
                  endpoint: str):
@@ -162,14 +187,14 @@ class PatchStorage:
         return os.path.join(self.url, endpoint)
 
     def search(self,
-               more_params: dict):
+               more_params: dict = {}):
         """make query
         default args:
             - page (int): current page, default 1
             - per_page (int): max number to return, default 10
             - order (str enum): [asc, desc], order sort, default desc
-            - orderby (str enum): [author, date, id, modified
-                                   relevance, slug, title],
+            - orderby (str enum): [author, date, id, modified, slug, title
+                                   relevance (must include search term)],
                                         order sort by, default date
         optional args:
             - search (str): search for given string
@@ -204,6 +229,19 @@ class PatchStorage:
             'platforms': self.platform,
             'states': self.state,
         }
+
+        # check type of optional args
+        for key in list(more_params.keys()):
+            if key in ['before', 'after']:
+                more_params[key] = self.validate_date(more_params[key])
+            if key in ['search', 'exclude', 'include', 'order',
+                       'orderby', 'slug', 'author', 'author_exclude']:
+                more_params[key] = self.validate_str(more_params[key])
+            if key in ['offset', 'categories', 'categories_exclude',
+                       'tags', 'tags_exclude', 'page', 'platforms',
+                       'platforms_exclude', 'states', 'states_exclude']:
+                more_params[key] = self.validate_int(more_params[key])
+
         params = {**default_params, **more_params}
 
         # make request
