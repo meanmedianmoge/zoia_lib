@@ -7,9 +7,10 @@ Usage:
 
 import os
 import psutil
-import struct
+import subprocess
+# import struct
 import zipfile
-from zoia_lib.common import errors
+from zoia_lib.renumber import Renumber
 
 
 class ZoiaPatch:
@@ -19,6 +20,7 @@ class ZoiaPatch:
         """Initializes ZoiaPatch class"""
 
         self.path = os.path.dirname(filename)
+        self.filename = filename
 
         # Read single bin file
         if filename.endswith('.bin'):
@@ -46,26 +48,6 @@ class ZoiaPatch:
                 else:
                     """create a note if the zip dir does not include one"""
                     self.notes = self.patch_notes(self.name[0])
-
-    @property
-    def path(self):
-        return self._path
-
-    @path.setter
-    def path(self, path):
-        if os.path.isdir(path):
-            self._path = os.path.abspath(path)
-            return
-        root_path = os.path.dirname(__file__)
-        _path = os.path.join(root_path, path)
-        if os.path.isdir(_path):
-            self._path = _path
-            return
-        else:
-            raise errors.BadPathError(
-                f'Supplied path {path} is not a child of '
-                f'current directory.'
-            )
 
     @staticmethod
     def strip_header(name: str):
@@ -97,7 +79,7 @@ class ZoiaPatch:
         #            'remove': self.remove_notes,
         #            'update': self.update_notes}
         if action == 'add':
-            with open('{}/{} patch notes.txt'.format(self.path, name), 'w') as fl:
+            with open('{}/{}.txt'.format(self.path, name), 'w') as fl:
                 fl.write('{}'.format(command))
 
             return fl
@@ -180,3 +162,41 @@ def MakeDictFromDir(drv: str):
         dct[pth] = GetPatchesFromDir(os.path.join(drv, pth))
 
     return dct
+
+
+def MakeSortedDirsFromMaster(mstr: str):
+    """Create directories of 64 ZoiaPatches from master directory path"""
+
+    subprocess.call(['split_master.sh'])
+
+    for dr in os.listdir(mstr):
+        if dr.startswith('.') or not os.path.isdir(os.path.join(mstr, dr)) \
+                or dr.startswith('_'):
+            continue
+        rn = Renumber(os.path.join(os.path.join(mstr, dr)))
+        rn.renumber(sort='alpha')
+
+
+def zoia_to_zip(pch: ZoiaPatch):
+    """Create zipped file from ZoiaPatch object(s)"""
+
+    reconstructed_name = pch.number + '_zoia_' + pch.name + '.bin'
+    outname = os.path.join(pch.path, pch.name + '.zip')
+
+    zf = zipfile.ZipFile(outname, "w", zipfile.ZIP_DEFLATED)
+
+    try:
+        print('adding binary patch file(s)')
+        zf.write(pch.filename,
+                 os.path.join(pch.name, reconstructed_name))
+
+        print('adding patch notes')
+        txt = reconstructed_name.replace('.bin', '')
+        pch.patch_notes(txt, 'add')
+        zf.write(pch.filename.replace('.bin', '.txt'),
+                 os.path.join(pch.name, txt + '.txt'))
+    finally:
+        print('closing')
+        zf.close()
+
+    return zf
