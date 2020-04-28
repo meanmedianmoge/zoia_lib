@@ -64,7 +64,7 @@ build and read our data from a ZIP file like what does ZIP_to_ZOIA() and the rev
 cuz I dont think we want to show .zips in the library, so when we build
 the library we should be converting the zips over
 
-Shit also. What is a library? Is it a single object in memory that contains all of 
+What is a library? Is it a single object in memory that contains all of 
 the zoia objects from all the directories?
 again I think we should follow the leads empress has been giving.
 you have an individual patch 01_name_zoia.bin
