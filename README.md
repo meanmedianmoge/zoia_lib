@@ -7,7 +7,7 @@ Discussion for the project will take place in the `library-app` channel.
 While working on modules, please make feature branches and submit to master via a PR/MR.
 
 If you would like to leave a tip, we are accepting donations here
-[![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UUQ3SW5VMV3X4)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=UUQ3SW5VMV3X4&currency_code=USD&source=url)
 Thank you for your support!
 
 ## Dependencies
