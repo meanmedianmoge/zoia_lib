@@ -1,9 +1,14 @@
 # zoia-lib
-Patch manager for Empress Effects ZOIA pedal  
-If you'd like to assist in development for this project, join our Discord here:
-`https://discordapp.com/invite/HG5GesY` and PM me for a dev role.
-Discussion for the project will take place in the #library-app channel.
-While working on modules, please make feature branches and submit to master via PR/MR. Thanks!
+Patch manager/librarian for the Empress Effects ZOIA modular-synthesizer in a pedal
+
+If you'd like to assist in development for this project, join our
+[Discord server](https://discordapp.com/invite/HG5GesY) and PM me for a dev role.
+Discussion for the project will take place in the `library-app` channel.
+While working on modules, please make feature branches and submit to master via a PR/MR.
+
+If you would like to leave a tip, we are accepting donations here
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UUQ3SW5VMV3X4)
+Thank you for your support!
 
 ## Dependencies
 - Patchstorage API https://patchstorage.com/docs/
