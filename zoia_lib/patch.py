@@ -194,6 +194,16 @@ def MakeSortedDirsFromMaster(mstr: str):
         rn.renumber(sort='alpha')
 
 
+def ZoiaPatchFromAPI(body):
+    """Create ZoiaPatch objects from PS returns"""
+
+    dct = {}
+    for patch in body:
+        dct[patch['id']] = ZoiaPatch(obj=patch)
+
+    return dct
+
+
 def zoia_to_zip(pch: ZoiaPatch):
     """Create zipped file from ZoiaPatch object(s)"""
 

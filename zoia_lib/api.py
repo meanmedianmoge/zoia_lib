@@ -11,7 +11,6 @@ import urllib3
 import certifi
 import datetime
 from furl import furl
-from zoia_lib.patch import ZoiaPatch
 http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',
                            ca_certs=certifi.where())
 
@@ -250,16 +249,6 @@ class PatchStorage:
             rr = http.request('GET', path)
             data = rr.data
             out.write(data)
-
-
-def ZoiaPatchFromAPI(body):
-    """Create ZoiaPatch objects from PS returns"""
-
-    dct = {}
-    for patch in body:
-        dct[patch['id']] = ZoiaPatch(obj=patch)
-
-    return dct
 
 
 def get_all_tags():
