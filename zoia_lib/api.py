@@ -15,136 +15,6 @@ from zoia_lib.patch import ZoiaPatch
 http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',
                            ca_certs=certifi.where())
 
-manifest = {
-    'categories': [
-        {'id': 378,
-            'self': 'https://patchstorage.com/api/alpha/categories/378',
-            'description': '',
-            'slug': 'composition',
-            'name': 'Composition'},
-        {'id': 77,
-            'self': 'https://patchstorage.com/api/alpha/categories/77',
-            'description': '',
-            'slug': 'effect',
-            'name': 'Effect'},
-        {'id': 3317,
-            'self': 'https://patchstorage.com/api/alpha/categories/3317',
-            'description': '',
-            'slug': 'game',
-            'name': 'Game'},
-        {'id': 1,
-            'self': 'https://patchstorage.com/api/alpha/categories/1',
-            'description': '',
-            'slug': 'other',
-            'name': 'Other'},
-        {'id': 75,
-            'self': 'https://patchstorage.com/api/alpha/categories/75',
-            'description': '',
-            'slug': 'sampler',
-            'name': 'Sampler'},
-        {'id': 76,
-            'self': 'https://patchstorage.com/api/alpha/categories/76',
-            'description': '',
-            'slug': 'sequencer',
-            'name': 'Sequencer'},
-        {'id': 372,
-            'self': 'https://patchstorage.com/api/alpha/categories/372',
-            'description': '',
-            'slug': 'sound',
-            'name': 'Sound'},
-        {'id': 74,
-            'self': 'https://patchstorage.com/api/alpha/categories/74',
-            'description': '',
-            'slug': 'synthesizer',
-            'name': 'Synthesizer'},
-        {'id': 117,
-            'self': 'https://patchstorage.com/api/alpha/categories/117',
-            'description': '',
-            'slug': 'utility',
-            'name': 'Utility'},
-        {'id': 91,
-            'self': 'https://patchstorage.com/api/alpha/categories/91',
-            'description': '',
-            'slug': 'video',
-            'name': 'Video'}
-    ],
-    'states': [
-        {'id': 149,
-            'self': 'https://patchstorage.com/api/alpha/states/149',
-            'description': '',
-            'slug': 'help-needed',
-            'name': 'Help Needed'},
-        {'id': 1098,
-            'self': 'https://patchstorage.com/api/alpha/states/1098',
-            'description': '',
-            'slug': 'inactive',
-            'name': 'Inactive'},
-        {'id': 151,
-            'self': 'https://patchstorage.com/api/alpha/states/151',
-            'description': '',
-            'slug': 'ready-to-go',
-            'name': 'Ready to Go'},
-        {'id': 150,
-            'self': 'https://patchstorage.com/api/alpha/states/150',
-            'description': '',
-            'slug': 'work-in-progress',
-            'name': 'Work in Progress'}
-    ],
-    'licenses': [
-        {'id': 4184,
-            'self': 'https://patchstorage.com/api/alpha/licenses/4184',
-            'description': '',
-            'slug': 'afl-3-0',
-            'name': 'Academic Free License v3.0'},
-        {'id': 4173,
-            'self': 'https://patchstorage.com/api/alpha/licenses/4173',
-            'description': '',
-            'slug': 'apache-2-0',
-            'name': 'Apache License 2.0'},
-        {'id': 4185,
-            'self': 'https://patchstorage.com/api/alpha/licenses/4185',
-            'description': '',
-            'slug': 'artistic-2-0',
-            'name': 'Artistic license 2.0'},
-        {'id': 4186,
-            'self': 'https://patchstorage.com/api/alpha/licenses/4186',
-            'description': '',
-            'slug': 'bsl-1-0',
-            'name': 'Boost Software License 1.0'},
-        {'id': 4174,
-            'self': 'https://patchstorage.com/api/alpha/licenses/4174',
-            'description': '',
-            'slug': 'bsd-2-clause',
-            'name': 'BSD 2-Clause "Simplified" License'},
-        {'id': 4175,
-            'self': 'https://patchstorage.com/api/alpha/licenses/4175',
-            'description': '',
-            'slug': 'bsd-3-clause',
-            'name': 'BSD 3-Clause "New" or "Revised" License'},
-        {'id': 4187,
-            'self': 'https://patchstorage.com/api/alpha/licenses/4187',
-            'description': '',
-            'slug': 'bsd-3-clause-clear',
-            'name': 'BSD 3-clause Clear license'},
-        {'id': 4190,
-            'self': 'https://patchstorage.com/api/alpha/licenses/4190',
-            'description': '',
-            'slug': 'cc-by-4-0',
-            'name': 'Creative Commons Attribution 4.0'},
-        {'id': 4191,
-            'self': 'https://patchstorage.com/api/alpha/licenses/4191',
-            'description': '',
-            'slug': 'cc-by-sa-4-0',
-            'name': 'Creative Commons Attribution Share Alike 4.0'},
-        {'id': 4188,
-            'self': 'https://patchstorage.com/api/alpha/licenses/4188',
-            'description': '',
-            'slug': 'cc',
-            'name': 'Creative Commons license family'}
-
-    ]
-}
-
 
 class PatchStorage:
 
@@ -153,9 +23,84 @@ class PatchStorage:
 
         # set defaults for query params
         self.url = 'https://patchstorage.com/api/alpha/'
-        self.platform = '3003'  # ZOIA
-        self.state = '151'  # Ready-to-Go
-        # self.author = '2825'  # HPC, '2953' CHMJ
+        self.platform = 3003  # ZOIA
+        self.state = 151  # Ready-to-Go
+        # self.author = '2825'  # MMM, '2953' CHMJ
+        self.manifest = {
+            'platforms': [
+                {704: 'aleph',
+                 3074: 'audiokit-synth-one',
+                 215: 'audulus',
+                 4751: 'beatmaker-3',
+                 400: 'bela',
+                 295: 'cabbage',
+                 1146: 'camomile',
+                 2017: 'chuck',
+                 3540: 'digit',
+                 4890: 'drambo',
+                 1525: 'echosystem',
+                 662: 'etc',
+                 4296: 'groove-rider',
+                 354: 'max-for-live',
+                 288: 'maxmsp',
+                 3201: 'midiboy',
+                 3830: 'midihub',
+                 3989: 'mirack',
+                 4242: 'moog-model-15',
+                 3341: 'mozaic',
+                 3501: 'nanostudio',
+                 3073: 'nebulae',
+                 3371: 'orac',
+                 3226: 'orca',
+                 154: 'organelle',
+                 289: 'owl',
+                 89: 'pd-extended',
+                 163: 'pd-pulp',
+                 90: 'pd-vanilla',
+                 1558: 'pisound',
+                 3270: 'medusa',
+                 1993: 'purr-data',
+                 4538: 'reaktor',
+                 1524: 'reverb',
+                 4690: 'roland-aira-modular-customizer',
+                 922: 'softube-modular',
+                 921: 'solorack',
+                 371: 'supercollider',
+                 3019: 'synthstrom-deluge',
+                 745: 'vcv-rack',
+                 3003: 'zoia'}
+            ],
+            'categories': [
+                {378: 'composition',
+                 77: 'effect',
+                 3317: 'game',
+                 1: 'other',
+                 75: 'sampler',
+                 76: 'sequencer',
+                 372: 'sound',
+                 74: 'synthesizer',
+                 117: 'utility',
+                 91: 'video'}
+            ],
+            'states': [
+                {149: 'help-needed',
+                 1098: 'inactive',
+                 151: 'ready-to-go',
+                 150: 'work-in-progress'}
+            ],
+            'licenses': [
+                {4184: 'afl-3-0',
+                 4173: 'apache-2-0',
+                 4185: 'artistic-2-0',
+                 4186: 'bsl-1-0',
+                 4174: 'bsd-2-clause',
+                 4175: 'bsd-3-clause',
+                 4187: 'bsd-3-clause-clear',
+                 4190: 'cc-by-4-0',
+                 4191: 'cc-by-sa-4-0',
+                 4188: 'cc'}
+            ]
+        }
 
     @staticmethod
     def validate_str(s: str):
@@ -204,19 +149,17 @@ class PatchStorage:
             - exclude (str): exclude specific id(s)
             - include (str): include specific id(s)
             - offset (int): offset by number of items
-            - slug (str): [], search for given slug(s)
+            - slug (str []): search for given slug(s)
             - author (str): search for items by an author(s)
             - author_exclude (str): exclude specific author(s)
-            - categories (int): [], search for items with a category(ies)
-            - categories_exclude (int): [], exclude specific category(ies)
-            - tags (int): [], search for items with tag(s)
-            - tags_exclude (int): [], exclude specific tag(s)
-            - platforms (int): [], search for items within a platform
-            - platforms_exclude (int): [], exclude specific platform(s)
-            - states (int): [], search for items with a given state
-            - states_exclude (int); [], exclude specific state(s)
-
-        see `manifest` dictionary for a breakdown of categories, states, and licenses
+            - categories (int []): search for items with a category(ies)
+            - categories_exclude (int []): exclude specific category(ies)
+            - tags (int []): search for items with tag(s)
+            - tags_exclude (int []): exclude specific tag(s)
+            - platforms (int []): search for items within a platform
+            - platforms_exclude (int []): exclude specific platform(s)
+            - states (int []): search for items with a given state
+            - states_exclude (int []); exclude specific state(s)
         """
 
         endpoint = self.endpoint('patches?/')
