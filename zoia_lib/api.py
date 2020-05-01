@@ -11,6 +11,7 @@ import urllib3
 import certifi
 import datetime
 from furl import furl
+from zoia_lib.patch import ZoiaPatch
 http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',
                            ca_certs=certifi.where())
 
@@ -188,7 +189,7 @@ class PatchStorage:
 
     def search(self,
                more_params: dict = {}):
-        """make query
+        """make query and output json body
         default args:
             - page (int): current page, default 1
             - per_page (int): max number to return, default 10
@@ -247,29 +248,82 @@ class PatchStorage:
         # make request
         url = str(furl(endpoint).add(params))
         r = http.request('GET', url)
-        body = json.loads(r.data)
+
+        return json.loads(r.data)
+
+    def get_list(self,
+                 more_params: dict = {}):
+        """get list of returned objects"""
+
+        body = self.search(more_params)
 
         return dict(zip([str(x['title']) for x in body],
                         [str(x['self']+'?/') for x in body]))
 
+    def get_tags(self,
+                 more_params: dict = {}):
+        """get list of tags"""
+
+        body = self.search(more_params)
+
+        return dict(zip([str(x['title']) for x in body],
+                        [str(x['tags']) for x in body]))
+
     def get_patch(self,
-                  idx: str,
-                  download: bool = True):
+                  idx: str):
         """get Patch object"""
 
         endpoint = self.endpoint('patches/{}?/'.format(idx))
 
         # make request
         r = http.request('GET', endpoint)
-        body = json.loads(r.data)
+
+        return json.loads(r.data)
+
+    def download(self,
+                 idx: str):
+        """download file using patch id"""
+
+        body = self.get_patch(idx)
+
         path = str(body['files'][0]['url'])
         fname = str(body['files'][0]['filename'])
 
-        # download
-        if download:
-            with open(fname, 'wb') as out:
-                rr = http.request('GET', path)
-                data = rr.data
-                out.write(data)
-        else:
-            return path
+        with open(fname, 'wb') as out:
+            rr = http.request('GET', path)
+            data = rr.data
+            out.write(data)
+
+
+def ZoiaPatchFromAPI(body):
+    """Create ZoiaPatch objects from PS returns"""
+
+    dct = {}
+    for patch in body:
+        dct[patch['id']] = ZoiaPatch(obj=patch)
+
+    return dct
+
+
+def get_all_tags():
+    """get master dict of all tag id's and slugs"""
+
+    ps = PatchStorage()
+    search = {'orderby': 'title',
+              'order': 'asc',
+              'per_page': 100}
+
+    tags = {}
+    for page in range(1, 6):
+        body = ps.search({**search, **{'page': page}})
+        for patch in body:
+            more = dict(zip([s['id'] for s in patch['tags']],
+                            [s['slug'] for s in patch['tags']]))
+
+            # remove any duplicate tags
+            for idx in set(more).intersection(set(tags)):
+                more.pop(idx, None)
+            tags = {**tags, **more}
+
+    with open('zoia_lib/common/tags.json', 'w') as f:
+        json.dump(tags, f)

@@ -10,44 +10,61 @@ import psutil
 import subprocess
 # import struct
 import zipfile
+from zoia_lib.api import PatchStorage
 from zoia_lib.renumber import Renumber
+ps = PatchStorage()
 
 
 class ZoiaPatch:
 
     def __init__(self,
-                 filename: str):
+                 fname: str = None,
+                 obj: dict = None):
         """Initializes ZoiaPatch class"""
 
-        self.path = os.path.dirname(filename)
-        self.filename = filename
+        if fname:
+            self.path = os.path.dirname(fname)
+            self.fname = fname
 
-        # Read single bin file
-        if filename.endswith('.bin'):
-            self.number, self.name = self.strip_header(filename)
-            """binary format requires specialized unpacking, waiting on Empress"""
-            # data = open(filename, 'rb').read()
-            # self.tag, self.version = struct.unpack('h1123b', data)
-            self.notes = self.patch_notes(self.name)
+            # Read single bin file
+            if fname.endswith('.bin'):
+                self.number, self.name = self.strip_header(fname)
+                """binary format requires specialized unpacking, waiting on Empress"""
+                # data = open(fname, 'rb').read()
+                # self.tag, self.version = struct.unpack('h1123b', data)
+                self.notes = self.patch_notes(self.name)
 
-        # Read compressed dir
-        elif filename.endswith('.zip'):
-            self.name = []
-            self.number = []
-            self.notes = []
-            data = zipfile.ZipFile(filename, "r")
-            for fl in data.namelist():
-                if fl.endswith('.bin'):
-                    self.number.append(self.strip_header(fl)[0])
-                    self.name.append(self.strip_header(fl)[1])
-                elif fl.endswith('.txt'):
-                    """read text file and add notes to object"""
-                    with data.open(fl) as f:
-                        for line in f:
-                            self.notes.append(line)
-                else:
-                    """create a note if the zip dir does not include one"""
-                    self.notes = self.patch_notes(self.name[0])
+            # Read compressed dir
+            elif fname.endswith('.zip'):
+                self.name = []
+                self.number = []
+                self.notes = []
+                data = zipfile.ZipFile(fname, "r")
+                for fl in data.namelist():
+                    if fl.endswith('.bin'):
+                        self.number.append(self.strip_header(fl)[0])
+                        self.name.append(self.strip_header(fl)[1])
+                    elif fl.endswith('.txt'):
+                        """read text file and add notes to object"""
+                        with data.open(fl) as f:
+                            for line in f:
+                                self.notes.append(line)
+                    else:
+                        """create a note if the zip dir does not include one"""
+                        self.notes = self.patch_notes(self.name[0])
+
+        if obj:
+            # get top-level attribs
+            self.path = obj['self']
+            self.name = obj['title']
+
+            # get patch endpoint attribs
+            patch = ps.get_patch(obj['id'])
+            self.fname = patch['files'][0]['filename']
+            self.number, self.name = self.strip_header(self.fname)
+            self.notes = patch['content']
+            self.categories = {s['id']: s['slug'] for s in patch['categories']}
+            self.tags = {s['id']: s['slug'] for s in patch['tags']}
 
     @staticmethod
     def strip_header(name: str):
@@ -114,7 +131,7 @@ def GetPatchesFromSD(path: str):
     for alg in os.listdir(pth):
         if alg.startswith('.'):
             continue
-        patch = ZoiaPatch(os.path.join(pth, alg))
+        patch = ZoiaPatch(fname=os.path.join(pth, alg))
         fls.append(patch)
 
     return fls
@@ -144,7 +161,7 @@ def GetPatchesFromDir(path: str):
     for alg in os.listdir(path):
         if alg.startswith('.'):
             continue
-        patch = ZoiaPatch(os.path.join(path, alg))
+        patch = ZoiaPatch(fname=os.path.join(path, alg))
         fls.append(patch)
 
     return fls
@@ -187,13 +204,13 @@ def zoia_to_zip(pch: ZoiaPatch):
 
     try:
         print('adding binary patch file(s)')
-        zf.write(pch.filename,
+        zf.write(pch.fname,
                  os.path.join(pch.name, reconstructed_name))
 
         print('adding patch notes')
         txt = reconstructed_name.replace('.bin', '')
         pch.patch_notes(txt, 'add')
-        zf.write(pch.filename.replace('.bin', '.txt'),
+        zf.write(pch.fname.replace('.bin', '.txt'),
                  os.path.join(pch.name, txt + '.txt'))
     finally:
         print('closing')

@@ -8,7 +8,6 @@ Usage:
 import os
 import random
 import uuid
-
 from zoia_lib.common import errors
 
 
@@ -112,7 +111,6 @@ class Renumber:
         """renumbers self.files alphabetically"""
 
         # sort alpha, ignore case
-
         return {k: v for k, v in sorted(
                     self.file_mapping.items(),
                     key=lambda item: item[1])
@@ -121,14 +119,17 @@ class Renumber:
     def alpha_invert(self):
         """renumbers self.files alphabetically in reverse"""
 
-        # sort alpha, ignore case
+        # sort alpha invert, ignore case
         return {k: v for k, v in sorted(
                     self.file_mapping.items(),
                     key=lambda item: item[1],
                     reverse=True)
                 }
 
-    def by_tag(self):
+    def by_tag(self,
+               how: str = 'category',
+               sort: str = 'alpha',
+               tags: list = None):
         """renumbers self.files by tag"""
 
         _type = [
