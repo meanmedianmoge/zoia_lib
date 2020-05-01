@@ -233,15 +233,29 @@ class PatchStorage:
 
         # check type of optional args
         for key in list(more_params.keys()):
+            # date
             if key in ['before', 'after']:
                 more_params[key] = self.validate_date(more_params[key])
+            # str
             if key in ['search', 'exclude', 'include', 'order',
-                       'orderby', 'slug', 'author', 'author_exclude']:
+                       'orderby', 'slug', 'author', 'author_exclude'] and \
+                    type(more_params[key]) != list:
                 more_params[key] = self.validate_str(more_params[key])
+            # int
             if key in ['offset', 'categories', 'categories_exclude',
                        'tags', 'tags_exclude', 'page', 'platforms',
-                       'platforms_exclude', 'states', 'states_exclude']:
+                       'platforms_exclude', 'states', 'states_exclude'] and \
+                    type(more_params[key]) != list:
                 more_params[key] = self.validate_int(more_params[key])
+            # str list
+            if key in ['slug'] and type(more_params[key]) == list:
+                more_params[key] = self.validate_strlist(more_params[key])
+            # int list
+            if key in ['categories', 'categories_exclude', 'tags',
+                       'tags_exclude', 'platforms', 'platforms_exclude',
+                       'states', 'states_exclude'] and \
+                    type(more_params[key]) == list:
+                more_params[key] = self.validate_intlist(more_params[key])
 
         params = {**default_params, **more_params}
 
