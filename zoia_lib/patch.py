@@ -6,6 +6,7 @@ Usage:
 """
 
 import os
+import json
 import psutil
 import subprocess
 # import struct
@@ -13,6 +14,9 @@ import zipfile
 from zoia_lib.api import PatchStorage
 from zoia_lib.renumber import Renumber
 ps = PatchStorage()
+
+with open('zoia_lib/common/tags.json', 'r') as f:
+    tags = json.load(f)
 
 
 class ZoiaPatch:
@@ -31,7 +35,7 @@ class ZoiaPatch:
                 self.number, self.name = self.strip_header(fname)
                 """binary format requires specialized unpacking, waiting on Empress"""
                 # data = open(fname, 'rb').read()
-                # self.tag, self.version = struct.unpack('h1123b', data)
+                # self.tags, self.version = struct.unpack('h1123b', data)
                 self.notes = self.patch_notes(self.name)
 
             # Read compressed dir
@@ -74,17 +78,20 @@ class ZoiaPatch:
             name[3:].split('_zoia_')[1].replace('.bin', '')
 
     def add_tags(self,
-                 primary: list,
-                 secondary: list):
-        """Add primary and secondary tags to Patch class"""
+                 to_add: list):
+        """Add tags to Patch class"""
 
-        self.tag += [primary, secondary]
+        keys = [{v: k for k, v in tags.items()}[s] for s in to_add]
+        more_tags = dict(zip(keys, to_add))
+        self.tags = {**self.tags, **more_tags}
 
     def remove_tags(self,
                     to_remove: list):
         """Remove tags from Patch class"""
 
-        self.tag.remove([t for t in to_remove])
+        reverse = {v: k for k, v in self.tags.items()}
+        for tag in to_remove:
+            self.tags.pop(reverse[tag], None)
 
     def patch_notes(self,
                     name: str,
