@@ -11,6 +11,7 @@ import psutil
 import subprocess
 # import struct
 import zipfile
+import numpy as np
 from zoia_lib.api import PatchStorage
 from zoia_lib.renumber import Renumber
 ps = PatchStorage()
@@ -24,7 +25,11 @@ class ZoiaPatch:
     def __init__(self,
                  fname: str = None,
                  obj: dict = None):
-        """Initializes ZoiaPatch class"""
+        """Initializes ZoiaPatch class
+
+        fname: used when files exist in local dir
+        obj: used when files are being imported from PS
+        """
 
         if fname:
             self.path = os.path.dirname(fname)
@@ -36,7 +41,6 @@ class ZoiaPatch:
                 """binary format requires specialized unpacking, waiting on Empress"""
                 # data = open(fname, 'rb').read()
                 # self.tags, self.version = struct.unpack('h1123b', data)
-                self.notes = self.patch_notes(self.name)
 
             # Read compressed dir
             elif fname.endswith('.zip'):
@@ -53,19 +57,31 @@ class ZoiaPatch:
                         with data.open(fl) as f:
                             for line in f:
                                 self.notes.append(line)
-                    else:
-                        """create a note if the zip dir does not include one"""
-                        self.notes = self.patch_notes(self.name[0])
 
         if obj:
             # get top-level attribs
             self.path = obj['self']
             self.name = obj['title']
+            self.views = obj['view_count']
+            self.likes = obj['like_count']
+            self.downloads = obj['download_count']
 
             # get patch endpoint attribs
             patch = ps.get_patch(obj['id'])
             self.fname = patch['files'][0]['filename']
-            self.number, self.name = self.strip_header(self.fname)
+            if self.fname.endswith('.bin'):
+                self.number, self.name = self.strip_header(self.fname)
+            elif self.fname.endswith('.zip'):
+                self.name = []
+                self.number = []
+                ps.download(obj['id'])
+                data = zipfile.ZipFile(self.fname)
+                for fl in data.namelist():
+                    if fl.endswith('.bin'):
+                        self.number.append(self.strip_header(fl)[0])
+                        self.name.append(self.strip_header(fl)[1])
+                os.remove(self.fname)
+
             self.notes = patch['content']
             self.categories = {s['id']: s['slug'] for s in patch['categories']}
             self.tags = {s['id']: s['slug'] for s in patch['tags']}
@@ -94,22 +110,27 @@ class ZoiaPatch:
             self.tags.pop(reverse[tag], None)
 
     def patch_notes(self,
-                    name: str,
-                    action: str = 'pop',
-                    command: str = 'v 1.0'):
+                    text: str = None,
+                    file: str = None):
         """Add or edit patch notes"""
 
-        # options = {'add': self.add_notes,
-        #            'remove': self.remove_notes,
-        #            'update': self.update_notes}
-        if action == 'add':
-            with open('{}/{}.txt'.format(self.path, name), 'w') as fl:
-                fl.write('{}'.format(command))
+        if file:
+            with open(file, 'r') as f:
+                for line in f:
+                    self.notes.join(line)
 
-            return fl
+        if text:
+            self.notes = text
 
-        else:
-            return ''
+    def rating(self,
+               rating: float,
+               scale: list = list(np.linspace(0, 5, 11))):
+        """Assign rating to Patch"""
+
+        if rating not in scale:
+            raise ValueError('Either define a new scale or score  '
+                             'within {}'.format(str(scale)))
+        self.rating = rating
 
 
 def check_sd_status():
