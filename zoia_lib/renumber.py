@@ -9,18 +9,32 @@ import os
 import random
 import uuid
 from zoia_lib.common import errors
+from zoia_lib.api import PatchStorage
+ps = PatchStorage()
+
+# TODO: figure out how to handle zip dirs from PS
+# best case would be to dl immediately and treat as separate patch objects
 
 
 class Renumber:
 
     def __init__(self,
-                 path: str):
+                 path: str = None,
+                 obj: dict = None):
         """initializes Renumber class"""
 
-        # get absolute path to files
-        self.path = path
-        # record original state of files so we can revert if needed
-        self.original_files = self.get_files(self.path)
+        if path:
+            # get absolute path to files
+            self.path = path
+            # record original state of files so we can revert if needed
+            self.original_files = self.get_files(self.path)
+
+        if obj:
+            # get absolute path to files
+            self.path = os.getcwd()
+            # record original state of files so we can revert if needed
+            self.original_files = [obj[s].fname for s in obj.keys()]
+
         self.sort_counts = {
             'alpha': 0,
             'alpha_invert': 0,
@@ -131,46 +145,6 @@ class Renumber:
                sort: str = 'alpha',
                tags: list = None):
         """renumbers self.files by tag"""
-
-        _type = [
-            'Patches',
-            'Questions',
-            'Tutorials'
-        ]
-
-        primary = [
-            'Composition',
-            'Effect',
-            'Game',
-            'Other',
-            'Sampler',
-            'Sequencer',
-            'Sound',
-            'Synthesizer',
-            'Utility',
-            'Video'
-        ]
-
-        secondary = [
-            'delay',
-            'glitch',
-            'granular',
-            ''
-        ]
-
-        state = [
-            'Help Needed',
-            'Inactive',
-            'Ready to Go',
-            'Work in Progress'
-        ]
-
-        sort_by = [
-            'Date',
-            'Views',
-            'Likes',
-            'Downloads'
-        ]
 
         return self.file_mapping
 
