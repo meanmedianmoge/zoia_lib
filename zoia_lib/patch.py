@@ -25,13 +25,15 @@ class ZoiaPatch:
 
     def __init__(self,
                  fname: str = None,
-                 obj: dict = None):
+                 obj=None):
         """Initializes ZoiaPatch class
 
         fname: used when files exist in local dir
         obj: used when files are being imported from PS
         """
 
+        if obj is None:
+            obj = {}
         if fname:
             self.path = os.path.dirname(fname)
             self.fname = fname

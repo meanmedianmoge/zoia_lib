@@ -17,24 +17,6 @@ http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',
                            ca_certs=certifi.where())
 
 
-def validate_intlist(lst: list):
-    """ Forces all items in a list to take on the type int
-
-    lst: The list of items to convert to ints
-    Returns the converted list.
-    """
-    return [int(v) for v in lst]
-
-
-def validate_strlist(lst: list):
-    """ Forces all items in a list to take on the type str
-
-    lst: The list of items to convert to strings
-    Returns the converted list.
-    """
-    return [str(s) for s in lst]
-
-
 class PatchStorage:
 
     def __init__(self):
@@ -122,6 +104,24 @@ class PatchStorage:
         }
 
     @staticmethod
+    def _validate_intlist(lst: list):
+        """ Forces all items in a list to take on the type int
+
+        lst: The list of items to convert to ints
+        Returns the converted list.
+        """
+        return [int(v) for v in lst]
+
+    @staticmethod
+    def _validate_strlist(lst: list):
+        """ Forces all items in a list to take on the type str
+
+        lst: The list of items to convert to strings
+        Returns the converted list.
+        """
+        return [str(s) for s in lst]
+
+    @staticmethod
     def validate_date(date: str):
         """ Ensures a date follows the format YYYY-MM-DD
 
@@ -203,13 +203,13 @@ class PatchStorage:
                 more_params[key] = int(more_params[key])
             # str list
             if key in ['slug'] and type(more_params[key]) == list:
-                more_params[key] = validate_strlist(more_params[key])
+                more_params[key] = self._validate_strlist(more_params[key])
             # int list
             if key in ['categories', 'categories_exclude', 'tags',
                        'tags_exclude', 'platforms', 'platforms_exclude',
                        'states', 'states_exclude'] and \
                     type(more_params[key]) == list:
-                more_params[key] = validate_intlist(more_params[key])
+                more_params[key] = self._validate_intlist(more_params[key])
 
         params = {**default_params, **more_params}
 
