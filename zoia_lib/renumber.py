@@ -57,10 +57,8 @@ class Renumber:
             self._path = _path
             return
         else:
-            raise errors.BadPathError(
-                f'Supplied path {path} is not a child of '
-                f'current directory.'
-            )
+            raise errors.BadPathError(path)
+
 
     @staticmethod
     def get_files(path: str):

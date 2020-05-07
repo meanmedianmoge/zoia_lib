@@ -124,9 +124,11 @@ class ZoiaPatch:
 
     def rating(self,
                rating: float,
-               scale: list = list(np.linspace(0, 5, 11))):
+               scale=None):
         """Assign rating to Patch"""
 
+        if scale is None:
+            scale = list(np.linspace(0, 5, 11))
         if rating not in scale:
             raise ValueError('Either define a new scale or score  '
                              'within {}'.format(str(scale)))
@@ -146,7 +148,7 @@ def check_sd_status():
     return None if mnt == '' else mnt
 
 
-def GetPatchesFromSD(path: str):
+def get_patches_from_sd(path: str):
     """Create list of ZoiaPatch objects from SD card"""
 
     mnt = check_sd_status()
@@ -165,7 +167,7 @@ def GetPatchesFromSD(path: str):
     return fls
 
 
-def MakeDictFromSD():
+def make_dict_from_sd():
     """Create dictionary of ZoiaPatch sub-dirs from SD card"""
 
     mnt = check_sd_status()
@@ -177,12 +179,12 @@ def MakeDictFromSD():
         if pth.startswith('.'):
             continue
         dct[pth] = {}
-        dct[pth] = GetPatchesFromSD(os.path.join(mnt, pth))
+        dct[pth] = get_patches_from_sd(os.path.join(mnt, pth))
 
     return dct
 
 
-def GetPatchesFromDir(path: str):
+def get_patches_from_dir(path: str):
     """Create list of ZoiaPatch objects from local directory path"""
 
     fls = []
@@ -195,7 +197,7 @@ def GetPatchesFromDir(path: str):
     return fls
 
 
-def MakeDictFromDir(drv: str):
+def make_dict_from_dir(drv: str):
     """Create dictionary of ZoiaPatch sub-dirs from directory path"""
 
     dct = {}
@@ -204,12 +206,12 @@ def MakeDictFromDir(drv: str):
                 or pth.startswith('_'):
             continue
         dct[pth] = {}
-        dct[pth] = GetPatchesFromDir(os.path.join(drv, pth))
+        dct[pth] = get_patches_from_dir(os.path.join(drv, pth))
 
     return dct
 
 
-def MakeSortedDirsFromMaster(mstr: str):
+def make_sorted_dirs_from_master(mstr: str):
     """Create directories of 64 ZoiaPatches from master directory path"""
 
     subprocess.call(['split_master.sh'])
@@ -222,7 +224,7 @@ def MakeSortedDirsFromMaster(mstr: str):
         rn.renumber(sort='alpha')
 
 
-def ZoiaPatchFromAPI(body):
+def zoia_patch_from_api(body):
     """Create ZoiaPatch objects from PS returns"""
 
     dct = {}
