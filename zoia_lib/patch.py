@@ -15,6 +15,7 @@ import numpy as np
 from zoia_lib.api import PatchStorage
 from zoia_lib.renumber import Renumber
 ps = PatchStorage()
+mnt = ''
 
 with open('zoia_lib/common/tags.json', 'r') as f:
     tags = json.load(f)
@@ -138,6 +139,7 @@ class ZoiaPatch:
 def check_sd_status():
     """Check if SD card is inserted"""
 
+    global mnt
     for disk in psutil.disk_partitions():
         if 'FAT32' in disk.fstype or 'msdos' in disk.fstype:
             mnt = disk.mountpoint
