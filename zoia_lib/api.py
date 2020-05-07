@@ -123,6 +123,12 @@ class PatchStorage:
 
     @staticmethod
     def validate_date(date: str):
+        """ Ensures a date follows the format YYYY-MM-DD
+
+        date: The date to check the format of.
+        Returns the date in the correct format.
+        On incorrect format a ValueError is raised.
+        """
         try:
             date = datetime.datetime.strptime(date, '%Y-%m-%d')
             return date.isoformat()
@@ -285,4 +291,4 @@ def get_all_tags():
         json.dump(tags, f)
 
 
-get_all_tags()
+
