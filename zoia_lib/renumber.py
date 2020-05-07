@@ -10,7 +10,9 @@ import random
 import uuid
 from zoia_lib.common import errors
 from zoia_lib.api import PatchStorage
+
 ps = PatchStorage()
+
 
 # TODO: figure out how to handle zip dirs from PS
 # best case would be to dl immediately and treat as separate patch objects
@@ -57,10 +59,7 @@ class Renumber:
             self._path = _path
             return
         else:
-            raise errors.BadPathError(
-                f'Supplied path {path} is not a child of '
-                f'current directory.'
-            )
+            raise errors.BadPathError(path)
 
     @staticmethod
     def get_files(path: str):
@@ -126,8 +125,8 @@ class Renumber:
 
         # sort alpha, ignore case
         return {k: v for k, v in sorted(
-                    self.file_mapping.items(),
-                    key=lambda item: item[1])
+            self.file_mapping.items(),
+            key=lambda item: item[1])
                 }
 
     def alpha_invert(self):
@@ -135,9 +134,9 @@ class Renumber:
 
         # sort alpha invert, ignore case
         return {k: v for k, v in sorted(
-                    self.file_mapping.items(),
-                    key=lambda item: item[1],
-                    reverse=True)
+            self.file_mapping.items(),
+            key=lambda item: item[1],
+            reverse=True)
                 }
 
     def by_tag(self,
@@ -157,6 +156,6 @@ class Renumber:
         shuffled = random.sample(
             sorted_files.items(),
             k=len(sorted_files.items())
-            )
+        )
 
         return dict(shuffled)
