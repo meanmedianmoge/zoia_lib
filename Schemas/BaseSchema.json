@@ -1,0 +1,492 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://github.com/meanmedianmoge/zoia_lib",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "id": 122661,
+            "created_at": "2020-04-22T06:24:14+00:00",
+            "title": "Dream Bender",
+            "content": "This is my go at the Mojo Hand FX Dream Mender, which is their go at the 70's style Deluxe Memory Man.\r\n\r\nIt is a delay with either chorus or tremolo. It is known for being able to self oscillate.  \r\n\r\nYou can turn on the chorus or tremolo, or have them both on(which you can't do on the original). \r\n\r\nL Mono output -&gt; Stereo RL Output\r\n↓\r\nDelay -&gt; Stereo RL Output\r\n↓   ↓   ↓\r\n↓   ↓    Chorus -&gt; Stereo RL Output\r\n↓   ↓          \r\n↓   Tremolo -&gt; Stereo RL Output\r\n↓             \r\nVCA\r\n↓\r\nBack to original delay (can control oscillation)",
+            "files": [
+		{
+		   "id":122660,
+                   "url":"https://patchstorage.com/api/alpha/patches/122661/files/122660",
+		   "filesize":32768,
+                   "filename":"012_zoia_dream_mender.bin"
+		}
+	    ],
+	    "preview_url": "",
+	    "view_count": 276,
+            "like_count": 2,
+            "download_count": 79,
+            "author": {
+                "id":5201,
+                "name":"nathanvassiliades"
+            },
+            "categories": [
+                {
+                    "id": 77,
+                    "name": "Effect"
+                }
+            ],
+            "tags": [
+                {
+                    "id": 63,
+                    "name": "chorus"
+                },
+                {
+                    "id": 130,
+                    "name": "delay"
+                },
+                {
+                    "id": 5113,
+                    "name": "Deluxe Memory Man"
+                },
+                {
+                    "id": 5112,
+                    "name": "Dream Mender"
+                },
+                {
+                    "id": 21,
+                    "name": "tremolo"
+                }
+            ],
+            "state": {
+                "id": 151,
+                "name": "Ready to Go"
+            },
+            "license": {
+                "id": 4183,
+                "name": "The Unlicense"
+            },
+            "custom_license_text": ""
+        }
+    ],
+    "required": [
+        "id",
+        "created_at"
+    ],
+    "additionalProperties": true,
+    "properties": {
+        "id": {
+            "$id": "#/properties/id",
+            "type": "integer",
+            "title": "The id schema",
+            "description": "A 6-digit unique identifier used to distinguish patches stored on PatchStorage",
+            "default": 0,
+            "examples": [
+                122661
+            ],
+            "maxLength": 6,
+            "minLength": 6
+        },
+        "created_at": {
+            "$id": "#/properties/created_at",
+            "type": "string",
+            "title": "The created_at schema",
+            "description": "A timestamp used to represent the time at which the patch was first created. Follows the format: “YYYY-MM-DDTHH:MM:SS+00:00”",
+            "default": "",
+            "examples": [
+                "2020-04-22T06:24:14+00:00"
+            ],
+            "readOnly": "true"
+        },
+        "title": {
+            "$id": "#/properties/title",
+            "type": "string",
+            "title": "The title schema",
+            "description": "A non-unique string used to identify a patch object by a name, rather than just its patch id",
+            "default": "",
+            "examples": [
+                "Dream Bender"
+            ]
+        },
+        "content": {
+            "$id": "#/properties/content",
+            "type": "string",
+            "title": "The content schema",
+            "description": "The contents associated with a patch object. Typically consists of a short description or patch notes",
+            "default": "",
+            "examples": [
+                "This is my go at the Mojo Hand FX Dream Mender, which is their go at the 70's style Deluxe Memory Man.\r\n\r\nIt is a delay with either chorus or tremolo. It is known for being able to self oscillate.  \r\n\r\nYou can turn on the chorus or tremolo, or have them both on(which you can't do on the original). \r\n\r\nL Mono output -&gt; Stereo RL Output\r\n↓\r\nDelay -&gt; Stereo RL Output\r\n↓   ↓   ↓\r\n↓   ↓    Chorus -&gt; Stereo RL Output\r\n↓   ↓          \r\n↓   Tremolo -&gt; Stereo RL Output\r\n↓             \r\nVCA\r\n↓\r\nBack to original delay (can control oscillation)"
+            ]
+        },
+	"preview_url": {
+            "$id": "#/properties/preview_url",
+            "type": "string",
+            "title": "The preview_url schema",
+            "description": "A link to a preview for the patch object. Typically, an audio or visual demonstration",
+            "default": "",
+            "examples": [
+                ""
+            ]
+        },
+        "view_count": {
+            "$id": "#/properties/view_count",
+            "type": "integer",
+            "title": "The view_count schema",
+            "description": "The total number of views for a given patch object",
+            "default": 0,
+            "examples": [
+                276
+            ]
+        },
+        "like_count": {
+            "$id": "#/properties/like_count",
+            "type": "integer",
+            "title": "The like_count schema",
+            "description": "The total number of likes for a given patch object",
+            "default": 0,
+            "examples": [
+                2
+            ]
+        },
+        "download_count": {
+            "$id": "#/properties/download_count",
+            "type": "integer",
+            "title": "The download_count schema",
+            "description": "The total number of downloads for a given patch object",
+            "default": 0,
+            "examples": [
+                79
+            ]
+        },
+	"files": {
+            "$id": "#/properties/files",
+            "type": "array",
+            "title": "The files schema",
+            "description": "Contains File objects associated with a given patch object",
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "id": 122660,
+                        "url": "https://patchstorage.com/api/alpha/patches/122661/files/122660",
+                        "filesize": 32768,
+                        "filename": "012_zoia_dream_mender.bin"
+                    }
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "anyOf": [
+                    {
+                        "$id": "#/properties/files/items/anyOf/0",
+                        "type": "object",
+                        "title": "The File object schema",
+                        "description": "Describes the specification of a file hosted on PatchStorage, including the id, url, file size, and file name",
+                        "default": {},
+                        "examples": [
+                            {
+                                "id": 122660,
+                                "url": "https://patchstorage.com/api/alpha/patches/122661/files/122660",
+                                "filesize": 32768,
+                                "filename": "012_zoia_dream_mender.bin"
+                            }
+                        ],
+                        "required": [
+                            "id",
+                            "filesize",
+                            "filename"
+                        ],
+                        "additionalProperties": true,
+                        "properties": {
+                            "id": {
+                                "$id": "#/properties/files/items/anyOf/0/properties/id",
+                                "type": "integer",
+                                "title": "The id schema",
+                                "description": "A unique identifier used to distinguish patch files stored on PatchStorage",
+                                "default": 0,
+                                "examples": [
+                                    122660
+                                ]
+                            },
+                            "url": {
+                                "$id": "#/properties/files/items/anyOf/0/properties/url",
+                                "type": "string",
+                                "title": "The url schema",
+                                "description": "A url that points to where the file can be retrieved from",
+                                "default": "",
+                                "examples": [
+                                    "https://patchstorage.com/api/alpha/patches/122661/files/122660"
+                                ]
+                            },
+                            "filesize": {
+                                "$id": "#/properties/files/items/anyOf/0/properties/filesize",
+                                "type": "integer",
+                                "title": "The filesize schema",
+                                "description": "The size of the file",
+                                "default": 0,
+                                "examples": [
+                                    32768
+                                ]
+                            },
+                            "filename": {
+                                "$id": "#/properties/files/items/anyOf/0/properties/filename",
+                                "type": "string",
+                                "title": "The filename schema",
+                                "description": "The name of the file",
+                                "default": "",
+                                "examples": [
+                                    "012_zoia_dream_mender.bin"
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "$id": "#/properties/files/items"
+            }
+        },
+        "author": {
+            "$id": "#/properties/author",
+            "type": "object",
+            "title": "The author schema",
+            "description": "An object that contains the information surrounding the creation of the patch object",
+            "default": {},
+            "examples": [
+                {
+                    "id": 5201,
+                    "name": "nathanvassiliades"
+                }
+            ],
+            "required": [],
+            "additionalProperties": true,
+            "properties": {
+                "id": {
+                    "$id": "#/properties/author/properties/id",
+                    "type": "integer",
+                    "title": "The id schema",
+                    "description": "A unique identifier used to distinguish patch authors stored on PatchStorage",
+                    "default": 0,
+                    "examples": [
+                        5505
+                    ]
+                },
+                "name": {
+                    "$id": "#/properties/author/properties/name",
+                    "type": "string",
+                    "title": "The name schema",
+                    "description": "A non-unique string used to identify a patch author by a name, rather than just by their author id",
+                    "default": "",
+                    "examples": [
+                        "zzlotss"
+                    ]
+                }
+            }
+        },
+        "categories": {
+            "$id": "#/properties/categories",
+            "type": "array",
+            "title": "The categories schema",
+            "description": "An array of Taxonomy objects. These Taxonomy objects contain the information about a category, including the id and name",
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "id": 77,
+                        "name": "Effect"
+                    }
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "anyOf": [
+                    {
+                        "$id": "#/properties/categories/items/anyOf",
+                        "type": "object",
+                        "title": "The Taxonomy schema",
+                        "description": "Describes tags, categories, licenses, and states of patch objects",
+                        "default": {},
+                        "examples": [
+                            {
+                                "id": 77,
+                                "name": "Effect"
+                            }
+                        ],
+                        "required": [
+                            "id",
+                            "name"
+                        ],
+                        "additionalProperties": true,
+                        "properties": {
+                            "id": {
+                                "$id": "#/properties/categories/items/anyOf/0/properties/id",
+                                "type": "integer",
+                                "title": "The id schema",
+                                "description": "A unique identifier used to distinguish patch categories stored on PatchStorage",
+                                "default": 0,
+                                "examples": [
+                                    77
+                                ]
+                            },
+                            "name": {
+                                "$id": "#/properties/categories/items/anyOf/0/properties/name",
+                                "type": "string",
+                                "title": "The name schema",
+                                "description": "A non-unique string used to identify a patch category in a meaningful manner, rather than just by its category id",
+                                "default": "",
+                                "examples": [
+                                    "Effect"
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "$id": "#/properties/categories/items"
+            }
+        },
+        "tags": {
+            "$id": "#/properties/tags",
+            "type": "array",
+            "title": "The tags schema",
+            "description": "An array of Taxonomy objects. These Taxonomy objects contain the information about a tag, including the id and name",
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "id": 63,
+                        "name": "chorus"
+                    },
+                    {
+                        "id": 130,
+                        "name": "delay"
+                    }
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "anyOf": [
+                    {
+                        "$id": "#/properties/tags/items/anyOf",
+                        "type": "object",
+                        "title": "The Taxonomy schema",
+                        "description": "Describes tags, categories, licenses, and states of patch objects",
+                        "default": {},
+                        "examples": [
+                            {
+                                "id": 63,
+                                "name": "chorus"
+                            }
+                        ],
+                        "required": [
+                            "id",
+                            "name"
+                        ],
+                        "additionalProperties": true,
+                        "properties": {
+                            "id": {
+                                "$id": "#/properties/tags/items/anyOf/0/properties/id",
+                                "type": "integer",
+                                "title": "The id schema",
+                                "description": "A unique identifier used to distinguish patch tags stored on PatchStorage",
+                                "default": 0,
+                                "examples": [
+                                    63
+                                ]
+                            },
+                            "name": {
+                                "$id": "#/properties/tags/items/anyOf/0/properties/name",
+                                "type": "string",
+                                "title": "The name schema",
+                                "description": "A non-unique string used to identify a patch tag in a meaningful manner, rather than just by its tag id",
+                                "default": "",
+                                "examples": [
+                                    "chorus"
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "$id": "#/properties/tags/items"
+            }
+        },
+        "state": {
+            "$id": "#/properties/state",
+            "type": "object",
+            "title": "The state schema",
+            "description": "Contains the information regarding the state of a patch object, including the id and name.",
+            "default": {},
+            "examples": [
+                {
+                    "id": 151,
+                    "name": "Ready to Go"
+                }
+            ],
+            "required": [],
+            "additionalProperties": true,
+            "properties": {
+                "id": {
+                    "$id": "#/properties/state/properties/id",
+                    "type": "integer",
+                    "title": "The id schema",
+                    "description": "A unique identifier used to distinguish patch states stored on PatchStorage",
+                    "default": 0,
+                    "examples": [
+                        151
+                    ]
+                },
+                "name": {
+                    "$id": "#/properties/state/properties/name",
+                    "type": "string",
+                    "title": "The name schema",
+                    "description": "A non-unique string used to identify a patch state in a meaningful manner, rather than just by its state id",
+                    "default": "",
+                    "examples": [
+                        "Ready to Go"
+                    ]
+                }
+            }
+        },
+        "license": {
+            "$id": "#/properties/license",
+            "type": "object",
+            "title": "The license schema",
+            "description": "Contains the information regarding the license of a patch object, including the id and name.",
+            "default": {},
+            "examples": [
+                {
+                    "id": 4183,
+                    "name": "The Unlicense"
+                }
+            ],
+            "required": [],
+            "additionalProperties": true,
+            "properties": {
+                "id": {
+                    "$id": "#/properties/license/properties/id",
+                    "type": "integer",
+                    "title": "The id schema",
+                    "description": "A unique identifier used to distinguish patch licneses stored on PatchStorage",
+                    "default": 0,
+                    "examples": [
+                        4183
+                    ]
+                },
+                "name": {
+                    "$id": "#/properties/license/properties/name",
+                    "type": "string",
+                    "title": "The name schema",
+                    "description": "A non-unique string used to identify a patch state in a meaningful manner, rather than just by its state id",
+                    "default": "",
+                    "examples": [
+                        "The Unlicense"
+                    ]
+                }
+            }
+        },
+        "custom_license_text": {
+            "$id": "#/properties/custom_license_text",
+            "type": "string",
+            "title": "The custom_license_text schema",
+            "description": "The custom licensing agreement for a patch object.",
+            "default": "",
+            "examples": [
+                ""
+            ]
+        }
+    }
+}
