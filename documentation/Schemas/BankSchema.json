@@ -10,7 +10,7 @@
             "bank": [
                 {
                     "slot": 1,
-                    "filepath": "dream_mender.bin"
+                    "filepath": "122661.bin"
                 }
             ]
         }
@@ -30,7 +30,7 @@
                 [
                     {
                         "slot": 1,
-                        "filepath": "dream_mender.bin"
+                        "filepath": "122661.bin"
                     }
                 ]
             ],
@@ -46,7 +46,7 @@
                         "examples": [
                             {
                                 "slot": 1,
-                                "filepath": "dream_mender.bin"
+                                "filepath": "122661.bin"
                             }
                         ],
                         "required": [
@@ -69,10 +69,10 @@
                                 "$id": "#/properties/bank/items/anyOf/0/properties/file",
                                 "type": "string",
                                 "title": "The file schema",
-                                "description": "A string used to specify the file to be added to an SD card",
+                                "description": "A string used to specify the file path to the file that will be added to an SD card",
                                 "default": "",
                                 "examples": [
-                                    "dream_mender.bin"
+                                    "122661.bin"
                                 ]
                             }
                         }
