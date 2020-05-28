@@ -68,7 +68,8 @@
     ],
     "required": [
         "id",
-        "created_at"
+        "created_at",
+        "title"
     ],
     "additionalProperties": true,
     "properties": {
