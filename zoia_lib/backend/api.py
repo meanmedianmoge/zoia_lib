@@ -289,6 +289,3 @@ def get_all_tags():
 
     with open('zoia_lib/common/tags.json', 'w') as f:
         json.dump(tags, f)
-
-
-

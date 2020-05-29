@@ -2,7 +2,7 @@
 import os
 import unittest
 
-from zoia_lib.renumber import Renumber
+from zoia_lib.backend.renumber import Renumber
 
 # Renumber changes the pwd so we save where we started here.
 THIS_DIR = os.path.dirname(__file__)

@@ -5,15 +5,18 @@ Author: Mike Moger
 Usage: 
 """
 
-import os
 import json
-import psutil
+import os
 import subprocess
 # import struct
 import zipfile
+
 import numpy as np
-from zoia_lib.api import PatchStorage
-from zoia_lib.renumber import Renumber
+import psutil
+
+from zoia_lib.backend.api import PatchStorage
+from zoia_lib.backend.renumber import Renumber
+
 ps = PatchStorage()
 mnt = ''
 
@@ -94,7 +97,7 @@ class ZoiaPatch:
         """remove header ***_zoia_ from files"""
 
         return name.split('_zoia_')[0].split('/')[-1], \
-            name[3:].split('_zoia_')[1].replace('.bin', '')
+               name[3:].split('_zoia_')[1].replace('.bin', '')
 
     def add_tags(self,
                  to_add: list):
