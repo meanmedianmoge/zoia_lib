@@ -27,6 +27,9 @@ class PatchStorage:
         self.platform = 3003  # ZOIA
         self.state = 151  # Ready-to-Go
         # self.author = '2825'  # MMM, '2953' CHMJ
+        # TODO Determine the page count upon class initialization to ensure it scales as new
+        #  patches are added to PS
+        self.page_count = 7
         self.manifest = {
             'platforms': [
                 {704: 'aleph',
@@ -122,7 +125,7 @@ class PatchStorage:
         return [str(s) for s in lst]
 
     @staticmethod
-    def validate_date(date: str):
+    def _validate_date(date: str):
         """ Ensures a date follows the format YYYY-MM-DD
 
         date: The date to check the format of.
@@ -189,7 +192,7 @@ class PatchStorage:
         for key in list(more_params.keys()):
             # date
             if key in ['before', 'after']:
-                more_params[key] = self.validate_date(more_params[key])
+                more_params[key] = self._validate_date(more_params[key])
             # str
             if key in ['search', 'exclude', 'include', 'order',
                        'orderby', 'slug', 'author', 'author_exclude'] and \
@@ -241,6 +244,17 @@ class PatchStorage:
         return dict(zip([str(x['title']) for x in body],
                         [str(x['tags']) for x in body]))
 
+    def get_categories(self,
+                       more_params=None):
+        """get list of categories"""
+
+        if more_params is None:
+            more_params = {}
+        body = self.search(more_params)
+
+        return dict(zip([str(x['title']) for x in body],
+                        [str(x['categories']) for x in body]))
+
     def get_patch(self,
                   idx: str):
         """get Patch object"""
@@ -276,7 +290,7 @@ def get_all_tags():
               'per_page': 100}
 
     tags = {}
-    for page in range(1, 6):
+    for page in range(1, ps.page_count):
         body = ps.search({**search, **{'page': page}})
         for patch in body:
             more = dict(zip([s['id'] for s in patch['tags']],
@@ -287,5 +301,29 @@ def get_all_tags():
                 more.pop(idx, None)
             tags = {**tags, **more}
 
-    with open('zoia_lib/common/tags.json', 'w') as f:
+    with open('common/tags.json', 'w') as f:
         json.dump(tags, f)
+    f.close()
+
+
+def get_all_patch_titles():
+    """ Retrieves the titles of all ZOIA patches currently
+    stored on PatchStorage and dumps them into a JSON file.
+    """
+
+    ps = PatchStorage()
+    search = {'orderby': 'title',
+              'order': 'asc',
+              'per_page': 100}
+
+    titles = {}
+    for page in range(1, ps.page_count):
+        # Get all the patches on the current page.
+        body = ps.search({**search, **{'page': page}})
+        for patch in body:
+            # Add the title and id of each patch to a .json file on the page.
+            titles = {**titles, **dict(zip([patch['id']], [patch['title']]))}
+
+    with open('common/titles.json', 'w') as f:
+        json.dump(titles, f)
+    f.close()
