@@ -25,7 +25,7 @@ class PatchStorage:
         # set defaults for query params
         self.url = 'https://patchstorage.com/api/alpha/'
         self.platform = 3003  # ZOIA
-        self.state = 151  # Ready-to-Go
+        self.state = {149, 1098, 151, 150}  # Ready-to-Go
         # self.author = '2825'  # MMM, '2953' CHMJ
         # TODO Determine the page count upon class initialization to ensure it scales as new
         #  patches are added to PS
@@ -185,7 +185,6 @@ class PatchStorage:
             'order': 'desc',
             'orderby': 'date',
             'platforms': self.platform,
-            'states': self.state,
         }
 
         # check type of optional args
@@ -262,23 +261,20 @@ class PatchStorage:
         endpoint = self.endpoint('patches/{}?/'.format(idx))
 
         # make request
-        r = http.request('GET', endpoint)
-
-        return json.loads(r.data)
+        return json.loads(http.request('GET', endpoint).data)
 
     def download(self,
                  idx: str):
         """download file using patch id"""
 
+        if idx is None or len(idx) != 6:
+            return None
+
         body = self.get_patch(idx)
 
         path = str(body['files'][0]['url'])
-        fname = str(body['files'][0]['filename'])
 
-        with open(fname, 'wb') as out:
-            rr = http.request('GET', path)
-            data = rr.data
-            out.write(data)
+        return http.request('GET', path).data
 
 
 def get_all_tags():
@@ -306,7 +302,7 @@ def get_all_tags():
     f.close()
 
 
-def get_all_patch_titles():
+def get_all_patches_meta():
     """ Retrieves the titles of all ZOIA patches currently
     stored on PatchStorage and dumps them into a JSON file.
     """
@@ -324,6 +320,4 @@ def get_all_patch_titles():
             # Add the title and id of each patch to a .json file on the page.
             titles = {**titles, **dict(zip([patch['id']], [patch['title']]))}
 
-    with open('common/titles.json', 'w') as f:
-        json.dump(titles, f)
-    f.close()
+    return titles

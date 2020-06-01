@@ -1,13 +1,12 @@
-
 import os
 import unittest
+from pathlib import Path
 
 from zoia_lib.backend.renumber import Renumber
 
 # Renumber changes the pwd so we save where we started here.
 THIS_DIR = os.path.dirname(__file__)
 TEST_RELATIVE_PATH = 'test_files/'
-RENUMBER_RELATIVE_PATH = 'zoia_lib/tests/test_files/'
 PATH = os.path.join(THIS_DIR, TEST_RELATIVE_PATH)
 TEST_FILE_NAMES = [
     '018_zoia_Afterneath_V4.bin',
@@ -18,13 +17,15 @@ TEST_FILE_NAMES = [
 class TestRenumber(unittest.TestCase):
 
     def setUp(self):
+        Path(TEST_RELATIVE_PATH).mkdir(parents=True, exist_ok=True)
         [open(os.path.join(PATH, f), 'a').close() for f in TEST_FILE_NAMES]
 
     def tearDown(self):
         [os.remove(os.path.join(PATH, f)) for f in os.listdir(PATH)]
+        os.rmdir(TEST_RELATIVE_PATH)
 
     def test_renumber_alpha(self):
-        renumber = Renumber(path=RENUMBER_RELATIVE_PATH)
+        renumber = Renumber(path=TEST_RELATIVE_PATH)
         # reorder test files
         renumber.renumber(sort='alpha')
         # get results
@@ -38,7 +39,7 @@ class TestRenumber(unittest.TestCase):
         self.assertListEqual(result, expected_result)
 
     def test_renumber_alpha_invert(self):
-        renumber = Renumber(path=RENUMBER_RELATIVE_PATH)
+        renumber = Renumber(path=TEST_RELATIVE_PATH)
         # reorder test files
         renumber.renumber(sort='alpha_invert')
         # get results
@@ -60,7 +61,7 @@ class TestRenumber(unittest.TestCase):
             '004_zoia_file_name.bin'
         ]
         [open(os.path.join(PATH, f), 'a').close() for f in test_filenames]
-        renumber = Renumber(path=RENUMBER_RELATIVE_PATH)
+        renumber = Renumber(path=TEST_RELATIVE_PATH)
         renumber.renumber(sort='alpha')
         # os.listdir() does not return directory contents in any order.
         # the list comprehension is to exclude any hidden files (.DS_Store)
@@ -83,7 +84,7 @@ class TestRenumber(unittest.TestCase):
             '004_zoia_file_name.bin'
         ]
         [open(os.path.join(PATH, f), 'a').close() for f in test_filenames]
-        renumber = Renumber(path=RENUMBER_RELATIVE_PATH)
+        renumber = Renumber(path=TEST_RELATIVE_PATH)
         renumber.renumber(sort='alpha')
         renumber.renumber(sort='alpha')
         result = sorted([f for f in os.listdir(PATH) if not f.startswith('.')])
@@ -98,7 +99,7 @@ class TestRenumber(unittest.TestCase):
         self.assertListEqual(result, expected)
 
     def test_renumber_random(self):
-        renumber = Renumber(path=RENUMBER_RELATIVE_PATH)
+        renumber = Renumber(path=TEST_RELATIVE_PATH)
         # reorder test files
         renumber.renumber(sort='random')
         # os.listdir() does not return directory contents in any order.

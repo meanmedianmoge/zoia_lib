@@ -7,7 +7,6 @@ class ZoiaLibError(Exception):
 class BadPathError(ZoiaLibError):
     """Class raised when the file path is not valid."""
 
-    def __init__(self,
-                 path: str):
+    def __init__(self, path: str):
         print(f'Supplied path {path} is not a child of '
               f'current directory.')

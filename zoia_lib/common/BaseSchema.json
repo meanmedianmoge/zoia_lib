@@ -8,8 +8,6 @@
     "examples": [
         {
             "id": 122661,
-	    "link":"https://patchstorage.com/dream-bender/",
-            "self":"https://patchstorage.com/api/alpha/patches/122661",
             "created_at": "2020-04-22T06:24:14+00:00",
             "title": "Dream Bender",
             "content": "This is my go at the Mojo Hand FX Dream Mender, which is their go at the 70's style Deluxe Memory Man.\r\n\r\nIt is a delay with either chorus or tremolo. It is known for being able to self oscillate.  \r\n\r\nYou can turn on the chorus or tremolo, or have them both on(which you can't do on the original). \r\n\r\nL Mono output -&gt; Stereo RL Output\r\n↓\r\nDelay -&gt; Stereo RL Output\r\n↓   ↓   ↓\r\n↓   ↓    Chorus -&gt; Stereo RL Output\r\n↓   ↓          \r\n↓   Tremolo -&gt; Stereo RL Output\r\n↓             \r\nVCA\r\n↓\r\nBack to original delay (can control oscillation)",
@@ -22,7 +20,6 @@
 		}
 	    ],
 	    "preview_url": "",
-            "revision":"1.0"
 	    "view_count": 276,
             "like_count": 2,
             "download_count": 79,
@@ -88,26 +85,6 @@
             "maxLength": 6,
             "minLength": 6
         },
-	"link": {
-            "$id": "#/properties/link",
-            "type": "string",
-            "title": "The link schema",
-            "description": "A link used to view a patch object as a page on the PatchStorage website. Takes the form of: “https://patchstorage.com/{patchName}",
-            "default": "",
-            "examples": [
-                "https://patchstorage.com/dream-bender/"
-            ]
-        },
-        "self": {
-            "$id": "#/properties/self",
-            "type": "string",
-            "title": "The self schema",
-            "description": "A link used to retrieve the API patch object. Takes the form of: “https://patchstorage.com/api/alpha/patches/{patchID}",
-            "default": "",
-            "examples": [
-                "https://patchstorage.com/api/alpha/patches/122661"
-            ]
-        },
         "created_at": {
             "$id": "#/properties/created_at",
             "type": "string",
@@ -117,7 +94,7 @@
             "examples": [
                 "2020-04-22T06:24:14+00:00"
             ],
-            "readOnly": "true"
+            "readOnly": true
         },
         "title": {
             "$id": "#/properties/title",
@@ -137,16 +114,6 @@
             "default": "",
             "examples": [
                 "This is my go at the Mojo Hand FX Dream Mender, which is their go at the 70's style Deluxe Memory Man.\r\n\r\nIt is a delay with either chorus or tremolo. It is known for being able to self oscillate.  \r\n\r\nYou can turn on the chorus or tremolo, or have them both on(which you can't do on the original). \r\n\r\nL Mono output -&gt; Stereo RL Output\r\n↓\r\nDelay -&gt; Stereo RL Output\r\n↓   ↓   ↓\r\n↓   ↓    Chorus -&gt; Stereo RL Output\r\n↓   ↓          \r\n↓   Tremolo -&gt; Stereo RL Output\r\n↓             \r\nVCA\r\n↓\r\nBack to original delay (can control oscillation)"
-            ]
-        },
-	"revision": {
-            "$id": "#/properties/revision",
-            "type": "string",
-            "title": "The revision schema",
-            "description": "A version number that indicates the current revision of the patch object",
-            "default": "",
-            "examples": [
-                "1.0"
             ]
         },
 	"preview_url": {
