@@ -18,10 +18,9 @@ from zoia_lib.backend.api import PatchStorage
 from zoia_lib.backend.renumber import Renumber
 
 ps = PatchStorage()
-mnt = ''
 
-with open('zoia_lib/common/tags.json', 'r') as f:
-    tags = json.load(f)
+with open('zoia_lib/common/tags.json', 'r') as tags_file:
+    tags = json.load(tags_file)
 
 
 class ZoiaPatch:
@@ -143,14 +142,12 @@ class ZoiaPatch:
 
 def check_sd_status():
     """Check if SD card is inserted"""
+    mnt = ''
 
-    global mnt
     for disk in psutil.disk_partitions():
         if 'FAT32' in disk.fstype or 'msdos' in disk.fstype:
             mnt = disk.mountpoint
             break
-        else:
-            mnt = ''
 
     return None if mnt == '' else mnt
 
@@ -264,3 +261,13 @@ def zoia_to_zip(pch: ZoiaPatch):
         zf.close()
 
     return zf
+
+
+def save_to_backend(patch):
+    """Attempts to save a patch and its metadata
+    to the backend LibraryApp directory.
+
+    patch: A tuple containing the downloaded
+           data and the patch metadata.
+    """
+    pass

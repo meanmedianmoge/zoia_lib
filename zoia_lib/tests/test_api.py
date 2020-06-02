@@ -72,6 +72,7 @@ class TestAPI(unittest.TestCase):
         # Try to actually download a .bin file.
         f = ps.download("122661")
         self.assertIsNotNone(f)
+        # save_to_backend(f)
 
 
     def test_api_download_compressed(self):
@@ -88,3 +89,4 @@ class TestAPI(unittest.TestCase):
         # Try to actually download a .bin file.
         f = ps.download("124605")
         self.assertIsNotNone(f)
+        # save_to_backend(f)

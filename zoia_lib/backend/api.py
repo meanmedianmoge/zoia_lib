@@ -25,7 +25,7 @@ class PatchStorage:
         # set defaults for query params
         self.url = 'https://patchstorage.com/api/alpha/'
         self.platform = 3003  # ZOIA
-        self.state = {149, 1098, 151, 150}  # Ready-to-Go
+        self.state = {149, 1098, 151, 150}  # All patch states
         # self.author = '2825'  # MMM, '2953' CHMJ
         # TODO Determine the page count upon class initialization to ensure it scales as new
         #  patches are added to PS
@@ -184,7 +184,7 @@ class PatchStorage:
             'per_page': 25,
             'order': 'desc',
             'orderby': 'date',
-            'platforms': self.platform,
+            'platforms': self.platform
         }
 
         # check type of optional args
@@ -274,7 +274,7 @@ class PatchStorage:
 
         path = str(body['files'][0]['url'])
 
-        return http.request('GET', path).data
+        return http.request('GET', path).data, body
 
 
 def get_all_tags():
