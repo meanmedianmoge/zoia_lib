@@ -1,11 +1,10 @@
-import os
-import pathlib
-import platform
 import sys
-
-from PySide2.QtWidgets import QApplication
 from pathlib import Path
 
+from PySide2.QtWidgets import QApplication
+
+import zoia_lib.backend.api as api
+import zoia_lib.backend.utilities as util
 from zoia_lib.UI.zoia_lib_ui import MainWindow
 
 
@@ -14,29 +13,21 @@ def create_backend_directories():
     store patch files, bank files, and metadata files
     in the appropriate directory based on the OS.
     """
-    curr_os = platform.system()
-    if curr_os == "Windows":
-        path = os.getenv('APPDATA')
-    elif curr_os == "Darwin":
-        path = pathlib.Path.home() / "Library/Application Support"
-    elif curr_os == "Linux":
-        path = pathlib.Path.home() / ".local/share"
-    else:
-        # Solaris/Chrome OS/Java?
-        path = None
+    backend_path = util.determine_backend_path()
 
-    if path is not None:
-        Path(path + "/.LibraryApp").mkdir(parents=True, exist_ok=True)
-        path = path + "/.LibraryApp"
-        Path(path + "/Banks").mkdir(parents=True, exist_ok=True)
+    if backend_path is not None:
+        Path(backend_path).mkdir(parents=True, exist_ok=True)
+        Path(backend_path + "\\Banks").mkdir(parents=True, exist_ok=True)
 
 
 if __name__ == "__main__":
     # Try to make the backend directories if need be.
     create_backend_directories()
+    ps = api.PatchStorage()
 
     # Get the list of patches on PS to pass to the GUI
-    # get_all_patches_meta
+    # Maybe we let the user do this with a button instead of doing it automatically?
+    # get_all_patches_meta()
 
     # Launch the GUI.
     app = QApplication(sys.argv)

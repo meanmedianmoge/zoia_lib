@@ -2,7 +2,7 @@
 """
 Created: 9:45 PM on 2/23/20
 Author: Mike Moger
-Usage: 
+Usage:
 """
 
 import json
@@ -29,7 +29,6 @@ class ZoiaPatch:
                  fname: str = None,
                  obj=None):
         """Initializes ZoiaPatch class
-
         fname: used when files exist in local dir
         obj: used when files are being imported from PS
         """
@@ -95,8 +94,7 @@ class ZoiaPatch:
     def strip_header(name: str):
         """remove header ***_zoia_ from files"""
 
-        return name.split('_zoia_')[0].split('/')[-1], \
-               name[3:].split('_zoia_')[1].replace('.bin', '')
+        return name.split('_zoia_')[0].split('/')[-1], name[3:].split('_zoia_')[1].replace('.bin', '')
 
     def add_tags(self,
                  to_add: list):
@@ -242,9 +240,9 @@ def zoia_to_zip(pch: ZoiaPatch):
     """Create zipped file from ZoiaPatch object(s)"""
 
     reconstructed_name = pch.number + '_zoia_' + pch.name + '.bin'
-    outname = os.path.join(pch.path, pch.name + '.zip')
+    out_name = os.path.join(pch.path, pch.name + '.zip')
 
-    zf = zipfile.ZipFile(outname, "w", zipfile.ZIP_DEFLATED)
+    zf = zipfile.ZipFile(out_name, "w", zipfile.ZIP_DEFLATED)
 
     try:
         print('adding binary patch file(s)')
@@ -261,13 +259,3 @@ def zoia_to_zip(pch: ZoiaPatch):
         zf.close()
 
     return zf
-
-
-def save_to_backend(patch):
-    """Attempts to save a patch and its metadata
-    to the backend LibraryApp directory.
-
-    patch: A tuple containing the downloaded
-           data and the patch metadata.
-    """
-    pass

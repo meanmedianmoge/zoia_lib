@@ -270,11 +270,14 @@ class PatchStorage:
         if idx is None or len(idx) != 6:
             return None
 
-        body = self.get_patch(idx)
-
-        path = str(body['files'][0]['url'])
-
-        return http.request('GET', path).data, body
+        try:
+            body = self.get_patch(idx)
+            path = str(body['files'][0]['url'])
+            f = http.request('GET', path).data, body
+            return f
+        except KeyError:
+            # No patch with the supplied id was found.
+            return None
 
 
 def get_all_tags():

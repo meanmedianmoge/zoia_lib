@@ -5,6 +5,7 @@ import shutil
 import unittest
 
 from zoia_lib.backend.startup import create_backend_directories
+import zoia_lib.backend.utilities as util
 
 
 class TestStartup(unittest.TestCase):
@@ -31,7 +32,7 @@ class TestStartup(unittest.TestCase):
         intended to be used normally. This will delete any patch/bank files.
         """
 
-        shutil.rmtree(self.path + "/.LibraryApp")
+        shutil.rmtree(self.path + "\\.LibraryApp")
 
     def test_directory_init(self):
         """Ensures the application successfully creates
@@ -51,7 +52,7 @@ class TestStartup(unittest.TestCase):
         for file in os.listdir(self.path):
             if file == ".LibraryApp":
                 found_library = True
-                for f in os.listdir(self.path + "/.LibraryApp"):
+                for f in os.listdir(self.path + "\\.LibraryApp"):
                     if f == "Banks":
                         found_bank = True
                         break
@@ -74,15 +75,14 @@ class TestStartup(unittest.TestCase):
         each patch.
         """
         # Try to break the method.
-        # save_to_backend(None, None)
-        # save_to_backend(None, data)
-        # save_to_backend("IAmAMalformedJSON", None)
-        # save_to_backend("IAmAMalformedJSON", data)
+        # save_to_backend(None)
+        incorrect_tuple = ("ERROR", "ERROR")
+        util.save_to_backend(incorrect_tuple)
 
         path = ''
         correct = False
 
-        for file in os.listdir(self.path + "/.LibraryApp"):
+        for file in os.listdir(self.path + "\\.LibraryApp"):
             if file == "55555":
                 path = self.path + file
                 correct = True
@@ -90,14 +90,15 @@ class TestStartup(unittest.TestCase):
         self.assertFalse(correct, "Found a directory with the expected patch id of 55555 when it should not exist.")
 
         # Create a dummy patch with dummy metadata.
-        # save_to_backend(json_meta)
-        # Save that same patch again.
-        # save_to_backend(json_meta)
+        # save_to_backend(f)
+        # Try to save the same patch again without making any changes to the binary contents of the patch.
+        # save_to_backend(f)
+        # Try to save the same patch again after making a change to the binary contents of the patch.
 
         # Ensure a directory was created.
         correct = False
 
-        for file in os.listdir(self.path + "/.LibraryApp"):
+        for file in os.listdir(self.path + "\\.LibraryApp"):
             if file == "55555":
                 path = self.path + file
                 correct = True
@@ -107,7 +108,7 @@ class TestStartup(unittest.TestCase):
         json_files = {}
         bin_files = {}
 
-        for f in os.listdir(path + "/55555"):
+        for f in os.listdir(path + "\\55555"):
             if os.path.splitext(f) == ".bin":
                 bin_files[len(bin_files)] = f
             elif os.path.splitext(f) == ".json":

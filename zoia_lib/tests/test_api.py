@@ -7,9 +7,9 @@ from bs4 import BeautifulSoup
 from jsonschema import validate, ValidationError
 from numpy import unicode
 
-from zoia_lib.backend.api import get_all_patches_meta, PatchStorage
+import zoia_lib.backend.api as api
 
-ps = PatchStorage()
+ps = api.PatchStorage()
 
 
 class TestAPI(unittest.TestCase):
@@ -35,7 +35,7 @@ class TestAPI(unittest.TestCase):
                            headers={"User-Agent": "Mozilla/5.0"})
         soup_ques = BeautifulSoup(urlopen(req_ques).read(), "html.parser")
 
-        patch_list = get_all_patches_meta()
+        patch_list = api.get_all_patches_meta()
 
         # Make sure that the correct number of patches are retrieved.
         self.assertEqual(int(zoia[:3]) - len(soup_ques.find_all(class_="card")),
@@ -60,20 +60,20 @@ class TestAPI(unittest.TestCase):
         """ Query the PS API for a patch with the .bin extension,
         and ensure that it is in the correct format as dictated by the
         BaseSchema.json schema.
-
-
         """
         # Try to download something that doesn't exist.
         f = ps.download("1111111111")
-        self.assertIsNone(f)
+        self.assertIsNone(f, "Retrieved patch data for a patch that does not exist (patch id > 6 digits in length).")
+        f = ps.download("900000")
+        self.assertIsNone(f, "Retrieved patch data for a patch that does not exist (patch id 900000).")
         # Try to pass in None.
         f = ps.download(None)
-        self.assertIsNone(f)
+        self.assertIsNone(f, "Retrieved patch data without passing a patch id.")
         # Try to actually download a .bin file.
         f = ps.download("122661")
-        self.assertIsNotNone(f)
-        # save_to_backend(f)
-
+        self.assertIsNotNone(f, "Did not retrieve patch data despite the patch id existing in PatchStorage.")
+        self.assertTrue(isinstance(f[0], bytes), "Returned tuple did not contain binary data in the first element.")
+        self.assertTrue(isinstance(f[1], str), "Returned tuple did not contain string data in the second element.")
 
     def test_api_download_compressed(self):
         """ Query the PS API for a compressed patch, uncompress the patch,
@@ -82,11 +82,12 @@ class TestAPI(unittest.TestCase):
         """
         # Try to download something that doesn't exist.
         f = ps.download("1111111111")
-        self.assertIsNone(f)
+        self.assertIsNone(f, "Retrieved patch data for a patch that does not exist (patch id > 6 digits in length).")
+        f = ps.download("900000")
+        self.assertIsNone(f, "Retrieved patch data for a patch that does not exist (patch id 900000).")
         # Try to pass in None.
         f = ps.download(None)
-        self.assertIsNone(f)
-        # Try to actually download a .bin file.
-        f = ps.download("124605")
+        self.assertIsNone(f, "Retrieved patch data without passing a patch id.")
+        # Try to actually download a compressed file.
+        # f = ps.download("124605")
         self.assertIsNotNone(f)
-        # save_to_backend(f)
