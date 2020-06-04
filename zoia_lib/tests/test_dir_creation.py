@@ -1,6 +1,4 @@
 import os
-import pathlib
-import platform
 import shutil
 import unittest
 
@@ -11,17 +9,7 @@ import zoia_lib.backend.utilities as util
 class TestStartup(unittest.TestCase):
     def setUp(self):
         # Figure out what path to use.
-        curr_os = platform.system()
-        if curr_os == "Windows":
-            self.path = os.getenv('APPDATA')
-        elif curr_os == "Darwin":
-            self.path = pathlib.Path.home() / "Library/Application Support"
-        elif curr_os == "Linux":
-            self.path = pathlib.Path.home() / ".local/share"
-        else:
-            # Solaris/Chrome OS/Java?
-            self.path = None
-
+        self.path = util.determine_backend_path()
         create_backend_directories()
 
     def tearDown(self):
@@ -31,7 +19,6 @@ class TestStartup(unittest.TestCase):
         Do not run this test suite if you are using the LibraryApp as it is
         intended to be used normally. This will delete any patch/bank files.
         """
-
         shutil.rmtree(self.path + "\\.LibraryApp")
 
     def test_directory_init(self):
@@ -75,7 +62,7 @@ class TestStartup(unittest.TestCase):
         each patch.
         """
         # Try to break the method.
-        # save_to_backend(None)
+        util.save_to_backend(None)
         incorrect_tuple = ("ERROR", "ERROR")
         util.save_to_backend(incorrect_tuple)
 
@@ -94,6 +81,8 @@ class TestStartup(unittest.TestCase):
         # Try to save the same patch again without making any changes to the binary contents of the patch.
         # save_to_backend(f)
         # Try to save the same patch again after making a change to the binary contents of the patch.
+        # the binary content magically changes with some excellent code here.
+        # save_to_backend(f)
 
         # Ensure a directory was created.
         correct = False

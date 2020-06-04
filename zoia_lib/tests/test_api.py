@@ -1,5 +1,4 @@
 import json
-import os
 import unittest
 from urllib.request import Request, urlopen
 
@@ -39,22 +38,20 @@ class TestAPI(unittest.TestCase):
 
         # Make sure that the correct number of patches are retrieved.
         self.assertEqual(int(zoia[:3]) - len(soup_ques.find_all(class_="card")),
-                         len(patch_list), "Returned patch list does not contain all ZOIA patches.")
+                         len(patch_list["patch_list"]), "Returned patch list does not contain all ZOIA patches.")
 
-        # Validate the patches returned against the MetadataSchema.json file
-        json_patches = json.dumps(patch_list)
-        os.chdir("..")
-        with open('common/MetadataSchema.json') as f:
-            meta_schema = json.load(f)
+        # Validate the patches returned against the BaseSchema.json file
+        with open('../common/BaseSchema.json') as f:
+            base_schema = json.load(f)
 
-        # TODO Actually implement a solution to this.
-        #  Should ideally be a JSON array of patches that can be indexed
-        #  and validated against the schema.
         try:
-            for i in range(len(patch_list)):
-                validate(instance=json_patches[i], schema=meta_schema)
+            for i in range(len(patch_list["patch_list"])):
+                validate(instance=patch_list["patch_list"][i], schema=base_schema)
         except ValidationError:
             self.fail("A patch failed to conform to the metadata schema.")
+
+        # TODO Add check to ensure only the attributes in the meta_schema are present
+        #  without any unnecessary attributes.
 
     def test_api_download_bin(self):
         """ Query the PS API for a patch with the .bin extension,
@@ -70,10 +67,19 @@ class TestAPI(unittest.TestCase):
         f = ps.download(None)
         self.assertIsNone(f, "Retrieved patch data without passing a patch id.")
         # Try to actually download a .bin file.
-        f = ps.download("122661")
+        f = ps.download("105634")
         self.assertIsNotNone(f, "Did not retrieve patch data despite the patch id existing in PatchStorage.")
         self.assertTrue(isinstance(f[0], bytes), "Returned tuple did not contain binary data in the first element.")
-        self.assertTrue(isinstance(f[1], str), "Returned tuple did not contain string data in the second element.")
+
+        # Validate the patches returned against the MetadataSchema.json file
+        with open('../common/MetadataSchema.json') as file:
+            meta_schema = json.load(file)
+
+        try:
+            json.dumps(f[1])
+            validate(instance=f[1], schema=meta_schema)
+        except ValueError:
+            self.fail("Returned tuple did not contain valid json data in the second element.")
 
     def test_api_download_compressed(self):
         """ Query the PS API for a compressed patch, uncompress the patch,
@@ -90,4 +96,8 @@ class TestAPI(unittest.TestCase):
         self.assertIsNone(f, "Retrieved patch data without passing a patch id.")
         # Try to actually download a compressed file.
         # f = ps.download("124605")
-        self.assertIsNotNone(f)
+        try:
+            # json.load(f[1])
+            pass
+        except ValueError:
+            self.fail("Returned tuple did not contain valid json data in the second element.")

@@ -16,3 +16,10 @@ class SavingError(ZoiaLibError):
 
     def __init__(self):
         print(f'Could not save the file to the backend LibraryApp directory.')
+
+
+class DeletionError(ZoiaLibError):
+    """Class raised when a file could not be deleted from the backend directories."""
+
+    def __init__(self, patch: str):
+        print(f'Could not delete the file {patch} from the backend LibraryApp directory.')
