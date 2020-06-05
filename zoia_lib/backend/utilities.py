@@ -73,18 +73,42 @@ def delete_patch(patch):
     if backend_path is None:
         determine_backend_path()
 
+    if patch is None:
+        raise errors.DeletionError(None)
+
     # Remove any file extension if it is included.
     patch = patch.split(".")[0]
 
+    new_path = None
+
     # Check if the file to be deleted is in a version directory.
+    patch_no_version = patch.split("_")[0]
     for file in os.listdir(backend_path):
-        if file == patch:
+        if file == patch_no_version:
             # We have hit a version directory.
             new_path = Path(backend_path + "\\" + file)
+            break
 
     # Try to delete the file and metadata file.
     try:
-        os.remove(Path(backend_path + "\\" + patch + ".bin"))
-        os.remove(Path(backend_path + "\\" + patch + ".json"))
+        real_path = new_path if new_path is not None else backend_path
+        os.remove(Path(str(real_path) + "\\" + patch + ".bin"))
+        os.remove(Path(str(real_path) + "\\" + patch + ".json"))
+        """ Special case: Deletion from a version directory. Need to check if
+        the version directory only contains one patch, and if so, move the
+        patch and metadata (also remove the version suffix) and delete the 
+        version directory for said patch.
+        """
+        if new_path is not None and len(os.listdir(new_path)) <= 2:
+            for left_files in os.listdir(new_path):
+                try:
+                    front = left_files.split("_")[0]
+                    end = left_files.split(".")[1]
+                    os.rename(Path(str(new_path) + "\\" + left_files),
+                              Path(str(backend_path) + "\\" + front + "." + end))
+                except FileNotFoundError:
+                    raise errors.RenamingError(left_files)
+            os.rmdir(new_path)
+
     except FileNotFoundError:
         raise errors.DeletionError(patch)

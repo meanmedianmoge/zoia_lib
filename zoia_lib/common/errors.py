@@ -22,4 +22,16 @@ class DeletionError(ZoiaLibError):
     """Class raised when a file could not be deleted from the backend directories."""
 
     def __init__(self, patch: str):
-        print(f'Could not delete the file {patch} from the backend LibraryApp directory.')
+        if patch is None:
+            print(f'Expected a patch name but got None instead.')
+        else:
+            print(f'Could not delete the file {patch} from the backend LibraryApp directory.')
+
+class RenamingError(ZoiaLibError):
+    """Class raised when a file could not be renamed correctly. """
+
+    def __init__(self, patch: str):
+        if patch is None:
+            print(f'Expected a patch name but got None instead.')
+        else:
+            print(f'Could not rename the file {patch}')

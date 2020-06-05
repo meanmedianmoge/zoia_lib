@@ -50,7 +50,7 @@ class TestAPI(unittest.TestCase):
         except ValidationError:
             self.fail("A patch failed to conform to the metadata schema.")
 
-        # TODO Add check to ensure only the attributes in the meta_schema are present
+        # TODO Add check to ensure only the attributes in the BaseSchema are present
         #  without any unnecessary attributes.
 
     def test_api_download_bin(self):
@@ -77,9 +77,16 @@ class TestAPI(unittest.TestCase):
 
         try:
             json.dumps(f[1])
-            validate(instance=f[1], schema=meta_schema)
         except ValueError:
             self.fail("Returned tuple did not contain valid json data in the second element.")
+
+        try:
+            validate(instance=f[1], schema=meta_schema)
+        except ValueError:
+            self.fail("Returned json data failed to validate against the MetadataSchema.json schema.")
+
+        # TODO Add check to ensure only the attributes in the MetaDataSchema are present
+        #  without any unnecessary attributes.
 
     def test_api_download_compressed(self):
         """ Query the PS API for a compressed patch, uncompress the patch,
