@@ -1,3 +1,4 @@
+import os
 import sys
 from pathlib import Path
 
@@ -16,8 +17,8 @@ def create_backend_directories():
     backend_path = util.determine_backend_path()
 
     if backend_path is not None:
-        Path(backend_path).mkdir(parents=True, exist_ok=True)
-        Path(backend_path + "\\Banks").mkdir(parents=True, exist_ok=True)
+        os.mkdir(backend_path)
+        os.mkdir(str(Path(backend_path + "/Banks")))
 
 
 if __name__ == "__main__":
