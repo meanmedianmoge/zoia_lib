@@ -83,6 +83,9 @@ class DeletionTest(unittest.TestCase):
         the patch and metadata are deleted, along with the patch
         directory that contained the files.
         """
+
+        self.setUp()
+
         # Try to break the method
         exc = (FileNotFoundError, errors.DeletionError)
         self.assertRaises(exc, util.delete_patch, "IamNotAPatch")
@@ -118,6 +121,8 @@ class DeletionTest(unittest.TestCase):
         if "22224_v3.json" not in os.listdir(os.path.join(testing_path, "22224")):
             self.fail("Deletion also removed the 22224_v3.json when it should not have.")
 
+        self.tearDown()
+
     def test_delete_patch_version(self):
         """ Attempt to delete a patch that is stored in the
         backend ZoiaLibraryApp directory. This specific patch is
@@ -133,6 +138,8 @@ class DeletionTest(unittest.TestCase):
         As such, this test only applied to the locally stored patches on
         a user's machine and not those on an SD card.
         """
+
+        self.setUp()
         # Try to delete a version.
         try:
             util.delete_patch(os.path.join("22224", "22224_v1"))
@@ -160,6 +167,8 @@ class DeletionTest(unittest.TestCase):
             self.fail("Deletion also removed 22222 patch directory when it should not have.")
         if "22223" not in os.listdir(testing_path):
             self.fail("Deletion also removed 22223 patch directory when it should not have.")
+
+        self.tearDown()
 
     def test_delete_patch_normal_sd(self):
         """ Attempt to delete a patch that is stored on an
