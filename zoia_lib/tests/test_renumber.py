@@ -15,7 +15,6 @@ TEST_FILE_NAMES = [
 
 
 class TestRenumber(unittest.TestCase):
-
     def setUp(self):
         Path(TEST_RELATIVE_PATH).mkdir(parents=True, exist_ok=True)
         [open(os.path.join(PATH, f), 'a').close() for f in TEST_FILE_NAMES]

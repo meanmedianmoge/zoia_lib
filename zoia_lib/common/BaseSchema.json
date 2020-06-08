@@ -89,7 +89,7 @@
             "$id": "#/properties/created_at",
             "type": "string",
             "title": "The created_at schema",
-            "description": "A timestamp used to represent the time at which the patch was first created. Follows the format: “YYYY-MM-DDTHH:MM:SS+00:00”",
+            "description": "A timestamp used to represent the time at which the patch was first created. Follows the format: YYYY-MM-DDTHH:MM:SS+00:00",
             "default": "",
             "examples": [
                 "2020-04-22T06:24:14+00:00"
@@ -244,7 +244,7 @@
         },
         "author": {
             "$id": "#/properties/author",
-            "type": "object",
+            "type": ["object", "null"],
             "title": "The author schema",
             "description": "An object that contains the information surrounding the creation of the patch object",
             "default": {},
@@ -407,7 +407,7 @@
         },
         "state": {
             "$id": "#/properties/state",
-            "type": "object",
+            "type": ["object", "null"],
             "title": "The state schema",
             "description": "Contains the information regarding the state of a patch object, including the id and name.",
             "default": {},
@@ -444,7 +444,7 @@
         },
         "license": {
             "$id": "#/properties/license",
-            "type": "object",
+            "type": ["object", "null"],
             "title": "The license schema",
             "description": "Contains the information regarding the license of a patch object, including the id and name.",
             "default": {},

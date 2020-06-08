@@ -277,7 +277,7 @@
         },
         "author": {
             "$id": "#/properties/author",
-            "type": "object",
+            "type": ["object", "null"],
             "title": "The author schema",
             "description": "An object that contains the information surrounding the creation of the patch object",
             "default": {},
@@ -440,7 +440,7 @@
         },
         "state": {
             "$id": "#/properties/state",
-            "type": "object",
+            "type": ["object", "null"],
             "title": "The state schema",
             "description": "Contains the information regarding the state of a patch object, including the id and name.",
             "default": {},
@@ -477,7 +477,7 @@
         },
         "license": {
             "$id": "#/properties/license",
-            "type": "object",
+            "type": ["object", "null"],
             "title": "The license schema",
             "description": "Contains the information regarding the license of a patch object, including the id and name.",
             "default": {},

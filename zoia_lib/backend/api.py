@@ -258,7 +258,7 @@ class PatchStorage:
                   idx: str):
         """get Patch object"""
 
-        endpoint = self.endpoint('patches/{}?/'.format(idx))
+        endpoint = self.endpoint('patches/{}/'.format(idx))
 
         # make request
         return json.loads(http.request('GET', endpoint).data)
@@ -315,12 +315,13 @@ def get_all_patches_meta():
               'order': 'asc',
               'per_page': 100}
 
-    titles = {}
+    all_patches = []
+
     for page in range(1, ps.page_count):
         # Get all the patches on the current page.
         body = ps.search({**search, **{'page': page}})
         for patch in body:
             # Add the title and id of each patch to a .json file on the page.
-            titles = {**titles, **dict(zip([patch['id']], [patch['title']]))}
+            all_patches.append(patch)
 
-    return titles
+    return {"patch_list": all_patches}
