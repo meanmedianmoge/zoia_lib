@@ -14,8 +14,12 @@ class BadPathError(ZoiaLibError):
 class SavingError(ZoiaLibError):
     """Class raised when a file could not be saved to the backend directories."""
 
-    def __init__(self):
-        print(f'Could not save the file to the backend LibraryApp directory.')
+    def __init__(self, patch: str):
+        if patch is None:
+            print(f'Expected a patch name but got None instead.')
+        else:
+            print(f'Could not save the file {patch} from the backend ZoiaLibraryApp directory due '
+                  f'to a data formatting error (was the JSON and binary valid?)')
 
 
 class DeletionError(ZoiaLibError):
@@ -25,13 +29,14 @@ class DeletionError(ZoiaLibError):
         if patch is None:
             print(f'Expected a patch name but got None instead.')
         else:
-            print(f'Could not delete the file {patch} from the backend LibraryApp directory.')
+            print(f'Could not delete the file {patch} from the backend ZoiaLibraryApp directory.')
+
 
 class RenamingError(ZoiaLibError):
-    """Class raised when a file could not be renamed correctly. """
+    """Class raised when a file could not be renamed correctly."""
 
     def __init__(self, patch: str):
         if patch is None:
             print(f'Expected a patch name but got None instead.')
         else:
-            print(f'Could not rename the file {patch}')
+            print(f'Could not rename the file {patch} correctly (did the target name contain an illegal character?)')

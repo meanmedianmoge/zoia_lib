@@ -48,7 +48,7 @@ class TestAPI(unittest.TestCase):
             for i in range(len(patch_list["patch_list"])):
                 validate(instance=patch_list["patch_list"][i], schema=base_schema)
         except ValidationError:
-            self.fail("A patch failed to conform to the metadata schema.")
+            self.fail("A patch failed to conform to the BaseSchema.json schema.")
 
         # TODO Add check to ensure only the attributes in the BaseSchema are present
         #  without any unnecessary attributes.
