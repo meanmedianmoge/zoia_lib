@@ -1,14 +1,15 @@
 import json
 import os
 import platform
+import zipfile
 from pathlib import Path
 
+import zoia_lib.backend.api as api
 import zoia_lib.common.errors as errors
-from zoia_lib.backend.api import PatchStorage
 
 # Global variable to avoid the rerunning of determine_backend_path() unnecessarily.
 backend_path = None
-ps = PatchStorage()
+ps = api.PatchStorage()
 
 
 def create_backend_directories():
@@ -43,6 +44,55 @@ def determine_backend_path():
     return back_path
 
 
+def patch_decompress(patch):
+    """ Method stub for decompressing files retrieved from the PS
+    API. Should be expanded to work with files imported into the
+    application and should correctly update the metadata for each
+    based on the date modified of each file. (Newest version should
+    be the .bin file with the most recent date modified).
+
+    patch: A tuple containing the downloaded file
+           data and the patch metadata, comes from ps.download(IDX).
+           patch[0] is raw binary data, while patch[1] is json data.
+    """
+    # No need to determine it again if we have done so before.
+    global backend_path
+    if backend_path is None:
+        backend_path = determine_backend_path()
+
+    patch_name = str(patch[1]['id'])
+
+    pch = os.path.join(backend_path, "{}".format(str(patch_name)))
+    if not os.path.isdir(pch):
+        os.mkdir(pch)
+
+    if patch[1]["files"][0]["filename"].split(".")[1] == "zip":
+        # .zip files
+        name_zip = os.path.join(pch, "{}.zip".format(patch_name))
+        f = open(name_zip, "wb")
+        f.write(patch[0])
+        f.close()
+        with zipfile.ZipFile(os.path.join(pch, "{}.zip".format(patch_name)), 'r') as zipObj:
+            # Extract all the contents into the patch directory
+            zipObj.extractall(pch)
+        # Ditch the zip
+        os.remove(name_zip)
+        i = 0
+        for file in os.listdir(pch):
+            if file.split(".")[1] == "bin":
+                i += 1
+                # Rename the file to follow the conventional format
+                # TODO Change this rename the file based on the date modified.
+                os.rename(os.path.join(pch, file),
+                          os.path.join(pch, "{}_v{}.bin".format(patch[1]["id"], i)))
+                patch[1]["revision"] = str(i)
+                save_metadata_json(patch, i)
+    else:
+        # Unexpected file extension encountered.
+        # TODO Handle this case gracefully.
+        raise errors.SavingError(patch[1]["title"])
+
+
 def save_to_backend(patch):
     """Attempts to save a simple binary patch and its metadata
     to the backend ZoiaLibraryApp directory.
@@ -72,16 +122,40 @@ def save_to_backend(patch):
     if not os.path.isdir(pch):
         os.mkdir(pch)
 
-    if isinstance(patch[0], bytes):
-        name_bin = os.path.join(backend_path, "{}.bin".format(patch_name))
+    if isinstance(patch[0], bytes) and patch[1]["files"][0]["filename"].split(".")[1] == "bin":
+        name_bin = os.path.join(pch, "{}.bin".format(patch_name))
         f = open(name_bin, "wb")
         f.write(patch[0])
         f.close()
-        name_json = os.path.join(backend_path, "{}.json".format(patch_name))
-        jf = open(name_json, "w")
-        json.dump(patch[1], jf)
-        jf.close()
-    # TODO implement the compressed file format case.
+        save_metadata_json(patch)
+    else:
+        # Might be a compressed file.
+        patch_decompress(patch)
+
+
+def save_metadata_json(patch, version=0):
+    """ Method stub for saving metadata. Should be expanded to work
+    for patches that do not originate from the PS API.
+
+    patch: A tuple containing the downloaded file
+           data and the patch metadata, comes from ps.download(IDX).
+           patch[0] is raw binary data, while patch[1] is json data.
+    version: Optional. If the patch needs a version suffix, this parameter
+             should be set to the appropriate version number. Valid version
+             numbers are > 0.
+    """
+    # No need to determine it again if we have done so before.
+    global backend_path
+    if backend_path is None:
+        backend_path = determine_backend_path()
+    # Save the metadata.
+    if version == 0:
+        name_json = os.path.join(backend_path, str(patch[1]['id']), "{}.json".format(patch[1]["id"]))
+    else:
+        name_json = os.path.join(backend_path, str(patch[1]['id']), "{}_v{}.json".format(patch[1]["id"], version))
+    jf = open(name_json, "w")
+    json.dump(patch[1], jf)
+    jf.close()
 
 
 def add_test_patch(name, idx):

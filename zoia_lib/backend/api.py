@@ -7,14 +7,17 @@ Usage: https://patchstorage.com/docs/
 
 import datetime
 import json
+import math
 import os
+from urllib.request import urlopen, Request
 
 import certifi
 import urllib3
+from bs4 import BeautifulSoup
 from furl import furl
+from numpy import unicode
 
-http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',
-                           ca_certs=certifi.where())
+http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 
 
 class PatchStorage:
@@ -27,9 +30,7 @@ class PatchStorage:
         self.platform = 3003  # ZOIA
         self.state = {149, 1098, 151, 150}  # All patch states
         # self.author = '2825'  # MMM, '2953' CHMJ
-        # TODO Determine the page count upon class initialization to ensure it scales as new
-        #  patches are added to PS
-        self.page_count = 7
+        self.page_count = self.determine_patch_count()
         self.manifest = {
             'platforms': [
                 {704: 'aleph',
@@ -176,7 +177,7 @@ class PatchStorage:
 
         if more_params is None:
             more_params = {}
-        endpoint = self.endpoint('patches?/')
+        endpoint = self.endpoint('patches/')
 
         # get param dict
         default_params = {
@@ -254,24 +255,40 @@ class PatchStorage:
         return dict(zip([str(x['title']) for x in body],
                         [str(x['categories']) for x in body]))
 
-    def get_patch(self,
-                  idx: str):
-        """get Patch object"""
+    def get_patch_meta(self,
+                       idx: str):
+        """ Get the metadata associated with a specific
+        patch ID.
 
+        idx: The id that the metadata will be retrieved for.
+        return: The metadata for the patch, in a MetadataSchema
+                compliant form.
+        """
         endpoint = self.endpoint('patches/{}/'.format(idx))
 
-        # make request
-        return json.loads(http.request('GET', endpoint).data)
+        # Make the request
+        raw_data = json.loads(http.request('GET', endpoint).data)
+        # Remove the data that is not apart of the MetadataSchema.json schema
+        raw_data.pop("slug", None)
+        raw_data.pop("excerpt", None)
+        raw_data.pop("comment_count", None)
+        raw_data.pop("platform", None)
+        raw_data.pop("code", None)
+        raw_data.pop("artwork", None)
+        raw_data.pop("source_code_url", None)
+
+        # Return the metadata
+        return raw_data
 
     def download(self,
                  idx: str):
-        """download file using patch id"""
+        """ Download file using patch id"""
 
         if idx is None or len(idx) != 6:
             return None
 
         try:
-            body = self.get_patch(idx)
+            body = self.get_patch_meta(idx)
             path = str(body['files'][0]['url'])
             f = http.request('GET', path).data, body
             return f
@@ -279,17 +296,84 @@ class PatchStorage:
             # No patch with the supplied id was found.
             return None
 
+    @staticmethod
+    def get_all_patch_data_min():
+        """ Returns the bare minimum amount of information
+        needed for display purposes once the user starts
+        the application.
+        This information is the following:
+         - id
+         - title
+         - created_at
+         - updated_at
+         - categories
+         - tags
+
+        return: A list of data, where each item contains the
+                information outlined above.
+        """
+
+        ps = PatchStorage()
+        per_page = 100
+        search = {
+            'orderby': 'title',
+            'order': 'asc',
+            'per_page': per_page
+        }
+
+        all_patches = []
+        for page in range(1, math.ceil(ps.page_count / per_page) + 1):
+            # Get all the patches on the current page.
+            body = ps.search({**search, **{'page': page}})
+            for patch in body:
+                data = {
+                    "id": patch["id"],
+                    "title": patch["title"],
+                    "created_at": patch["created_at"],
+                    "updated_at": patch["updated_at"],
+                    "tags": patch["tags"],
+                    "categories": patch["categories"]
+                }
+                all_patches.append(data)
+
+        return {"patch_list": all_patches}
+
+    @staticmethod
+    def determine_patch_count():
+        """ Determines the number of ZOIA patches that are currently being stored on PS.
+
+        return: An integer representing the total of ZOIA patches.
+        """
+        soup_patch = BeautifulSoup(urlopen(Request("https://patchstorage.com/",
+                                                   headers={"User-Agent": "Mozilla/5.0"})).read(), "html.parser")
+        found_pedals = soup_patch.find_all(class_="d-flex flex-column justify-content-center")
+
+        # Convert the ResultSet to a string so we can split on what we are looking for.
+        # The PS website does not have unique div names, so this is to workaround that.
+        zoia = unicode.join(u'\n', map(unicode, found_pedals)).split("ZOIA", 1)[1].split("<strong>", 1)[1]
+
+        # For some reason, questions posted on PS count as "patches",
+        # so we need to figure out the # of questions.
+        soup_ques = BeautifulSoup(
+            urlopen(Request("https://patchstorage.com/platform/zoia/?search_query=&ptype%5B%5D=question&tax_platform"
+                            "=zoia&tax_post_tag=&orderby=modified&wpas_id=search_form&wpas_submit=1",
+                            headers={"User-Agent": "Mozilla/5.0"})).read(), "html.parser")
+
+        # Return the total minus the number of questions found.
+        return int(zoia[:3]) - len(soup_ques.find_all(class_="card"))
+
 
 def get_all_tags():
     """get master dict of all tag id's and slugs"""
 
     ps = PatchStorage()
+    per_page = 100
     search = {'orderby': 'title',
               'order': 'asc',
-              'per_page': 100}
+              'per_page': per_page}
 
     tags = {}
-    for page in range(1, ps.page_count):
+    for page in range(1, math.ceil(ps.page_count / per_page) + 1):
         body = ps.search({**search, **{'page': page}})
         for patch in body:
             more = dict(zip([s['id'] for s in patch['tags']],
@@ -303,25 +387,3 @@ def get_all_tags():
     with open('common/tags.json', 'w') as f:
         json.dump(tags, f)
     f.close()
-
-
-def get_all_patches_meta():
-    """ Retrieves the titles of all ZOIA patches currently
-    stored on PatchStorage and dumps them into a JSON file.
-    """
-
-    ps = PatchStorage()
-    search = {'orderby': 'title',
-              'order': 'asc',
-              'per_page': 100}
-
-    all_patches = []
-
-    for page in range(1, ps.page_count):
-        # Get all the patches on the current page.
-        body = ps.search({**search, **{'page': page}})
-        for patch in body:
-            # Add the title and id of each patch to a .json file on the page.
-            all_patches.append(patch)
-
-    return {"patch_list": all_patches}
