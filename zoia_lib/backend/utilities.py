@@ -1,6 +1,7 @@
 import json
 import os
 import platform
+import shutil
 import zipfile
 from pathlib import Path
 
@@ -81,21 +82,43 @@ def patch_decompress(patch):
         for file in os.listdir(pch):
             if file.split(".")[1] == "bin":
                 i += 1
-                # Rename the file to follow the conventional format
-                # TODO Change this rename the file based on the date modified.
-                os.rename(os.path.join(pch, file),
-                          os.path.join(pch, "{}_v{}.bin".format(patch[1]["id"], i)))
-                patch[1]["revision"] = str(i)
-                save_metadata_json(patch, i)
+                try:
+                    # Rename the file to follow the conventional format
+                    # TODO Change this rename the file based on the date modified.
+                    os.rename(os.path.join(pch, file),
+                              os.path.join(pch, "{}_v{}.bin".format(patch[1]["id"], i)))
+                    patch[1]["revision"] = str(i)
+                    save_metadata_json(patch, i)
+                except FileNotFoundError or FileExistsError:
+                    raise errors.RenamingError
     else:
         # Unexpected file extension encountered.
         # TODO Handle this case gracefully.
         raise errors.SavingError(patch[1]["title"])
 
 
+def import_to_backend(path):
+    """Attempts to import a simple binary patch to the backend
+       ZoiaLibraryApp directory. This method is meant to work
+       for patches that originate from a local user's machine.
+       Base metadata will be created from the available information
+       of the patch, mostly derived of the name and any additional
+       information
+
+       path: The filepath that leads to the local patch that is
+             being imported.
+       """
+    pass
+
+
 def save_to_backend(patch):
     """Attempts to save a simple binary patch and its metadata
-    to the backend ZoiaLibraryApp directory.
+    to the backend ZoiaLibraryApp directory. This method is meant
+    to work for patches retrieved via the PS API. As such, it should
+    only be called with the returned output from download() located
+    in api.py. Other input will most likely case a SavingError.
+
+    For local patch importing, see import_to_backend().
 
     patch: A tuple containing the downloaded file
            data and the patch metadata, comes from ps.download(IDX).
@@ -109,28 +132,120 @@ def save_to_backend(patch):
     # Don't try to save a file when we are missing necessary information.
     if patch is None or patch[0] is None or patch[1] is None or backend_path is None \
             or not isinstance(patch[0], bytes) or not isinstance(patch[1], dict):
-        raise errors.SavingError(patch)
+        raise errors.SavingError(None)
 
     try:
         # Ensure that the data is in valid json format.
         json.dumps(patch[1])
     except ValueError:
-        raise errors.SavingError(patch)
+        raise errors.SavingError(patch[1]["title"])
 
     patch_name = str(patch[1]['id'])
     pch = os.path.join(backend_path, "{}".format(patch_name))
     if not os.path.isdir(pch):
         os.mkdir(pch)
-
-    if isinstance(patch[0], bytes) and patch[1]["files"][0]["filename"].split(".")[1] == "bin":
-        name_bin = os.path.join(pch, "{}.bin".format(patch_name))
-        f = open(name_bin, "wb")
-        f.write(patch[0])
-        f.close()
-        save_metadata_json(patch)
+        # Make sure the files attribute exists
+        if "files" in patch[1]:
+            if isinstance(patch[0], bytes) and patch[1]["files"][0]["filename"].split(".")[1] == "bin":
+                name_bin = os.path.join(pch, "{}.bin".format(patch_name))
+                f = open(name_bin, "wb")
+                f.write(patch[0])
+                f.close()
+                save_metadata_json(patch)
+            else:
+                # Might be a compressed file.
+                patch_decompress(patch)
+        else:
+            # No files attribute,
+            raise errors.SavingError(patch[1]["title"])
     else:
-        # Might be a compressed file.
-        patch_decompress(patch)
+        """ A directory already existed for this patch id, so we
+        need to check if this a unique patch version (otherwise there
+        is not need to save it, especially if the binaries are the same).
+        """
+        for file in os.listdir(os.path.join(pch)):
+            if file.split(".")[1] == "bin":
+                f = open(os.path.join(pch, file), "rb")
+                if f.read() == patch[0]:
+                    # This exact binary is already saved onto the system.
+                    f.close()
+                    raise errors.SavingError(patch)
+                f.close()
+        # If we get here, we have a unique patch, so we need to find out what version # to give it.
+        # Case 1: Only one version of the patch existed previously.
+        if len(os.listdir(os.path.join(backend_path, pch))) == 2:
+            name_bin = os.path.join(pch, "{}_v1.bin".format(patch_name))
+            f = open(name_bin, "wb")
+            f.write(patch[0])
+            f.close()
+            save_metadata_json(patch, 1)
+            f = open(os.path.join(pch,
+                                  "{}_v1.json".format(patch_name)), "r")
+            jf = json.loads(f.read())
+            f.close()
+            f = open(os.path.join(pch,
+                                  "{}_v1.json".format(patch_name)), "w")
+            jf["revision"] = 1
+            json.dump(jf, f)
+            f.close()
+            try:
+                os.rename(os.path.join(pch, "{}.bin".format(patch_name)),
+                          os.path.join(pch, "{}_v2.bin".format(patch_name)))
+                os.rename(os.path.join(pch, "{}.json".format(patch_name)),
+                          os.path.join(pch, "{}_v2.json".format(patch_name)))
+            except FileNotFoundError or FileExistsError:
+                raise errors.RenamingError(patch)
+            f = open(os.path.join(pch,
+                                  "{}_v2.json".format(patch_name)), "r")
+            jf = json.loads(f.read())
+            f.close()
+            f = open(os.path.join(pch,
+                                  "{}_v2.json".format(patch_name)), "w")
+            jf["revision"] = 2
+            json.dump(jf, f)
+            f.close()
+        # Case 2: There were already multiple versions in the patch directory.
+        elif len(os.listdir(os.path.join(backend_path, pch))) > 2:
+            # Increment the version number for each file in the directory.
+            try:
+                for file in reversed(os.listdir(os.path.join(pch))):
+                    version_number = file.split("v")[1].split(".")[0]
+                    extension = file.split(".")[1]
+                    os.rename(os.path.join(pch, "{}_v{}.{}".format(patch_name, version_number, extension)),
+                              os.path.join(pch,
+                                           "{}_v{}.{}".format(patch_name, str(int(version_number) + 1), extension)))
+                    # Update the revision number in each metadata file
+                    f = open(os.path.join(pch,
+                                          "{}_v{}.json".format(patch_name, str(int(version_number) + 1))), "r")
+                    jf = json.loads(f.read())
+                    f.close()
+                    f = open(os.path.join(pch,
+                                          "{}_v{}.json".format(patch_name, str(int(version_number) + 1))), "w")
+                    jf["revision"] = str(int(version_number) + 1)
+                    json.dump(jf, f)
+                    f.close()
+            except FileNotFoundError or FileExistsError:
+                raise errors.RenamingError(patch)
+            # Save the newest version
+            name_bin = os.path.join(pch, "{}_v1.bin".format(patch_name))
+            f = open(name_bin, "wb")
+            f.write(patch[0])
+            f.close()
+            save_metadata_json(patch, 1)
+            # Update the revision number for the newest version
+            f = open(os.path.join(pch,
+                                  "{}_v1.json".format(patch_name)), "r")
+            jf = json.loads(f.read())
+            f.close()
+            f = open(os.path.join(pch,
+                                  "{}_v1.json".format(patch_name)), "w")
+            jf["revision"] = 1
+            json.dump(jf, f)
+            f.close()
+        else:
+            # Getting here indicates that the amount of files in the directory was less than 2
+            # (which would imply some form of corruption occurred).
+            raise errors.SavingError(patch[1]["title"])
 
 
 def save_metadata_json(patch, version=0):
@@ -226,7 +341,7 @@ def delete_patch(patch):
                     end = left_files.split(".")[1]
                     os.rename(os.path.join(new_path, left_files),
                               os.path.join(new_path, "{}.{}".format(front, end)))
-                except FileNotFoundError:
+                except FileNotFoundError or FileExistsError:
                     raise errors.RenamingError(left_files)
         elif new_path is not None and len(os.listdir(new_path)) == 0:
             """ Special case: There are no more patches left in the patch
@@ -235,3 +350,34 @@ def delete_patch(patch):
             os.rmdir(new_path)
     except FileNotFoundError:
         raise errors.DeletionError(patch)
+
+
+def delete_full_patch_directory(patch_dir):
+    """ Forces the deletion of an entire patch directory, should
+    one exist.
+    Please note that this method will not attempt to correct invalid
+    input. Please ensure that the patch parameter is exclusively the
+    name of the patch directory that will be deleted.
+
+    patch_dir: A string representing the patch directory to be deleted.
+    """
+    # No need to determine it again if we have done so before.
+    global backend_path
+    if backend_path is None:
+        backend_path = determine_backend_path()
+
+    if patch_dir is None:
+        raise errors.DeletionError(patch_dir)
+
+    if len(patch_dir.split(".")) > 1:
+        # There shouldn't be a file extension.
+        raise errors.DeletionError(patch_dir)
+    if len(patch_dir.split("_")) > 1:
+        # There shouldn't be a version extension.
+        raise errors.DeletionError(patch_dir)
+
+    try:
+        shutil.rmtree(os.path.join(backend_path, patch_dir))
+    except FileNotFoundError:
+        # Couldn't find the patch directory that was passed.
+        raise errors.DeletionError(patch_dir)

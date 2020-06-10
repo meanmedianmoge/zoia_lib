@@ -2,8 +2,8 @@ import os
 import shutil
 import unittest
 
-from zoia_lib.common import errors
 import zoia_lib.backend.utilities as util
+from zoia_lib.common import errors
 
 user_backend_path = util.determine_backend_path()
 
@@ -97,7 +97,6 @@ class TestStartup(unittest.TestCase):
         # Try to save the same patch again without making any changes to the binary contents of the patch.
         util.add_test_patch(os.path.join("55555", "55555_v2"), 55555)
         # Try to save the same patch again after making a change to the binary contents of the patch.
-        # the binary content magically changes with some excellent code here
         fb = open(os.path.join(path, "55555", "55555_v1.bin"), "rb")
         binary = fb.read()
         binary += b'ed'
@@ -112,20 +111,13 @@ class TestStartup(unittest.TestCase):
             if file == "55555":
                 correct = True
                 break
+
         self.assertTrue(correct, "Did not find a directory with the expected patch id of 55555.")
-
-        json_files = {}
-        bin_files = {}
-
-        for f in os.listdir(os.path.join(path, "55555")):
-            if os.path.splitext(f)[1] == ".bin":
-                bin_files[len(bin_files)] = f
-            elif os.path.splitext(f)[1] == ".json":
-                json_files[len(json_files)] = f
-
-        self.assertTrue(len(json_files) + len(bin_files) == 4,
+        self.assertTrue(len(os.listdir(os.path.join(path, "55555"))) == 4,
                         "Directory did not contain the expected number of files.")
-        self.assertTrue(json_files[0] == "55555_v1.json", "File 55555_v1.json was not found.")
-        self.assertTrue(json_files[1] == "55555_v2.json", "File 55555_v2.json was not found.")
-        self.assertTrue(bin_files[0] == "55555_v1.bin", "File 55555_v1.bin was not found.")
-        self.assertTrue(bin_files[1] == "55555_v2.bin", "File 55555_v2.bin was not found.")
+
+        for i in range(1, 3):
+            self.assertTrue("55555_v{}.bin".format(i) in os.listdir(os.path.join(path, "55555")),
+                            "The expected patch file \"55555_v{}.bin\" was not found.".format(i))
+            self.assertTrue("55555_v{}.json".format(i) in os.listdir(os.path.join(path, "55555")),
+                            "The expected patch file \"55555_v{}.json\" was not found.".format(i))

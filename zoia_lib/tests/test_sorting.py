@@ -8,5 +8,5 @@ class TestSorting(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_metadata_creation(self):
+    def test_title_sort(self):
         pass

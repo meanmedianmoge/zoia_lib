@@ -137,7 +137,7 @@ class PatchStorage:
             date = datetime.datetime.strptime(date, '%Y-%m-%d')
             return date.isoformat()
         except ValueError:
-            raise ValueError('Incorrect data format, should be YYYY-MM-DD')
+            raise ValueError('Incorrect date format, should be YYYY-MM-DD')
 
     def endpoint(self,
                  endpoint: str):

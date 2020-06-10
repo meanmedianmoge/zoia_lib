@@ -18,9 +18,8 @@ class DeletionTest(unittest.TestCase):
         util.add_test_patch("22223", 22223)
 
         # Create a version directory with 3 versions
-        util.add_test_patch(os.path.join("22224", "22224_v1"), 22224)
-        util.add_test_patch(os.path.join("22224", "22224_v2"), 22224)
-        util.add_test_patch(os.path.join("22224", "22224_v3"), 22224)
+        for i in range(1, 4):
+            util.add_test_patch(os.path.join("22224", "22224_v{}".format(i)), 22224)
 
     def tearDown(self):
         # Clean up everything (in case it wasn't deleted properly).
@@ -53,27 +52,9 @@ class DeletionTest(unittest.TestCase):
         except FileNotFoundError:
             pass
         try:
-            os.remove(os.path.join(testing_path, "22224", "22224_v1.bin"))
-        except FileNotFoundError:
-            pass
-        try:
-            os.remove(os.path.join(testing_path, "22224", "22224_v1.json"))
-        except FileNotFoundError:
-            pass
-        try:
-            os.remove(os.path.join(testing_path, "22224", "22224_v2.bin"))
-        except FileNotFoundError:
-            pass
-        try:
-            os.remove(os.path.join(testing_path, "22224", "22224_v2.json"))
-        except FileNotFoundError:
-            pass
-        try:
-            os.remove(os.path.join(testing_path, "22224", "22224_v3.bin"))
-        except FileNotFoundError:
-            pass
-        try:
-            os.remove(os.path.join(testing_path, "22224", "22224_v3.json"))
+            for i in range(1, 4):
+                os.remove(os.path.join(testing_path, "22224", "22224_v{}.bin".format(i)))
+                os.remove(os.path.join(testing_path, "22224", "22224_v{}.bin".format(i)))
         except FileNotFoundError:
             pass
 
@@ -99,27 +80,20 @@ class DeletionTest(unittest.TestCase):
 
         # Ensure the deletion removed both 22222.bin and 22222.json
         for file in os.listdir(testing_path):
-            if file == "22222.bin" or file == "22222.json" or file == "22222":
-                self.fail("Deletion did not properly remove both the 22222 patch file, "
-                          "associated metadata, and patch directory")
+            self.assertFalse(file == "22222.bin" or file == "22222.json" or file == "22222",
+                             "Deletion did not properly remove both the 22222 patch file, "
+                             "associated metadata, and patch directory")
 
         # Check to make sure that no other files got deleted unexpectedly.
-        if "22223" not in os.listdir(testing_path):
-            self.fail("Deletion also removed 22223 patch directory when it should not have.")
-        if "22224" not in os.listdir(testing_path):
-            self.fail("Deletion also removed 22224 patch directory when it should not have.")
-        if "22224_v1.bin" not in os.listdir(os.path.join(testing_path, "22224")):
-            self.fail("Deletion also removed the 22224_v1.bin when it should not have.")
-        if "22224_v1.json" not in os.listdir(os.path.join(testing_path, "22224")):
-            self.fail("Deletion also removed the 22224_v1.json when it should not have.")
-        if "22224_v2.bin" not in os.listdir(os.path.join(testing_path, "22224")):
-            self.fail("Deletion also removed the 22224_v2.bin when it should not have.")
-        if "22224_v2.json" not in os.listdir(os.path.join(testing_path, "22224")):
-            self.fail("Deletion also removed the 22224_v2.json when it should not have.")
-        if "22224_v3.bin" not in os.listdir(os.path.join(testing_path, "22224")):
-            self.fail("Deletion also removed the 22224_v3.bin when it should not have.")
-        if "22224_v3.json" not in os.listdir(os.path.join(testing_path, "22224")):
-            self.fail("Deletion also removed the 22224_v3.json when it should not have.")
+        self.assertFalse("22223" not in os.listdir(testing_path),
+                         "Deletion also removed 22223 patch directory when it should not have.")
+        self.assertFalse("22224" not in os.listdir(testing_path),
+                         "Deletion also removed 22224 patch directory when it should not have.")
+        for i in range(1, 4):
+            self.assertTrue("22224_v{}.bin".format(i) in os.listdir(os.path.join(testing_path, "22224")),
+                            "Deletion also removed patch file \"22224_v{}.bin\" when it should not have.".format(i))
+            self.assertTrue("22224_v{}.json".format(i) in os.listdir(os.path.join(testing_path, "22224")),
+                            "Deletion also removed patch file \"22224_v{}.json\" when it should not have.".format(i))
 
         self.tearDown()
 
@@ -148,8 +122,8 @@ class DeletionTest(unittest.TestCase):
 
         # Ensure the deletion removed both 22224_v1.bin and 22224_v1.json
         for file in os.listdir(os.path.join(testing_path, "22224")):
-            if file == "22224_v1.bin" or file == "22224_v1.json":
-                self.fail("Deletion did not properly remove both the 22224_v1 patch file and associated metadata.")
+            self.assertFalse(file == "22224_v1.bin" or file == "22224_v1.json",
+                             "Deletion did not properly remove both the 22224_v1 patch file and associated metadata.")
 
         # Delete another version (which leaves only one version of the patch.
         try:
@@ -159,14 +133,48 @@ class DeletionTest(unittest.TestCase):
 
         # Ensure the remaining version of the patch was renamed properly.
         for patch in os.listdir(os.path.join(testing_path, "22224")):
-            if patch == "22224_v3.bin" or patch == "22224_v3.json" or patch == "22224":
-                self.fail("Deletion did not properly result in the renaming of the singularly remaining patch version.")
+            self.assertFalse(patch == "22224_v3.bin" or patch == "22224_v3.json" or patch == "22224",
+                             "Deletion did not properly result in the renaming of the singularly "
+                             "remaining patch version.")
 
         # Check to make sure that no other files got deleted unexpectedly.
-        if "22222" not in os.listdir(testing_path):
-            self.fail("Deletion also removed 22222 patch directory when it should not have.")
-        if "22223" not in os.listdir(testing_path):
-            self.fail("Deletion also removed 22223 patch directory when it should not have.")
+        self.assertFalse("22222" not in os.listdir(testing_path),
+                         "Deletion also removed 22222 patch directory when it should not have.")
+        self.assertFalse("22223" not in os.listdir(testing_path),
+                         "Deletion also removed 22223 patch directory when it should not have.")
+
+        self.tearDown()
+
+    def test_delete_patch_directory(self):
+        self.setUp()
+
+        # Try to break the method.
+        exc = (FileNotFoundError, errors.DeletionError)
+        self.assertRaises(exc, util.delete_full_patch_directory, "IamNotAPatch")
+        self.assertRaises(exc, util.delete_full_patch_directory, None)
+        self.assertRaises(exc, util.delete_full_patch_directory, "22222.bin")
+        self.assertRaises(exc, util.delete_full_patch_directory, "22224_v1.bin")
+        self.assertRaises(exc, util.delete_full_patch_directory, "22224_v1")
+
+        # Try to delete a patch directory.
+        util.delete_full_patch_directory("22222")
+        self.assertFalse("22222" in os.listdir(testing_path),
+                         "Deletion did not successfully remove patch directory 22222.")
+        # Try to delete it again.
+        self.assertRaises(exc, util.delete_full_patch_directory, "22222")
+
+        # Try to delete a patch directory with multiple patches contained within.
+        util.delete_full_patch_directory("22224")
+        self.assertFalse("22224" in os.listdir(testing_path),
+                         "Deletion did not successfully remove patch directory 22224.")
+        try:
+            for i in range(1, 4):
+                self.assertTrue("22224_v{}.bin".format(i) in os.listdir(os.path.join(testing_path, "22224")),
+                                "Deletion did not remove patch file \"22224_v{}.bin\".".format(i))
+                self.assertTrue("22224_v{}.json".format(i) in os.listdir(os.path.join(testing_path, "22224")),
+                                "Deletion did not remove patch file \"22224_v{}.json\".".format(i))
+        except FileNotFoundError:
+            pass
 
         self.tearDown()
 

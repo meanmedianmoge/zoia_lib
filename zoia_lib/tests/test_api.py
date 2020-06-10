@@ -1,4 +1,5 @@
 import json
+import os
 import unittest
 from urllib.request import Request, urlopen
 
@@ -7,7 +8,6 @@ from jsonschema import validate, ValidationError
 from numpy import unicode
 
 import zoia_lib.backend.api as api
-import zoia_lib.backend.utilities as util
 
 ps = api.PatchStorage()
 
@@ -16,7 +16,7 @@ class TestAPI(unittest.TestCase):
     def test_api_all_zoia_patches(self):
         """ Query the PS API to ensure that all ZOIA patches are returned,
         and ensure that they are of the correct format as dictated by the
-        MetadataSchema.json schema.
+        MinSchema.json schema.
         """
         # Need a known user agent to avoid getting 403'd.
         # Used to grab the current number of ZOIA patches on PS.
@@ -41,7 +41,7 @@ class TestAPI(unittest.TestCase):
         self.assertTrue(int(zoia[:3]) - len(soup_ques.find_all(class_="card")) ==
                         len(patch_list["patch_list"]), "Returned patch list does not contain all ZOIA patches.")
 
-        # Validate the patches returned against the BaseSchema.json file
+        # Validate the patches returned against the MinSchema.json file
         with open('../common/MinSchema.json') as f:
             min_schema = json.load(f)
 
@@ -74,7 +74,7 @@ class TestAPI(unittest.TestCase):
     def test_api_download_bin(self):
         """ Query the PS API for a patch with the .bin extension,
         and ensure that it is in the correct format as dictated by the
-        BaseSchema.json schema.
+        MetadataSchema.json schema.
         """
         # Try to download something that doesn't exist.
         f = ps.download("1111111111")
@@ -94,7 +94,7 @@ class TestAPI(unittest.TestCase):
             meta_schema = json.load(file)
 
         try:
-            jf = f[1]
+            jf = json.dumps(f[1])
         except ValueError:
             self.fail("Returned tuple did not contain valid json data in the second element.")
 
@@ -141,18 +141,16 @@ class TestAPI(unittest.TestCase):
                         "Returned min item did not contain the custom_license_text attribute.")
 
     def test_api_download_compressed(self):
-        """ Query the PS API for a compressed patch, uncompress the patch,
-        and ensure that it is in the correct format as dictated by the
-        BaseSchema.json schema.
+        """ Query the PS API for a compressed patch, and ensure that
+        it is in the correct format as dictated by the MetadataSchema.json schema.
         """
 
-        # Try to download a compressed file.
+        # Try to download a zip file.
         f = ps.download("124436")
         self.assertIsNotNone(f, "Did not retrieve patch data despite the patch id existing in PatchStorage.")
         self.assertTrue(isinstance(f[0], bytes), "Returned tuple did not contain binary data in the first element.")
         try:
-            util.save_to_backend(f)
-            pass
+            jf = json.dumps(f[1])
         except ValueError:
             self.fail("Returned tuple did not contain valid json data in the second element.")
 
@@ -164,3 +162,40 @@ class TestAPI(unittest.TestCase):
             validate(instance=f[1], schema=meta_schema)
         except ValueError:
             self.fail("Returned json data failed to validate against the MetadataSchema.json schema.")
+
+        self.assertTrue("id" in jf,
+                        "Returned min item did not contain the id attribute.")
+        self.assertTrue("link" in jf,
+                        "Returned min item did not contain the link attribute.")
+        self.assertTrue("content" in jf,
+                        "Returned min item did not contain the content attribute.")
+        self.assertTrue("files" in jf,
+                        "Returned min item did not contain the files attribute.")
+        self.assertTrue("preview_url" in jf,
+                        "Returned min item did not contain the preview_url attribute.")
+        self.assertTrue("revision" in jf,
+                        "Returned min item did not contain the revision attribute.")
+        self.assertTrue("view_count" in jf,
+                        "Returned min item did not contain the review_count attribute.")
+        self.assertTrue("like_count" in jf,
+                        "Returned min item did not contain the like_count attribute.")
+        self.assertTrue("download_count" in jf,
+                        "Returned min item did not contain the download_count attribute.")
+        self.assertTrue("author" in jf,
+                        "Returned min item did not contain the author attribute.")
+        self.assertTrue("title" in jf,
+                        "Returned min item did not contain the title attribute.")
+        self.assertTrue("created_at" in jf,
+                        "Returned min item did not contain the created_at attribute.")
+        self.assertTrue("updated_at" in jf,
+                        "Returned min item did not contain the updated_at attribute.")
+        self.assertTrue("tags" in jf,
+                        "Returned min item did not contain the tags attribute.")
+        self.assertTrue("categories" in jf,
+                        "Returned min item did not contain the categories attribute.")
+        self.assertTrue("state" in jf,
+                        "Returned min item did not contain the state attribute.")
+        self.assertTrue("license" in jf,
+                        "Returned min item did not contain the license attribute.")
+        self.assertTrue("custom_license_text" in jf,
+                        "Returned min item did not contain the custom_license_text attribute.")
