@@ -384,6 +384,7 @@ def get_all_tags():
                 more.pop(idx, None)
             tags = {**tags, **more}
 
-    with open('common/tags.json', 'w') as f:
+    os.chdir(os.path.dirname(os.getcwd()))
+    with open(os.path.join("common", "tags.json"), 'w') as f:
         json.dump(tags, f)
     f.close()

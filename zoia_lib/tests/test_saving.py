@@ -66,24 +66,34 @@ class TestSorting(unittest.TestCase):
         # Try to save a different patch with the same id (should correctly make a new version since the binary has
         # changed).
         util.save_to_backend((b"TestDifferentBinary", sample_json))
+        # Check the contents of the patch directory and ensure the revision numbers were updated correctly.
         for i in range(1, 3):
-            self.assertTrue("122661_v{}.bin".format(i) in os.listdir(os.path.join(testing_path, "122661")),
-                        "The expected patch file \"122661_v{}.bin\" was not found.".format(i))
-            self.assertTrue("122661_v{}.json".format(i) in os.listdir(os.path.join(testing_path, "122661")),
-                        "The expected patch file \"122661_v{}.json\" was not found.".format(i))
-
-        # TODO Verify the revision numbers were properly updated.
+            self.assertTrue("122661_v{}.bin".format(i) in sorted(os.listdir(os.path.join(testing_path, "122661"))),
+                            "The expected patch file \"122661_v{}.bin\" was not found.".format(i))
+            self.assertTrue("122661_v{}.json".format(i) in sorted(os.listdir(os.path.join(testing_path, "122661"))),
+                            "The expected patch file \"122661_v{}.json\" was not found.".format(i))
+            f = open(os.path.join(testing_path, "122661", "122661_v{}.json".format(i)), "r")
+            jf = json.loads(f.read())
+            f.close()
+            self.assertTrue(jf["revision"] == i,
+                            "The expected revision number for \"122661_v{}.json\" "
+                            "was not found (Got {} and expected {}).".format(i, jf["revision"], i))
 
         # Try to save a different patch with the same id (should correctly make a new version since the binary has
         # changed).
         util.save_to_backend((b"TestDifferentBinaryAgain", sample_json))
+        # Check the contents of the patch directory and ensure the revision numbers were updated correctly.
         for i in range(1, 4):
-            self.assertTrue("122661_v{}.bin".format(i) in os.listdir(os.path.join(testing_path, "122661")),
-                        "The expected patch file \"122661_v{}.bin\" was not found.".format(i))
-            self.assertTrue("122661_v{}.json".format(i) in os.listdir(os.path.join(testing_path, "122661")),
-                        "The expected patch file \"122661_v{}.json\" was not found.".format(i))
-
-        # TODO Verify the revision numbers were properly updated.
+            self.assertTrue("122661_v{}.bin".format(i) in sorted(os.listdir(os.path.join(testing_path, "122661"))),
+                            "The expected patch file \"122661_v{}.bin\" was not found.".format(i))
+            self.assertTrue("122661_v{}.json".format(i) in sorted(os.listdir(os.path.join(testing_path, "122661"))),
+                            "The expected patch file \"122661_v{}.json\" was not found.".format(i))
+            f = open(os.path.join(testing_path, "122661", "122661_v{}.json".format(i)), "r")
+            jf = json.loads(f.read())
+            f.close()
+            self.assertTrue(jf["revision"] == i,
+                            "The expected revision number for \"122661_v{}.json\" "
+                            "was not found (Got {} and expected {}).".format(i, jf["revision"], i))
 
     def test_save_patch_api_compressed(self):
         """ Attempts to save a regular compressed patch to the
@@ -107,10 +117,21 @@ class TestSorting(unittest.TestCase):
 
         # Make sure the patch directory got created.
         self.assertTrue("124436" in os.listdir(testing_path), "The patch directory for patch 122661 was not found.")
-        # Check the contents of the patch directory.
-        for i in range(1, 10):
-            self.assertTrue("124436_v{}.bin".format(i) in os.listdir(os.path.join(testing_path, "124436")),
+        # Check the contents of the patch directory and ensure the revision numbers were updated correctly.
+        for i in range(1, 11):
+            self.assertTrue("124436_v{}.bin".format(i) in sorted(os.listdir(os.path.join(testing_path, "124436"))),
                             "The expected patch file \"124436_v{}.bin\" was not found.".format(i))
-            self.assertTrue("124436_v{}.json".format(i) in os.listdir(os.path.join(testing_path, "124436")),
+            self.assertTrue("124436_v{}.json".format(i) in sorted(os.listdir(os.path.join(testing_path, "124436"))),
                             "The expected patch file \"124436_v{}.json\" was not found.".format(i))
-        # TODO fix the bytes so it doesn't cause the test to fail.
+            f = open(os.path.join(testing_path, "124436", "124436_v{}.json".format(i)), "r")
+            jf = json.loads(f.read())
+            f.close()
+            self.assertTrue(jf["revision"] == i,
+                            "The expected revision number for \"124436_v{}.json\" "
+                            "was not found (Got {} and expected {}).".format(i, jf["revision"], i))
+
+        # Try to same the same patch again (should fail, since the binary has not changed).
+        exc = (FileNotFoundError, errors.SavingError)
+        self.assertRaises(exc, util.save_to_backend, (sample_bytes, sample_json))
+
+        # TODO Test other compression algorithms
