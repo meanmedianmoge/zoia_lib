@@ -1,4 +1,5 @@
 import json
+import os
 import unittest
 from urllib.request import Request, urlopen
 
@@ -41,8 +42,9 @@ class TestAPI(unittest.TestCase):
         self.assertTrue(int(zoia[:3]) - len(soup_ques.find_all(class_="card")) ==
                         len(patch_list["patch_list"]), "Returned patch list does not contain all ZOIA patches.")
 
-        # Validate the patches returned against the BaseSchema.json file
-        with open('zoia_lib/common/MinSchema.json') as f:
+        # Validate the patches returned against the MinSchema.json file
+        os.chdir(os.path.dirname(os.getcwd()))
+        with open(os.path.join("common", "MinSchema.json")) as f:
             min_schema = json.load(f)
 
         """ Check to ensure only the attributes in the MinSchema are present.
@@ -90,7 +92,8 @@ class TestAPI(unittest.TestCase):
         self.assertTrue(isinstance(f[0], bytes), "Returned tuple did not contain binary data in the first element.")
 
         # Validate the patches returned against the MetadataSchema.json file
-        with open('zoia_lib/common/MetadataSchema.json') as file:
+        os.chdir(os.path.dirname(os.getcwd()))
+        with open(os.path.join("common", "MetadataSchema.json")) as file:
             meta_schema = json.load(file)
 
         try:
@@ -157,7 +160,8 @@ class TestAPI(unittest.TestCase):
             self.fail("Returned tuple did not contain valid json data in the second element.")
 
         # Validate the patches returned against the MetadataSchema.json file
-        with open('zoia_lib/common/MetadataSchema.json') as file:
+        os.chdir(os.path.dirname(os.getcwd()))
+        with open(os.path.join("common", "MetadataSchema.json")) as file:
             meta_schema = json.load(file)
 
         try:
