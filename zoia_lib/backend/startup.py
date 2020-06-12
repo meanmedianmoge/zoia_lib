@@ -12,8 +12,9 @@ if __name__ == "__main__":
     ps = api.PatchStorage()
 
     # Get the list of patches on PS to pass to the GUI
-    # Maybe we let the user do this with a button instead of doing it automatically?
-    # get_all_patches_meta()
+    # TODO Maybe we let the user do this with a button
+    #  instead of doing it automatically?
+    # patch_list = get_all_patches_min()
 
     # Launch the GUI.
     app = QApplication(sys.argv)
