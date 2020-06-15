@@ -10,9 +10,18 @@ testing_path = os.getcwd()
 
 
 class TestSorting(unittest.TestCase):
+    """ This class is responsible for testing the various patch
+    saving methods that are to be used by the application.
+
+    Currently, the tests cover the saving of both .bin and .zip files
+    originating from the PS API and from a local user's
+    computer and SD card.
+    """
 
     def setUp(self):
         util.backend_path = testing_path
+        open(os.path.join(testing_path, "sample_files",
+                          "019_zoia_testpatch.bin"), 'a').close()
 
     def tearDown(self):
         try:
@@ -21,6 +30,11 @@ class TestSorting(unittest.TestCase):
             pass
         try:
             shutil.rmtree(os.path.join(testing_path, "124436"))
+        except FileNotFoundError:
+            pass
+        try:
+            os.remove(os.path.join(testing_path, "sample_files",
+                                   "019_zoia_testpatch.bin"))
         except FileNotFoundError:
             pass
 
@@ -174,3 +188,30 @@ class TestSorting(unittest.TestCase):
                           (sample_bytes, sample_json))
 
         # TODO Test other compression algorithms
+
+    def test_save_patch_local_bin(self):
+        """ Attempts to save a regular binary patch to the
+        backend ZoiaLibraryApp directory. This requires the
+        creation of a patch directory to store the patch within,
+        along with the accompanying metadata. This simulates a
+        patch that originates from a user's machine or from an SD card.
+        """
+
+        # Try to break the method.
+        exc = (FileNotFoundError, errors.SavingError)
+        self.assertRaises(exc, util.import_to_backend, None)
+        self.assertRaises(exc, util.import_to_backend, "I am not a patch")
+
+        util.import_to_backend(os.path.join(testing_path, "sample_files",
+                                            "019_zoia_testpatch.bin"))
+
+        # TODO Cleanup afterwards.
+
+    def test_save_patch_local_compressed(self):
+        """ Attempts to save a regular compressed patch to the
+        backend ZoiaLibraryApp directory. This requires the
+        creation of a patch directory to store the patch within,
+        along with the accompanying metadata. This simulates a
+        patch that originates from a user's machine or from an SD card.
+        """
+        pass

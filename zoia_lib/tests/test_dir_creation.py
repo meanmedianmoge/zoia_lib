@@ -9,11 +9,12 @@ backend_path = util.determine_backend_path()
 
 
 class TestStartup(unittest.TestCase):
-    """ This class is responsible for testing the various deletion
-    methods that are to be used on data stored in the backend
-    application directory. Currently, the tests cover the deletion of
-    locally stored patches, a specific local version of a patch, and the
-    deletion of an entire patch directory.
+    """ This class is responsible for testing the various directory
+    creation methods that are to be used by the application.
+
+    Currently, the tests cover the creation of the initial backend
+    .ZoiaLibraryApp directory, along with the creation of patch
+    directories within said .ZoiaLibraryApp directory.
     """
 
     def setUp(self):

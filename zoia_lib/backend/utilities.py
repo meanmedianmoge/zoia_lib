@@ -1,6 +1,8 @@
+import datetime
 import json
 import os
 import platform
+import random
 import shutil
 import zipfile
 from pathlib import Path
@@ -92,9 +94,14 @@ def patch_decompress(patch):
                     os.rename(os.path.join(pch, file),
                               os.path.join(pch, "{}_v{}.bin".format(
                                   patch[1]["id"], i)))
-                    save_metadata_json(patch, i)
+                    save_metadata_json(patch[1], i)
                 except FileNotFoundError or FileExistsError:
                     raise errors.RenamingError(patch, 601)
+            else:
+                # Remove any additional files.
+                # TODO make this better. Shouldn't just delete
+                #  additional files.
+                os.remove(os.path.join(pch, file))
     else:
         # Unexpected file extension encountered.
         # TODO Handle this case gracefully.
@@ -102,17 +109,61 @@ def patch_decompress(patch):
 
 
 def import_to_backend(path):
-    """Attempts to import a simple binary patch to the backend
+    """Attempts to import a patch to the backend
     ZoiaLibraryApp directory. This method is meant to work
-    for patches that originate from a local user's machine.
+    for patches that originate from a local user's machine,
+    or from a ZOIA formatted SD card.
+
     Base metadata will be created from the available information
     of the patch, mostly derived of the name and any additional
-    information
+    information that can be ascertained.
 
     path: The filepath that leads to the local patch that is
           being imported.
+    Raises a SavingError should the patch fail to save.
     """
-    pass
+
+    global backend_path
+    if backend_path is None:
+        backend_path = determine_backend_path()
+
+    if path is None:
+        raise errors.SavingError(None)
+
+    # Get the file extension for the patch that is being imported.
+    if "." not in path:
+        raise errors.SavingError(path)
+    patch_name, ext = path.split(".")
+    patch_name = patch_name.split("/")[-1]
+    # Generate a random patch ID to use (must be 5 digits).
+    while True:
+        patch_id = str(random.randint(10000, 99999))
+        if patch_id not in os.listdir(backend_path):
+            break
+    if "_zoia_" in patch_name:
+        patch_name = patch_name.split("_zoia_")[1]
+    # Binary file, easiest case.
+    # Get the bytes.
+    with open(path, "rb") as f:
+        temp_data = f.read()
+    # Prepare the JSON.
+    js_data = {
+        "id": patch_id,
+        "created_at": "{:%Y-%m-%dT%H:%M:%S+00:00}".format(
+            datetime.datetime.now()),
+        "updated_at": "{:%Y-%m-%dT%H:%M:%S+00:00}".format(
+            datetime.datetime.now()),
+        "title": patch_name,
+        "revision": "1",
+        "files": [
+            {
+                "id": patch_id,
+                "filename": patch_name + "." + ext
+            }
+        ]
+    }
+    # Try to save the patch.
+    save_to_backend((temp_data, js_data))
 
 
 def save_to_backend(patch):
@@ -163,7 +214,7 @@ def save_to_backend(patch):
             name_bin = os.path.join(pch, "{}.bin".format(pch_id))
             with open(name_bin, "wb") as f:
                 f.write(patch[0])
-            save_metadata_json(patch)
+            save_metadata_json(patch[1])
         else:
             # No files attribute,
             raise errors.SavingError(patch[1]["title"], 503)
@@ -180,7 +231,8 @@ def save_to_backend(patch):
 
             # Figure out which file compression is being used.
             if patch[1]["files"][0]["filename"].split(".")[1] == "zip":
-                # Create a temporary directory to store the extracted files.
+                # Create a temporary directory to store
+                # the extracted files.
                 os.mkdir(os.path.join(backend_path, "temp"))
                 # Write the zip
                 zfile = os.path.join(backend_path, "temp.zip")
@@ -232,7 +284,7 @@ def save_to_backend(patch):
             name_bin = os.path.join(pch, "{}_v1.bin".format(pch_id))
             with open(name_bin, "wb") as f:
                 f.write(patch[0])
-            save_metadata_json(patch, 1)
+            save_metadata_json(patch[1], 1)
             try:
                 os.rename(os.path.join(pch, "{}.bin".format(pch_id)),
                           os.path.join(pch, "{}_v2.bin".format(pch_id)))
@@ -282,7 +334,7 @@ def save_to_backend(patch):
             name_bin = os.path.join(pch, "{}_v1.bin".format(pch_id))
             with open(name_bin, "wb") as f:
                 f.write(patch[0])
-            save_metadata_json(patch, 1)
+            save_metadata_json(patch[1], 1)
         else:
             """ Getting here indicates that the amount of files in the 
             directory was less than 2 (which would imply some form of 
@@ -291,13 +343,12 @@ def save_to_backend(patch):
             raise errors.SavingError(patch[1]["title"])
 
 
-def save_metadata_json(patch, version=0):
+def save_metadata_json(metadata, version=0):
     """ Method stub for saving metadata. Should be expanded to work
     for patches that do not originate from the PS API.
 
-    patch: A tuple containing the downloaded file
-           data and the patch metadata, comes from ps.download(IDX).
-           patch[0] is raw binary data, while patch[1] is json data.
+    metadata: A string containing the JSON data that will be used for
+              the metadata file that is being created.
     version: Optional. If the patch needs a version suffix, this
              parameter should be set to the appropriate version number.
              Valid version numbers are > 0.
@@ -309,18 +360,18 @@ def save_metadata_json(patch, version=0):
 
     # Save the metadata.
     if version <= 0:
-        name_json = os.path.join(backend_path, str(patch[1]['id']),
-                                 "{}.json".format(patch[1]["id"]))
+        name_json = os.path.join(backend_path, str(metadata['id']),
+                                 "{}.json".format(metadata["id"]))
     else:
-        name_json = os.path.join(backend_path, str(patch[1]['id']),
-                                 "{}_v{}.json".format(patch[1]["id"], version))
+        name_json = os.path.join(backend_path, str(metadata['id']),
+                                 "{}_v{}.json".format(metadata["id"], version))
 
     # Update the revision number if need be.
     if version > 0:
-        patch[1]["revision"] = version
+        metadata["revision"] = version
 
     with open(name_json, "w") as jf:
-        json.dump(patch[1], jf)
+        json.dump(metadata, jf)
 
 
 def add_test_patch(name, idx):
@@ -362,6 +413,8 @@ def delete_patch(patch):
     the backend ZoiaLibraryApp directory.
 
     patch: A string representing the patch to be deleted.
+    Raises a RenamingError if the file could not be renamed correctly.
+    Raises a BadPathError if patch was not a valid path.
     """
 
     global backend_path
@@ -414,7 +467,7 @@ def delete_full_patch_directory(patch_dir):
 
     patch_dir: A string representing the patch directory to be deleted.
     Raises a DeletionError if patch_dir is malformed.
-    Raises a BadPathError if patch_dir does not lead to a path.
+    Raises a BadPathError if patch_dir does not lead to a patch.
     """
 
     global backend_path
@@ -436,3 +489,39 @@ def delete_full_patch_directory(patch_dir):
     except FileNotFoundError:
         # Couldn't find the patch directory that was passed.
         raise errors.BadPathError(patch_dir, 301)
+
+
+def delete_patch_sd(path):
+    """ Attempts to delete a patch located on an inserted, ZOIA
+    formatted, SD card.
+
+    This method relies on the user leaving the SD card inserted
+    while the deletion occurs. Otherwise, corruption is likely
+    to occur.
+
+    path: A string representing the path to the patch on the inserted
+          SD card. This path must include the name of the file to be
+          deleted, otherwise the method will not know which file to
+          delete and a DeletionError will be raised.
+    Raises BadPatchError if path does not lead to a patch.
+    Raises a DeletionError if patch_dir is malformed, cannot find a
+    a patch to delete, or the SD card is removed during deletion.
+    """
+
+    global backend_path
+    if backend_path is None:
+        backend_path = determine_backend_path()
+
+    if path is None:
+        raise errors.DeletionError(None)
+
+    if not len(path.split(".")) > 1:
+        # There should be a file extension.
+        raise errors.DeletionError(path, 403)
+
+    # Delete the patch.
+    try:
+        os.remove(path)
+    except FileNotFoundError:
+        # Couldn't find the patch at the supplied path.
+        raise errors.BadPathError(path, 301)

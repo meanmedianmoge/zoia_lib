@@ -6,7 +6,7 @@ from zoia_lib.backend.renumber import Renumber
 
 # Renumber changes the pwd so we save where we started here.
 THIS_DIR = os.path.dirname(__file__)
-TEST_RELATIVE_PATH = 'test_files/'
+TEST_RELATIVE_PATH = 'sample_files/'
 PATH = os.path.join(THIS_DIR, TEST_RELATIVE_PATH)
 TEST_FILE_NAMES = [
     '018_zoia_Afterneath_V4.bin',

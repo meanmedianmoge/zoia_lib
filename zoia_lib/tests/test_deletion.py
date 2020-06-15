@@ -11,7 +11,9 @@ test_path = os.getcwd()
 class DeletionTest(unittest.TestCase):
     """ This class is responsible for testing the various deletion
     methods that are to be used on data stored in the backend
-    application directory. Currently, the tests cover the deletion of
+    application directory.
+
+    Currently, the tests cover the deletion of
     locally stored patches, a specific local version of a patch, and the
     deletion of an entire patch directory.
     """
@@ -226,5 +228,23 @@ class DeletionTest(unittest.TestCase):
         inserted SD card.
         """
 
-        # TODO Buy an SD card adapter and get to work on this.
-        pass
+        # In order to simulate this, we can just delete any patch using
+        # the full path name and the appropriate method.
+
+        # Try to break the method.
+        exc = (FileNotFoundError, errors.DeletionError, errors.BadPathError)
+        self.assertRaises(exc, util.delete_patch_sd,
+                          None)
+        self.assertRaises(exc, util.delete_patch_sd,
+                          "IamNotAPatch")
+
+        util.delete_patch_sd(os.path.join(test_path, "22222", "22222.bin"))
+        # Ensure it got deleted correctly.
+        self.assertTrue("22222.bin" not in
+                        os.listdir(os.path.join(test_path, "22222")))
+        # Try to delete it again.
+        self.assertRaises(exc, util.delete_patch_sd,
+                          os.path.join(test_path, "22222", "22222.bin"))
+        # Try to delete a patch without the file extension.
+        self.assertRaises(exc, util.delete_patch_sd,
+                          os.path.join(test_path, "22222", "22222"))
