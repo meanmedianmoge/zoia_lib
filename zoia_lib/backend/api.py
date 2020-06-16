@@ -366,6 +366,9 @@ class PatchStorage:
         # Return the total minus the number of questions found.
         return int(zoia[:3]) - len(soup_ques.find_all(class_="card"))
 
+    def get_possible_updates(self):
+        pass
+
 
 def get_all_tags():
     """get master dict of all tag id's and slugs"""

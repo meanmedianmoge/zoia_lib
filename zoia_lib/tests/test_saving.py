@@ -114,7 +114,7 @@ class TestSorting(unittest.TestCase):
                             "\"122661_v{}.json\" was not found (Got {} and "
                             "expected {}).".format(i, jf["revision"], i))
 
-        # Try to save a different patch with the same id
+        # Try to save a different patch with the same id again
         # (should correctly make a new version since the binary has changed).
         util.save_to_backend((b"TestDifferentBinaryAgain", sample_json))
         # Check the contents of the patch directory and ensure the
@@ -183,6 +183,10 @@ class TestSorting(unittest.TestCase):
 
         # Try to same the same patch again
         # (should fail, since the binary has not changed).
+        with open(os.path.join(os.getcwd(),
+                               "sample_files",
+                               "sampleJSONZIP.json"), "r") as f:
+            sample_json = json.loads(f.read())
         exc = (FileNotFoundError, errors.SavingError)
         self.assertRaises(exc, util.save_to_backend,
                           (sample_bytes, sample_json))

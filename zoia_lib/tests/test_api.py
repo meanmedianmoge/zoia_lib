@@ -279,3 +279,6 @@ class TestAPI(unittest.TestCase):
         self.assertTrue("custom_license_text" in jf,
                         "Returned min item did not contain the "
                         "custom_license_text attribute.")
+
+    def test_check_for_updates(self):
+        pass

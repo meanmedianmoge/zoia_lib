@@ -105,4 +105,23 @@ class RenamingError(ZoiaLibError):
         else:
             # Default case. We do not want to get here.
             print(f'Could not rename the file {patch} correctly '
-                  f'due to an unexpected error..')
+                  f'due to an unexpected error.')
+
+class ExportingError(ZoiaLibError):
+    """Class raised when a file could not be exported correctly.
+
+    Possible error codes:
+     - 701: The slot identifier was not in the correct range.
+    """
+
+    def __init__(self, patch, slot, error_code=0):
+        if patch is None:
+            print(f'Expected a patch name but got None instead.')
+        elif error_code == 701:
+            print(f'Could not export the file {patch} correctly '
+                  f'due to the slot number being greater than 63 '
+                  f'(got {slot}).')
+        else:
+            # Default case. We do not want to get here.
+            print(f'Could not export the file {patch} correctly '
+                  f'due to an unexpected error.')

@@ -88,12 +88,14 @@ def patch_decompress(patch):
             if file.split(".")[1] == "bin":
                 i += 1
                 try:
+                    name = file
                     # Rename the file to follow the conventional format
                     # TODO Change this to rename the file based on the
                     #  date modified.
                     os.rename(os.path.join(pch, file),
                               os.path.join(pch, "{}_v{}.bin".format(
                                   patch[1]["id"], i)))
+                    patch[1]["files"][0]["filename"] = name
                     save_metadata_json(patch[1], i)
                 except FileNotFoundError or FileExistsError:
                     raise errors.RenamingError(patch, 601)
@@ -140,8 +142,6 @@ def import_to_backend(path):
         patch_id = str(random.randint(10000, 99999))
         if patch_id not in os.listdir(backend_path):
             break
-    if "_zoia_" in patch_name:
-        patch_name = patch_name.split("_zoia_")[1]
     # Binary file, easiest case.
     # Get the bytes.
     with open(path, "rb") as f:
@@ -426,13 +426,12 @@ def delete_patch(patch):
 
     # Remove any file extension if it is included.
     if os.path.sep in patch:
-        dr, patch = patch.split(os.path.sep)
+        patch = patch.split(os.path.sep)[-1]
     patch = patch.split(".")[0]
 
     # Try to delete the file and metadata file.
     try:
-        # Should the patch directory not exist,
-        # a BadPathError is raised.
+        # Should the patch directory not exist, a BadPathError is raised.
         new_path = os.path.join(backend_path, patch.split("_")[0])
         os.remove(os.path.join(new_path, patch + ".bin"))
         os.remove(os.path.join(new_path, patch + ".json"))
@@ -525,3 +524,101 @@ def delete_patch_sd(path):
     except FileNotFoundError:
         # Couldn't find the patch at the supplied path.
         raise errors.BadPathError(path, 301)
+
+
+def export_patch_bin(patch, dest, slot=-1):
+    """ Attempts to export a patch from the application to the
+    specified supplied path. Normally, this will be a user's SD card,
+    but it could be used for a location on a user's machine as well.
+    This method is specifically for the exporting of .bin patch files.
+
+    patch: A string representing the patch that is to be exported. This
+           does not need a file extension, but supplying one will not
+           cause the method to fail.
+    dest: A string representing the destination that the patch will be
+          exported to.
+    slot: Optional. If a patch is being exported to an SD card, set this
+          to the desired slot that you wish to see the patch appear in
+          on a ZOIA. Valid slot numbers are 0 - 63. Should the slot be
+          negative, a slot identifier will not be added to the name.
+    """
+
+    global backend_path
+    if backend_path is None:
+        backend_path = determine_backend_path()
+
+    # Prepare the name of the patch. We need to access the metadata.
+    # Extract the patch id from the supplied patch parameter.
+    idx = patch
+    if "." in idx:
+        idx = patch.split(".")[0]
+
+    if "_" in idx:
+        idx = idx.split("_")[0]
+    # Get the metadata for this patch.
+    with open(os.path.join(backend_path, idx,
+                           "{}.json".format(idx)), "r") as f:
+        metadata = json.loads(f.read())
+
+    # Extract the filename attribute.
+    name = metadata["files"][0]["filename"]
+    # Check to see if the patch author included a ZOIA prefix.
+    # (and drop it from the name).
+    if "_" in name:
+        prefix = name.split("_")[0]
+        if len(prefix) == 3:
+            try:
+                float(prefix)
+                name = name[4:]
+            except ValueError:
+                pass
+    try:
+        if -1 < slot < 10:
+            # one digit
+            name = "00{}_".format(slot) + name
+        elif slot > 10 < 64:
+            # two digits
+            name = "0{}_".format(slot) + name
+        elif slot < 0:
+            # No slot, not going to an sd card, no need for digits.
+            pass
+        else:
+            # Incorrect slot number provided.
+            raise errors.ExportingError(slot, 701)
+    except FileNotFoundError or FileExistsError:
+        pass
+
+    # Add the file extension if need be.
+    if "." not in patch:
+        patch += ".bin"
+
+    # Rename the patch and export.
+    try:
+        os.rename(os.path.join(backend_path, idx, patch),
+                  os.path.join(dest, name))
+    except FileNotFoundError or FileExistsError:
+        raise errors.ExportingError(patch)
+
+
+def check_for_updates():
+    """ Upon startup, automatically retrieve the latest version of
+    patches from PS, should any that have been previously downloaded
+    are updated.
+
+    This method will check the updated_at attribute of each downloaded
+    patch, should this differ compared to what is returned by PS, a
+    new patch will attempt to be saved. If the binary file is determined
+    to be identical to the one stored within the backend, the saving is
+    aborted at there was no update to the patch itself. Otherwise, a new
+    version of the patch is added and saved within the patch directory.
+    """
+    global backend_path
+    if backend_path is None:
+        backend_path = determine_backend_path()
+
+    for patch in os.listdir(backend_path):
+        if len(os.listdir(os.path.join(backend_path, patch))) > 2:
+            # Multiple versions, only need the latest.
+            pass
+    # TODO Finish this logic.
+
