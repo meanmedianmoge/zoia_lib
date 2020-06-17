@@ -366,32 +366,22 @@ class PatchStorage:
         # Return the total minus the number of questions found.
         return int(zoia[:3]) - len(soup_ques.find_all(class_="card"))
 
-    def get_possible_updates(self):
-        pass
+    def get_potential_updates(self, meta):
+        """ Queries the PS API for all patches that have an updated_at
+        attribute that is more recent than the one present for patches
+        that have been previously downloaded.
 
+        meta: An array containing the id and updated_at attributes for
+              patches that may need to be updated.
+        """
+        new_bin = []
 
-def get_all_tags():
-    """get master dict of all tag id's and slugs"""
+        for entry in meta:
+            idx = entry["id"]
 
-    ps = PatchStorage()
-    per_page = 100
-    search = {'orderby': 'title',
-              'order': 'asc',
-              'per_page': per_page}
+            # Check to see if the patch has been updated by comparing the dates
+            curr_meta = self.get_patch_meta(idx)
+            if curr_meta["updated_at"] > meta["updated_at"]:
+                new_bin.append((self.download(meta["id"]), curr_meta))
 
-    tags = {}
-    for page in range(1, math.ceil(ps.page_count / per_page) + 1):
-        body = ps.search({**search, **{'page': page}})
-        for patch in body:
-            more = dict(zip([s['id'] for s in patch['tags']],
-                            [s['slug'] for s in patch['tags']]))
-
-            # remove any duplicate tags
-            for idx in set(more).intersection(set(tags)):
-                more.pop(idx, None)
-            tags = {**tags, **more}
-
-    os.chdir(os.path.dirname(os.getcwd()))
-    with open(os.path.join("common", "tags.json"), 'w') as f:
-        json.dump(tags, f)
-    f.close()
+        return new_bin

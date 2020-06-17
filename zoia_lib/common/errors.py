@@ -57,12 +57,11 @@ class SavingError(ZoiaLibError):
     Possible error codes:
      - 501: Encountered a file extension that the method
             is not meant to deal with
-     - 502: The JSON data was not in correct JSON format.
-     - 503: The patch metadata was missing a "files" attribute when it
+     - 502: The patch metadata was missing a "files" attribute when it
             was required.
-     - 504: Saving of a patch was attempted, but since that patch was
+     - 503: Saving of a patch was attempted, but since that patch was
             already saved in the backend, no saving occurred.
-     - 505: A file extension was expected but none was encountered.
+     - 504: A file extension was expected but none was encountered.
     """
 
     def __init__(self, patch, error_code=0):
@@ -72,15 +71,12 @@ class SavingError(ZoiaLibError):
             print(f'Could not save the file {patch} because a file extension '
                   f'was encountered when none should have been supplied.')
         elif error_code == 502:
-            print(f'Could not save the file {patch} because the JSON data '
-                  f'was mal-formatted (i.e., it was not JSON compliant).')
-        elif error_code == 503:
             print(f'Could not save the file {patch} because necessary '
                   f'\"files\" attribute was missing in the metadata.')
-        elif error_code == 504:
+        elif error_code == 503:
             print(f'Could not save the file {patch} because the binary '
                   f'content has already been saved and still exists.')
-        elif error_code == 505:
+        elif error_code == 504:
             print(f'Could not save the file {patch} because it lacked '
                   f'a file extension.')
         else:
@@ -107,21 +103,46 @@ class RenamingError(ZoiaLibError):
             print(f'Could not rename the file {patch} correctly '
                   f'due to an unexpected error.')
 
+
 class ExportingError(ZoiaLibError):
     """Class raised when a file could not be exported correctly.
 
     Possible error codes:
      - 701: The slot identifier was not in the correct range.
+     - 702: Exporting would result in overwriting of data.
     """
 
-    def __init__(self, patch, slot, error_code=0):
+    def __init__(self, patch, slot=-1, error_code=0):
         if patch is None:
             print(f'Expected a patch name but got None instead.')
         elif error_code == 701:
             print(f'Could not export the file {patch} correctly '
                   f'due to the slot number being greater than 63 '
                   f'(got {slot}).')
+        elif error_code == 702:
+            print(f'Exporting would result in overwriting of data,'
+                  f'as a bank directory already existed on the SD'
+                  f'card')
         else:
             # Default case. We do not want to get here.
             print(f'Could not export the file {patch} correctly '
+                  f'due to an unexpected error.')
+
+
+class JSONError(ZoiaLibError):
+    """Class raised when a file could not be exported correctly.
+
+    Possible error codes:
+     - 801: The JSON data was malformed.
+    """
+
+    def __init__(self, data, error_code=0):
+        if data is None:
+            print(f'Expected a json data but got None instead.')
+        elif error_code == 801:
+            print(f'Could not process {data} because the JSON data '
+                  f'was mal-formatted (i.e., it was not JSON compliant).')
+        else:
+            # Default case. We do not want to get here.
+            print(f'Could not process {data} correctly '
                   f'due to an unexpected error.')

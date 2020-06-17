@@ -2,11 +2,11 @@ import datetime
 import json
 import os
 import platform
-import random
 import shutil
 import zipfile
 from pathlib import Path
 
+import zoia_lib.backend.api as api
 import zoia_lib.common.errors as errors
 
 # Global variable to avoid the rerunning of
@@ -102,7 +102,8 @@ def patch_decompress(patch):
             else:
                 # Remove any additional files.
                 # TODO make this better. Shouldn't just delete
-                #  additional files.
+                #  additional files. Especially .txt, would want to
+                #  add that to the content attribute in the JSON.
                 os.remove(os.path.join(pch, file))
     else:
         # Unexpected file extension encountered.
@@ -114,7 +115,8 @@ def import_to_backend(path):
     """Attempts to import a patch to the backend
     ZoiaLibraryApp directory. This method is meant to work
     for patches that originate from a local user's machine,
-    or from a ZOIA formatted SD card.
+    or from a ZOIA formatted SD card. It will also import entire
+    directories of patch should they exist on an SD card.
 
     Base metadata will be created from the available information
     of the patch, mostly derived of the name and any additional
@@ -136,34 +138,42 @@ def import_to_backend(path):
     if "." not in path:
         raise errors.SavingError(path)
     patch_name, ext = path.split(".")
-    patch_name = patch_name.split("/")[-1]
-    # Generate a random patch ID to use (must be 5 digits).
-    while True:
-        patch_id = str(random.randint(10000, 99999))
-        if patch_id not in os.listdir(backend_path):
-            break
-    # Binary file, easiest case.
-    # Get the bytes.
-    with open(path, "rb") as f:
-        temp_data = f.read()
-    # Prepare the JSON.
-    js_data = {
-        "id": patch_id,
-        "created_at": "{:%Y-%m-%dT%H:%M:%S+00:00}".format(
-            datetime.datetime.now()),
-        "updated_at": "{:%Y-%m-%dT%H:%M:%S+00:00}".format(
-            datetime.datetime.now()),
-        "title": patch_name,
-        "revision": "1",
-        "files": [
-            {
-                "id": patch_id,
-                "filename": patch_name + "." + ext
-            }
-        ]
-    }
-    # Try to save the patch.
-    save_to_backend((temp_data, js_data))
+    patch_name = patch_name.split(os.path.sep)[-1]
+
+    count = 1
+    if os.path.isdir(path):
+        count = len(os.listdir(path))
+    for i in range(count):
+        # Generate a random patch ID to use (must be 5 digits).
+        patch_id = str(abs(hash(path)))
+        if len(patch_id) > 5:
+            patch_id = patch_id[:5]
+        else:
+            while len(patch_id) < 5:
+                patch_id += "0"
+        patch_id = int(patch_id)
+        # Binary file, easiest case.
+        # Get the bytes.
+        with open(path, "rb") as f:
+            temp_data = f.read()
+        # Prepare the JSON.
+        js_data = {
+            "id": patch_id,
+            "created_at": "{:%Y-%m-%dT%H:%M:%S+00:00}".format(
+                datetime.datetime.now()),
+            "updated_at": "{:%Y-%m-%dT%H:%M:%S+00:00}".format(
+                datetime.datetime.now()),
+            "title": patch_name,
+            "revision": "1",
+            "files": [
+                {
+                    "id": patch_id,
+                    "filename": patch_name + "." + ext
+                }
+            ]
+        }
+        # Try to save the patch.
+        save_to_backend((temp_data, js_data))
 
 
 def save_to_backend(patch):
@@ -171,7 +181,7 @@ def save_to_backend(patch):
     to the backend ZoiaLibraryApp directory. This method is meant
     to work for patches retrieved via the PS API. As such, it should
     only be called with the returned output from download() located
-    in api.py. Other input will most likely case a SavingError.
+    in api.py. Other input will most likely cause a SavingError.
 
     For local patch importing, see import_to_backend().
 
@@ -197,7 +207,7 @@ def save_to_backend(patch):
         # Ensure that the data is in valid json format.
         json.dumps(patch[1])
     except ValueError:
-        raise errors.SavingError(patch[1]["title"], 502)
+        raise errors.JSONError(patch[1], 801)
 
     pch_id = str(patch[1]['id'])
     pch = os.path.join(backend_path, "{}".format(pch_id))
@@ -217,7 +227,7 @@ def save_to_backend(patch):
             save_metadata_json(patch[1])
         else:
             # No files attribute,
-            raise errors.SavingError(patch[1]["title"], 503)
+            raise errors.SavingError(patch[1], 801)
     else:
         """ A directory already existed for this patch id, so 
         we need to check if this is a unique patch version 
@@ -260,7 +270,7 @@ def save_to_backend(patch):
                 shutil.rmtree(os.path.join(backend_path, "temp"))
                 if not diff:
                     # No files changed, so we should raise a SavingError
-                    raise errors.SavingError(patch[1]["title"], 504)
+                    raise errors.SavingError(patch[1]["title"], 503)
                 return
             else:
                 # TODO Cover the other compression cases.
@@ -273,7 +283,7 @@ def save_to_backend(patch):
                 with open(os.path.join(pch, file), "rb") as f:
                     if f.read() == patch[0]:
                         # This exact binary is already saved onto the system.
-                        raise errors.SavingError(patch[1]["title"], 504)
+                        raise errors.SavingError(patch[1]["title"], 503)
                 f.close()
 
         # If we get here, we have a unique patch, so we need to find
@@ -460,6 +470,7 @@ def delete_patch(patch):
 def delete_full_patch_directory(patch_dir):
     """ Forces the deletion of an entire patch directory, should
     one exist.
+
     Please note that this method will not attempt to correct invalid
     input. Please ensure that the patch parameter is exclusively the
     name of the patch directory that will be deleted.
@@ -496,7 +507,8 @@ def delete_patch_sd(path):
 
     This method relies on the user leaving the SD card inserted
     while the deletion occurs. Otherwise, corruption is likely
-    to occur.
+    to occur. In such situations, either a DeletionError, or
+    BadPathError may be raised.
 
     path: A string representing the path to the patch on the inserted
           SD card. This path must include the name of the file to be
@@ -600,6 +612,42 @@ def export_patch_bin(patch, dest, slot=-1):
         raise errors.ExportingError(patch)
 
 
+def export_bank(bank, dest):
+    """ Exports an entire bank to be ready for use on a ZOIA. Ideally,
+    this is used to export a bank from a local user's machine to a
+    ZOIA SD card.
+
+    bank: The name of the bank file to be processed.
+    """
+
+    global backend_path
+    if backend_path is None:
+        backend_path = determine_backend_path()
+
+    # Load the bank data.
+    try:
+        with open(os.path.join(backend_path, "Banks", bank), "r") as f:
+            content = json.dumps(f)
+    except FileNotFoundError or ValueError:
+        if ValueError:
+            raise errors.JSONError(content)
+        else:
+            raise errors.BadPathError(
+                os.path.join(backend_path, "Banks", bank), 301)
+
+    # Prepare a destination directory. Name it the name of the Bank.
+    try:
+        os.mkdir(os.path.join(dest, bank))
+    except FileExistsError:
+        # TODO Just try again by adding _# to the name.
+        raise errors.ExportingError(bank)
+
+    # Process the bank and add each to the bank directory.
+    for i in range(64):
+        if content[i] != "":
+            export_patch_bin(content[i], os.path.join(dest, bank), i)
+
+
 def check_for_updates():
     """ Upon startup, automatically retrieve the latest version of
     patches from PS, should any that have been previously downloaded
@@ -612,13 +660,40 @@ def check_for_updates():
     aborted at there was no update to the patch itself. Otherwise, a new
     version of the patch is added and saved within the patch directory.
     """
+
     global backend_path
     if backend_path is None:
         backend_path = determine_backend_path()
 
-    for patch in os.listdir(backend_path):
-        if len(os.listdir(os.path.join(backend_path, patch))) > 2:
-            # Multiple versions, only need the latest.
-            pass
-    # TODO Finish this logic.
+    meta = []
 
+    for patch in os.listdir(backend_path):
+        if len(patch) > 5 \
+                and len(os.listdir(os.path.join(backend_path, patch))) > 2:
+            # Multiple versions, only need the latest.
+            temp = json.loads(os.path.join(backend_path, patch,
+                                           "{}_v1.json".format(patch)))
+            meta_small = {
+                "id": temp["id"],
+                "updated_at": temp["updated_at"]
+            }
+            meta.append(meta_small)
+        elif len(patch) > 5:
+            temp = json.loads(os.path.join(backend_path, patch,
+                                           "{}.json".format(patch)))
+            meta_small = {
+                "id": temp["id"],
+                "updated_at": temp["updated_at"]
+            }
+            meta.append(meta_small)
+
+    # Get a list of binary/metadata for all files that have been updated
+    # on PatchStorage.
+    ps = api.PatchStorage()
+    pch_list = ps.get_potential_updates(meta)
+
+    # Try to save the new binaries to the backend.
+    for patch in pch_list:
+        save_to_backend(patch)
+
+    # TODO Actually check to see if this works at all.

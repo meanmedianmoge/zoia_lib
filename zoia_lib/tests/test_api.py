@@ -58,7 +58,7 @@ class TestAPI(unittest.TestCase):
 
         # Validate the patches returned against the MinSchema.json file
         os.chdir(os.path.dirname(os.getcwd()))
-        with open(os.path.join("common", "MinSchema.json")) as f:
+        with open(os.path.join("common", "schemas", "MinSchema.json")) as f:
             min_schema = json.load(f)
         os.chdir("tests")
 
@@ -123,7 +123,7 @@ class TestAPI(unittest.TestCase):
 
         # Validate the patches returned against the MetadataSchema.json file
         os.chdir(os.path.dirname(os.getcwd()))
-        with open(os.path.join("common", "MetadataSchema.json")) as file:
+        with open(os.path.join("common", "schemas", "MetadataSchema.json")) as file:
             meta_schema = json.load(file)
         os.chdir("tests")
 
@@ -215,7 +215,7 @@ class TestAPI(unittest.TestCase):
 
         # Validate the patches returned against the MetadataSchema.json file
         os.chdir(os.path.dirname(os.getcwd()))
-        with open(os.path.join("common", "MetadataSchema.json")) as file:
+        with open(os.path.join("common", "schemas", "MetadataSchema.json")) as file:
             meta_schema = json.load(file)
         os.chdir("tests")
 

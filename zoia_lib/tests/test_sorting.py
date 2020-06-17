@@ -5,6 +5,7 @@ class TestSorting(unittest.TestCase):
     """ This class is responsible for testing the various patch
     sorting methods that are to be used by the application.
     """
+
     def setUp(self):
         pass
 

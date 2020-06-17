@@ -225,7 +225,11 @@ class DeletionTest(unittest.TestCase):
 
     def test_delete_patch_normal_sd(self):
         """ Attempt to delete a patch that is stored on an
-        inserted SD card.
+        inserted SD card. Note that we cannot properly anticipate
+        the case where a user removes the SD card while trying to
+        delete a patch. In such cases, the SD will most likely be left
+        in a corrupted state, but a DeletionError will be properly
+        raised.
         """
 
         # In order to simulate this, we can just delete any patch using
