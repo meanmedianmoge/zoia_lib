@@ -21,14 +21,16 @@ class TestStartup(unittest.TestCase):
         # Create a backend directory and another
         # directory for additional tests.
         util.create_backend_directories()
-        util.backend_path = os.path.join(os.getcwd(), ".ZoiaLibraryApp")
+        util.backend_path = os.path.join(os.getcwd(), "zoia_lib",
+                                         "tests", ".ZoiaLibraryApp")
         util.create_backend_directories()
 
     def tearDown(self):
         # Remove the testing ZoiaLibraryApp directory.
         # Leave the real backend directory alone.
         try:
-            shutil.rmtree(os.path.join(os.getcwd(), ".ZoiaLibraryApp"))
+            shutil.rmtree(os.path.join(os.getcwd(), "zoia_lib",
+                                       "tests", ".ZoiaLibraryApp"))
         except FileNotFoundError:
             pass
 
@@ -79,7 +81,8 @@ class TestStartup(unittest.TestCase):
         self.assertRaises(exc, util.save_to_backend, ("ERROR", None))
 
         # Make sure there is no directory
-        path = os.path.join(os.getcwd(), ".ZoiaLibraryApp")
+        path = os.path.join(os.getcwd(), "zoia_lib", "tests",
+                            ".ZoiaLibraryApp")
         self.assertFalse("55555" in os.listdir(path),
                          "Found a directory with the expected patch id of "
                          "55555 when it should not exist.")

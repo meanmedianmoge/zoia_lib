@@ -6,7 +6,7 @@ import unittest
 import zoia_lib.backend.utilities as util
 from zoia_lib.common import errors
 
-testing_path = os.getcwd()
+test_path = os.path.join(os.getcwd(), "zoia_lib", "tests")
 
 
 class TestSorting(unittest.TestCase):
@@ -19,21 +19,21 @@ class TestSorting(unittest.TestCase):
     """
 
     def setUp(self):
-        util.backend_path = testing_path
-        open(os.path.join(testing_path, "sample_files",
+        util.backend_path = test_path
+        open(os.path.join(test_path, "sample_files",
                           "019_zoia_testpatch.bin"), 'a').close()
 
     def tearDown(self):
         try:
-            shutil.rmtree(os.path.join(testing_path, "122661"))
+            shutil.rmtree(os.path.join(test_path, "122661"))
         except FileNotFoundError:
             pass
         try:
-            shutil.rmtree(os.path.join(testing_path, "124436"))
+            shutil.rmtree(os.path.join(test_path, "124436"))
         except FileNotFoundError:
             pass
         try:
-            os.remove(os.path.join(testing_path, "sample_files",
+            os.remove(os.path.join(test_path, "sample_files",
                                    "019_zoia_testpatch.bin"))
         except FileNotFoundError:
             pass
@@ -50,7 +50,7 @@ class TestSorting(unittest.TestCase):
         # functionality is what we are trying to test.
 
         # Load the sample JSON data.
-        with open(os.path.join(os.getcwd(), "sample_files",
+        with open(os.path.join(test_path, "sample_files",
                                "sampleJSON.json")) as f:
             sample_json = json.loads(f.read())
 
@@ -77,10 +77,10 @@ class TestSorting(unittest.TestCase):
         util.save_to_backend((b"TestPatch", sample_json))
 
         # Make sure the patch directory got created.
-        self.assertTrue("122661" in os.listdir(testing_path),
+        self.assertTrue("122661" in os.listdir(test_path),
                         "The patch directory for patch 122661 was not found.")
         # Check the contents of the patch directory.
-        path = os.path.join(testing_path, "122661")
+        path = os.path.join(test_path, "122661")
         self.assertTrue("122661.bin" in os.listdir(path),
                         "The expected patch file \"122661.bin\" was not "
                         "found.")
@@ -105,7 +105,7 @@ class TestSorting(unittest.TestCase):
             self.assertTrue("122661_v{}.json".format(i) in os.listdir(path),
                             "The expected patch file \"122661_v{}.json\" was "
                             "not found.".format(i))
-            with open(os.path.join(testing_path, "122661",
+            with open(os.path.join(test_path, "122661",
                                    "122661_v{}.json".format(i)), "r") as f:
                 jf = json.loads(f.read())
 
@@ -126,7 +126,7 @@ class TestSorting(unittest.TestCase):
             self.assertTrue("122661_v{}.json".format(i) in os.listdir(path),
                             "The expected patch file \"122661_v{}.json\" was "
                             "not found.".format(i))
-            with open(os.path.join(testing_path, "122661",
+            with open(os.path.join(test_path, "122661",
                                    "122661_v{}.json".format(i)), "r") as f:
                 jf = json.loads(f.read())
 
@@ -144,13 +144,13 @@ class TestSorting(unittest.TestCase):
         """
 
         # Load the sample JSON data.
-        with open(os.path.join(os.getcwd(),
+        with open(os.path.join(test_path,
                                "sample_files",
                                "sampleJSONZIP.json"), "r") as f:
             sample_json = json.loads(f.read())
 
         # Load the sample zip binary data
-        with open(os.path.join(os.getcwd(), "sample_files",
+        with open(os.path.join(test_path, "sample_files",
                                "sampleZIPBytes.bin"), "rb") as f:
             sample_bytes = f.read()
 
@@ -159,20 +159,20 @@ class TestSorting(unittest.TestCase):
         util.save_to_backend((sample_bytes, sample_json))
 
         # Make sure the patch directory got created.
-        self.assertTrue("124436" in os.listdir(testing_path),
+        self.assertTrue("124436" in os.listdir(test_path),
                         "The patch directory for patch 122661 was not found.")
         # Check the contents of the patch directory and ensure
         # the revision numbers were updated correctly.
         for i in range(1, 11):
             self.assertTrue("124436_v{}.bin".format(i) in sorted(
-                os.listdir(os.path.join(testing_path, "124436"))),
+                os.listdir(os.path.join(test_path, "124436"))),
                             "The expected patch file \"124436_v{}.bin\" was "
                             "not found.".format(i))
             self.assertTrue("124436_v{}.json".format(i) in sorted(
-                os.listdir(os.path.join(testing_path, "124436"))),
+                os.listdir(os.path.join(test_path, "124436"))),
                             "The expected patch file \"124436_v{}.json\" was "
                             "not found.".format(i))
-            with open(os.path.join(testing_path, "124436",
+            with open(os.path.join(test_path, "124436",
                                    "124436_v{}.json".format(i)), "r") as f:
                 jf = json.loads(f.read())
 
@@ -183,7 +183,7 @@ class TestSorting(unittest.TestCase):
 
         # Try to same the same patch again
         # (should fail, since the binary has not changed).
-        with open(os.path.join(os.getcwd(),
+        with open(os.path.join(test_path,
                                "sample_files",
                                "sampleJSONZIP.json"), "r") as f:
             sample_json = json.loads(f.read())
@@ -207,24 +207,24 @@ class TestSorting(unittest.TestCase):
         self.assertRaises(exc, util.import_to_backend, "I am not a patch")
 
         # Try to save an imported patch.
-        util.import_to_backend(os.path.join(testing_path, "sample_files",
+        util.import_to_backend(os.path.join(test_path, "sample_files",
                                             "019_zoia_testpatch.bin"))
 
         # Try to import it again (should fail, since it is already saved).
         self.assertRaises(exc, util.import_to_backend, os.path.join(
-            testing_path, "sample_files", "019_zoia_testpatch.bin"))
+            test_path, "sample_files", "019_zoia_testpatch.bin"))
 
         # Unfortunately, the id is random, so we need to find it to remove it.
         count = 0
-        for file in os.listdir(testing_path):
+        for file in os.listdir(test_path):
             if len(file) == 5:
                 count += 1
-                self.assertTrue(len(os.listdir(os.path.join(testing_path,
+                self.assertTrue(len(os.listdir(os.path.join(test_path,
                                                             file))) == 2,
                                 "The locally imported patch did not "
                                 "successfully create the two expected files "
                                 "(.bin and .json).")
-                with open(os.path.join(testing_path, file,
+                with open(os.path.join(test_path, file,
                                        "{}.json".format(file)), "r") as f:
                     meta_check = json.loads(f.read())
 
@@ -236,10 +236,10 @@ class TestSorting(unittest.TestCase):
                 self.assertTrue("files" in meta_check,
                                 "JSON data didn't contain the files "
                                 "attribute.")
-                self.assertEquals(meta_check["files"][0]["filename"],
-                                  "019_zoia_testpatch.bin",
-                                  "The filename attribute did not match the "
-                                  "expected file name.")
+                self.assertTrue(meta_check["files"][0]["filename"] ==
+                                "019_zoia_testpatch.bin",
+                                "The filename attribute did not match the "
+                                "expected file name.")
                 self.assertTrue("updated_at" in meta_check,
                                 "JSON data didn't contain the updated_at "
                                 "attribute.")
@@ -250,7 +250,7 @@ class TestSorting(unittest.TestCase):
                                 "JSON data didn't contain the revision "
                                 "attribute.")
                 # Cleanup
-                shutil.rmtree(os.path.join(testing_path, file))
+                shutil.rmtree(os.path.join(test_path, file))
                 break
 
         self.assertTrue(count == 1, "Did not find exactly 1 patch directory"

@@ -57,10 +57,9 @@ class TestAPI(unittest.TestCase):
                         "Returned list does not contain all ZOIA patches.")
 
         # Validate the patches returned against the MinSchema.json file
-        os.chdir(os.path.dirname(os.getcwd()))
-        with open(os.path.join("common", "schemas", "MinSchema.json")) as f:
+        with open(os.path.join(os.getcwd(), "zoia_lib", "common", "schemas",
+                               "MinSchema.json")) as f:
             min_schema = json.load(f)
-        os.chdir("tests")
 
         """ Check to ensure only the attributes in the MinSchema are present.
         There are a total of 25 attributes that could be returned by the API, 
@@ -122,10 +121,9 @@ class TestAPI(unittest.TestCase):
                         "first element.")
 
         # Validate the patches returned against the MetadataSchema.json file
-        os.chdir(os.path.dirname(os.getcwd()))
-        with open(os.path.join("common", "schemas", "MetadataSchema.json")) as file:
+        with open(os.path.join(os.getcwd(), "zoia_lib", "common", "schemas",
+                               "MetadataSchema.json")) as file:
             meta_schema = json.load(file)
-        os.chdir("tests")
 
         try:
             jf = json.dumps(f[1])
@@ -214,10 +212,9 @@ class TestAPI(unittest.TestCase):
                 "element.")
 
         # Validate the patches returned against the MetadataSchema.json file
-        os.chdir(os.path.dirname(os.getcwd()))
-        with open(os.path.join("common", "schemas", "MetadataSchema.json")) as file:
+        with open(os.path.join(os.getcwd(), "zoia_lib", "common", "schemas",
+                               "MetadataSchema.json")) as file:
             meta_schema = json.load(file)
-        os.chdir("tests")
 
         try:
             validate(instance=f[1], schema=meta_schema)

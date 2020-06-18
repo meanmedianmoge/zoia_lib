@@ -5,7 +5,7 @@ import unittest
 
 import zoia_lib.backend.utilities as util
 
-test_path = os.getcwd()
+test_path = os.path.join(os.getcwd(), "zoia_lib", "tests")
 
 
 class MyTestCase(unittest.TestCase):
@@ -19,7 +19,7 @@ class MyTestCase(unittest.TestCase):
         util.backend_path = test_path
         # Create a patch to export.
         sample_bytes = b'test'
-        with open(os.path.join(os.getcwd(), "sample_files",
+        with open(os.path.join(test_path, "sample_files",
                                "sampleJSON.json")) as f:
             sample_json = json.loads(f.read())
         util.save_to_backend((sample_bytes, sample_json))
@@ -41,7 +41,7 @@ class MyTestCase(unittest.TestCase):
         """
 
         # TODO Make this a lot more robust.
-        util.export_patch_bin("122661", os.getcwd(), 7)
+        util.export_patch_bin("122661", test_path, 7)
 
         self.assertTrue("007_zoia_dream_mender.bin" in os.listdir(test_path),
                         "Did not find a properly exported patch when it should"

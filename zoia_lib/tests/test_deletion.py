@@ -5,7 +5,7 @@ import unittest
 import zoia_lib.backend.utilities as util
 import zoia_lib.common.errors as errors
 
-test_path = os.getcwd()
+test_path = os.path.join(os.getcwd(), "zoia_lib", "tests")
 
 
 class DeletionTest(unittest.TestCase):
