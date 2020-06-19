@@ -4,11 +4,10 @@ import shutil
 import unittest
 
 import zoia_lib.backend.utilities as util
-
 test_path = os.path.join(os.getcwd(), "zoia_lib", "tests")
 
 
-class MyTestCase(unittest.TestCase):
+class TestExporting(unittest.TestCase):
     """ This class is responsible for testing the various patch
     exporting methods that are to be used by the application.
 

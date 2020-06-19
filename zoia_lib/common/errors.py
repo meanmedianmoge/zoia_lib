@@ -138,11 +138,33 @@ class JSONError(ZoiaLibError):
 
     def __init__(self, data, error_code=0):
         if data is None:
-            print(f'Expected a json data but got None instead.')
+            print(f'Expected a JSON data but got None instead.')
         elif error_code == 801:
             print(f'Could not process {data} because the JSON data '
                   f'was mal-formatted (i.e., it was not JSON compliant).')
         else:
             # Default case. We do not want to get here.
             print(f'Could not process {data} correctly '
+                  f'due to an unexpected error.')
+
+
+class SortingError(ZoiaLibError):
+    """Class raised when metadata could not be sorted correctly.
+
+    Possible error codes:
+     - 901: The mode was invalid.
+     - 902: The data supplied was not a list.
+    """
+    def __init__(self, info, error_code=0):
+        if info is None:
+            print(f'Expected information but got None instead.')
+        elif error_code == 901:
+            print(f'Sorting mode {info} is invalid. Valid sorting modes '
+                  f'occur between 1 and 6 inclusive.')
+        elif error_code == 902:
+            print(f'The supplied metadata {info} is not a list. Sorting '
+                  f'can only occur on valid lists.')
+        else:
+            # Default case. We do not want to get here.
+            print(f'Could not process {info} correctly '
                   f'due to an unexpected error.')
