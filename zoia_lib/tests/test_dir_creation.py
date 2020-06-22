@@ -8,7 +8,7 @@ from zoia_lib.common import errors
 backend_path = util.determine_backend_path()
 
 
-class TestStartup(unittest.TestCase):
+class TestDirectoryCreation(unittest.TestCase):
     """ This class is responsible for testing the various directory
     creation methods that are to be used by the application.
 

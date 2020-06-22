@@ -9,7 +9,7 @@ from zoia_lib.common import errors
 test_path = os.path.join(os.getcwd(), "zoia_lib", "tests")
 
 
-class TestSorting(unittest.TestCase):
+class TestSaving(unittest.TestCase):
     """ This class is responsible for testing the various patch
     saving methods that are to be used by the application.
 
@@ -20,8 +20,9 @@ class TestSorting(unittest.TestCase):
 
     def setUp(self):
         util.backend_path = test_path
-        open(os.path.join(test_path, "sample_files",
-                          "019_zoia_testpatch.bin"), 'a').close()
+        with open(os.path.join(test_path, "sample_files",
+                               "019_zoia_testpatch.bin"), 'wb') as f:
+            f.write(b"Test")
 
     def tearDown(self):
         try:

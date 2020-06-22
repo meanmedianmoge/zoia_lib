@@ -134,6 +134,8 @@ def import_to_backend(path):
     if path is None:
         raise errors.SavingError(None)
 
+    # TODO Add a binary check to ensure this is a ZOIA patch.
+
     # Get the file extension for the patch that is being imported.
     if "." not in path:
         raise errors.SavingError(path)
@@ -210,6 +212,20 @@ def save_to_backend(patch):
         raise errors.JSONError(patch[1], 801)
 
     pch_id = str(patch[1]['id'])
+    if len(pch_id) == 5:
+        # This is an imported patch. Unfortunately, we need to make sure
+        # that its a unique binary by checking every patch currently
+        # stored. TODO Use binary analysis to improve this process.
+        for direc in os.listdir(backend_path):
+            if os.path.isdir(direc) and direc != "Banks" \
+                    and direc != "sample_files":
+                for files in os.listdir(os.path.join(backend_path, direc)):
+                    if files.split(".")[1] == "bin":
+                        with open(os.path.join(
+                                backend_path, direc, files), "rb") as f:
+                            data = f.read()
+                        if patch[0] == data:
+                            raise errors.SavingError(patch[1]["title"], 503)
     pch = os.path.join(backend_path, "{}".format(pch_id))
     # Check to see if a directory needs to be made (new patch,
     # no version control needed yet).
@@ -289,7 +305,7 @@ def save_to_backend(patch):
         # If we get here, we have a unique patch, so we need to find
         # out what version # to give it.
 
-        # Case 2: Only one version of the  patch  existed previously.
+        # Case 2: Only one version of the patch existed previously.
         if len(os.listdir(os.path.join(backend_path, pch))) == 2:
             name_bin = os.path.join(pch, "{}_v1.bin".format(pch_id))
             with open(name_bin, "wb") as f:
@@ -604,10 +620,14 @@ def export_patch_bin(patch, dest, slot=-1):
     if "." not in patch:
         patch += ".bin"
 
+    # If the dest is not a directory, create one.
+    if not os.path.isdir(dest):
+        os.mkdir(dest)
+
     # Rename the patch and export.
     try:
-        os.rename(os.path.join(backend_path, idx, patch),
-                  os.path.join(dest, name))
+        shutil.copy(os.path.join(backend_path, idx, patch),
+                    os.path.join(dest, name))
     except FileNotFoundError or FileExistsError:
         raise errors.ExportingError(patch)
 
@@ -697,3 +717,55 @@ def check_for_updates():
         save_to_backend(patch)
 
     # TODO Actually check to see if this works at all.
+
+
+def sort_metadata(mode, data, rev):
+    """ Sort an array of metadata based on the passed parameters.
+
+    mode: The method in which the data will be sorted. Valid modes are:
+          - 1 -> Sort by title
+          - 2 -> Sort by author
+          - 3 -> Sort by like count
+          - 4 -> Sort by download count
+          - 5 -> Sort by view count*
+          - 6 -> Sort by date modified (updated_at attribute)
+    data: An array of metadata that is to be sorted.
+    inc: True if the data should be sorted in reverse,
+         false otherwise.
+    """
+
+    """ The use of .upper() is to prevent sorting of lower case names 
+    before their uppercase counterparts, especially when they share the 
+    same initial letter. In a list, you would want all the "d" titles 
+    grouped together.
+    """
+    if mode is None or data is None or rev is None:
+        return None
+
+    if mode < 1 or mode > 6:
+        raise errors.SortingError(mode, 901)
+    if not isinstance(data, list):
+        raise errors.SortingError(data, 902)
+
+    if mode == 1:
+        # Sort by title
+        data.sort(key=lambda x: x["title"].upper(), reverse=rev)
+    elif mode == 2:
+        # Sort by author
+        data.sort(key=lambda x: x["author"]["name"].upper()
+                  if "author" in x else "", reverse=rev)
+    elif mode == 3:
+        # Sort by like count.
+        data.sort(key=lambda x: x["like_count"] if "like_count" in x else 0,
+                  reverse=rev)
+    elif mode == 4:
+        # Sort by download count.
+        data.sort(key=lambda x: x["download_count"]
+                  if "download_count" in x else 0, reverse=rev)
+    elif mode == 5:
+        # Sort by view count.
+        data.sort(key=lambda x: x["view_count"] if "view_count" in x else 0,
+                  reverse=rev)
+    elif mode == 6:
+        # Sort by date modified
+        data.sort(key=lambda x: x["updated_at"].upper(), reverse=rev)
