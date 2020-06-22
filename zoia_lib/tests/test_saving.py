@@ -47,6 +47,8 @@ class TestSaving(unittest.TestCase):
         patch that originates from the PS API.
         """
 
+        self.setUp()
+
         # Can't use the usual add_test_patch method since that
         # functionality is what we are trying to test.
 
@@ -136,6 +138,8 @@ class TestSaving(unittest.TestCase):
                             "\"122661_v{}.json\" was not found (Got {} and "
                             "expected {}).".format(i, jf["revision"], i))
 
+        self.tearDown()
+
     def test_save_patch_api_compressed(self):
         """ Attempts to save a regular compressed patch to the
         backend ZoiaLibraryApp directory. This requires the
@@ -143,6 +147,8 @@ class TestSaving(unittest.TestCase):
         along with the accompanying metadata. This simulates a
         patch that originates from the PS API.
         """
+
+        self.setUp()
 
         # Load the sample JSON data.
         with open(os.path.join(test_path,
@@ -194,6 +200,8 @@ class TestSaving(unittest.TestCase):
 
         # TODO Test other compression algorithms
 
+        self.tearDown()
+
     def test_save_patch_local_bin(self):
         """ Attempts to save a regular binary patch to the
         backend ZoiaLibraryApp directory. This requires the
@@ -201,6 +209,8 @@ class TestSaving(unittest.TestCase):
         along with the accompanying metadata. This simulates a
         patch that originates from a user's machine or from an SD card.
         """
+
+        self.setUp()
 
         # Try to break the method.
         exc = (FileNotFoundError, errors.SavingError)
@@ -256,6 +266,8 @@ class TestSaving(unittest.TestCase):
 
         self.assertTrue(count == 1, "Did not find exactly 1 patch directory"
                                     "with a 5-digit identification number.")
+
+        self.tearDown()
 
     def test_save_patch_local_compressed(self):
         """ Attempts to save a regular compressed patch to the

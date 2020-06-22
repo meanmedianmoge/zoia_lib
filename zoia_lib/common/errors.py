@@ -168,3 +168,23 @@ class SortingError(ZoiaLibError):
             # Default case. We do not want to get here.
             print(f'Could not process {info} correctly '
                   f'due to an unexpected error.')
+
+
+class SearchingError(ZoiaLibError):
+    """Class raised when searching through metadata did not complete
+    successfully.
+
+    Possible error codes:
+     - 1001: The mode was invalid.
+     - 1002: The query supplied was not a list.
+    """
+    def __init__(self, info, error_code=0):
+        if info is None:
+            print(f'Expected information but got None instead.')
+        elif error_code == 1001:
+            print(f'The supplied metadata {info} is not a list. Searching '
+                  f'can only occur on valid lists.')
+        else:
+            # Default case. We do not want to get here.
+            print(f'Could not process {info} correctly '
+                  f'due to an unexpected error.')

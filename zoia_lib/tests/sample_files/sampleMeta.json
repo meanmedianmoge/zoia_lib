@@ -1,5 +1,6 @@
 [
   {
+    "id": 122243,
     "updated_at": "2020-06-09T04:29:27+00:00",
     "slug": "dream-bender",
     "title": "Dream Bender",
@@ -11,6 +12,14 @@
       "slug": "nathanvassiliades",
       "name": "nathanvassiliades"
     },
+    "files": [
+      {
+        "id": 122243,
+        "url": "https:\\/\\/patchstorage.com\\/api\\/alpha\\/patches\\/122661\\/files\\/125336",
+        "filesize": 32768,
+        "filename": "012_zoia_dream_mender.bin"
+      }
+    ],
     "categories": [
       {
         "id": 77,
@@ -47,6 +56,7 @@
     ]
   },
   {
+    "id": 124566,
     "updated_at": "2020-04-30T10:22:24+00:00",
     "slug": "loveless",
     "title": "LOVELESS",
@@ -58,6 +68,14 @@
       "slug": "meagher",
       "name": "meagher"
     },
+    "files": [
+      {
+        "id": 124566,
+        "url": "https:\\/\\/patchstorage.com\\/api\\/alpha\\/patches\\/122661\\/files\\/125336",
+        "filesize": 32768,
+        "filename": "012_loveless.bin"
+      }
+    ],
     "tags": [
       {
         "id": 3126,
@@ -97,6 +115,7 @@
     ]
   },
   {
+    "id": 121123,
     "updated_at": "2020-01-09T15:25:56+00:00",
     "slug": "goldfinger-golden-ratio",
     "title": "GOLDFINGER (Golden Ratio)",
@@ -108,6 +127,14 @@
       "slug": "an-moku",
       "name": "An Moku"
     },
+    "files": [
+      {
+        "id": 121123,
+        "url": "https:\\/\\/patchstorage.com\\/api\\/alpha\\/patches\\/122661\\/files\\/125336",
+        "filesize": 32768,
+        "filename": "012_goldfinger.bin"
+      }
+    ],
     "categories": [
       {
         "id": 77,
@@ -179,12 +206,21 @@
     ]
   },
   {
+    "id": 104273,
     "updated_at": "2019-08-26T01:20:17+00:00",
     "slug": "subtle-knife",
     "title": "Subtle Knife",
     "like_count": 1,
     "download_count": 34,
     "view_count": 80,
+    "files": [
+      {
+        "id": 104273,
+        "url": "https:\\/\\/patchstorage.com\\/api\\/alpha\\/patches\\/122661\\/files\\/125336",
+        "filesize": 32768,
+        "filename": "012_subtle_knife.bin"
+      }
+    ],
     "categories": [
       {
         "id": 77,
@@ -206,6 +242,7 @@
     ]
   },
   {
+    "id": 126563,
     "updated_at": "2020-04-01T15:44:55+00:00",
     "slug": "upward",
     "title": "Upward",
@@ -214,6 +251,14 @@
       "slug": "hopefulutopian",
       "name": "HopefulUtopian"
     },
+    "files": [
+      {
+        "id": 126563,
+        "url": "https:\\/\\/patchstorage.com\\/api\\/alpha\\/patches\\/122661\\/files\\/125336",
+        "filesize": 32768,
+        "filename": "012_upward.bin"
+      }
+    ],
     "categories": [
       {
         "id": 77,

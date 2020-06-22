@@ -22,6 +22,10 @@ class TestSorting(unittest.TestCase):
     """
 
     def test_sort_edge_cases(self):
+        """ Test the edge cases of the sorting method should it
+        encounter unexpected input.
+        """
+
         # Try to break the method.
         exc = errors.SortingError
 
@@ -35,9 +39,17 @@ class TestSorting(unittest.TestCase):
         self.assertRaises(exc, util.sort_metadata, 5, "Nope", True)
 
     def test_title_sort(self):
+        """ Attempts to sort a dataset by the title attribute. This
+        data must be collected beforehand, but that specific
+        functionality is not being tested here.
+
+        The sorting occurs in both lexicographical and reverse
+        lexicographical order.
+        """
+
         # Get the JSON metadata
         with open(os.path.join(test_path, "sample_files",
-                               "sampleMetaSorting.json"), "r") as f:
+                               "sampleMeta.json"), "r") as f:
             data = json.loads(f.read())
 
         # Sort by title in lexicographical order.
@@ -67,9 +79,18 @@ class TestSorting(unittest.TestCase):
                         "Sorted data did not have Dream Bender in position 4")
 
     def test_author_sort(self):
+        """ Attempts to sort a dataset by the author attribute. This
+        data must be collected beforehand, but that specific
+        functionality is not being tested here.
+
+        The sorting occurs in both lexicographical and reverse
+        lexicographical order. The sorting should function should no
+        author attribute exist.
+        """
+
         # Get the JSON metadata
         with open(os.path.join(test_path, "sample_files",
-                               "sampleMetaSorting.json"), "r") as f:
+                               "sampleMeta.json"), "r") as f:
             data = json.loads(f.read())
 
         # Sort by author in lexicographical order.
@@ -100,9 +121,18 @@ class TestSorting(unittest.TestCase):
                         "Sorted data did not have Subtle Knife in position 0")
 
     def test_like_count_sort(self):
+        """ Attempts to sort a dataset by the like_count attribute. This
+        data must be collected beforehand, but that specific
+        functionality is not being tested here.
+
+        The sorting occurs in both lexicographical and reverse
+        lexicographical order. The sorting should function should no
+        like_count attribute exist.
+        """
+
         # Get the JSON metadata
         with open(os.path.join(test_path, "sample_files",
-                               "sampleMetaSorting.json"), "r") as f:
+                               "sampleMeta.json"), "r") as f:
             data = json.loads(f.read())
 
         util.sort_metadata(3, data, False)
@@ -130,9 +160,18 @@ class TestSorting(unittest.TestCase):
                         "Sorted data did not have Upward in position 4")
 
     def test_download_count_sort(self):
+        """ Attempts to sort a dataset by the download_count attribute.
+        This data must be collected beforehand, but that specific
+        functionality is not being tested here.
+
+        The sorting occurs in both lexicographical and reverse
+        lexicographical order. The sorting should function should no
+        download_count attribute exist.
+        """
+
         # Get the JSON metadata
         with open(os.path.join(test_path, "sample_files",
-                               "sampleMetaSorting.json"), "r") as f:
+                               "sampleMeta.json"), "r") as f:
             data = json.loads(f.read())
 
         util.sort_metadata(4, data, False)
@@ -160,9 +199,18 @@ class TestSorting(unittest.TestCase):
                         "Sorted data did not have Upward in position 4")
 
     def test_view_count_sort(self):
+        """ Attempts to sort a dataset by the view_count attribute.
+        This data must be collected beforehand, but that specific
+        functionality is not being tested here.
+
+        The sorting occurs in both lexicographical and reverse
+        lexicographical order. The sorting should function should no
+        view_count attribute exist.
+        """
+
         # Get the JSON metadata
         with open(os.path.join(test_path, "sample_files",
-                               "sampleMetaSorting.json"), "r") as f:
+                               "sampleMeta.json"), "r") as f:
             data = json.loads(f.read())
 
         util.sort_metadata(5, data, False)
@@ -190,9 +238,17 @@ class TestSorting(unittest.TestCase):
                         "Sorted data did not have Upward in position 4")
 
     def test_date_sort(self):
+        """ Attempts to sort a dataset by the updated_at attribute.
+        This data must be collected beforehand, but that specific
+        functionality is not being tested here.
+
+        The sorting occurs in both lexicographical and reverse
+        lexicographical order.
+        """
+
         # Get the JSON metadata
         with open(os.path.join(test_path, "sample_files",
-                               "sampleMetaSorting.json"), "r") as f:
+                               "sampleMeta.json"), "r") as f:
             data = json.loads(f.read())
 
         # Sort by date_modified in lexicographical order.

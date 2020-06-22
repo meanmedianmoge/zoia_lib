@@ -1,4 +1,5 @@
 import datetime
+import fnmatch
 import json
 import os
 import platform
@@ -227,8 +228,8 @@ def save_to_backend(patch):
                         if patch[0] == data:
                             raise errors.SavingError(patch[1]["title"], 503)
     pch = os.path.join(backend_path, "{}".format(pch_id))
-    # Check to see if a directory needs to be made (new patch,
-    # no version control needed yet).
+    # Check to see if a directory needs to be made
+    # (new patch, no version control needed yet).
     if not os.path.isdir(pch):
         os.mkdir(pch)
         if "files" in patch[1] \
@@ -243,7 +244,7 @@ def save_to_backend(patch):
             save_metadata_json(patch[1])
         else:
             # No files attribute,
-            raise errors.SavingError(patch[1], 801)
+            raise errors.SavingError(patch[1], 502)
     else:
         """ A directory already existed for this patch id, so 
         we need to check if this is a unique patch version 
@@ -739,9 +740,10 @@ def sort_metadata(mode, data, rev):
     same initial letter. In a list, you would want all the "d" titles 
     grouped together.
     """
+    # Input checking.
     if mode is None or data is None or rev is None:
+        # TODO replace with an error.
         return None
-
     if mode < 1 or mode > 6:
         raise errors.SortingError(mode, 901)
     if not isinstance(data, list):
@@ -769,3 +771,57 @@ def sort_metadata(mode, data, rev):
     elif mode == 6:
         # Sort by date modified
         data.sort(key=lambda x: x["updated_at"].upper(), reverse=rev)
+
+
+def search_patches(data, query):
+    """ Search an array of metadata based on the passed parameters. The
+    search will attempt to match results using a wildcard regex system.
+
+    data: An array of metadata that is to be searched through.
+    query: The search term for the current search.
+    Returns an array of metadata containing the data that matches the
+    search query.
+    """
+
+    global backend_path
+    if backend_path is None:
+        backend_path = determine_backend_path()
+
+    # Input checking.
+    if query is None or data is None:
+        # TODO replace with an error.
+        return None
+    if not isinstance(data, list):
+        raise errors.SearchingError(query, 1001)
+
+    hits = []
+
+    for curr in data:
+        # Check the patch title.
+        if query.lower() in curr["title"].lower():
+            hits.append(curr)
+            continue
+        if "author" in curr:
+            # Check the author name.
+            if query.lower() in curr["author"]["name"].lower():
+                hits.append(curr)
+                continue
+        if "tags" in curr:
+            # Check every tag.
+            for tag in curr["tags"]:
+                if query.lower() in tag["name"]:
+                    hits.append(curr)
+                    continue
+        if "categories" in curr:
+            # Check every category.
+            for tag in curr["categories"]:
+                if query.lower() in tag["name"]:
+                    hits.append(curr)
+                    continue
+
+        # Date search, weirdest case. We need to account for the fact
+        # a user might enter the date in a variety of formats.
+        # TODO Try this again tomorrow, not happening today :(
+        continue
+
+    return hits
