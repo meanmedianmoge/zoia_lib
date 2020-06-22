@@ -8,7 +8,7 @@ import zoia_lib.common.errors as errors
 test_path = os.path.join(os.getcwd(), "zoia_lib", "tests")
 
 
-class DeletionTest(unittest.TestCase):
+class TestDeletion(unittest.TestCase):
     """ This class is responsible for testing the various deletion
     methods that are to be used on data stored in the backend
     application directory.
@@ -234,6 +234,7 @@ class DeletionTest(unittest.TestCase):
 
         # In order to simulate this, we can just delete any patch using
         # the full path name and the appropriate method.
+        self.setUp()
 
         # Try to break the method.
         exc = (FileNotFoundError, errors.DeletionError, errors.BadPathError)
@@ -252,3 +253,5 @@ class DeletionTest(unittest.TestCase):
         # Try to delete a patch without the file extension.
         self.assertRaises(exc, util.delete_patch_sd,
                           os.path.join(test_path, "22222", "22222"))
+
+        self.tearDown()
