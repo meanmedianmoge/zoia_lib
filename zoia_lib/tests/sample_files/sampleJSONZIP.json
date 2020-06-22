@@ -1,0 +1,81 @@
+{
+  "id": 124436,
+  "link": "https://patchstorage.com/juniper-a-four-voice-polysynth-inspired-by-the-80s/",
+  "created_at": "2020-05-18T19:20:07+00:00",
+  "updated_at": "2020-05-28T14:21:25+00:00",
+  "title": "Juniper 1.1 and preset pack -- a four-voice polysynth inspired by the 80s",
+  "content": "I really wanted to expand the synth voice I used in MIDI Arp into a polysynth.  That synth was already inspired by the Juno (in particular, a video DivKid did about the new Juno-inspired Soundforce dual ADSR module--btw, if anyone from Soundforce is reading, I'd be happy to do a much worse demo than DivKid's; just putting that out there--and the logarithmic curve of its envelopes; to achieve a similar curve, send an ADSR through a CV filter and use a value module to adjust the attack of the ADSR and the time constant of the CV filter in unison).  So, I just sort of... leaned into that.\r\n\r\nThis is not a clone of that synth, but I think, particularly for building dreamy pads, it draws from a similar sonic space.  The architecture is relatively simple:  one square wave oscillator (with pulsewidth modulation), a VCA and a low-pass filter.  One triangle LFO (global; assignable to pitch and/or PWM), one envelope (per voice; assignable to PWM, the filter and/or the amp).\r\n\r\nMIDI is defaulted to channel 1; note priority newest.  The MIDI note in module is on the second page (along with the output module); adjust as fits your setup.\r\n\r\nI wanted to do six voices, but the CPU wouldn't oblige for the other features I thought were really important to sound-shaping.  I might have snuck a fifth voice in, but I felt the stereo chorus was an important element of the sound.  C'est la vie.  It sounds good (in my opinion).\r\n\r\nIt excels at dreamy pads, but it also does all right leads and basses (especially with the amp envelope off).  No arp here, but then again, MIDI Arp has a very similar voice, so... try that out.\r\n\r\nControls:\r\n\r\nFront panel:\r\n\r\nGeneral note:  Most of the pushbuttons on the front page kind of work in reverse (with the exception of the Amp envelope button); when they are LIT UP, that means that parameter is OFF (this a result of the ORing logic employed to conserve CPU)\r\n\r\nLFO (Sky)\r\n\r\nLFO rate -- determines the rate of the LFO\r\n\r\nLFO fade-in time -- determines how long the LFO takes to reach full range; triggered by the first note played (the release time, or fade-out, of the LFO is determined by the release time of the envelope)\r\n\r\nOscillator (Red)\r\n\r\nLFO pitch depth -- determines the depth of the LFO as applied to the oscillator frequency/pitch (the LFO is bipolar when applied to pitch)\r\n\r\nGlide -- sets the portamento between notes\r\n\r\nDrift -- introduces random fluttering to the oscillator and filter frequency, a bit like noise and distortion, it can help the synth feel a bit more lively\r\n\r\nPulsewidth (Orange)\r\n\r\nPulsewidth -- sets the base pulsewidth of the oscillator\r\n\r\nPWM depth -- determines the depth or intensity of the PWM (always positively applied to the base pulsewidth and regulated by that parameter)\r\n\r\nPWM Env Off -- this determines whether the envelope is applied to PWM (lit up means off; the envelope is not applied)\r\n\r\nPWM LFO Off -- this determines whether the LFO is applied to PWM (lit up means off; the LFO is not applied)\r\n\r\nBoth LFO and Env can be combined and applied to PWM.\r\n\r\nFilter (Mango)\r\n\r\nFilter frequency -- base frequency of the filter before modulation\r\n\r\nFilter resonance -- resonance of the filter\r\n\r\nFilter keytrack -- determines how much the filter tracks the oscillator (or keyboard notes); 0 = 0%, 1 = 100% (slightly different from filter keytracking in MIDI Arp)\r\n\r\nADSR (Blue)\r\n\r\n... Um.  ADSR = set the parameters of the envelope\r\n\r\nFilter controls extended (below ADSR, red)\r\n\r\nFilter env depth -- bipolar control that allows the envelope to be applied positively or negatively to the filter\r\n\r\nAmp controls (orange)\r\n\r\nAmp envelope -- Unlike the other pushbuttons, when this button is lit up, the envelope is applied to the amp, making it an ON state\r\n\r\nAmp velocity off -- And we return to the backward controls immediately below it... velocity can be applied to the amp.  Interestingly, velocity can be applied whether or not the envelope is applied to the amp, allowing for velocity-sensitive gates.\r\n\r\n(I have a pretty light touch on a keyboard, so I amplified the connection of the velocity output to the amp; if you would like to adjust this, select the velocity output of each voice and follow it to the appropriate multiplier on that voice's page)\r\n\r\nChorus (white)\r\n\r\nThis is the full chorus module.  I placed it on the front page, because it made dialing in the frequency of the chorus rate easier.\r\n\r\nIf you are interested in the iconic chorus sounds of the Juno, which inspired this:\r\n\r\nI -- .5 Hz\r\nII -- .8 Hz\r\nI+II -- 1 Hz\r\n\r\n(Those rates are based on the Juno 60; the rates for the Juno 6 were slightly slower.)\r\n\r\nAdditionally, the tilt eq of the chorus can mildly compensate for the lack of a high-pass filter.  If I find more CPU to play with.... well, I'll add more voices in.  But if there is still CPU to play with after that, I would put in a HPF.\r\n\r\n=============================================\r\n\r\nRevision notes and preset list:\r\n\r\nRevision notes:\r\n\r\nI found some issues with audio and CPU clipping using Juniper, so I decided to do a revision.  \r\n\r\nI ended up removing the glide control, as I rarely used it but it cost quite a lot in CPU; this addressed the CPU clipping.  \r\n\r\nI also adjusted some of the internal routing levels; resonant filters were causing the chorus to clip (and not in a good way).  Audio clipping still happen at -really extreme- resonant levels; the SV filter's resonance is... hard to completely compensate for.\r\n\r\nInstead of just releasing the revision, I decided to release... 10 revisions.  Ha, sort of.  When you download the patch, you will find a .zip file.  Inside the zipped folder are 10 patches named ###_zoia_juniper.bin (000-009).  Each of these correspond to different presets.  Watch the video and see which one you want to load into your ZOIA (or load all of them).\r\n\r\n000 is based on the default settings of the original patch, a good \"starting point\" pad sound\r\n001 is a detuned pad, with the chorus mix set to 100% (vibrato)\r\n002 uses a more vocal, resonant filter sound\r\n003 features a (relatively) sharp attack, with a soft finish; its sound depends a lot on when you release the keys\r\n004 is a tuned percussion patch, like a marimba\r\n005 is a slowly detuning pad that sounds like a synth run through a VCR\r\n006 uses a low audio rate LFO to create a buzzy FM sound, the negative envelope sweep on the filter sounds great for basses or leads\r\n007 features a negative filter sweep to produce a percussive attack, then a rising tail\r\n008 a bright, punchy patch, kept in check with the keytracking setting\r\n009 is a soft, dreamy pad sound I love using as a \"foundation\" to build off of",
+  "files": [
+    {
+      "id": 124941,
+      "url": "https://patchstorage.com/api/alpha/patches/124436/files/124941",
+      "filesize": 21394,
+      "filename": "Juniper-revision-and-preset-pack.zip"
+    }
+  ],
+  "preview_url": "https://youtu.be/D9wQmsrY1Vg",
+  "revision": "1.1 -- See revision and preset notes at bottom of patch notes",
+  "view_count": 468,
+  "like_count": 4,
+  "download_count": 136,
+  "author": {
+    "id": 2953,
+    "slug": "christopher-h-m-jacques",
+    "name": "Christopher H. M. Jacques"
+  },
+  "categories": [
+    {
+      "id": 74,
+      "name": "Synthesizer",
+      "slug": "synthesizer"
+    }
+  ],
+  "tags": [
+    {
+      "id": 4710,
+      "name": "4 voice",
+      "slug": "4-voice"
+    },
+    {
+      "id": 1389,
+      "name": "dreamy",
+      "slug": "dreamy"
+    },
+    {
+      "id": 5319,
+      "name": "ellen page",
+      "slug": "ellen-page"
+    },
+    {
+      "id": 5318,
+      "name": "juno-esque",
+      "slug": "juno-esque"
+    },
+    {
+      "id": 265,
+      "name": "Pads",
+      "slug": "pads"
+    },
+    {
+      "id": 370,
+      "name": "polysynth",
+      "slug": "polysynth"
+    },
+    {
+      "id": 3856,
+      "name": "washy",
+      "slug": "washy"
+    }
+  ],
+  "state": {
+    "id": 151,
+    "name": "Ready to Go",
+    "slug": "ready-to-go"
+  },
+  "license": {
+    "id": 4191,
+    "name": "Creative Commons Attribution Share Alike 4.0",
+    "slug": "cc-by-sa-4-0"
+  },
+  "custom_license_text": ""
+}
