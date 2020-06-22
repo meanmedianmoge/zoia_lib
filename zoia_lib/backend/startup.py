@@ -16,7 +16,7 @@ if __name__ == "__main__":
     # Get the list of patches on PS to pass to the GUI
     # TODO Maybe we let the user do this with a button
     #  instead of doing it automatically?
-    # patch_list = get_all_patches_min()
+    # patch_list = ps.get_all_patch_data_min()["patch_list"]
     # Example:
     #  - Download and save the patch with id 122661 to an SD card
     #    in drive G to ZOIA slot 8
