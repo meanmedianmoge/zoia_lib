@@ -1,5 +1,4 @@
 import datetime
-import fnmatch
 import json
 import os
 import platform
@@ -29,6 +28,14 @@ def create_backend_directories():
     if backend_path is not None and not os.path.exists(backend_path):
         os.mkdir(backend_path)
         os.mkdir(str(Path(backend_path + "/Banks")))
+
+
+def get_backend_path():
+    global backend_path
+    if backend_path is None:
+        backend_path = determine_backend_path()
+
+    return backend_path
 
 
 def determine_backend_path():
@@ -84,6 +91,13 @@ def patch_decompress(patch):
             zipObj.extractall(pch)
         # Ditch the zip
         os.remove(name_zip)
+        to_delete = None
+
+        for file in os.listdir(pch):
+            if os.path.isdir(os.path.join(pch, file)):
+                to_delete = (os.path.join(pch, file))
+                pch = os.path.join(pch, file)
+
         i = 0
         for file in os.listdir(pch):
             if file.split(".")[1] == "bin":
@@ -106,6 +120,17 @@ def patch_decompress(patch):
                 #  additional files. Especially .txt, would want to
                 #  add that to the content attribute in the JSON.
                 os.remove(os.path.join(pch, file))
+        if to_delete is not None:
+            for file in os.listdir(to_delete):
+                correct_pch = os.path.join(backend_path,
+                                           "{}".format(str(patch_name)))
+                shutil.copy(os.path.join(to_delete, file),
+                            os.path.join(correct_pch))
+            try:
+                shutil.rmtree(to_delete)
+            except FileNotFoundError:
+                raise errors.RenamingError(patch)
+
     else:
         # Unexpected file extension encountered.
         # TODO Handle this case gracefully.

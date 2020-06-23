@@ -146,9 +146,7 @@ class TestSearching(unittest.TestCase):
         functionality is not being tested here.
         """
 
-
         global data
-
 
         pass
 

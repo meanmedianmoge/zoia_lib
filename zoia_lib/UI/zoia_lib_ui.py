@@ -222,12 +222,3 @@ class MainWindow(QMainWindow):
         statusmessage = "{}\t\t{} items".format(
             self.sd_model.rootPath(), self.sd_model.rowCount(self.sd_index))
         self.ui.statusbar.showMessage(statusmessage)
-
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-
-    window = MainWindow()
-    window.show()
-
-    sys.exit(app.exec_())
