@@ -3,7 +3,6 @@ import os
 from os.path import expanduser
 from threading import Thread
 
-from PyQt5.uic.properties import QtGui
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
@@ -39,6 +38,7 @@ class ThrowawayUIMain(QMainWindow):
         self.search_local_data = None
 
         self.create_table()
+        self.create_table_local()
 
         self.ui.left_widget.currentChanged.connect(self.get_local_patches)
         self.ui.actionSort_by_title_A_Z.triggered.connect(self.sort)
@@ -54,6 +54,7 @@ class ThrowawayUIMain(QMainWindow):
         self.ui.actionSpecify_SD_Card_Location.triggered.connect(self.sd_path)
         self.ui.actionQuit.triggered.connect(self.try_quit)
         self.ui.search_button_3.clicked.connect(self.search)
+        self.ui.search_button_4.clicked.connect(self.search_local)
 
         self.ui.table.setFont(QFont('SansSerif', 11))
         self.ui.right_widget.setFont(QFont('SansSerif', 16))
@@ -67,6 +68,11 @@ class ThrowawayUIMain(QMainWindow):
         self.ui.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.ui.table.resizeColumnsToContents()
         self.ui.table.resizeRowsToContents()
+
+    def create_table_local(self):
+        self.ui.table_2.setRowCount(len(self.data))
+        self.ui.table_2.setColumnCount(5)
+        self.ui.table_2.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
     def get_local_patches(self):
         if self.ui.left_widget.currentIndex() == 1:
@@ -84,7 +90,6 @@ class ThrowawayUIMain(QMainWindow):
         else:
             self.ui.right_widget.setText("")
             self.set_data(False)
-
 
     def set_data(self, search):
         self.ui.table.clear()
@@ -146,16 +151,16 @@ class ThrowawayUIMain(QMainWindow):
     def set_data_local(self, search):
         self.ui.table_2.clear()
         if search:
-            data = self.local_search_data
+            data = self.search_local_data
         else:
             data = self.local_data
-        self.ui.table.setRowCount(len(data))
+        self.ui.table_2.setRowCount(len(data))
         hor_headers = ["Title", "Tags", "Categories", "Date Modified", "Export"]
         for i in range(len(data)):
             btn_title = QRadioButton(data[i]["title"], self)
             btn_title.setObjectName(str(data[i]["id"]))
             btn_title.toggled.connect(self.display_patch_info)
-            self.ui.table.setCellWidget(i, 0, btn_title)
+            self.ui.table_2.setCellWidget(i, 0, btn_title)
             tags = ""
             for j in range(1, len(data[i]["tags"])):
                 tags += data[i]["tags"][j]["name"] + ", "
@@ -170,7 +175,7 @@ class ThrowawayUIMain(QMainWindow):
             btn_tag.setToolTip(tags)
             btn_tag.setStyleSheet(style_sheet)
             btn_tag.setFont(QFont('SansSerif', 11))
-            self.ui.table.setCellWidget(i, 1, btn_tag)
+            self.ui.table_2.setCellWidget(i, 1, btn_tag)
 
             cat = ""
             for k in range(1, len(data[i]["categories"])):
@@ -187,41 +192,38 @@ class ThrowawayUIMain(QMainWindow):
             btn_cat.setToolTip(cat)
             btn_cat.setFont(QFont('SansSerif', 11))
             btn_cat.setStyleSheet(style_sheet)
-            self.ui.table.setCellWidget(i, 2, btn_cat)
+            self.ui.table_2.setCellWidget(i, 2, btn_cat)
             date = QTableWidgetItem(data[i]["updated_at"][:10])
             date.setTextAlignment(Qt.AlignCenter)
-            self.ui.table.setItem(i, 3, date)
+            self.ui.table_2.setItem(i, 3, date)
             expt = QPushButton(str(data[i]["id"]), self)
             expt.setFont(QFont('SansSerif', 11))
             expt.clicked.connect(self.initiate_export)
-            self.ui.table.setCellWidget(i, 4, expt)
-        self.ui.table.setHorizontalHeaderLabels(hor_headers)
+            self.ui.table_2.setCellWidget(i, 4, expt)
+        self.ui.table_2.setHorizontalHeaderLabels(hor_headers)
+        self.ui.table_2.resizeColumnsToContents()
+        self.ui.table_2.resizeRowsToContents()
 
     def initiate_download(self):
         self.ui.statusbar.showMessage("Starting download...")
         idx = str(self.sender().text())
         self.sender().setText("...")
         self.sender().show()
-        thread = Thread(target=self.download_and_save, args=(idx, self.sender(),))
-        thread.start()
-        # TODO Replace with FCFS scheduling
-        thread.join()
+        # TODO Replace with FCFS thread scheduling
+        self.download_and_save(idx, self.sender())
 
     def initiate_export(self):
         if self.sd_card_path is None:
+            # TODO Investigate why this closes immediately.
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Information)
             msg.setText("Please specify your SD card path!")
+            msg.setInformativeText("File -> Specify SD card path")
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.show()
         else:
+            # TODO Prompt the user for a slot.
             util.export_patch_bin(self.sender().text(), self.sd_card_path, 8)
-        self.ui.statusbar.showMessage("Starting download...")
-        idx = str(self.sender().text())
-        self.sender().setText("...")
-        self.sender().show()
-        thread = Thread(target=self.download_and_save, args=(idx, self.sender(),))
-        thread.start()
-        # TODO Replace with FCFS scheduling
-        thread.join()
 
     def download_and_save(self, idx, btn):
         data = ps.download(idx)
@@ -256,7 +258,7 @@ class ThrowawayUIMain(QMainWindow):
     def sd_path(self):
         input_dir = QFileDialog.getExistingDirectory(None, 'Select a folder:',
                                                      expanduser("~"))
-        self.ui.sd_card_path = str(input_dir)
+        self.sd_card_path = str(input_dir)
 
     def search(self):
         if self.ui.searchbar_3.text() == "":
@@ -265,6 +267,14 @@ class ThrowawayUIMain(QMainWindow):
             self.search_data = \
                 util.search_patches(self.data, self.ui.searchbar_3.text())
             self.set_data(True)
+
+    def search_local(self):
+        if self.ui.searchbar_4.text() == "":
+            self.set_data_local(False)
+        else:
+            self.search_local_data = \
+                util.search_patches(self.local_data, self.ui.searchbar_4.text())
+            self.set_data_local(True)
 
     def sort(self):
         if self.sender().objectName() == "actionSort_by_title_A_Z":
@@ -311,31 +321,31 @@ class ThrowawayUIMain(QMainWindow):
                 self.set_data(True)
         elif self.sender().objectName() == "actionSort_by_views_high_low":
             if self.ui.searchbar_3.text() == "":
-                util.sort_metadata(4, self.data, True)
-                self.set_data(False)
-            else:
-                util.sort_metadata(4, self.search_data, True)
-                self.set_data(True)
-        elif self.sender().objectName() == "actionSort_by_views_low_high":
-            if self.ui.searchbar_3.text() == "":
-                util.sort_metadata(4, self.data, False)
-                self.set_data(False)
-            else:
-                util.sort_metadata(4, self.search_data, False)
-                self.set_data(True)
-        elif self.sender().objectName() == "actionSort_by_downloads_high_low":
-            if self.ui.searchbar_3.text() == "":
                 util.sort_metadata(5, self.data, True)
                 self.set_data(False)
             else:
                 util.sort_metadata(5, self.search_data, True)
                 self.set_data(True)
-        elif self.sender().objectName() == "actionSort_by_downloads_low_high":
+        elif self.sender().objectName() == "actionSort_by_views_low_high":
             if self.ui.searchbar_3.text() == "":
                 util.sort_metadata(5, self.data, False)
                 self.set_data(False)
             else:
                 util.sort_metadata(5, self.search_data, False)
+                self.set_data(True)
+        elif self.sender().objectName() == "actionSort_by_downloads_high_low":
+            if self.ui.searchbar_3.text() == "":
+                util.sort_metadata(4, self.data, True)
+                self.set_data(False)
+            else:
+                util.sort_metadata(4, self.search_data, True)
+                self.set_data(True)
+        elif self.sender().objectName() == "actionSort_by_downloads_low_high":
+            if self.ui.searchbar_3.text() == "":
+                util.sort_metadata(4, self.data, False)
+                self.set_data(False)
+            else:
+                util.sort_metadata(4, self.search_data, False)
                 self.set_data(True)
         else:
             print("How did this even happen?")
