@@ -753,7 +753,7 @@ def sort_metadata(mode, data, rev):
           - 2 -> Sort by author
           - 3 -> Sort by like count
           - 4 -> Sort by download count
-          - 5 -> Sort by view count*
+          - 5 -> Sort by view count
           - 6 -> Sort by date modified (updated_at attribute)
     data: An array of metadata that is to be sorted.
     inc: True if the data should be sorted in reverse,

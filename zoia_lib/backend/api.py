@@ -303,6 +303,9 @@ class PatchStorage:
          - updated_at
          - categories
          - tags
+         - like_count
+         - view_count
+         - download_count
 
         return: A list of data, where each item contains the
                 information outlined above.
@@ -327,7 +330,10 @@ class PatchStorage:
                     "created_at": patch["created_at"],
                     "updated_at": patch["updated_at"],
                     "tags": patch["tags"],
-                    "categories": patch["categories"]
+                    "categories": patch["categories"],
+                    "like_count": patch["like_count"],
+                    "download_count": patch["download_count"],
+                    "view_count": patch["view_count"]
                 }
                 all_patches.append(data)
 

@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1318</width>
+    <height>1039</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>ZOIA Librarian</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>resources/logo.png</normaloff>resources/logo.png</iconset>
+  </property>
+  <property name="tabShape">
+   <enum>QTabWidget::Rounded</enum>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>true</bool>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="sizeConstraint">
+     <enum>QLayout::SetNoConstraint</enum>
+    </property>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetNoConstraint</enum>
+      </property>
+      <item>
+       <widget class="QTabWidget" name="left_widget">
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <property name="movable">
+         <bool>true</bool>
+        </property>
+        <widget class="QWidget" name="tab_ps_2">
+         <attribute name="title">
+          <string>PatchStorage View</string>
+         </attribute>
+         <attribute name="toolTip">
+          <string>Switch to view all ZOIA patches on PatchStorage</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <item>
+               <widget class="QLineEdit" name="searchbar_3"/>
+              </item>
+              <item>
+               <widget class="QPushButton" name="search_button_3">
+                <property name="text">
+                 <string>Search</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QTableWidget" name="table"/>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_ls">
+         <attribute name="title">
+          <string>Local Storage View</string>
+         </attribute>
+         <attribute name="toolTip">
+          <string>Switch to your locally saved patches</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_6">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetNoConstraint</enum>
+            </property>
+            <item>
+             <widget class="QLineEdit" name="searchbar_4"/>
+            </item>
+            <item>
+             <widget class="QPushButton" name="search_button_4">
+              <property name="text">
+               <string>Search</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QTableWidget" name="table_2">
+            <property name="gridStyle">
+             <enum>Qt::SolidLine</enum>
+            </property>
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTextBrowser" name="right_widget"/>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1318</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFiel">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionSpecify_SD_Card_Location"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuSort">
+    <property name="title">
+     <string>Sort</string>
+    </property>
+    <addaction name="actionSort_by_title_A_Z"/>
+    <addaction name="actionSort_by_title_Z_A"/>
+    <addaction name="actionSort_by_date_new_old"/>
+    <addaction name="actionSort_by_date_old_new"/>
+    <addaction name="actionSort_by_likes_high_low"/>
+    <addaction name="actionSort_by_likes_low_high"/>
+    <addaction name="actionSort_by_views_high_low"/>
+    <addaction name="actionSort_by_views_low_high"/>
+    <addaction name="actionSort_by_downloads_high_low"/>
+    <addaction name="actionSort_by_downloads_low_high"/>
+   </widget>
+   <addaction name="menuFiel"/>
+   <addaction name="menuSort"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionSpecify_SD_Card_Location">
+   <property name="text">
+    <string>Specify SD Card Location</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionSort_by_title_A_Z">
+   <property name="text">
+    <string>Sort by title (A-Z)</string>
+   </property>
+  </action>
+  <action name="actionSort_by_title_Z_A">
+   <property name="text">
+    <string>Sort by title (Z-A)</string>
+   </property>
+  </action>
+  <action name="actionSort_by_date_new_old">
+   <property name="text">
+    <string>Sort by date (new-old)</string>
+   </property>
+  </action>
+  <action name="actionSort_by_date_old_new">
+   <property name="text">
+    <string>Sort by date (old-new)</string>
+   </property>
+  </action>
+  <action name="actionSort_by_likes_high_low">
+   <property name="text">
+    <string>Sort by likes (high-low)</string>
+   </property>
+  </action>
+  <action name="actionSort_by_likes_low_high">
+   <property name="text">
+    <string>Sort by likes (low-high)</string>
+   </property>
+  </action>
+  <action name="actionSort_by_views_high_low">
+   <property name="text">
+    <string>Sort by views (high-low)</string>
+   </property>
+  </action>
+  <action name="actionSort_by_views_low_high">
+   <property name="text">
+    <string>Sort by views (low-high)</string>
+   </property>
+  </action>
+  <action name="actionSort_by_downloads_high_low">
+   <property name="text">
+    <string>Sort by downloads (high-low)</string>
+   </property>
+  </action>
+  <action name="actionSort_by_downloads_low_high">
+   <property name="text">
+    <string>Sort by downloads (low-high)</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
