@@ -580,7 +580,7 @@ def delete_patch_sd(path):
         raise errors.BadPathError(path, 301)
 
 
-def export_patch_bin(patch, dest, slot=-1):
+def export_patch_bin(patch, dest, slot=-1, override=False):
     """ Attempts to export a patch from the application to the
     specified supplied path. Normally, this will be a user's SD card,
     but it could be used for a location on a user's machine as well.
@@ -600,6 +600,18 @@ def export_patch_bin(patch, dest, slot=-1):
     global backend_path
     if backend_path is None:
         backend_path = determine_backend_path()
+
+    # Check to see if there is already another patch with that slot #
+    # in the destination.
+    if not override:
+        for pch in os.listdir(dest):
+            if pch[:3] == "00{}".format(slot) or pch[:3] == "0{}".format(slot):
+                raise errors.ExportingError(slot, 703)
+    else:
+        # Delete the previous patch that occupied the slot.
+        for pch in os.listdir(dest):
+            if pch[:3] == "00{}".format(slot) or pch[:3] == "0{}".format(slot):
+                os.remove(os.path.join(dest, pch))
 
     # Prepare the name of the patch. We need to access the metadata.
     # Extract the patch id from the supplied patch parameter.
@@ -714,6 +726,8 @@ def check_for_updates():
     meta = []
 
     for patch in os.listdir(backend_path):
+        # Only check for updates for patches hosted on PS
+        # (denoted via the 6-digit ID numbers).
         if len(patch) > 5 \
                 and len(os.listdir(os.path.join(backend_path, patch))) > 2:
             # Multiple versions, only need the latest.
@@ -846,7 +860,7 @@ def search_patches(data, query):
 
         # Date search, weirdest case. We need to account for the fact
         # a user might enter the date in a variety of formats.
-        # TODO Try this again tomorrow, not happening today :(
+        # TODO Comprehensive date searching
         continue
 
     return hits

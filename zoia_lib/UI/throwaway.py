@@ -8,9 +8,11 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import (QCoreApplication, QMetaObject,
-                            QRect, QSize, Qt)
-from PySide2.QtGui import (QIcon)
+from PySide2.QtCore import (QCoreApplication, QDate, QDateTime, QMetaObject,
+    QObject, QPoint, QRect, QSize, QTime, QUrl, Qt)
+from PySide2.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont,
+    QFontDatabase, QIcon, QKeySequence, QLinearGradient, QPalette, QPainter,
+    QPixmap, QRadialGradient)
 from PySide2.QtWidgets import *
 
 
@@ -18,7 +20,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1318, 1039)
+        MainWindow.resize(1523, 1081)
         icon = QIcon()
         icon.addFile(u"resources/logo.png", QSize(), QIcon.Normal, QIcon.Off)
         MainWindow.setWindowIcon(icon)
@@ -54,8 +56,10 @@ class Ui_MainWindow(object):
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setSizeConstraint(QLayout.SetNoConstraint)
         self.horizontalLayout_2 = QHBoxLayout()
+        self.horizontalLayout_2.setSpacing(6)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalLayout_2.setSizeConstraint(QLayout.SetNoConstraint)
+        self.horizontalLayout_2.setSizeConstraint(QLayout.SetFixedSize)
+        self.horizontalLayout_2.setContentsMargins(0, -1, -1, -1)
         self.left_widget = QTabWidget(self.centralwidget)
         self.left_widget.setObjectName(u"left_widget")
         self.left_widget.setMovable(True)
@@ -82,6 +86,9 @@ class Ui_MainWindow(object):
 
         self.table = QTableWidget(self.tab_ps_2)
         self.table.setObjectName(u"table")
+        self.table.setAutoFillBackground(False)
+        self.table.verticalHeader().setVisible(False)
+        self.table.verticalHeader().setHighlightSections(False)
 
         self.verticalLayout.addWidget(self.table)
 
@@ -113,6 +120,8 @@ class Ui_MainWindow(object):
         self.table_2.setObjectName(u"table_2")
         self.table_2.setGridStyle(Qt.SolidLine)
         self.table_2.setSortingEnabled(True)
+        self.table_2.verticalHeader().setVisible(False)
+        self.table_2.verticalHeader().setHighlightSections(False)
 
         self.verticalLayout_4.addWidget(self.table_2)
 
@@ -131,7 +140,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1318, 27))
+        self.menubar.setGeometry(QRect(0, 0, 1523, 27))
         self.menuFiel = QMenu(self.menubar)
         self.menuFiel.setObjectName(u"menuFiel")
         self.menuSort = QMenu(self.menubar)

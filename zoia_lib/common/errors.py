@@ -123,6 +123,9 @@ class ExportingError(ZoiaLibError):
             print(f'Exporting would result in overwriting of data,'
                   f'as a bank directory already existed on the SD'
                   f'card')
+        elif error_code == 703:
+            print(f'Exporting would create a conflict between two'
+                  f'patches.')
         else:
             # Default case. We do not want to get here.
             print(f'Could not export the file {patch} correctly '

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1318</width>
-    <height>1039</height>
+    <width>1523</width>
+    <height>1081</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,9 +29,15 @@
      <enum>QLayout::SetNoConstraint</enum>
     </property>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0">
+      <property name="spacing">
+       <number>6</number>
+      </property>
       <property name="sizeConstraint">
-       <enum>QLayout::SetNoConstraint</enum>
+       <enum>QLayout::SetFixedSize</enum>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
       </property>
       <item>
        <widget class="QTabWidget" name="left_widget">
@@ -66,7 +72,17 @@
              </layout>
             </item>
             <item>
-             <widget class="QTableWidget" name="table"/>
+             <widget class="QTableWidget" name="table">
+              <property name="autoFillBackground">
+               <bool>false</bool>
+              </property>
+              <attribute name="verticalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="verticalHeaderHighlightSections">
+               <bool>false</bool>
+              </attribute>
+             </widget>
             </item>
            </layout>
           </item>
@@ -105,6 +121,12 @@
             <property name="sortingEnabled">
              <bool>true</bool>
             </property>
+            <attribute name="verticalHeaderVisible">
+             <bool>false</bool>
+            </attribute>
+            <attribute name="verticalHeaderHighlightSections">
+             <bool>false</bool>
+            </attribute>
            </widget>
           </item>
          </layout>
@@ -123,7 +145,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1318</width>
+     <width>1523</width>
      <height>27</height>
     </rect>
    </property>

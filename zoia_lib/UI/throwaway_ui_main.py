@@ -1,7 +1,6 @@
 import json
 import os
 from os.path import expanduser
-from threading import Thread
 
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
@@ -9,6 +8,7 @@ from PySide2.QtWidgets import *
 import zoia_lib.UI.throwaway as ui_main
 import zoia_lib.backend.api as api
 import zoia_lib.backend.utilities as util
+import zoia_lib.common.errors as errors
 
 ps = api.PatchStorage()
 backend_path = util.get_backend_path()
@@ -25,8 +25,24 @@ style_sheet = """
 
 
 class ThrowawayUIMain(QMainWindow):
+    """ ** TEMPORARY FUNCTIONALITY SHOWCASE **
+    The ThrowawayUIMain class represents the frontend for the
+    application. It allows users to interact with the various backend
+    functions avaiable. These include searching, download, sorting, and
+    exporting patches.
+
+    Known issues:
+     - Versioning is not implemented in the frontend. As such, exporting
+       a patch with multiple version will fail.
+     - Tables do not scale correctly.
+     - Importing is not implemented.
+     - Bank creation, re-arranging, and exporting is not implemented.
+    """
 
     def __init__(self):
+        """
+
+        """
         super(ThrowawayUIMain, self).__init__()
         self.ui = ui_main.Ui_MainWindow()
         self.ui.setupUi(self)
@@ -37,8 +53,16 @@ class ThrowawayUIMain(QMainWindow):
         self.local_data = None
         self.search_local_data = None
 
-        self.create_table()
-        self.create_table_local()
+        self.ui.table.setRowCount(len(self.data))
+        self.ui.table.setColumnCount(5)
+        self.set_data(False)
+        self.ui.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.ui.table.resizeColumnsToContents()
+        self.ui.table.resizeRowsToContents()
+
+        self.ui.table_2.setRowCount(len(self.data))
+        self.ui.table_2.setColumnCount(5)
+        self.ui.table_2.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         self.ui.left_widget.currentChanged.connect(self.get_local_patches)
         self.ui.actionSort_by_title_A_Z.triggered.connect(self.sort)
@@ -61,20 +85,13 @@ class ThrowawayUIMain(QMainWindow):
 
         self.showMaximized()
 
-    def create_table(self):
-        self.ui.table.setRowCount(len(self.data))
-        self.ui.table.setColumnCount(5)
-        self.set_data(False)
-        self.ui.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.ui.table.resizeColumnsToContents()
-        self.ui.table.resizeRowsToContents()
-
-    def create_table_local(self):
-        self.ui.table_2.setRowCount(len(self.data))
-        self.ui.table_2.setColumnCount(5)
-        self.ui.table_2.setEditTriggers(QAbstractItemView.NoEditTriggers)
-
     def get_local_patches(self):
+        """ Gets a list of local patch metadata from the backend
+        directory.
+
+        # TODO Expand this accurately deal with versioning (array in
+           the array).
+        """
         if self.ui.left_widget.currentIndex() == 1:
             self.ui.right_widget.setText("")
             self.local_data = []
@@ -92,6 +109,9 @@ class ThrowawayUIMain(QMainWindow):
             self.set_data(False)
 
     def set_data(self, search):
+        """
+
+        """
         self.ui.table.clear()
         if search:
             data = self.search_data
@@ -149,6 +169,9 @@ class ThrowawayUIMain(QMainWindow):
         self.ui.table.setHorizontalHeaderLabels(hor_headers)
 
     def set_data_local(self, search):
+        """
+
+        """
         self.ui.table_2.clear()
         if search:
             data = self.search_local_data
@@ -205,6 +228,9 @@ class ThrowawayUIMain(QMainWindow):
         self.ui.table_2.resizeRowsToContents()
 
     def initiate_download(self):
+        """
+
+        """
         self.ui.statusbar.showMessage("Starting download...")
         idx = str(self.sender().text())
         self.sender().setText("...")
@@ -213,31 +239,88 @@ class ThrowawayUIMain(QMainWindow):
         self.download_and_save(idx, self.sender())
 
     def initiate_export(self):
+        """ **TEMPORARY METHOD** - Will be removed once GUI is expanded.
+
+        Attempts to export a patch saved in the backend to an SD
+        card. This requires that the user has previously set their SD
+        card path using sd_path(). Should the patch be missing, a
+        message prompt will inform the user that it must be specified.
+
+        The application will ask for a slot number, and this is forced
+        to be between 0 and 63 inclusive. Should the user specify a slot
+        and the application detects that the slot is occupied by another
+        patch on the SD card, the user will be asked if they wish to
+        overwrite the other patch. If yes, exporting will export the new
+        patch and delete the other patch that previously occupied the
+        slot. If no, the user will be asked to enter a different slot
+        number. At any point, the user can abort the operation by
+        closing the message dialog or hitting the "Cancel" button.
+        """
         if self.sd_card_path is None:
-            # TODO Investigate why this closes immediately.
+            # No SD path.
             msg = QMessageBox()
+            msg.setWindowTitle("No SD Path")
             msg.setIcon(QMessageBox.Information)
             msg.setText("Please specify your SD card path!")
-            msg.setInformativeText("File -> Specify SD card path")
+            msg.setInformativeText("File -> Specify SD Card Location")
             msg.setStandardButtons(QMessageBox.Ok)
-            msg.show()
+            msg.exec_()
         else:
-            # TODO Prompt the user for a slot.
-            util.export_patch_bin(self.sender().text(), self.sd_card_path, 8)
+            while True:
+                # Ask for a slot
+                slot, ok = QInputDialog().getInt(self, "Patch Export",
+                                                 "Slot number:",
+                                                 minValue=0, maxValue=63)
+                if slot and ok:
+                    # Got a slot and the user hit "OK"
+                    try:
+                        util.export_patch_bin(self.sender().text(),
+                                              self.sd_card_path, slot)
+                        self.ui.statusbar.showMessage("Export complete!",
+                                                      timeout=2000)
+                        break
+                    except errors.ExportingError:
+                        # There was already a patch in that slot.
+                        msg = QMessageBox()
+                        msg.setWindowTitle("Slot Exists")
+                        msg.setIcon(QMessageBox.Information)
+                        msg.setText("That slot is occupied by another patch. "
+                                    "Would you like to overwrite it?")
+                        msg.setStandardButtons(QMessageBox.Yes |
+                                               QMessageBox.No)
+                        value = msg.exec_()
+                        if value == QMessageBox.Yes:
+                            # Overwrite the other patch.
+                            util.export_patch_bin(self.sender().text(),
+                                                  self.sd_card_path, slot,
+                                                  True)
+                            break
+                        else:
+                            continue
+                else:
+                    # Operation was aborted.
+                    break
 
     def download_and_save(self, idx, btn):
+        """
+
+        """
         data = ps.download(idx)
         util.save_to_backend(data)
         btn.setEnabled(False)
         btn.setText("Downloaded!")
-        self.ui.statusbar.showMessage("Download complete!", timeout=2)
+        self.ui.statusbar.showMessage("Download complete!", timeout=2000)
 
     def display_patch_info(self):
+        """
+
+        """
         btn = self.sender()
         if btn.isChecked():
             content = ps.get_patch_meta(btn.objectName())
             if content["preview_url"] == "":
                 content["preview_url"] = "None provided"
+
             content["content"] = content["content"].replace("\n", "<br/>")
             self.ui.right_widget.setText("<html><h3>"
                                          + content["title"]
@@ -256,11 +339,17 @@ class ThrowawayUIMain(QMainWindow):
                                          + "</html>")
 
     def sd_path(self):
+        """
+
+        """
         input_dir = QFileDialog.getExistingDirectory(None, 'Select a folder:',
                                                      expanduser("~"))
         self.sd_card_path = str(input_dir)
 
     def search(self):
+        """
+
+        """
         if self.ui.searchbar_3.text() == "":
             self.set_data(False)
         else:
@@ -277,79 +366,156 @@ class ThrowawayUIMain(QMainWindow):
             self.set_data_local(True)
 
     def sort(self):
+        """ Sorts the metadata in a table depending on the option
+        selection via the menu.
+        """
         if self.sender().objectName() == "actionSort_by_title_A_Z":
-            if self.ui.searchbar_3.text() == "":
+            if self.ui.searchbar_3.text() == "" \
+                    and self.ui.left_widget.currentIndex() == 0:
                 util.sort_metadata(1, self.data, False)
                 self.set_data(False)
-            else:
+            elif self.ui.left_widget.currentIndex() == 0:
                 util.sort_metadata(1, self.search_data, False)
                 self.set_data(True)
+            elif self.ui.searchbar_4.text() == "" \
+                    and self.ui.left_widget.currentIndex() == 1:
+                util.sort_metadata(1, self.local_data, False)
+                self.set_data_local(False)
+            else:
+                util.sort_metadata(1, self.search_local_data, False)
+                self.set_data_local(True)
         elif self.sender().objectName() == "actionSort_by_title_Z_A":
             if self.ui.searchbar_3.text() == "":
                 util.sort_metadata(1, self.data, True)
                 self.set_data(False)
-            else:
+            elif self.ui.left_widget.currentIndex() == 0:
                 util.sort_metadata(1, self.search_data, True)
                 self.set_data(True)
+            elif self.ui.searchbar_4.text() == "" \
+                    and self.ui.left_widget.currentIndex() == 1:
+                util.sort_metadata(1, self.local_data, True)
+                self.set_data_local(False)
+            else:
+                util.sort_metadata(1, self.search_local_data, True)
+                self.set_data_local(True)
         elif self.sender().objectName() == "actionSort_by_date_new_old":
             if self.ui.searchbar_3.text() == "":
                 util.sort_metadata(6, self.data, True)
                 self.set_data(False)
-            else:
+            elif self.ui.left_widget.currentIndex() == 0:
                 util.sort_metadata(6, self.search_data, True)
                 self.set_data(True)
+            elif self.ui.searchbar_4.text() == "" \
+                    and self.ui.left_widget.currentIndex() == 1:
+                util.sort_metadata(6, self.local_data, True)
+                self.set_data_local(False)
+            else:
+                util.sort_metadata(6, self.search_local_data, True)
+                self.set_data_local(True)
         elif self.sender().objectName() == "actionSort_by_date_old_new":
             if self.ui.searchbar_3.text() == "":
                 util.sort_metadata(6, self.data, False)
                 self.set_data(False)
-            else:
+            elif self.ui.left_widget.currentIndex() == 0:
                 util.sort_metadata(6, self.search_data, False)
                 self.set_data(True)
+            elif self.ui.searchbar_4.text() == "" \
+                    and self.ui.left_widget.currentIndex() == 1:
+                util.sort_metadata(6, self.local_data, False)
+                self.set_data_local(False)
+            else:
+                util.sort_metadata(6, self.search_local_data, False)
+                self.set_data_local(True)
         elif self.sender().objectName() == "actionSort_by_likes_high_low":
             if self.ui.searchbar_3.text() == "":
                 util.sort_metadata(3, self.data, True)
                 self.set_data(False)
-            else:
+            elif self.ui.left_widget.currentIndex() == 0:
                 util.sort_metadata(3, self.search_data, True)
                 self.set_data(True)
+            elif self.ui.searchbar_4.text() == "" \
+                    and self.ui.left_widget.currentIndex() == 1:
+                util.sort_metadata(3, self.local_data, True)
+                self.set_data_local(False)
+            else:
+                util.sort_metadata(3, self.search_local_data, True)
+                self.set_data_local(True)
         elif self.sender().objectName() == "actionSort_by_likes_low_high":
             if self.ui.searchbar_3.text() == "":
                 util.sort_metadata(3, self.data, False)
                 self.set_data(False)
-            else:
+            elif self.ui.left_widget.currentIndex() == 0:
                 util.sort_metadata(3, self.search_data, False)
                 self.set_data(True)
+            elif self.ui.searchbar_4.text() == "" \
+                    and self.ui.left_widget.currentIndex() == 1:
+                util.sort_metadata(3, self.local_data, False)
+                self.set_data_local(False)
+            else:
+                util.sort_metadata(3, self.search_local_data, False)
+                self.set_data_local(True)
         elif self.sender().objectName() == "actionSort_by_views_high_low":
             if self.ui.searchbar_3.text() == "":
                 util.sort_metadata(5, self.data, True)
                 self.set_data(False)
-            else:
+            elif self.ui.left_widget.currentIndex() == 0:
                 util.sort_metadata(5, self.search_data, True)
                 self.set_data(True)
+            elif self.ui.searchbar_4.text() == "" \
+                    and self.ui.left_widget.currentIndex() == 1:
+                util.sort_metadata(5, self.local_data, True)
+                self.set_data_local(False)
+            else:
+                util.sort_metadata(5, self.search_local_data, True)
+                self.set_data_local(True)
         elif self.sender().objectName() == "actionSort_by_views_low_high":
             if self.ui.searchbar_3.text() == "":
                 util.sort_metadata(5, self.data, False)
                 self.set_data(False)
-            else:
+            elif self.ui.left_widget.currentIndex() == 0:
                 util.sort_metadata(5, self.search_data, False)
                 self.set_data(True)
+            elif self.ui.searchbar_4.text() == "" \
+                    and self.ui.left_widget.currentIndex() == 1:
+                util.sort_metadata(5, self.local_data, False)
+                self.set_data_local(False)
+            else:
+                util.sort_metadata(5, self.search_local_data, False)
+                self.set_data_local(True)
         elif self.sender().objectName() == "actionSort_by_downloads_high_low":
             if self.ui.searchbar_3.text() == "":
                 util.sort_metadata(4, self.data, True)
                 self.set_data(False)
-            else:
+            elif self.ui.left_widget.currentIndex() == 0:
                 util.sort_metadata(4, self.search_data, True)
                 self.set_data(True)
+            elif self.ui.searchbar_4.text() == "" \
+                    and self.ui.left_widget.currentIndex() == 1:
+                util.sort_metadata(4, self.local_data, True)
+                self.set_data_local(False)
+            else:
+                util.sort_metadata(4, self.search_local_data, True)
+                self.set_data_local(True)
         elif self.sender().objectName() == "actionSort_by_downloads_low_high":
             if self.ui.searchbar_3.text() == "":
                 util.sort_metadata(4, self.data, False)
                 self.set_data(False)
-            else:
+            elif self.ui.left_widget.currentIndex() == 0:
                 util.sort_metadata(4, self.search_data, False)
                 self.set_data(True)
+            elif self.ui.searchbar_4.text() == "" \
+                    and self.ui.left_widget.currentIndex() == 1:
+                util.sort_metadata(5, self.local_data, False)
+                self.set_data_local(False)
+            else:
+                util.sort_metadata(5, self.search_local_data, False)
+                self.set_data_local(True)
         else:
             print("How did this even happen?")
             print(self.sender().objectName())
 
     def try_quit(self):
+        """ Forces the application to close.
+        Currently triggered via a menu action.
+        """
         self.close()

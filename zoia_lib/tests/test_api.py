@@ -69,9 +69,9 @@ class TestAPI(unittest.TestCase):
         """
         try:
             for i in range(len(pch_list["patch_list"])):
-                self.assertTrue(len(pch_list["patch_list"][i]) == 6,
+                self.assertTrue(len(pch_list["patch_list"][i]) == 9,
                                 "Returned min item did not contain the "
-                                "expected 6 items.")
+                                "expected 9 items.")
                 self.assertTrue("id" in pch_list["patch_list"][i],
                                 "Returned min item did not contain the id "
                                 "attribute.")
@@ -90,6 +90,15 @@ class TestAPI(unittest.TestCase):
                 self.assertTrue("categories" in pch_list["patch_list"][i],
                                 "Returned min item did not contain the "
                                 "categories attribute.")
+                self.assertTrue("like_count" in pch_list["patch_list"][i],
+                                "Returned min item did not contain the "
+                                "like_count attribute.")
+                self.assertTrue("view_count" in pch_list["patch_list"][i],
+                                "Returned min item did not contain the "
+                                "view_count attribute.")
+                self.assertTrue("download_count" in pch_list["patch_list"][i],
+                                "Returned min item did not contain the "
+                                "download_count attribute.")
                 validate(instance=pch_list["patch_list"][i], schema=min_schema)
         except ValidationError:
             self.fail("A patch failed to conform to the MinSchema.json "
