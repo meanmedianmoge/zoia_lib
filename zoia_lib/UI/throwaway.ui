@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>resources/logo.png</normaloff>resources/logo.png</iconset>
+    <normaloff>resources/logo.ico</normaloff>resources/logo.ico</iconset>
   </property>
   <property name="tabShape">
    <enum>QTabWidget::Rounded</enum>
@@ -154,6 +154,7 @@
      <string>File</string>
     </property>
     <addaction name="actionSpecify_SD_Card_Location"/>
+    <addaction name="actionCheck_For_Updates"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -234,6 +235,11 @@
   <action name="actionSort_by_downloads_low_high">
    <property name="text">
     <string>Sort by downloads (low-high)</string>
+   </property>
+  </action>
+  <action name="actionCheck_For_Updates">
+   <property name="text">
+    <string>Check For Patch Updates</string>
    </property>
   </action>
  </widget>

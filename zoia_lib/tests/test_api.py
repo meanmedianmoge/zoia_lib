@@ -21,8 +21,7 @@ class TestAPI(unittest.TestCase):
 
     def test_api_all_zoia_patches(self):
         """ Query the PS API to ensure that all ZOIA patches are
-        returned, and ensure that they are of the correct format as
-        dictated by the MinSchema.json schema.
+        returned.
         """
 
         # Need a known user agent to avoid getting 403'd.
@@ -49,60 +48,12 @@ class TestAPI(unittest.TestCase):
             headers={"User-Agent": "Mozilla/5.0"})
         soup_ques = BeautifulSoup(urlopen(req_ques).read(), "html.parser")
 
-        pch_list = ps.get_all_patch_data_min()
+        pch_list = ps.get_all_patch_data_init()
 
         # Make sure that the correct number of patches are retrieved.
         self.assertTrue(int(zoia[:3]) - len(soup_ques.find_all(class_="card"))
-                        == len(pch_list["patch_list"]),
+                        == len(pch_list),
                         "Returned list does not contain all ZOIA patches.")
-
-        # Validate the patches returned against the MinSchema.json file
-        with open(os.path.join(os.getcwd(), "zoia_lib", "common", "schemas",
-                               "MinSchema.json")) as f:
-            min_schema = json.load(f)
-
-        """ Check to ensure only the attributes in the MinSchema are present.
-        There are a total of 25 attributes that could be returned by the API, 
-        but any pch_list item should only contain 6.
-        
-        Additionally, a JSON schema validation check is performed. 
-        """
-        try:
-            for i in range(len(pch_list["patch_list"])):
-                self.assertTrue(len(pch_list["patch_list"][i]) == 9,
-                                "Returned min item did not contain the "
-                                "expected 9 items.")
-                self.assertTrue("id" in pch_list["patch_list"][i],
-                                "Returned min item did not contain the id "
-                                "attribute.")
-                self.assertTrue("title" in pch_list["patch_list"][i],
-                                "Returned min item did not contain the title "
-                                "attribute.")
-                self.assertTrue("created_at" in pch_list["patch_list"][i],
-                                "Returned min item did not contain the "
-                                "created_at attribute.")
-                self.assertTrue("updated_at" in pch_list["patch_list"][i],
-                                "Returned min item did not contain the "
-                                "updated_at attribute.")
-                self.assertTrue("tags" in pch_list["patch_list"][i],
-                                "Returned min item did not contain the tags "
-                                "attribute.")
-                self.assertTrue("categories" in pch_list["patch_list"][i],
-                                "Returned min item did not contain the "
-                                "categories attribute.")
-                self.assertTrue("like_count" in pch_list["patch_list"][i],
-                                "Returned min item did not contain the "
-                                "like_count attribute.")
-                self.assertTrue("view_count" in pch_list["patch_list"][i],
-                                "Returned min item did not contain the "
-                                "view_count attribute.")
-                self.assertTrue("download_count" in pch_list["patch_list"][i],
-                                "Returned min item did not contain the "
-                                "download_count attribute.")
-                validate(instance=pch_list["patch_list"][i], schema=min_schema)
-        except ValidationError:
-            self.fail("A patch failed to conform to the MinSchema.json "
-                      "schema.")
 
     def test_api_download_bin(self):
         """ Query the PS API for a patch with the .bin extension,

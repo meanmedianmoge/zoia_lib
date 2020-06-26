@@ -728,7 +728,7 @@ def check_for_updates():
     for patch in os.listdir(backend_path):
         # Only check for updates for patches hosted on PS
         # (denoted via the 6-digit ID numbers).
-        if len(patch) > 5 \
+        if os.path.isdir(patch) and len(patch) > 5 \
                 and len(os.listdir(os.path.join(backend_path, patch))) > 2:
             # Multiple versions, only need the latest.
             temp = json.loads(os.path.join(backend_path, patch,
@@ -738,7 +738,7 @@ def check_for_updates():
                 "updated_at": temp["updated_at"]
             }
             meta.append(meta_small)
-        elif len(patch) > 5:
+        elif os.path.isdir(patch) and len(patch) > 5:
             temp = json.loads(os.path.join(backend_path, patch,
                                            "{}.json".format(patch)))
             meta_small = {
@@ -753,8 +753,15 @@ def check_for_updates():
     pch_list = ps.get_potential_updates(meta)
 
     # Try to save the new binaries to the backend.
+    updates = 0
     for patch in pch_list:
-        save_to_backend(patch)
+        try:
+            save_to_backend(patch)
+            updates += 1
+        except errors.SavingError:
+            pass
+
+    return updates
 
     # TODO Actually check to see if this works at all.
 

@@ -30,82 +30,7 @@ class PatchStorage:
         self.platform = 3003  # ZOIA
         self.state = {149, 1098, 151, 150}  # All patch states
         # self.author = '2825'  # MMM, '2953' CHMJ
-        self.page_count = self.determine_patch_count()
-        self.manifest = {
-            'platforms': [
-                {704: 'aleph',
-                 3074: 'audiokit-synth-one',
-                 215: 'audulus',
-                 4751: 'beatmaker-3',
-                 400: 'bela',
-                 295: 'cabbage',
-                 1146: 'camomile',
-                 2017: 'chuck',
-                 3540: 'digit',
-                 4890: 'drambo',
-                 1525: 'echosystem',
-                 662: 'etc',
-                 4296: 'groove-rider',
-                 354: 'max-for-live',
-                 288: 'maxmsp',
-                 3201: 'midiboy',
-                 3830: 'midihub',
-                 3989: 'mirack',
-                 4242: 'moog-model-15',
-                 3341: 'mozaic',
-                 3501: 'nanostudio',
-                 3073: 'nebulae',
-                 3371: 'orac',
-                 3226: 'orca',
-                 154: 'organelle',
-                 289: 'owl',
-                 89: 'pd-extended',
-                 163: 'pd-pulp',
-                 90: 'pd-vanilla',
-                 1558: 'pisound',
-                 3270: 'medusa',
-                 1993: 'purr-data',
-                 4538: 'reaktor',
-                 1524: 'reverb',
-                 4690: 'roland-aira-modular-customizer',
-                 922: 'softube-modular',
-                 921: 'solorack',
-                 371: 'supercollider',
-                 3019: 'synthstrom-deluge',
-                 745: 'vcv-rack',
-                 3003: 'zoia'}
-            ],
-            'categories': [
-                {378: 'composition',
-                 77: 'effect',
-                 3317: 'game',
-                 1: 'other',
-                 75: 'sampler',
-                 76: 'sequencer',
-                 372: 'sound',
-                 74: 'synthesizer',
-                 117: 'utility',
-                 91: 'video'}
-            ],
-            'states': [
-                {149: 'help-needed',
-                 1098: 'inactive',
-                 151: 'ready-to-go',
-                 150: 'work-in-progress'}
-            ],
-            'licenses': [
-                {4184: 'afl-3-0',
-                 4173: 'apache-2-0',
-                 4185: 'artistic-2-0',
-                 4186: 'bsl-1-0',
-                 4174: 'bsd-2-clause',
-                 4175: 'bsd-3-clause',
-                 4187: 'bsd-3-clause-clear',
-                 4190: 'cc-by-4-0',
-                 4191: 'cc-by-sa-4-0',
-                 4188: 'cc'}
-            ]
-        }
+        self.patch_count = self.determine_patch_count()
 
     @staticmethod
     def _validate_intlist(lst: list):
@@ -216,36 +141,6 @@ class PatchStorage:
 
         return json.loads(r.data)
 
-    def get_list(self, more_params=None):
-        """get list of returned objects"""
-
-        if more_params is None:
-            more_params = {}
-        body = self.search(more_params)
-
-        return dict(zip([str(x['title']) for x in body],
-                        [str(x['self'] + '?/') for x in body]))
-
-    def get_tags(self, more_params=None):
-        """get list of tags"""
-
-        if more_params is None:
-            more_params = {}
-        body = self.search(more_params)
-
-        return dict(zip([str(x['title']) for x in body],
-                        [str(x['tags']) for x in body]))
-
-    def get_categories(self, more_params=None):
-        """get list of categories"""
-
-        if more_params is None:
-            more_params = {}
-        body = self.search(more_params)
-
-        return dict(zip([str(x['title']) for x in body],
-                        [str(x['categories']) for x in body]))
-
     def get_patch_meta(self, idx: str):
         """ Get the metadata associated with a specific
         patch ID.
@@ -291,53 +186,26 @@ class PatchStorage:
             # No patch with the supplied id was found.
             return None
 
-    @staticmethod
-    def get_all_patch_data_min():
-        """ Returns the bare minimum amount of information
+    def get_all_patch_data_init(self):
+        """ Returns the initial amount of information
         needed for display purposes once the user starts
         the application.
-        This information is the following:
-         - id
-         - title
-         - created_at
-         - updated_at
-         - categories
-         - tags
-         - like_count
-         - view_count
-         - download_count
 
         return: A list of data, where each item contains the
                 information outlined above.
         """
 
-        ps = PatchStorage()
         per_page = 100
         search = {
-            'orderby': 'title',
-            'order': 'asc',
             'per_page': per_page
         }
 
         all_patches = []
-        for page in range(1, math.ceil(ps.page_count / per_page) + 1):
+        for page in range(1, math.ceil(self.patch_count / per_page) + 1):
             # Get all the patches on the current page.
-            body = ps.search({**search, **{'page': page}})
-            for patch in body:
-                data = {
-                    "id": patch["id"],
-                    "title": patch["title"],
-                    "created_at": patch["created_at"],
-                    "updated_at": patch["updated_at"],
-                    "tags": patch["tags"],
-                    "categories": patch["categories"],
-                    "like_count": patch["like_count"],
-                    "download_count": patch["download_count"],
-                    "view_count": patch["view_count"]
-                }
-                all_patches.append(data)
+            all_patches += self.search({**search, **{'page': page}})
 
-        return {"patch_list": all_patches}
+        return all_patches
 
     @staticmethod
     def determine_patch_count():
@@ -348,7 +216,7 @@ class PatchStorage:
         """
         soup_patch = BeautifulSoup(urlopen(Request("https://patchstorage.com/",
                                                    headers={"User-Agent":
-                                                            "Mozilla/5.0"})
+                                                                "Mozilla/5.0"})
                                            ).read(), "html.parser")
         found_pedals = soup_patch.find_all(class_="d-flex flex-column "
                                                   "justify-content-center")
@@ -391,3 +259,29 @@ class PatchStorage:
                 new_bin.append((self.download(meta["id"]), curr_meta))
 
         return new_bin
+
+    def get_newest_patches(self, pch_num):
+        """ Queries the PS API for the latest patches that have not been
+        stored in data.json previously. This is only called after the
+        initial launch of the application and only if new patches have
+        been uploaded to PS since that initial launch.
+
+        pch_num: The number of patches currently stored in data.json
+        """
+        per_page = self.patch_count - pch_num
+        if per_page > 100:
+            per_page = 100
+        search = {
+            'per_page': per_page
+        }
+
+        new_patches = []
+        pages = 2
+        if per_page == 100:
+            pages = math.ceil((self.patch_count - pch_num) / 100) + 1
+        if pages == 2:
+            return self.search({**search, **{'page': 1}})
+        else:
+            for i in range(1, pages):
+                new_patches += self.search({**search, **{'page': 1}})
+            return new_patches
