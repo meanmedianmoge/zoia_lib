@@ -52,6 +52,10 @@ class Ui_MainWindow(object):
         self.actionSort_by_downloads_low_high.setObjectName(u"actionSort_by_downloads_low_high")
         self.actionCheck_For_Updates = QAction(MainWindow)
         self.actionCheck_For_Updates.setObjectName(u"actionCheck_For_Updates")
+        self.actionReload_PatchStorage_patch_list = QAction(MainWindow)
+        self.actionReload_PatchStorage_patch_list.setObjectName(u"actionReload_PatchStorage_patch_list")
+        self.actionZOIA_Librarian_Help = QAction(MainWindow)
+        self.actionZOIA_Librarian_Help.setObjectName(u"actionZOIA_Librarian_Help")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
@@ -147,6 +151,8 @@ class Ui_MainWindow(object):
         self.menuFiel.setObjectName(u"menuFiel")
         self.menuSort = QMenu(self.menubar)
         self.menuSort.setObjectName(u"menuSort")
+        self.menuHelp = QMenu(self.menubar)
+        self.menuHelp.setObjectName(u"menuHelp")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -154,8 +160,10 @@ class Ui_MainWindow(object):
 
         self.menubar.addAction(self.menuFiel.menuAction())
         self.menubar.addAction(self.menuSort.menuAction())
+        self.menubar.addAction(self.menuHelp.menuAction())
         self.menuFiel.addAction(self.actionSpecify_SD_Card_Location)
         self.menuFiel.addAction(self.actionCheck_For_Updates)
+        self.menuFiel.addAction(self.actionReload_PatchStorage_patch_list)
         self.menuFiel.addSeparator()
         self.menuFiel.addAction(self.actionQuit)
         self.menuSort.addAction(self.actionSort_by_title_A_Z)
@@ -168,6 +176,7 @@ class Ui_MainWindow(object):
         self.menuSort.addAction(self.actionSort_by_views_low_high)
         self.menuSort.addAction(self.actionSort_by_downloads_high_low)
         self.menuSort.addAction(self.actionSort_by_downloads_low_high)
+        self.menuHelp.addAction(self.actionZOIA_Librarian_Help)
 
         self.retranslateUi(MainWindow)
 
@@ -192,6 +201,8 @@ class Ui_MainWindow(object):
         self.actionSort_by_downloads_high_low.setText(QCoreApplication.translate("MainWindow", u"Sort by downloads (high-low)", None))
         self.actionSort_by_downloads_low_high.setText(QCoreApplication.translate("MainWindow", u"Sort by downloads (low-high)", None))
         self.actionCheck_For_Updates.setText(QCoreApplication.translate("MainWindow", u"Check For Patch Updates", None))
+        self.actionReload_PatchStorage_patch_list.setText(QCoreApplication.translate("MainWindow", u"Reload PatchStorage Patch List", None))
+        self.actionZOIA_Librarian_Help.setText(QCoreApplication.translate("MainWindow", u"ZOIA Librarian Help", None))
         self.search_button_3.setText(QCoreApplication.translate("MainWindow", u"Search", None))
         self.left_widget.setTabText(self.left_widget.indexOf(self.tab_ps_2), QCoreApplication.translate("MainWindow", u"PatchStorage View", None))
 #if QT_CONFIG(tooltip)
@@ -204,5 +215,6 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(tooltip)
         self.menuFiel.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
         self.menuSort.setTitle(QCoreApplication.translate("MainWindow", u"Sort", None))
+        self.menuHelp.setTitle(QCoreApplication.translate("MainWindow", u"Help", None))
     # retranslateUi
 

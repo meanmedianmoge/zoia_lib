@@ -28,8 +28,6 @@ class PatchStorage:
         # set defaults for query params
         self.url = 'https://patchstorage.com/api/alpha/'
         self.platform = 3003  # ZOIA
-        self.state = {149, 1098, 151, 150}  # All patch states
-        # self.author = '2825'  # MMM, '2953' CHMJ
         self.patch_count = self.determine_patch_count()
 
     @staticmethod

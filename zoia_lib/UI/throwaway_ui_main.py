@@ -54,6 +54,7 @@ class ThrowawayUIMain(QMainWindow):
         cached data, or get the most recent patches and add them to the
         cache; and subsequently starting the application.
         """
+
         super(ThrowawayUIMain, self).__init__()
         # Setup the UI using throwaway.py
         self.ui = ui_main.Ui_MainWindow()
@@ -100,7 +101,7 @@ class ThrowawayUIMain(QMainWindow):
         self.ui.table.resizeRowsToContents()
 
         self.ui.table_2.setRowCount(len(self.data))
-        self.ui.table_2.setColumnCount(5)
+        self.ui.table_2.setColumnCount(6)
         self.ui.table_2.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         # Connect buttons and items to methods.
@@ -117,6 +118,8 @@ class ThrowawayUIMain(QMainWindow):
         self.ui.actionSort_by_downloads_low_high.triggered.connect(self.sort)
         self.ui.actionSpecify_SD_Card_Location.triggered.connect(self.sd_path)
         self.ui.actionCheck_For_Updates.triggered.connect(self.update)
+        self.ui.actionReload_PatchStorage_patch_list.triggered.connect(
+            self.reload_ps)
         self.ui.actionQuit.triggered.connect(self.try_quit)
         self.ui.search_button_3.clicked.connect(self.search)
         self.ui.search_button_4.clicked.connect(self.search)
@@ -127,6 +130,7 @@ class ThrowawayUIMain(QMainWindow):
         self.ui.right_widget.setFont(QFont('SansSerif', 16))
 
         # Ensure the application starts as maximized.
+        self.setFocusPolicy(Qt.StrongFocus)
         self.showMaximized()
 
     def get_local_patches(self):
@@ -136,6 +140,7 @@ class ThrowawayUIMain(QMainWindow):
         TODO Expand this to accurately deal with version history
          (array in the array).
         """
+
         if self.ui.left_widget.currentIndex() == 1:
             self.ui.right_widget.setText("")
             self.local_data = []
@@ -157,6 +162,7 @@ class ThrowawayUIMain(QMainWindow):
         begins, whenever the tab is returned to, or whenever a search
         is initiated.
         """
+
         self.ui.table.clear()
         if search:
             data = self.search_data
@@ -222,6 +228,7 @@ class ThrowawayUIMain(QMainWindow):
         """ Sets the data for the PS table. This is done whenever the
         tab is returned to, or whenever a search is initiated.
         """
+
         self.ui.table_2.clear()
         if search:
             data = self.search_local_data
@@ -229,7 +236,7 @@ class ThrowawayUIMain(QMainWindow):
             data = self.local_data
         self.ui.table_2.setRowCount(len(data))
         hor_headers = ["Title", "Tags", "Categories", "Date Modified",
-                       "Export"]
+                       "Export", "Delete"]
         for i in range(len(data)):
             btn_title = QRadioButton(data[i]["title"], self)
             btn_title.setObjectName(str(data[i]["id"]))
@@ -276,6 +283,11 @@ class ThrowawayUIMain(QMainWindow):
             expt.setFont(QFont('SansSerif', 11))
             expt.clicked.connect(self.initiate_export)
             self.ui.table_2.setCellWidget(i, 4, expt)
+            delete = QPushButton("X")
+            delete.setObjectName(str(data[i]["id"]))
+            delete.setFont(QFont('SansSerif', 11))
+            delete.clicked.connect(self.initiate_delete)
+            self.ui.table_2.setCellWidget(i, 5, delete)
         self.ui.table_2.setHorizontalHeaderLabels(hor_headers)
         self.ui.table_2.resizeColumnsToContents()
         self.ui.table_2.resizeRowsToContents()
@@ -289,6 +301,7 @@ class ThrowawayUIMain(QMainWindow):
         successfully download. Support for additional file formats will
         be implemented in subsequent releases.
         """
+
         self.ui.statusbar.showMessage("Starting download...",
                                       timeout=2000)
 
@@ -318,6 +331,7 @@ class ThrowawayUIMain(QMainWindow):
         closing the message dialog or hitting the "Cancel" button.
         Currently triggered via a button press.
         """
+
         if self.sd_card_path is None:
             # No SD path.
             msg = QMessageBox()
@@ -334,6 +348,8 @@ class ThrowawayUIMain(QMainWindow):
                                                  "Slot number:",
                                                  minValue=0, maxValue=63)
                 if slot and ok:
+                    self.ui.statusbar.showMessage("Patch be movin",
+                                                  timeout=2000)
                     # Got a slot and the user hit "OK"
                     try:
                         util.export_patch_bin(self.sender().text(),
@@ -363,6 +379,24 @@ class ThrowawayUIMain(QMainWindow):
                     # Operation was aborted.
                     break
 
+    def initiate_delete(self):
+        """ Attempts to delete a patch that is stored on a user's local
+        filesystem.
+        """
+
+        msg = QMessageBox()
+        msg.setWindowTitle("Delete")
+        msg.setIcon(QMessageBox.Information)
+        msg.setText("Are you sure you want to delete this patch?\n"
+                    "(This cannot be undone)")
+        msg.setStandardButtons(QMessageBox.Yes |
+                               QMessageBox.No)
+        value = msg.exec_()
+        if value == QMessageBox.Yes:
+            util.delete_patch(self.sender().objectName())
+            self.get_local_patches()
+            self.set_data_local(False)
+
     def display_patch_info(self):
         """ Queries the PS API for additional patch information whenever
         a patch is selected in the PS table or local table. Information
@@ -371,6 +405,7 @@ class ThrowawayUIMain(QMainWindow):
         absent in the current implementation.
         Currently triggered via a radio button selection.
         """
+
         if self.sender().isChecked():
             content = ps.get_patch_meta(self.sender().objectName())
             if content["preview_url"] == "":
@@ -393,12 +428,34 @@ class ThrowawayUIMain(QMainWindow):
                                          + content["content"]
                                          + "</html>")
 
+    def reload_ps(self):
+        """ Reloads the PS table view to accurately reflect new uploads.
+        Currently triggered via a menu action.
+        """
+
+        # Get the new patch metadata that we don't have (if any).
+        try:
+            new_patches = ps.get_newest_patches(len(self.data))
+            self.data = new_patches + self.data
+            with open(os.path.join(backend_path, "data.json"), "w") as f:
+                f.write(json.dumps(self.data))
+            self.ui.searchbar_3.setText("")
+            self.set_data(False)
+        except TypeError:
+            msg = QMessageBox()
+            msg.setWindowTitle("No New Patches")
+            msg.setIcon(QMessageBox.Information)
+            msg.setText("No new patches were found to be on PatchStorage.")
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.exec_()
+
     def sd_path(self):
         """ Allows the user to specify the path to their SD card via
         their OS file explorer dialog. Note, nothing is done to ensure
         that the location selected is actually an SD card.
         Currently triggered via a menu action.
         """
+
         input_dir = QFileDialog.getExistingDirectory(None, 'Select a folder:',
                                                      expanduser("~"))
         self.sd_card_path = str(input_dir)
@@ -409,6 +466,7 @@ class ThrowawayUIMain(QMainWindow):
         set the table to display the returned query matches.
         Currently triggered via a button press.
         """
+
         if self.sender().objectName() == "search_button_3":
             if self.ui.searchbar_3.text() == "":
                 self.set_data(False)
@@ -433,6 +491,7 @@ class ThrowawayUIMain(QMainWindow):
         TODO Use the QTableWidget sort method for improved speed
          (requires an override to how the sort pulls data).
         """
+
         # Determine how to sort the data.
         curr_sort = {
             "actionSort_by_title_A_Z": (1, False),
@@ -470,6 +529,7 @@ class ThrowawayUIMain(QMainWindow):
 
         TODO Test if this functions correctly.
         """
+
         self.ui.statusbar.showMessage("Checking for updates...",
                                       timeout=2000)
         count = util.check_for_updates()
@@ -493,4 +553,5 @@ class ThrowawayUIMain(QMainWindow):
         """ Forces the application to close.
         Currently triggered via a menu action.
         """
+
         self.close()

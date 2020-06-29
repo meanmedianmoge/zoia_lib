@@ -801,7 +801,7 @@ def sort_metadata(mode, data, rev):
     elif mode == 2:
         # Sort by author
         data.sort(key=lambda x: x["author"]["name"].upper()
-                  if "author" in x else "", reverse=rev)
+        if "author" in x else "", reverse=rev)
     elif mode == 3:
         # Sort by like count.
         data.sort(key=lambda x: x["like_count"] if "like_count" in x else 0,
@@ -809,7 +809,7 @@ def sort_metadata(mode, data, rev):
     elif mode == 4:
         # Sort by download count.
         data.sort(key=lambda x: x["download_count"]
-                  if "download_count" in x else 0, reverse=rev)
+        if "download_count" in x else 0, reverse=rev)
     elif mode == 5:
         # Sort by view count.
         data.sort(key=lambda x: x["view_count"] if "view_count" in x else 0,
@@ -871,3 +871,23 @@ def search_patches(data, query):
         continue
 
     return hits
+
+
+def add_tag(idx, data, mode):
+    """ Attempts to add data to a patches metadata.
+
+    idx: The id for the patch metadata that is to be modified.
+    tag: A string representing the tag that is to be added. Does not
+         necessarily need to be a single tag.
+    mode: The type of data that is being added. Valid modes are:
+          - 1 -> Add a tag
+          - 2 -> Add a category
+    """
+    index = {
+        "1": "tags",
+        "2": "category"
+    }
+    ver = None
+    if "_" in idx:
+        idx, ver = idx.split("_")
+    pass

@@ -155,6 +155,7 @@
     </property>
     <addaction name="actionSpecify_SD_Card_Location"/>
     <addaction name="actionCheck_For_Updates"/>
+    <addaction name="actionReload_PatchStorage_patch_list"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -173,8 +174,15 @@
     <addaction name="actionSort_by_downloads_high_low"/>
     <addaction name="actionSort_by_downloads_low_high"/>
    </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionZOIA_Librarian_Help"/>
+   </widget>
    <addaction name="menuFiel"/>
    <addaction name="menuSort"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionSpecify_SD_Card_Location">
@@ -240,6 +248,16 @@
   <action name="actionCheck_For_Updates">
    <property name="text">
     <string>Check For Patch Updates</string>
+   </property>
+  </action>
+  <action name="actionReload_PatchStorage_patch_list">
+   <property name="text">
+    <string>Reload PatchStorage Patch List</string>
+   </property>
+  </action>
+  <action name="actionZOIA_Librarian_Help">
+   <property name="text">
+    <string>ZOIA Librarian Help</string>
    </property>
   </action>
  </widget>
