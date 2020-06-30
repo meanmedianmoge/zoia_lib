@@ -5,7 +5,7 @@ from os.path import expanduser
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
-import zoia_lib.UI.throwaway as ui_main
+import zoia_lib.UI.early_ui as ui_main
 import zoia_lib.backend.api as api
 import zoia_lib.backend.utilities as util
 import zoia_lib.common.errors as errors
@@ -18,13 +18,13 @@ style_sheet = """
     {
         background: white;
         border: none;
-        font-size: 14px;
+        font-size: 13px;
         color: black;
     }
     """
 
 
-class ThrowawayUIMain(QMainWindow):
+class EarlyUIMain(QMainWindow):
     """ ** TEMPORARY FUNCTIONALITY SHOWCASE **
 
     The ThrowawayUIMain class represents the frontend for the
@@ -34,7 +34,7 @@ class ThrowawayUIMain(QMainWindow):
 
     Any changes made to the .ui file will not be reflected unless the
     following command is run from the UI directory:
-        pyside2-uic.exe .\throwaway.ui -o .\throwaway.py
+        pyside2-uic.exe .\early.ui -o .\early_ui.py
 
     Known issues:
      - Version history is not implemented in the frontend. As such,
@@ -55,7 +55,7 @@ class ThrowawayUIMain(QMainWindow):
         cache; and subsequently starting the application.
         """
 
-        super(ThrowawayUIMain, self).__init__()
+        super(EarlyUIMain, self).__init__()
         # Setup the UI using throwaway.py
         self.ui = ui_main.Ui_MainWindow()
         self.ui.setupUi(self)
@@ -76,6 +76,16 @@ class ThrowawayUIMain(QMainWindow):
             if len(data) == ps.patch_count:
                 # No new patches.
                 self.data = data
+            elif len(data) > ps.patch_count:
+                # Uh oh, some patches got deleted on PatchStorage.
+                # TODO Don't just get all of the data again, figure out a way
+                #  to determine which patches have been deleted and just remove
+                #  those.
+                ps_data = ps.get_all_patch_data_init()
+                with open(os.path.join(backend_path, "data.json"),
+                          "w") as f:
+                    f.write(json.dumps(ps_data))
+                    self.data = ps_data
             else:
                 # Get the new patch metadata that we don't have.
                 new_patches = ps.get_newest_patches(len(data))
@@ -96,13 +106,14 @@ class ThrowawayUIMain(QMainWindow):
         self.ui.table.setRowCount(len(self.data))
         self.ui.table.setColumnCount(5)
         self.set_data(False)
-        self.ui.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.ui.table.resizeColumnsToContents()
         self.ui.table.resizeRowsToContents()
 
         self.ui.table_2.setRowCount(len(self.data))
         self.ui.table_2.setColumnCount(6)
-        self.ui.table_2.setEditTriggers(QAbstractItemView.NoEditTriggers)
+
+        self.ui.table_3.setHorizontalHeaderLabels(["SD Card"])
+        self.ui.tab_sd.setEnabled(False)
 
         # Connect buttons and items to methods.
         self.ui.left_widget.currentChanged.connect(self.get_local_patches)
@@ -123,11 +134,14 @@ class ThrowawayUIMain(QMainWindow):
         self.ui.actionQuit.triggered.connect(self.try_quit)
         self.ui.search_button_3.clicked.connect(self.search)
         self.ui.search_button_4.clicked.connect(self.search)
+        self.ui.searchbar_3.returnPressed.connect(self.search)
+        self.ui.searchbar_4.returnPressed.connect(self.search)
 
         # Font consistency.
-        self.ui.table.setFont(QFont('SansSerif', 11))
-        self.ui.table_2.setFont(QFont('SansSerif', 11))
-        self.ui.right_widget.setFont(QFont('SansSerif', 16))
+        self.ui.table.setFont(QFont('Verdana', 10))
+        self.ui.table_2.setFont(QFont('Verdana', 10))
+        self.ui.text_browser.setFont(QFont('Verdana', 16))
+        self.ui.text_browser_2.setFont(QFont('Verdana', 16))
 
         # Ensure the application starts as maximized.
         self.setFocusPolicy(Qt.StrongFocus)
@@ -142,20 +156,60 @@ class ThrowawayUIMain(QMainWindow):
         """
 
         if self.ui.left_widget.currentIndex() == 1:
-            self.ui.right_widget.setText("")
             self.local_data = []
             for patches in os.listdir(backend_path):
                 if patches != "Banks" and patches != "data.json":
-                    for pch in os.listdir(os.path.join(backend_path, patches)):
-                        if pch.split(".")[1] == "json":
-                            with open(os.path.join(backend_path,
-                                                   patches, pch)) as f:
-                                temp = json.loads(f.read())
-                            self.local_data.append(temp)
+                    if len(os.listdir(os.path.join(backend_path,
+                                                   patches))) == 2:
+                        for pch in os.listdir(os.path.join(backend_path,
+                                                           patches)):
+                            if pch.split(".")[1] == "json":
+                                with open(os.path.join(backend_path,
+                                                       patches, pch)) as f:
+                                    temp = json.loads(f.read())
+                                self.local_data.append(temp)
+                    else:
+                        # Multiple versions, just do v1 for now.
+                        for pch in os.listdir(os.path.join(backend_path,
+                                                           patches)):
+                            if pch.split(".")[1] == "json":
+                                with open(os.path.join(backend_path,
+                                                       patches, pch)) as f:
+                                    temp = json.loads(f.read())
+                                self.local_data.append(temp)
+                                break
             self.set_data_local(False)
-        else:
-            # No need to reload the PS table after the app starts.
-            self.ui.right_widget.setText("")
+        elif self.ui.left_widget.currentIndex() == 2:
+            # SD card tab
+            if self.sd_card_path is None:
+                msg = QMessageBox()
+                msg.setWindowTitle("No SD Path")
+                msg.setIcon(QMessageBox.Information)
+                msg.setText("Please specify your SD card path!")
+                msg.setInformativeText("File -> Specify SD Card Location")
+                msg.setStandardButtons(QMessageBox.Ok)
+                msg.exec_()
+                self.ui.left_widget.setCurrentIndex(1)
+            else:
+                self.set_data_sd()
+
+    def set_data_sd(self):
+        """ Sets the data for the PS table. This is done when the tab is
+        returned to.
+        """
+
+        self.ui.table_3.clear()
+        for pch in os.listdir(self.sd_card_path):
+            # Get the index
+            index = pch.split("_")[0]
+            if index[1] == "0":
+                # one digit
+                index = int(index[2])
+            else:
+                # two digits
+                index = int(index[1:3])
+            self.ui.table_3.setItem(index, 0, QTableWidgetItem(pch))
+        self.ui.table_3.setHorizontalHeaderLabels(["SD Card"])
 
     def set_data(self, search):
         """ Sets the data for the PS table. This is done when the app
@@ -187,10 +241,10 @@ class ThrowawayUIMain(QMainWindow):
                                                       - 1) + " more", self)
             else:
                 btn_tag = QPushButton(data[i]["tags"][0]["name"], self)
-            QToolTip.setFont(QFont('SansSerif', 11))
+            QToolTip.setFont(QFont('Verdana', 10))
             btn_tag.setToolTip(tags[:len(tags) - 2])
             btn_tag.setStyleSheet(style_sheet)
-            btn_tag.setFont(QFont('SansSerif', 11))
+            btn_tag.setFont(QFont('Verdana', 10))
             self.ui.table.setCellWidget(i, 1, btn_tag)
 
             cat = ""
@@ -205,16 +259,16 @@ class ThrowawayUIMain(QMainWindow):
                                             - 1) + " more", self)
             else:
                 btn_cat = QPushButton(data[i]["categories"][0]["name"], self)
-            QToolTip.setFont(QFont('SansSerif', 11))
+            QToolTip.setFont(QFont('Verdana', 10))
             btn_cat.setToolTip(cat[:len(cat) - 2])
-            btn_cat.setFont(QFont('SansSerif', 11))
+            btn_cat.setFont(QFont('Verdana', 10))
             btn_cat.setStyleSheet(style_sheet)
             self.ui.table.setCellWidget(i, 2, btn_cat)
             date = QTableWidgetItem(data[i]["updated_at"][:10])
             date.setTextAlignment(Qt.AlignCenter)
             self.ui.table.setItem(i, 3, date)
             dwn = QPushButton(str(data[i]["id"]), self)
-            dwn.setFont(QFont('SansSerif', 11))
+            dwn.setFont(QFont('Verdana', 10))
             dwn.clicked.connect(self.initiate_download)
 
             if (str(data[i]["id"])) in os.listdir(backend_path):
@@ -253,10 +307,10 @@ class ThrowawayUIMain(QMainWindow):
                                                       - 1) + " more", self)
             else:
                 btn_tag = QPushButton(data[i]["tags"][0]["name"], self)
-            QToolTip.setFont(QFont('SansSerif', 11))
+            QToolTip.setFont(QFont('Verdana', 10))
             btn_tag.setToolTip(tags[:len(tags) - 2])
             btn_tag.setStyleSheet(style_sheet)
-            btn_tag.setFont(QFont('SansSerif', 11))
+            btn_tag.setFont(QFont('Verdana', 10))
             self.ui.table_2.setCellWidget(i, 1, btn_tag)
 
             cat = ""
@@ -271,21 +325,21 @@ class ThrowawayUIMain(QMainWindow):
             else:
                 btn_cat = QPushButton(data[i]["categories"][0]["name"], self)
 
-            QToolTip.setFont(QFont('SansSerif', 11))
+            QToolTip.setFont(QFont('Verdana', 10))
             btn_cat.setToolTip(cat[:len(cat) - 2])
-            btn_cat.setFont(QFont('SansSerif', 11))
+            btn_cat.setFont(QFont('Verdana', 10))
             btn_cat.setStyleSheet(style_sheet)
             self.ui.table_2.setCellWidget(i, 2, btn_cat)
             date = QTableWidgetItem(data[i]["updated_at"][:10])
             date.setTextAlignment(Qt.AlignCenter)
             self.ui.table_2.setItem(i, 3, date)
             expt = QPushButton(str(data[i]["id"]), self)
-            expt.setFont(QFont('SansSerif', 11))
+            expt.setFont(QFont('Verdana', 10))
             expt.clicked.connect(self.initiate_export)
             self.ui.table_2.setCellWidget(i, 4, expt)
             delete = QPushButton("X")
             delete.setObjectName(str(data[i]["id"]))
-            delete.setFont(QFont('SansSerif', 11))
+            delete.setFont(QFont('Verdana', 10))
             delete.clicked.connect(self.initiate_delete)
             self.ui.table_2.setCellWidget(i, 5, delete)
         self.ui.table_2.setHorizontalHeaderLabels(hor_headers)
@@ -347,7 +401,8 @@ class ThrowawayUIMain(QMainWindow):
                 slot, ok = QInputDialog().getInt(self, "Patch Export",
                                                  "Slot number:",
                                                  minValue=0, maxValue=63)
-                if slot and ok:
+
+                if slot >= 0 and ok:
                     self.ui.statusbar.showMessage("Patch be movin",
                                                   timeout=2000)
                     # Got a slot and the user hit "OK"
@@ -369,12 +424,24 @@ class ThrowawayUIMain(QMainWindow):
                         value = msg.exec_()
                         if value == QMessageBox.Yes:
                             # Overwrite the other patch.
-                            util.export_patch_bin(self.sender().text(),
-                                                  self.sd_card_path, slot,
-                                                  True)
+                            try:
+                                util.export_patch_bin(self.sender().text(),
+                                                      self.sd_card_path, slot,
+                                                      True)
+                            except FileNotFoundError:
+                                idx = str(self.sender().text()) + "_v1"
+                                util.export_patch_bin(idx,
+                                                      self.sd_card_path, slot,
+                                                      True)
                             break
                         else:
                             continue
+                    except FileNotFoundError:
+                        idx = str(self.sender().text()) + "_v1"
+                        util.export_patch_bin(idx,
+                                              self.sd_card_path, slot,
+                                              True)
+                        break
                 else:
                     # Operation was aborted.
                     break
@@ -395,6 +462,7 @@ class ThrowawayUIMain(QMainWindow):
         if value == QMessageBox.Yes:
             util.delete_patch(self.sender().objectName())
             self.get_local_patches()
+            self.set_data(False)
             self.set_data_local(False)
 
     def display_patch_info(self):
@@ -406,27 +474,58 @@ class ThrowawayUIMain(QMainWindow):
         Currently triggered via a radio button selection.
         """
 
-        if self.sender().isChecked():
+        if self.ui.left_widget.currentIndex() == 0:
+            temp = self.ui.text_browser
+        elif self.ui.left_widget.currentIndex() == 1:
+            temp = self.ui.text_browser_2
+
+        if self.sender().isChecked() and \
+                self.ui.left_widget.currentIndex() == 0:
             content = ps.get_patch_meta(self.sender().objectName())
             if content["preview_url"] == "":
                 content["preview_url"] = "None provided"
-
             content["content"] = content["content"].replace("\n", "<br/>")
-            self.ui.right_widget.setText("<html><h3>"
-                                         + content["title"]
-                                         + "</h3><u>Author:</u> "
-                                         + content["author"]["name"]
-                                         + "<br/><u>Likes:</u> "
-                                         + str(content["like_count"])
-                                         + "<br/><u>Downloads:</u> "
-                                         + str(content["download_count"])
-                                         + "<br/><u>Views:</u> "
-                                         + str(content["view_count"])
-                                         + "<br/><u>Preview:</u> "
-                                         + content["preview_url"]
-                                         + "<br/><br/><u>Patch Notes:</u><br/>"
-                                         + content["content"]
-                                         + "</html>")
+            temp.setText("<html><h3>"
+                         + content["title"] + "</h3><u>Author:</u> "
+                         + content["author"]["name"] + "<br/><u>Likes:</u> "
+                         + str(content["like_count"])
+                         + "<br/><u>Downloads:</u> "
+                         + str(content["download_count"])
+                         + "<br/><u>Views:</u> "
+                         + str(content["view_count"]) + "<br/><u>Preview:</u> "
+                         + content["preview_url"]
+                         + "<br/><br/><u>Patch Notes:</u><br/>"
+                         + content["content"] + "</html>")
+        elif self.sender().isChecked() and \
+                self.ui.left_widget.currentIndex() == 1:
+            try:
+                with open(os.path.join(backend_path,
+                                       str(self.sender().objectName()),
+                                       str(self.sender().objectName())
+                                       + ".json")) as f:
+                    content = json.loads(f.read())
+            except FileNotFoundError:
+                with open(os.path.join(backend_path,
+                                       str(self.sender().objectName()),
+                                       str(self.sender().objectName())
+                                       + "_v1.json")) as f:
+                    content = json.loads(f.read())
+            # I hate duplicating code, but due to the nature of radio buttons,
+            # this needs to be duplicated here otherwise an error will get
+            # thrown for every non-selected radio button. Since this is
+            # temporary anyway, I'm not too worried about it.
+            content["content"] = content["content"].replace("\n", "<br/>")
+            temp.setText("<html><h3>"
+                         + content["title"] + "</h3><u>Author:</u> "
+                         + content["author"]["name"] + "<br/><u>Likes:</u> "
+                         + str(content["like_count"])
+                         + "<br/><u>Downloads:</u> "
+                         + str(content["download_count"])
+                         + "<br/><u>Views:</u> "
+                         + str(content["view_count"]) + "<br/><u>Preview:</u> "
+                         + content["preview_url"]
+                         + "<br/><br/><u>Patch Notes:</u><br/>"
+                         + content["content"] + "</html>")
 
     def reload_ps(self):
         """ Reloads the PS table view to accurately reflect new uploads.
@@ -458,7 +557,9 @@ class ThrowawayUIMain(QMainWindow):
 
         input_dir = QFileDialog.getExistingDirectory(None, 'Select a folder:',
                                                      expanduser("~"))
-        self.sd_card_path = str(input_dir)
+        if input_dir is not "" and os.path.isdir(input_dir):
+            self.sd_card_path = str(input_dir)
+            self.ui.tab_sd.setEnabled(True)
 
     def search(self):
         """ Initiates a data search for the metadata that is retrieved
@@ -467,7 +568,8 @@ class ThrowawayUIMain(QMainWindow):
         Currently triggered via a button press.
         """
 
-        if self.sender().objectName() == "search_button_3":
+        if self.sender().objectName() == "search_button_3" or \
+                self.sender().objectName() == "searchbar_3":
             if self.ui.searchbar_3.text() == "":
                 self.set_data(False)
             else:

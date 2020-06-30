@@ -198,7 +198,11 @@ def import_to_backend(path):
                     "id": patch_id,
                     "filename": patch_name + "." + ext
                 }
-            ]
+            ],
+            "categories": [],
+            "tags": [],
+            "content": "",
+            "author": ""
         }
         # Try to save the patch.
         save_to_backend((temp_data, js_data))
@@ -616,14 +620,18 @@ def export_patch_bin(patch, dest, slot=-1, override=False):
     # Prepare the name of the patch. We need to access the metadata.
     # Extract the patch id from the supplied patch parameter.
     idx = patch
+    if "." in patch:
+        patch = patch.split(".")[0]
+
     if "." in idx:
         idx = patch.split(".")[0]
 
     if "_" in idx:
         idx = idx.split("_")[0]
+
     # Get the metadata for this patch.
     with open(os.path.join(backend_path, idx,
-                           "{}.json".format(idx)), "r") as f:
+                           "{}.json".format(patch)), "r") as f:
         metadata = json.loads(f.read())
 
     # Extract the filename attribute.
@@ -833,6 +841,8 @@ def search_patches(data, query):
     if backend_path is None:
         backend_path = determine_backend_path()
 
+    query = query.lower()
+
     # Input checking.
     if query is None or data is None:
         # TODO replace with an error.
@@ -842,27 +852,37 @@ def search_patches(data, query):
 
     hits = []
 
+    # Special case, searching for a category. Since there are a known # of
+    # categories, we prioritize these first.
+    if query in "composition" or query in "effect" or query in "game" or \
+            query in "other" or query in "sampler" or query in "sequencer" or \
+            query in "sound" or query in "synthesizer" or query in "utility" \
+            or query in "video":
+        for curr in data:
+            if "categories" in curr:
+                # Check category tag.
+                for category in curr["categories"]:
+                    if query in category["name"].lower():
+                        hits.insert(0, curr)
+                        continue
     for curr in data:
         # Check the patch title.
-        if query.lower() in curr["title"].lower():
-            hits.append(curr)
+        if query in curr["title"].lower():
+            if curr not in hits:
+                hits.append(curr)
             continue
         if "author" in curr:
             # Check the author name.
-            if query.lower() in curr["author"]["name"].lower():
-                hits.append(curr)
+            if query in curr["author"]["name"].lower():
+                if curr not in hits:
+                    hits.append(curr)
                 continue
         if "tags" in curr:
             # Check every tag.
             for tag in curr["tags"]:
-                if query.lower() in tag["name"]:
-                    hits.append(curr)
-                    continue
-        if "categories" in curr:
-            # Check every category.
-            for tag in curr["categories"]:
-                if query.lower() in tag["name"]:
-                    hits.append(curr)
+                if query in tag["name"].lower():
+                    if curr not in hits:
+                        hits.append(curr)
                     continue
 
         # Date search, weirdest case. We need to account for the fact
