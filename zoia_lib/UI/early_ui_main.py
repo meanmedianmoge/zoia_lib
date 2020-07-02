@@ -158,7 +158,8 @@ class EarlyUIMain(QMainWindow):
         if self.ui.left_widget.currentIndex() == 1:
             self.local_data = []
             for patches in os.listdir(backend_path):
-                if patches != "Banks" and patches != "data.json":
+                if patches != "Banks" and patches != "data.json" and \
+                        patches != '.DS_Store':
                     if len(os.listdir(os.path.join(backend_path,
                                                    patches))) == 2:
                         for pch in os.listdir(os.path.join(backend_path,
