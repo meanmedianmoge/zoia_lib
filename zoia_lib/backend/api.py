@@ -253,8 +253,11 @@ class PatchStorage:
 
             # Check to see if the patch has been updated by comparing the dates
             curr_meta = self.get_patch_meta(idx)
-            if curr_meta["updated_at"] > meta["updated_at"]:
-                new_bin.append((self.download(meta["id"]), curr_meta))
+            try:
+                if curr_meta["updated_at"] > entry["updated_at"]:
+                    new_bin.append((self.download(str(entry["id"])), curr_meta))
+            except KeyError:
+                continue
 
         return new_bin
 

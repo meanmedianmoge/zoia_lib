@@ -754,8 +754,9 @@ def check_for_updates():
                 and len(os.listdir(os.path.join(backend_path, patch))) > 2 \
                 and patch != "Banks" and patch != ".DS_Store":
             # Multiple versions, only need the latest.
-            temp = json.loads(os.path.join(backend_path, patch,
-                                           "{}_v1.json".format(patch)))
+            with open(os.path.join(backend_path, patch,
+                                   "{}_v1.json".format(patch)), "r") as f:
+                temp = json.loads(f.read())
             meta_small = {
                 "id": temp["id"],
                 "updated_at": temp["updated_at"]
@@ -763,8 +764,9 @@ def check_for_updates():
             meta.append(meta_small)
         elif os.path.isdir(os.path.join(backend_path, patch)) \
                 and len(patch) > 5:
-            temp = json.loads(os.path.join(backend_path, patch,
-                                           "{}.json".format(patch)))
+            with open(os.path.join(backend_path, patch,
+                                   "{}.json".format(patch)), "r") as f:
+                temp = json.loads(f.read())
             meta_small = {
                 "id": temp["id"],
                 "updated_at": temp["updated_at"]
@@ -780,9 +782,23 @@ def check_for_updates():
     updates = 0
     for patch in pch_list:
         try:
-            save_to_backend(patch)
+            save_to_backend(patch[0])
             updates += 1
         except errors.SavingError:
+            # TODO If we fail to save, at least update the metadata.
+            try:
+                with open(os.path.join(backend_path,
+                                       str(patch[1]["id"]),
+                                       "{}.bin".format(str(patch[1]["id"]))),
+                          "w") as f:
+                    f.write(json.dumps(patch[1]))
+            except FileNotFoundError:
+                with open(os.path.join(backend_path,
+                                 str(patch[1]["id"]),
+                                 "{}_v1.bin".format(str(patch[1]["id"]))),
+                          "r") as f:
+                    f.write(json.dumps(patch[1]))
+            updates += 1
             pass
 
     return updates
