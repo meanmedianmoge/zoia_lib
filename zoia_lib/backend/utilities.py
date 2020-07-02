@@ -166,7 +166,11 @@ def import_to_backend(path):
     if "." not in path:
         raise errors.SavingError(path)
     patch_name, ext = path.split(".")
-    patch_name = patch_name.split(os.path.sep)[-1]
+    patch_name = patch_name.split("/")[-1]
+    if "_zoia_" in patch_name:
+        title = patch_name.split("_zoia_")[1]
+    else:
+        title = patch_name
 
     count = 1
     if os.path.isdir(path):
@@ -191,8 +195,15 @@ def import_to_backend(path):
                 datetime.datetime.now()),
             "updated_at": "{:%Y-%m-%dT%H:%M:%S+00:00}".format(
                 datetime.datetime.now()),
-            "title": patch_name,
+            "title": title,
             "revision": "1",
+            "preview_url": "",
+            "like_count": "",
+            "download_count": "",
+            "view_count": "",
+            "author": {
+                "name": ""
+            },
             "files": [
                 {
                     "id": patch_id,
@@ -202,7 +213,9 @@ def import_to_backend(path):
             "categories": [],
             "tags": [],
             "content": "",
-            "author": ""
+            "license": {
+                "name": ""
+            }
         }
         # Try to save the patch.
         save_to_backend((temp_data, js_data))
@@ -247,8 +260,8 @@ def save_to_backend(patch):
         # that its a unique binary by checking every patch currently
         # stored. TODO Use binary analysis to improve this process.
         for direc in os.listdir(backend_path):
-            if os.path.isdir(direc) and direc != "Banks" \
-                    and direc != "sample_files":
+            if os.path.isdir(os.path.join(backend_path, direc)) and direc != "Banks" \
+                    and direc != "sample_files" and direc != ".DS_Store":
                 for files in os.listdir(os.path.join(backend_path, direc)):
                     if files.split(".")[1] == "bin":
                         with open(os.path.join(
@@ -736,8 +749,10 @@ def check_for_updates():
     for patch in os.listdir(backend_path):
         # Only check for updates for patches hosted on PS
         # (denoted via the 6-digit ID numbers).
-        if os.path.isdir(patch) and len(patch) > 5 \
-                and len(os.listdir(os.path.join(backend_path, patch))) > 2:
+        if os.path.isdir(os.path.join(backend_path, patch)) \
+                and len(patch) > 5 \
+                and len(os.listdir(os.path.join(backend_path, patch))) > 2 \
+                and patch != "Banks" and patch != ".DS_Store":
             # Multiple versions, only need the latest.
             temp = json.loads(os.path.join(backend_path, patch,
                                            "{}_v1.json".format(patch)))
@@ -746,7 +761,8 @@ def check_for_updates():
                 "updated_at": temp["updated_at"]
             }
             meta.append(meta_small)
-        elif os.path.isdir(patch) and len(patch) > 5:
+        elif os.path.isdir(os.path.join(backend_path, patch)) \
+                and len(patch) > 5:
             temp = json.loads(os.path.join(backend_path, patch,
                                            "{}.json".format(patch)))
             meta_small = {
@@ -893,21 +909,38 @@ def search_patches(data, query):
     return hits
 
 
-def add_tag(idx, data, mode):
-    """ Attempts to add data to a patches metadata.
+def modify_data(idx, data, mode):
+    """ Attempts to modify data to a patches metadata.
 
     idx: The id for the patch metadata that is to be modified.
     tag: A string representing the tag that is to be added. Does not
          necessarily need to be a single tag.
     mode: The type of data that is being added. Valid modes are:
-          - 1 -> Add a tag
-          - 2 -> Add a category
+          - 1 -> Modify the tags
+          - 2 -> Modify the categories
+          - 3 -> Modify the patch notes
+
     """
+
+    global backend_path
+    if backend_path is None:
+        backend_path = determine_backend_path()
+
     index = {
-        "1": "tags",
-        "2": "category"
-    }
-    ver = None
+        1: "tags",
+        2: "category",
+        3: "content"
+    }[mode]
+
+    pch = idx
     if "_" in idx:
-        idx, ver = idx.split("_")
-    pass
+        idx = idx.split("_")[0]
+
+    if mode == 3:
+        with open(os.path.join(backend_path, idx, "{}.json".format(pch)),
+                  "r") as f:
+            temp = json.loads(f.read())
+        temp[index] = data
+        with open(os.path.join(backend_path, idx, "{}.json".format(pch)),
+                  "w") as f:
+            f.write(json.dumps(temp))

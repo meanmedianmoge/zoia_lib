@@ -27,7 +27,7 @@ style_sheet = """
 class EarlyUIMain(QMainWindow):
     """ ** TEMPORARY FUNCTIONALITY SHOWCASE **
 
-    The ThrowawayUIMain class represents the frontend for the
+    The EarlyUIMain class represents the frontend for the
     application. It allows users to interact with the various backend
     functions available. These include searching, download, sorting,
     and exporting patches.
@@ -37,9 +37,7 @@ class EarlyUIMain(QMainWindow):
         pyside2-uic.exe .\early.ui -o .\early_ui.py
 
     Known issues:
-     - Version history is not implemented in the frontend. As such,
-       exporting a patch with multiple version will fail.
-     - Tables do not scale correctly.
+     - Version history is not implemented in the frontend.
      - Importing is not implemented.
      - Bank creation, re-arranging, and exporting is not implemented.
      - The window icon does not display properly.
@@ -100,14 +98,15 @@ class EarlyUIMain(QMainWindow):
         self.sd_card_path = None
         self.local_data = None
         self.search_local_data = None
+        self.local_selected = None
+        self.selected = None
+        self.dark = False
 
         # Setup the tables, but only populate the PS API table
         # (The local table will populate once the user switches tabs).
         self.ui.table.setRowCount(len(self.data))
         self.ui.table.setColumnCount(5)
         self.set_data(False)
-        self.ui.table.resizeColumnsToContents()
-        self.ui.table.resizeRowsToContents()
 
         self.ui.table_2.setRowCount(len(self.data))
         self.ui.table_2.setColumnCount(6)
@@ -117,6 +116,8 @@ class EarlyUIMain(QMainWindow):
 
         # Connect buttons and items to methods.
         self.ui.left_widget.currentChanged.connect(self.get_local_patches)
+        self.ui.actionAlternating_Row_Colours.triggered.connect(
+            self.row_invert)
         self.ui.actionSort_by_title_A_Z.triggered.connect(self.sort)
         self.ui.actionSort_by_title_Z_A.triggered.connect(self.sort)
         self.ui.actionSort_by_date_new_old.triggered.connect(self.sort)
@@ -132,6 +133,11 @@ class EarlyUIMain(QMainWindow):
         self.ui.actionReload_PatchStorage_patch_list.triggered.connect(
             self.reload_ps)
         self.ui.actionQuit.triggered.connect(self.try_quit)
+        self.ui.update_patch_notes.clicked.connect(self.update_patch_notes)
+        self.ui.actionImport_A_Patch.triggered.connect(self.import_patch)
+        self.ui.actionToggle_Dark_Mode.triggered.connect(self.toggle_darkmode)
+        # TODO Figure out drag and drop events
+        # self.ui.table_3.dropEvent(self.move_patch)
         self.ui.search_button_3.clicked.connect(self.search)
         self.ui.search_button_4.clicked.connect(self.search)
         self.ui.searchbar_3.returnPressed.connect(self.search)
@@ -145,6 +151,9 @@ class EarlyUIMain(QMainWindow):
 
         # Ensure the application starts as maximized.
         self.setFocusPolicy(Qt.StrongFocus)
+        self.ui.update_patch_notes.setEnabled(False)
+        self.ui.splitter_2.setSizes([500, 500])
+        self.ui.splitter_3.setSizes([500, 500])
         self.showMaximized()
 
     def get_local_patches(self):
@@ -199,17 +208,17 @@ class EarlyUIMain(QMainWindow):
         returned to.
         """
 
-        self.ui.table_3.clear()
         for pch in os.listdir(self.sd_card_path):
             # Get the index
             index = pch.split("_")[0]
-            if index[1] == "0":
-                # one digit
-                index = int(index[2])
-            else:
-                # two digits
-                index = int(index[1:3])
-            self.ui.table_3.setItem(index, 0, QTableWidgetItem(pch))
+            if index[0] == "0":
+                if index[1] == "0":
+                    # one digit
+                    index = int(index[2])
+                else:
+                    # two digits
+                    index = int(index[1:3])
+                self.ui.table_3.setItem(index, 0, QTableWidgetItem(pch))
         self.ui.table_3.setHorizontalHeaderLabels(["SD Card"])
 
     def set_data(self, search):
@@ -233,44 +242,46 @@ class EarlyUIMain(QMainWindow):
             self.ui.table.setCellWidget(i, 0, btn_title)
             tags = ""
 
-            for j in range(1, len(data[i]["tags"])):
-                tags += data[i]["tags"][j]["name"] + ", "
-
-            if (len(data[i]["tags"])) > 1:
-                btn_tag = QPushButton(data[i]["tags"][0]["name"]
-                                      + " and " + str(len(data[i]["tags"])
-                                                      - 1) + " more", self)
+            if len(data[i]["tags"]) > 2:
+                for j in range(0, len(data[i]["tags"]) - 1):
+                    tags += data[i]["tags"][j]["name"] + ", "
+                tags = tags + "and " \
+                       + data[i]["tags"][len(data[i]["tags"]) - 1]["name"]
+            elif len(data[i]["tags"]) == 2:
+                tags = data[i]["tags"][0]["name"] + " and " \
+                       + data[i]["tags"][1]["name"]
             else:
-                btn_tag = QPushButton(data[i]["tags"][0]["name"], self)
-            QToolTip.setFont(QFont('Verdana', 10))
-            btn_tag.setToolTip(tags[:len(tags) - 2])
-            btn_tag.setStyleSheet(style_sheet)
-            btn_tag.setFont(QFont('Verdana', 10))
-            self.ui.table.setCellWidget(i, 1, btn_tag)
+                tags = data[i]["tags"][0]["name"]
+
+            tag_item = QTableWidgetItem(tags)
+            tag_item.setTextAlignment(Qt.AlignCenter)
+            self.ui.table.setItem(i, 1, tag_item)
 
             cat = ""
 
-            for k in range(1, len(data[i]["categories"])):
-                cat += data[i]["categories"][k]["name"] + ", "
-
-            if (len(data[i]["categories"])) > 1:
-                btn_cat = QPushButton(data[i]["categories"][0]["name"]
-                                      + " and "
-                                      + str(len(data[i]["categories"])
-                                            - 1) + " more", self)
+            if len(data[i]["categories"]) > 2:
+                for j in range(0, len(data[i]["categories"]) - 1):
+                    cat += data[i]["categories"][j]["name"] + ", "
+                cat = cat + "and " \
+                      + data[i]["categories"][len(data[i]["categories"])
+                                              - 1]["name"]
+            elif len(data[i]["categories"]) == 2:
+                cat = data[i]["categories"][0]["name"] + " and " \
+                      + data[i]["categories"][1]["name"]
             else:
-                btn_cat = QPushButton(data[i]["categories"][0]["name"], self)
-            QToolTip.setFont(QFont('Verdana', 10))
-            btn_cat.setToolTip(cat[:len(cat) - 2])
-            btn_cat.setFont(QFont('Verdana', 10))
-            btn_cat.setStyleSheet(style_sheet)
-            self.ui.table.setCellWidget(i, 2, btn_cat)
+                cat = data[i]["categories"][0]["name"]
+
+            cat_item = QTableWidgetItem(cat)
+            cat_item.setTextAlignment(Qt.AlignCenter)
+            self.ui.table.setItem(i, 2, cat_item)
+
             date = QTableWidgetItem(data[i]["updated_at"][:10])
             date.setTextAlignment(Qt.AlignCenter)
             self.ui.table.setItem(i, 3, date)
-            dwn = QPushButton(str(data[i]["id"]), self)
+            dwn = QPushButton("Click me to download!", self)
             dwn.setFont(QFont('Verdana', 10))
             dwn.clicked.connect(self.initiate_download)
+            dwn.setObjectName(str(data[i]["id"]))
 
             if (str(data[i]["id"])) in os.listdir(backend_path):
                 dwn.setEnabled(False)
@@ -278,6 +289,10 @@ class EarlyUIMain(QMainWindow):
 
             self.ui.table.setCellWidget(i, 4, dwn)
         self.ui.table.setHorizontalHeaderLabels(hor_headers)
+        self.ui.table.resizeColumnsToContents()
+        self.ui.table.setColumnWidth(1, 140)
+        self.ui.table.setColumnWidth(2, 140)
+        self.ui.table.resizeRowsToContents()
 
     def set_data_local(self, search):
         """ Sets the data for the PS table. This is done whenever the
@@ -298,43 +313,47 @@ class EarlyUIMain(QMainWindow):
             btn_title.toggled.connect(self.display_patch_info)
             self.ui.table_2.setCellWidget(i, 0, btn_title)
             tags = ""
-
-            for j in range(1, len(data[i]["tags"])):
-                tags += data[i]["tags"][j]["name"] + ", "
-
-            if (len(data[i]["tags"])) > 1:
-                btn_tag = QPushButton(data[i]["tags"][0]["name"]
-                                      + " and " + str(len(data[i]["tags"])
-                                                      - 1) + " more", self)
+            if len(data[i]["tags"]) > 2:
+                for j in range(0, len(data[i]["tags"]) - 1):
+                    tags += data[i]["tags"][j]["name"] + ", "
+                tags = tags + "and " \
+                       + data[i]["tags"][len(data[i]["tags"]) - 1]["name"]
+            elif len(data[i]["tags"]) == 2:
+                tags = data[i]["tags"][0]["name"] + " and " \
+                       + data[i]["tags"][1]["name"]
+            elif len(data[i]["tags"]) == 0:
+                tags = "No tags"
             else:
-                btn_tag = QPushButton(data[i]["tags"][0]["name"], self)
-            QToolTip.setFont(QFont('Verdana', 10))
-            btn_tag.setToolTip(tags[:len(tags) - 2])
-            btn_tag.setStyleSheet(style_sheet)
-            btn_tag.setFont(QFont('Verdana', 10))
-            self.ui.table_2.setCellWidget(i, 1, btn_tag)
+                tags = data[i]["tags"][0]["name"]
+
+            tag_item = QTableWidgetItem(tags)
+            tag_item.setTextAlignment(Qt.AlignCenter)
+            self.ui.table_2.setItem(i, 1, tag_item)
 
             cat = ""
-            for k in range(1, len(data[i]["categories"])):
-                cat += data[i]["categories"][k]["name"] + ", "
 
-            if (len(data[i]["categories"])) > 1:
-                btn_cat = QPushButton(data[i]["categories"][0]["name"]
-                                      + " and "
-                                      + str(len(data[i]["categories"])
-                                            - 1) + " more", self)
+            if len(data[i]["categories"]) > 2:
+                for j in range(0, len(data[i]["categories"]) - 1):
+                    cat += data[i]["categories"][j]["name"] + ", "
+                cat = cat + "and " + \
+                      data[i]["categories"][len(data[i]["categories"])
+                                            - 1]["name"]
+            elif len(data[i]["categories"]) == 2:
+                cat = data[i]["categories"][0]["name"] + " and " \
+                      + data[i]["categories"][1]["name"]
+            elif len(data[i]["categories"]) == 0:
+                cat = "No categories"
             else:
-                btn_cat = QPushButton(data[i]["categories"][0]["name"], self)
+                cat = data[i]["categories"][0]["name"]
 
-            QToolTip.setFont(QFont('Verdana', 10))
-            btn_cat.setToolTip(cat[:len(cat) - 2])
-            btn_cat.setFont(QFont('Verdana', 10))
-            btn_cat.setStyleSheet(style_sheet)
-            self.ui.table_2.setCellWidget(i, 2, btn_cat)
+            cat_item = QTableWidgetItem(cat)
+            cat_item.setTextAlignment(Qt.AlignCenter)
+            self.ui.table_2.setItem(i, 2, cat_item)
             date = QTableWidgetItem(data[i]["updated_at"][:10])
             date.setTextAlignment(Qt.AlignCenter)
             self.ui.table_2.setItem(i, 3, date)
-            expt = QPushButton(str(data[i]["id"]), self)
+            expt = QPushButton("Click me to export!")
+            expt.setObjectName(str(data[i]["id"]))
             expt.setFont(QFont('Verdana', 10))
             expt.clicked.connect(self.initiate_export)
             self.ui.table_2.setCellWidget(i, 4, expt)
@@ -345,6 +364,9 @@ class EarlyUIMain(QMainWindow):
             self.ui.table_2.setCellWidget(i, 5, delete)
         self.ui.table_2.setHorizontalHeaderLabels(hor_headers)
         self.ui.table_2.resizeColumnsToContents()
+        self.ui.table_2.setColumnWidth(1, 140)
+        self.ui.table_2.setColumnWidth(2, 140)
+        self.ui.table_2.setColumnWidth(4, 150)
         self.ui.table_2.resizeRowsToContents()
 
     def initiate_download(self):
@@ -361,7 +383,7 @@ class EarlyUIMain(QMainWindow):
                                       timeout=2000)
 
         # TODO Replace with FCFS thread scheduling
-        util.save_to_backend(ps.download(str(self.sender().text())))
+        util.save_to_backend(ps.download(str(self.sender().objectName())))
         self.sender().setEnabled(False)
         self.sender().setText("Downloaded!")
         self.ui.statusbar.showMessage("Download complete!", timeout=2000)
@@ -408,7 +430,7 @@ class EarlyUIMain(QMainWindow):
                                                   timeout=2000)
                     # Got a slot and the user hit "OK"
                     try:
-                        util.export_patch_bin(self.sender().text(),
+                        util.export_patch_bin(self.sender().objectName(),
                                               self.sd_card_path, slot)
                         self.ui.statusbar.showMessage("Export complete!",
                                                       timeout=2000)
@@ -426,11 +448,12 @@ class EarlyUIMain(QMainWindow):
                         if value == QMessageBox.Yes:
                             # Overwrite the other patch.
                             try:
-                                util.export_patch_bin(self.sender().text(),
-                                                      self.sd_card_path, slot,
-                                                      True)
+                                util.export_patch_bin(
+                                    self.sender().objectName(),
+                                    self.sd_card_path, slot,
+                                    True)
                             except FileNotFoundError:
-                                idx = str(self.sender().text()) + "_v1"
+                                idx = str(self.sender().objectName()) + "_v1"
                                 util.export_patch_bin(idx,
                                                       self.sd_card_path, slot,
                                                       True)
@@ -438,7 +461,7 @@ class EarlyUIMain(QMainWindow):
                         else:
                             continue
                     except FileNotFoundError:
-                        idx = str(self.sender().text()) + "_v1"
+                        idx = str(self.sender().objectName()) + "_v1"
                         util.export_patch_bin(idx,
                                               self.sd_card_path, slot,
                                               True)
@@ -482,23 +505,32 @@ class EarlyUIMain(QMainWindow):
 
         if self.sender().isChecked() and \
                 self.ui.left_widget.currentIndex() == 0:
+            self.selected = str(self.sender().objectName())
             content = ps.get_patch_meta(self.sender().objectName())
             if content["preview_url"] == "":
                 content["preview_url"] = "None provided"
+            else:
+                content["preview_url"] = "<a href=" + content["preview_url"] \
+                                         + ">Click here</a>"
+            if content["license"]["name"] == "":
+                content["license"]["name"] == "None provided"
             content["content"] = content["content"].replace("\n", "<br/>")
-            temp.setText("<html><h3>"
+            temp.setHtml("<html><h3>"
                          + content["title"] + "</h3><u>Author:</u> "
                          + content["author"]["name"] + "<br/><u>Likes:</u> "
                          + str(content["like_count"])
                          + "<br/><u>Downloads:</u> "
                          + str(content["download_count"])
                          + "<br/><u>Views:</u> "
-                         + str(content["view_count"]) + "<br/><u>Preview:</u> "
+                         + str(content["view_count"]) + "<br/><u>License:</u> "
+                         + content["license"]["name"] + "<br/><u>Preview:</u> "
                          + content["preview_url"]
                          + "<br/><br/><u>Patch Notes:</u><br/>"
                          + content["content"] + "</html>")
         elif self.sender().isChecked() and \
                 self.ui.left_widget.currentIndex() == 1:
+            self.ui.update_patch_notes.setEnabled(True)
+            self.local_selected = str(self.sender().objectName())
             try:
                 with open(os.path.join(backend_path,
                                        str(self.sender().objectName()),
@@ -515,6 +547,13 @@ class EarlyUIMain(QMainWindow):
             # this needs to be duplicated here otherwise an error will get
             # thrown for every non-selected radio button. Since this is
             # temporary anyway, I'm not too worried about it.
+            if content["preview_url"] == "":
+                content["preview_url"] = "None provided"
+            else:
+                content["preview_url"] = "<a href=" + content["preview_url"] \
+                                         + ">Click here</a>"
+            if content["license"]["name"] == "":
+                content["license"]["name"] == "None provided"
             content["content"] = content["content"].replace("\n", "<br/>")
             temp.setText("<html><h3>"
                          + content["title"] + "</h3><u>Author:</u> "
@@ -523,7 +562,8 @@ class EarlyUIMain(QMainWindow):
                          + "<br/><u>Downloads:</u> "
                          + str(content["download_count"])
                          + "<br/><u>Views:</u> "
-                         + str(content["view_count"]) + "<br/><u>Preview:</u> "
+                         + str(content["view_count"]) + "<br/><u>License:</u> "
+                         + content["license"]["name"] + "<br/><u>Preview:</u> "
                          + content["preview_url"]
                          + "<br/><br/><u>Patch Notes:</u><br/>"
                          + content["content"] + "</html>")
@@ -592,7 +632,7 @@ class EarlyUIMain(QMainWindow):
         Currently triggered via a menu action.
 
         TODO Use the QTableWidget sort method for improved speed
-         (requires an override to how the sort pulls data).
+         (requires an override to know how the sort pulls data).
         """
 
         # Determine how to sort the data.
@@ -651,6 +691,85 @@ class EarlyUIMain(QMainWindow):
             msg.setText("Successfully updated " + str(count) + " patches.")
             msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()
+
+    def row_invert(self):
+        """ Either enables of disables alternating row colours for
+        tables; depending on the previous state of the tables.
+        Currently triggered via a menu action.
+        """
+        self.ui.table.setAlternatingRowColors(
+            not self.ui.table.alternatingRowColors())
+        self.ui.table_2.setAlternatingRowColors(
+            not self.ui.table_2.alternatingRowColors())
+        self.ui.table_3.setAlternatingRowColors(
+            not self.ui.table_3.alternatingRowColors())
+
+    def update_patch_notes(self):
+        """ Updates the patch notes for a patch that has been previously
+        locally saved to a user's machine.
+        Currently triggered via a button click.
+        """
+        text = self.ui.text_browser_2.toPlainText()
+        try:
+            text = text.split("Patch Notes:")[1]
+            util.modify_data(self.local_selected, text, 3)
+        except IndexError:
+            util.modify_data(self.local_selected, "", 3)
+        self.ui.statusbar.showMessage("Successfully updated patch notes.")
+
+    def import_patch(self):
+        """ Attempts to import patches into the librarian.
+        Currently triggered via a menu action.
+
+        TODO Add the ability to import and entire directory of patches.
+        """
+
+        pch = QFileDialog.getOpenFileName()[0]
+        try:
+            util.import_to_backend(pch)
+            if self.ui.left_widget.currentIndex() == 1:
+                self.set_data_local(self.ui.searchbar_4.text() == "")
+            self.ui.statusbar.showMessage("Import complete!")
+        except errors.BadPathError:
+            msg = QMessageBox()
+            msg.setWindowTitle("No Patch Found")
+            msg.setIcon(QMessageBox.Information)
+            msg.setText("Incorrect file selected, importing failed.")
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.exec_()
+        except errors.SavingError:
+            msg = QMessageBox()
+            msg.setWindowTitle("Patch Already In Library")
+            msg.setIcon(QMessageBox.Information)
+            msg.setText("That patch exists in within your locally saved "
+                        "patches.")
+            msg.setInformativeText("No importing has occurred.")
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.exec_()
+
+    def move_patch(self):
+        """ Attempts to move a patch from one SD card slot to another
+        Currently triggered via a QTableWidget move event.
+        """
+        print("Yo")
+
+    def toggle_darkmode(self):
+        """
+        Toggles dark mode for the application.
+        """
+        app = QApplication.instance()
+        if not self.dark:
+            with open(os.path.join("..", "UI", "resources", "stylesheets",
+                                   "dark.qss"), "r") as f:
+                data = f.read()
+            self.dark = True
+        else:
+            with open(os.path.join("..", "UI", "resources", "stylesheets",
+                                   "light.qss"), "r") as f:
+                data = f.read()
+            self.dark = False
+
+        app.setStyleSheet(data)
 
     def try_quit(self):
         """ Forces the application to close.
