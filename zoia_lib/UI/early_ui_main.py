@@ -2,6 +2,7 @@ import json
 import os
 from os.path import expanduser
 
+from PySide2.QtCore import QEvent
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
@@ -76,9 +77,6 @@ class EarlyUIMain(QMainWindow):
                 self.data = data
             elif len(data) > ps.patch_count:
                 # Uh oh, some patches got deleted on PatchStorage.
-                # TODO Don't just get all of the data again, figure out a way
-                #  to determine which patches have been deleted and just remove
-                #  those.
                 ps_data = ps.get_all_patch_data_init()
                 with open(os.path.join(backend_path, "data.json"),
                           "w") as f:
@@ -137,7 +135,8 @@ class EarlyUIMain(QMainWindow):
         self.ui.actionImport_A_Patch.triggered.connect(self.import_patch)
         self.ui.actionToggle_Dark_Mode.triggered.connect(self.toggle_darkmode)
         # TODO Figure out drag and drop events
-        # self.ui.table_3.dropEvent(self.move_patch)
+        self.ui.table_3.installEventFilter(self)
+
         self.ui.search_button_3.clicked.connect(self.search)
         self.ui.search_button_4.clicked.connect(self.search)
         self.ui.searchbar_3.returnPressed.connect(self.search)
@@ -383,10 +382,20 @@ class EarlyUIMain(QMainWindow):
                                       timeout=2000)
 
         # TODO Replace with FCFS thread scheduling
-        util.save_to_backend(ps.download(str(self.sender().objectName())))
-        self.sender().setEnabled(False)
-        self.sender().setText("Downloaded!")
-        self.ui.statusbar.showMessage("Download complete!", timeout=2000)
+        try:
+            util.save_to_backend(ps.download(str(self.sender().objectName())))
+            self.sender().setEnabled(False)
+            self.sender().setText("Downloaded!")
+            self.ui.statusbar.showMessage("Download complete!", timeout=2000)
+        except errors.SavingError:
+            msg = QMessageBox()
+            msg.setWindowTitle("Invalid File Type")
+            msg.setIcon(QMessageBox.Information)
+            msg.setText("Unfortunately, that patch is not in a "
+                        "supported format.")
+            msg.setInformativeText("Supported formats are .bin and .zip")
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.exec_()
 
     def initiate_export(self):
         """ **TEMPORARY METHOD** - Will be removed once the UI is
@@ -492,29 +501,44 @@ class EarlyUIMain(QMainWindow):
     def display_patch_info(self):
         """ Queries the PS API for additional patch information whenever
         a patch is selected in the PS table or local table. Information
-        is displayed via HTML, which means it may be possible to embed
-        videos via the use of <iframe>. However, this functionality is
-        absent in the current implementation.
+        is displayed via HTML.
         Currently triggered via a radio button selection.
         """
 
-        if self.ui.left_widget.currentIndex() == 0:
-            temp = self.ui.text_browser
-        elif self.ui.left_widget.currentIndex() == 1:
-            temp = self.ui.text_browser_2
-
-        if self.sender().isChecked() and \
-                self.ui.left_widget.currentIndex() == 0:
-            self.selected = str(self.sender().objectName())
-            content = ps.get_patch_meta(self.sender().objectName())
+        if self.sender().isChecked():
+            temp = None
+            if self.ui.left_widget.currentIndex() == 0:
+                temp = self.ui.text_browser
+                self.selected = str(self.sender().objectName())
+                content = ps.get_patch_meta(self.sender().objectName())
+            elif self.ui.left_widget.currentIndex() == 1:
+                temp = self.ui.text_browser_2
+                self.ui.update_patch_notes.setEnabled(True)
+                self.local_selected = str(self.sender().objectName())
+                try:
+                    with open(os.path.join(backend_path,
+                                           str(self.sender().objectName()),
+                                           str(self.sender().objectName())
+                                           + ".json")) as f:
+                        content = json.loads(f.read())
+                except FileNotFoundError:
+                    with open(os.path.join(backend_path,
+                                           str(self.sender().objectName()),
+                                           str(self.sender().objectName())
+                                           + "_v1.json")) as f:
+                        content = json.loads(f.read())
             if content["preview_url"] == "":
                 content["preview_url"] = "None provided"
             else:
                 content["preview_url"] = "<a href=" + content["preview_url"] \
                                          + ">Click here</a>"
-            if content["license"]["name"] == "":
-                content["license"]["name"] == "None provided"
+            if "license" not in content or content["license"] is None or \
+                    content["license"]["name"] == "":
+                license = "None provided"
+            else:
+                license = content["license"]["name"]
             content["content"] = content["content"].replace("\n", "<br/>")
+
             temp.setHtml("<html><h3>"
                          + content["title"] + "</h3><u>Author:</u> "
                          + content["author"]["name"] + "<br/><u>Likes:</u> "
@@ -523,47 +547,7 @@ class EarlyUIMain(QMainWindow):
                          + str(content["download_count"])
                          + "<br/><u>Views:</u> "
                          + str(content["view_count"]) + "<br/><u>License:</u> "
-                         + content["license"]["name"] + "<br/><u>Preview:</u> "
-                         + content["preview_url"]
-                         + "<br/><br/><u>Patch Notes:</u><br/>"
-                         + content["content"] + "</html>")
-        elif self.sender().isChecked() and \
-                self.ui.left_widget.currentIndex() == 1:
-            self.ui.update_patch_notes.setEnabled(True)
-            self.local_selected = str(self.sender().objectName())
-            try:
-                with open(os.path.join(backend_path,
-                                       str(self.sender().objectName()),
-                                       str(self.sender().objectName())
-                                       + ".json")) as f:
-                    content = json.loads(f.read())
-            except FileNotFoundError:
-                with open(os.path.join(backend_path,
-                                       str(self.sender().objectName()),
-                                       str(self.sender().objectName())
-                                       + "_v1.json")) as f:
-                    content = json.loads(f.read())
-            # I hate duplicating code, but due to the nature of radio buttons,
-            # this needs to be duplicated here otherwise an error will get
-            # thrown for every non-selected radio button. Since this is
-            # temporary anyway, I'm not too worried about it.
-            if content["preview_url"] == "":
-                content["preview_url"] = "None provided"
-            else:
-                content["preview_url"] = "<a href=" + content["preview_url"] \
-                                         + ">Click here</a>"
-            if content["license"]["name"] == "":
-                content["license"]["name"] == "None provided"
-            content["content"] = content["content"].replace("\n", "<br/>")
-            temp.setText("<html><h3>"
-                         + content["title"] + "</h3><u>Author:</u> "
-                         + content["author"]["name"] + "<br/><u>Likes:</u> "
-                         + str(content["like_count"])
-                         + "<br/><u>Downloads:</u> "
-                         + str(content["download_count"])
-                         + "<br/><u>Views:</u> "
-                         + str(content["view_count"]) + "<br/><u>License:</u> "
-                         + content["license"]["name"] + "<br/><u>Preview:</u> "
+                         + license + "<br/><u>Preview:</u> "
                          + content["preview_url"]
                          + "<br/><br/><u>Patch Notes:</u><br/>"
                          + content["content"] + "</html>")
@@ -725,10 +709,13 @@ class EarlyUIMain(QMainWindow):
         """
 
         pch = QFileDialog.getOpenFileName()[0]
+        if pch == "":
+            return
         try:
             util.import_to_backend(pch)
             if self.ui.left_widget.currentIndex() == 1:
-                self.set_data_local(self.ui.searchbar_4.text() == "")
+                self.get_local_patches()
+                self.set_data_local(self.ui.searchbar_4.text() != "")
             self.ui.statusbar.showMessage("Import complete!")
         except errors.BadPathError:
             msg = QMessageBox()
@@ -747,16 +734,49 @@ class EarlyUIMain(QMainWindow):
             msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()
 
-    def move_patch(self):
+    def move_patch_sd(self, src, dest):
         """ Attempts to move a patch from one SD card slot to another
         Currently triggered via a QTableWidget move event.
+
+        src: The index the item originated from.
+        dest: The index the item is being moved to.
         """
-        print("Yo")
+
+        # We need to find out if we are just doing a simple move or a swap.
+        if dest < 10:
+            dest = str("00{}".format(dest))
+        else:
+            dest = str("0{}".format(dest))
+        if src < 10:
+            src = str("00{}".format(src))
+        else:
+            src = str("0{}".format(src))
+        src_pch = None
+        dest_pch = None
+        for pch in os.listdir(self.sd_card_path):
+            if pch[:3] == src:
+                src_pch = pch
+            if pch[:3] == dest:
+                dest_pch = pch
+            if src_pch is not None and dest_pch is not None:
+                # We are doing a swap.
+                os.rename(os.path.join(self.sd_card_path, src_pch),
+                          os.path.join(self.sd_card_path, dest + src_pch[3:]))
+                os.rename(os.path.join(self.sd_card_path, dest_pch),
+                          os.path.join(self.sd_card_path, src + dest_pch[3:]))
+                self.set_data_sd()
+                return
+
+        # We are doing a move.
+        os.rename(os.path.join(self.sd_card_path, src_pch),
+                  os.path.join(self.sd_card_path, dest + src_pch[3:]))
+
+        self.set_data_sd()
 
     def toggle_darkmode(self):
+        """ Toggles dark mode for the application.
         """
-        Toggles dark mode for the application.
-        """
+
         app = QApplication.instance()
         if not self.dark:
             with open(os.path.join("..", "UI", "resources", "stylesheets",
@@ -770,6 +790,36 @@ class EarlyUIMain(QMainWindow):
             self.dark = False
 
         app.setStyleSheet(data)
+
+    def eventFilter(self, o, e):
+        """ This god awful code is responsible for the drag and drop
+        events that can occur on the SD card and Bank views. Direct
+        overriding of dropEvent in table_3 can't occur because of the
+        use of QtDesigner, so this is an obtuse solution to accomplish
+        a similar goal.
+        """
+
+        if o.objectName() == "table_3":
+            if e.type() == QEvent.ChildRemoved:
+                # We have dropped an item, so now we need to rename it
+                # or swap it with the item that was previously in that
+                # slot.
+                source_index = self.ui.table_3.currentRow()
+                for i in range(64):
+                    temp = self.ui.table_3.item(i, 0)
+                    if temp is not None:
+                        temp = temp.text()[:3]
+                        if temp[1] == "0":
+                            # one digit
+                            temp = int(temp[2])
+                        else:
+                            # two digits
+                            temp = int(temp[1:3])
+                        if temp != i:
+                            dst_index = i
+                self.move_patch_sd(source_index, dst_index)
+                return True
+        return False
 
     def try_quit(self):
         """ Forces the application to close.

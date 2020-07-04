@@ -213,7 +213,7 @@
                           <bool>false</bool>
                          </property>
                          <property name="selectionMode">
-                          <enum>QAbstractItemView::NoSelection</enum>
+                          <enum>QAbstractItemView::SingleSelection</enum>
                          </property>
                          <property name="selectionBehavior">
                           <enum>QAbstractItemView::SelectItems</enum>
@@ -380,6 +380,9 @@
                           <property name="editTriggers">
                            <set>QAbstractItemView::NoEditTriggers</set>
                           </property>
+                          <property name="selectionMode">
+                           <enum>QAbstractItemView::SingleSelection</enum>
+                          </property>
                           <property name="rowCount">
                            <number>1</number>
                           </property>
@@ -454,6 +457,9 @@
               <height>0</height>
              </size>
             </property>
+            <property name="acceptDrops">
+             <bool>true</bool>
+            </property>
             <property name="editTriggers">
              <set>QAbstractItemView::NoEditTriggers</set>
             </property>
@@ -474,6 +480,9 @@
             </property>
             <property name="selectionMode">
              <enum>QAbstractItemView::SingleSelection</enum>
+            </property>
+            <property name="selectionBehavior">
+             <enum>QAbstractItemView::SelectRows</enum>
             </property>
             <property name="rowCount">
              <number>64</number>
@@ -808,6 +817,11 @@
            </widget>
           </item>
          </layout>
+        </widget>
+        <widget class="QWidget" name="tab_bank">
+         <attribute name="title">
+          <string>Banks</string>
+         </attribute>
         </widget>
        </widget>
       </item>

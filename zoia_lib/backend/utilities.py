@@ -277,7 +277,12 @@ def save_to_backend(patch):
         if "files" in patch[1] \
                 and patch[1]["files"][0]["filename"].split(".")[1] != "bin":
             # If it isn't a straight bin additional work must be done.
-            patch_decompress(patch)
+            if patch[1]["files"][0]["filename"].split(".")[1] == "py":
+                # We are not responsible for .py files.
+                shutil.rmtree(os.path.join(backend_path, pch))
+                raise errors.SavingError(patch[1], 501)
+            else:
+                patch_decompress(patch)
         # Make sure the files attribute exists.
         elif "files" in patch[1] and isinstance(patch[0], bytes):
             name_bin = os.path.join(pch, "{}.bin".format(pch_id))
@@ -794,8 +799,9 @@ def check_for_updates():
                     f.write(json.dumps(patch[1]))
             except FileNotFoundError:
                 with open(os.path.join(backend_path,
-                                 str(patch[1]["id"]),
-                                 "{}_v1.bin".format(str(patch[1]["id"]))),
+                                       str(patch[1]["id"]),
+                                       "{}_v1.bin".format(
+                                           str(patch[1]["id"]))),
                           "r") as f:
                     f.write(json.dumps(patch[1]))
             updates += 1
@@ -953,10 +959,19 @@ def modify_data(idx, data, mode):
         idx = idx.split("_")[0]
 
     if mode == 3:
-        with open(os.path.join(backend_path, idx, "{}.json".format(pch)),
-                  "r") as f:
-            temp = json.loads(f.read())
-        temp[index] = data
-        with open(os.path.join(backend_path, idx, "{}.json".format(pch)),
-                  "w") as f:
-            f.write(json.dumps(temp))
+        try:
+            with open(os.path.join(backend_path, idx, "{}.json".format(pch)),
+                      "r") as f:
+                temp = json.loads(f.read())
+            temp[index] = data
+            with open(os.path.join(backend_path, idx, "{}.json".format(pch)),
+                      "w") as f:
+                f.write(json.dumps(temp))
+        except FileNotFoundError:
+            with open(os.path.join(backend_path, idx, "{}_v1.json".format(pch)),
+                      "r") as f:
+                temp = json.loads(f.read())
+            temp[index] = data
+            with open(os.path.join(backend_path, idx, "{}_v1.json".format(pch)),
+                      "w") as f:
+                f.write(json.dumps(temp))

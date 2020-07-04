@@ -148,7 +148,7 @@ class Ui_MainWindow(object):
         self.table.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table.setAlternatingRowColors(False)
-        self.table.setSelectionMode(QAbstractItemView.NoSelection)
+        self.table.setSelectionMode(QAbstractItemView.SingleSelection)
         self.table.setSelectionBehavior(QAbstractItemView.SelectItems)
         self.table.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.table.setRowCount(1)
@@ -238,6 +238,7 @@ class Ui_MainWindow(object):
             self.table_2.setRowCount(1)
         self.table_2.setObjectName(u"table_2")
         self.table_2.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table_2.setSelectionMode(QAbstractItemView.SingleSelection)
         self.table_2.setRowCount(1)
         self.table_2.setColumnCount(6)
         self.table_2.horizontalHeader().setStretchLastSection(True)
@@ -418,6 +419,7 @@ class Ui_MainWindow(object):
         self.table_3.setVerticalHeaderItem(63, __qtablewidgetitem63)
         self.table_3.setObjectName(u"table_3")
         self.table_3.setMinimumSize(QSize(1619, 0))
+        self.table_3.setAcceptDrops(True)
         self.table_3.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table_3.setDragEnabled(True)
         self.table_3.setDragDropOverwriteMode(False)
@@ -425,6 +427,7 @@ class Ui_MainWindow(object):
         self.table_3.setDefaultDropAction(Qt.TargetMoveAction)
         self.table_3.setAlternatingRowColors(False)
         self.table_3.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.table_3.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table_3.setRowCount(64)
         self.table_3.setColumnCount(1)
         self.table_3.horizontalHeader().setStretchLastSection(True)
@@ -432,6 +435,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addWidget(self.table_3)
 
         self.left_widget.addTab(self.tab_sd, "")
+        self.tab_bank = QWidget()
+        self.tab_bank.setObjectName(u"tab_bank")
+        self.left_widget.addTab(self.tab_bank, "")
 
         self.horizontalLayout_2.addWidget(self.left_widget)
 
@@ -647,6 +653,7 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem63 = self.table_3.verticalHeaderItem(63)
         ___qtablewidgetitem63.setText(QCoreApplication.translate("MainWindow", u"63", None));
         self.left_widget.setTabText(self.left_widget.indexOf(self.tab_sd), QCoreApplication.translate("MainWindow", u"SD Card View", None))
+        self.left_widget.setTabText(self.left_widget.indexOf(self.tab_bank), QCoreApplication.translate("MainWindow", u"Banks", None))
         self.menuFiel.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
         self.menuSort.setTitle(QCoreApplication.translate("MainWindow", u"Sort", None))
         self.menuHelp.setTitle(QCoreApplication.translate("MainWindow", u"Help", None))
