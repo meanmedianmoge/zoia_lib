@@ -950,7 +950,7 @@ def modify_data(idx, data, mode):
 
     index = {
         1: "tags",
-        2: "category",
+        2: "categories",
         3: "content"
     }[mode]
 
@@ -958,20 +958,19 @@ def modify_data(idx, data, mode):
     if "_" in idx:
         idx = idx.split("_")[0]
 
-    if mode == 3:
-        try:
-            with open(os.path.join(backend_path, idx, "{}.json".format(pch)),
-                      "r") as f:
-                temp = json.loads(f.read())
-            temp[index] = data
-            with open(os.path.join(backend_path, idx, "{}.json".format(pch)),
-                      "w") as f:
-                f.write(json.dumps(temp))
-        except FileNotFoundError:
-            with open(os.path.join(backend_path, idx, "{}_v1.json".format(pch)),
-                      "r") as f:
-                temp = json.loads(f.read())
-            temp[index] = data
-            with open(os.path.join(backend_path, idx, "{}_v1.json".format(pch)),
-                      "w") as f:
-                f.write(json.dumps(temp))
+    try:
+        with open(os.path.join(backend_path, idx, "{}.json".format(pch)),
+                  "r") as f:
+            temp = json.loads(f.read())
+        temp[index] = data
+        with open(os.path.join(backend_path, idx, "{}.json".format(pch)),
+                  "w") as f:
+            f.write(json.dumps(temp))
+    except FileNotFoundError:
+        with open(os.path.join(backend_path, idx, "{}_v1.json".format(pch)),
+                  "r") as f:
+            temp = json.loads(f.read())
+        temp[index] = data
+        with open(os.path.join(backend_path, idx, "{}_v1.json".format(pch)),
+                  "w") as f:
+            f.write(json.dumps(temp))

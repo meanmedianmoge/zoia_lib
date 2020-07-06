@@ -14,16 +14,6 @@ import zoia_lib.common.errors as errors
 ps = api.PatchStorage()
 backend_path = util.get_backend_path()
 
-style_sheet = """
-    QPushButton
-    {
-        background: white;
-        border: none;
-        font-size: 13px;
-        color: black;
-    }
-    """
-
 
 class EarlyUIMain(QMainWindow):
     """ ** TEMPORARY FUNCTIONALITY SHOWCASE **
@@ -98,18 +88,20 @@ class EarlyUIMain(QMainWindow):
         self.search_local_data = None
         self.local_selected = None
         self.selected = None
+        self.prev_tag_cat = None
         self.dark = False
+        self.table_title_size = None
+        self.table_2_title_size = None
 
         # Setup the tables, but only populate the PS API table
         # (The local table will populate once the user switches tabs).
         self.ui.table.setRowCount(len(self.data))
-        self.ui.table.setColumnCount(5)
         self.set_data(False)
 
         self.ui.table_2.setRowCount(len(self.data))
-        self.ui.table_2.setColumnCount(6)
 
-        self.ui.table_3.setHorizontalHeaderLabels(["SD Card"])
+        self.ui.table_3.setHorizontalHeaderLabels(["Patch", "Remove"])
+        self.ui.table_4.setHorizontalHeaderLabels(["Patch", "Remove"])
         self.ui.tab_sd.setEnabled(False)
 
         # Connect buttons and items to methods.
@@ -134,12 +126,13 @@ class EarlyUIMain(QMainWindow):
         self.ui.update_patch_notes.clicked.connect(self.update_patch_notes)
         self.ui.actionImport_A_Patch.triggered.connect(self.import_patch)
         self.ui.actionToggle_Dark_Mode.triggered.connect(self.toggle_darkmode)
+        self.ui.table_2.installEventFilter(self)
         # TODO Figure out drag and drop events
         self.ui.table_3.installEventFilter(self)
-
-        self.ui.search_button_3.clicked.connect(self.search)
-        self.ui.search_button_4.clicked.connect(self.search)
+        self.ui.table_4.installEventFilter(self)
         self.ui.searchbar_3.returnPressed.connect(self.search)
+        self.ui.searchbar_3.installEventFilter(self)
+        self.ui.searchbar_4.installEventFilter(self)
         self.ui.searchbar_4.returnPressed.connect(self.search)
 
         # Font consistency.
@@ -151,8 +144,9 @@ class EarlyUIMain(QMainWindow):
         # Ensure the application starts as maximized.
         self.setFocusPolicy(Qt.StrongFocus)
         self.ui.update_patch_notes.setEnabled(False)
-        self.ui.splitter_2.setSizes([500, 500])
         self.ui.splitter_3.setSizes([500, 500])
+        self.ui.splitter_2.setSizes([500, 500])
+        self.ui.splitter.setSizes([500, 500])
         self.showMaximized()
 
     def get_local_patches(self):
@@ -162,6 +156,8 @@ class EarlyUIMain(QMainWindow):
         TODO Expand this to accurately deal with version history
          (array in the array).
         """
+
+        self.prev_tag_cat = None
 
         if self.ui.left_widget.currentIndex() == 1:
             self.local_data = []
@@ -206,6 +202,9 @@ class EarlyUIMain(QMainWindow):
         """ Sets the data for the PS table. This is done when the tab is
         returned to.
         """
+        for i in range(32):
+            self.ui.table_3.setItem(i, 0, QTableWidgetItem(None))
+            self.ui.table_4.setItem(i, 0, QTableWidgetItem(None))
 
         for pch in os.listdir(self.sd_card_path):
             # Get the index
@@ -217,8 +216,20 @@ class EarlyUIMain(QMainWindow):
                 else:
                     # two digits
                     index = int(index[1:3])
-                self.ui.table_3.setItem(index, 0, QTableWidgetItem(pch))
-        self.ui.table_3.setHorizontalHeaderLabels(["SD Card"])
+                if index < 32:
+                    self.ui.table_3.setItem(index, 0, QTableWidgetItem(pch))
+                else:
+                    self.ui.table_4.setItem(index - 32, 0, QTableWidgetItem(pch))
+        self.ui.table_3.resizeColumnsToContents()
+        self.ui.table_4.resizeColumnsToContents()
+        self.ui.table_3.setColumnWidth(0, 400)
+        self.ui.table_3.setColumnWidth(1, 100)
+        self.ui.table_4.setColumnWidth(0, 400)
+        self.ui.table_4.setColumnWidth(1, 100)
+        self.ui.table_3.setHorizontalHeaderLabels(["Patch", "Remove"])
+        self.ui.table_4.setHorizontalHeaderLabels(["Patch", "Remove"])
+        self.ui.table_3.resizeRowsToContents()
+        self.ui.table_4.resizeRowsToContents()
 
     def set_data(self, search):
         """ Sets the data for the PS table. This is done when the app
@@ -277,7 +288,7 @@ class EarlyUIMain(QMainWindow):
             date = QTableWidgetItem(data[i]["updated_at"][:10])
             date.setTextAlignment(Qt.AlignCenter)
             self.ui.table.setItem(i, 3, date)
-            dwn = QPushButton("Click me to download!", self)
+            dwn = QPushButton("Click me\nto download!", self)
             dwn.setFont(QFont('Verdana', 10))
             dwn.clicked.connect(self.initiate_download)
             dwn.setObjectName(str(data[i]["id"]))
@@ -289,6 +300,10 @@ class EarlyUIMain(QMainWindow):
             self.ui.table.setCellWidget(i, 4, dwn)
         self.ui.table.setHorizontalHeaderLabels(hor_headers)
         self.ui.table.resizeColumnsToContents()
+        if self.table_title_size is None:
+            self.table_title_size = self.ui.table.columnWidth(0)
+        else:
+            self.ui.table.setColumnWidth(0, self.table_title_size)
         self.ui.table.setColumnWidth(1, 140)
         self.ui.table.setColumnWidth(2, 140)
         self.ui.table.resizeRowsToContents()
@@ -351,7 +366,7 @@ class EarlyUIMain(QMainWindow):
             date = QTableWidgetItem(data[i]["updated_at"][:10])
             date.setTextAlignment(Qt.AlignCenter)
             self.ui.table_2.setItem(i, 3, date)
-            expt = QPushButton("Click me to export!")
+            expt = QPushButton("Click me\nto export!")
             expt.setObjectName(str(data[i]["id"]))
             expt.setFont(QFont('Verdana', 10))
             expt.clicked.connect(self.initiate_export)
@@ -363,9 +378,14 @@ class EarlyUIMain(QMainWindow):
             self.ui.table_2.setCellWidget(i, 5, delete)
         self.ui.table_2.setHorizontalHeaderLabels(hor_headers)
         self.ui.table_2.resizeColumnsToContents()
+        if self.table_2_title_size is None:
+            self.table_2_title_size = self.ui.table_2.columnWidth(0)
+        else:
+            self.ui.table_2.setColumnWidth(0, self.table_2_title_size)
         self.ui.table_2.setColumnWidth(1, 140)
         self.ui.table_2.setColumnWidth(2, 140)
-        self.ui.table_2.setColumnWidth(4, 150)
+        self.ui.table_2.setColumnWidth(4, 100)
+        self.ui.table_2.setColumnWidth(5, 100)
         self.ui.table_2.resizeRowsToContents()
 
     def initiate_download(self):
@@ -555,23 +575,16 @@ class EarlyUIMain(QMainWindow):
     def reload_ps(self):
         """ Reloads the PS table view to accurately reflect new uploads.
         Currently triggered via a menu action.
+
+        # TODO Fix this, shouldn't just query the whole thing again.
         """
 
         # Get the new patch metadata that we don't have (if any).
-        try:
-            new_patches = ps.get_newest_patches(len(self.data))
-            self.data = new_patches + self.data
-            with open(os.path.join(backend_path, "data.json"), "w") as f:
-                f.write(json.dumps(self.data))
-            self.ui.searchbar_3.setText("")
-            self.set_data(False)
-        except TypeError:
-            msg = QMessageBox()
-            msg.setWindowTitle("No New Patches")
-            msg.setIcon(QMessageBox.Information)
-            msg.setText("No new patches were found to be on PatchStorage.")
-            msg.setStandardButtons(QMessageBox.Ok)
-            msg.exec_()
+        self.data = ps.get_all_patch_data_init()
+        with open(os.path.join(backend_path, "data.json"), "w") as f:
+            f.write(json.dumps(self.data))
+        self.ui.searchbar_3.setText("")
+        self.set_data(False)
 
     def sd_path(self):
         """ Allows the user to specify the path to their SD card via
@@ -586,6 +599,8 @@ class EarlyUIMain(QMainWindow):
             self.sd_card_path = str(input_dir)
             self.ui.tab_sd.setEnabled(True)
 
+        self.set_data_sd()
+
     def search(self):
         """ Initiates a data search for the metadata that is retrieved
         via the PS API or that is stored locally. The search will then
@@ -593,8 +608,7 @@ class EarlyUIMain(QMainWindow):
         Currently triggered via a button press.
         """
 
-        if self.sender().objectName() == "search_button_3" or \
-                self.sender().objectName() == "searchbar_3":
+        if self.ui.left_widget.currentIndex() == 0:
             if self.ui.searchbar_3.text() == "":
                 self.set_data(False)
             else:
@@ -687,6 +701,8 @@ class EarlyUIMain(QMainWindow):
             not self.ui.table_2.alternatingRowColors())
         self.ui.table_3.setAlternatingRowColors(
             not self.ui.table_3.alternatingRowColors())
+        self.ui.table_4.setAlternatingRowColors(
+            not self.ui.table_4.alternatingRowColors())
 
     def update_patch_notes(self):
         """ Updates the patch notes for a patch that has been previously
@@ -760,14 +776,31 @@ class EarlyUIMain(QMainWindow):
                 dest_pch = pch
             if src_pch is not None and dest_pch is not None:
                 # We are doing a swap.
-                os.rename(os.path.join(self.sd_card_path, src_pch),
-                          os.path.join(self.sd_card_path, dest + src_pch[3:]))
-                os.rename(os.path.join(self.sd_card_path, dest_pch),
-                          os.path.join(self.sd_card_path, src + dest_pch[3:]))
+                try:
+                    os.rename(os.path.join(self.sd_card_path, src_pch),
+                              os.path.join(self.sd_card_path, dest
+                                           + src_pch[3:]))
+                    os.rename(os.path.join(self.sd_card_path, dest_pch),
+                              os.path.join(self.sd_card_path, src
+                                           + dest_pch[3:]))
+                except FileExistsError:
+                    # Swapping files that are named the same thing.
+                    os.rename(os.path.join(self.sd_card_path, src_pch),
+                              os.path.join(self.sd_card_path, "064"
+                                           + src_pch[3:]))
+                    # Swapping files that are named the same thing.
+                    os.rename(os.path.join(self.sd_card_path, dest_pch),
+                              os.path.join(self.sd_card_path, src
+                                           + dest_pch[3:]))
+                    os.rename(os.path.join(self.sd_card_path, "064"
+                                           + src_pch[3:]),
+                              os.path.join(self.sd_card_path, dest
+                                           + src_pch[3:]))
                 self.set_data_sd()
                 return
 
         # We are doing a move.
+
         os.rename(os.path.join(self.sd_card_path, src_pch),
                   os.path.join(self.sd_card_path, dest + src_pch[3:]))
 
@@ -775,6 +808,8 @@ class EarlyUIMain(QMainWindow):
 
     def toggle_darkmode(self):
         """ Toggles dark mode for the application.
+        TODO Modify the stylesheets to have them conform to the initial
+             application style.
         """
 
         app = QApplication.instance()
@@ -792,34 +827,112 @@ class EarlyUIMain(QMainWindow):
         app.setStyleSheet(data)
 
     def eventFilter(self, o, e):
-        """ This god awful code is responsible for the drag and drop
-        events that can occur on the SD card and Bank views. Direct
-        overriding of dropEvent in table_3 can't occur because of the
-        use of QtDesigner, so this is an obtuse solution to accomplish
-        a similar goal.
+        """ Deals with events that originate from various widgets
+        present in the GUI.
         """
 
-        if o.objectName() == "table_3":
+        # SD card tab swap/move
+        if o.objectName() == "table_3" or o.objectName() == "table_4":
             if e.type() == QEvent.ChildRemoved:
                 # We have dropped an item, so now we need to rename it
                 # or swap it with the item that was previously in that
                 # slot.
-                source_index = self.ui.table_3.currentRow()
+                if o.objectName() == "table_3":
+                    source_index = self.ui.table_3.currentRow()
+                else:
+                    source_index = self.ui.table_4.currentRow() + 32
                 for i in range(64):
-                    temp = self.ui.table_3.item(i, 0)
-                    if temp is not None:
-                        temp = temp.text()[:3]
-                        if temp[1] == "0":
+                    if i < 32:
+                        temp = self.ui.table_3.item(i, 0)
+                    else:
+                        temp = self.ui.table_4.item(i - 32, 0)
+                    if temp is not None and temp.text() != "":
+                        if temp.text()[1] == "0":
                             # one digit
-                            temp = int(temp[2])
+                            temp = int(temp.text()[2])
                         else:
                             # two digits
-                            temp = int(temp[1:3])
+                            temp = int(temp.text()[1:3])
                         if temp != i:
                             dst_index = i
                 self.move_patch_sd(source_index, dst_index)
                 return True
+        elif o.objectName() == "searchbar_4" \
+                or o.objectName() == "searchbar_3":
+            if e.type() == QEvent.KeyRelease:
+                self.search()
+                return True
+        elif o.objectName() == "table_2":
+            if e.type() == QEvent.FocusIn:
+                if self.prev_tag_cat is None:
+                    self.get_local_patches()
+                    self.set_data_local(self.ui.searchbar_4 == "")
+                    return False
+                else:
+                    new_text = self.ui.table_2.item(self.prev_tag_cat[0],
+                                                    self.prev_tag_cat[1]
+                                                    ).text()
+                    if new_text == self.prev_tag_cat[2] \
+                            or self.ui.table_2.currentColumn() == 3:
+                        self.get_local_patches()
+                        self.set_data_local(self.ui.searchbar_4 == "")
+                        return False
+                    else:
+                        self.update_tags_cats(new_text,
+                                              self.prev_tag_cat[1] == 1,
+                                              self.ui.table_2.cellWidget(
+                                                  self.ui.table_2.currentRow(),
+                                                  4)
+                                              .objectName())
+                        return True
+            elif e.type() == QEvent.FocusOut:
+                try:
+                    if self.ui.table_2.currentColumn() != 3:
+                        self.prev_tag_cat = (self.ui.table_2.currentRow(),
+                                             self.ui.table_2.currentColumn(),
+                                             self.ui.table_2.selectedItems()[0]
+                                             .text())
+                    return True
+                except IndexError:
+                    return False
         return False
+
+    def update_tags_cats(self, text, mode, idx):
+        """ Updates the tags or categories for a locally downloaded
+        patch.
+
+        text: The text used to discern tags and categories from.
+        mode: True for tags update, False for categories update.
+        """
+
+        # Case 1 - The text is empty (i.e., delete everything)
+        if text == "":
+            if mode:
+                util.modify_data(idx, [], 1)
+            else:
+                util.modify_data(idx, [], 2)
+        # Case 2 - The text isn't empty
+        else:
+            # Tags/categories are separated by commas
+            items = text.split(",")
+            done = []
+            for curr in items:
+                if " and " in curr:
+                    done.append({
+                        "name": curr.split(" and ")[0]
+                    })
+                    curr = curr.split(" and ")[1]
+                elif "and " in curr:
+                    curr = curr.split("and ")[1]
+                done.append({
+                    "name": curr
+                })
+            if mode:
+                util.modify_data(idx, done, 1)
+            else:
+                util.modify_data(idx, done, 2)
+        self.get_local_patches()
+        self.set_data_local(self.ui.searchbar_4 == "")
 
     def try_quit(self):
         """ Forces the application to close.
