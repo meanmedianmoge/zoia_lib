@@ -81,8 +81,13 @@ class EarlyUIMain(QMainWindow):
                     f.write(json.dumps(data))
                     self.data = data
 
+        # Set the window icon
+        self.setWindowIcon(QIcon(os.path.join(os.getcwd(), "zoia_lib", "UI",
+                                              "resources", "logo.ico")))
+
         # Variable initialization.
         self.search_data = None
+        self.sd_card_root = None
         self.sd_card_path = None
         self.local_data = None
         self.search_local_data = None
@@ -127,13 +132,13 @@ class EarlyUIMain(QMainWindow):
         self.ui.actionImport_A_Patch.triggered.connect(self.import_patch)
         self.ui.actionToggle_Dark_Mode.triggered.connect(self.toggle_darkmode)
         self.ui.table_2.installEventFilter(self)
-        # TODO Figure out drag and drop events
         self.ui.table_3.installEventFilter(self)
         self.ui.table_4.installEventFilter(self)
         self.ui.searchbar_3.returnPressed.connect(self.search)
         self.ui.searchbar_3.installEventFilter(self)
         self.ui.searchbar_4.installEventFilter(self)
         self.ui.searchbar_4.returnPressed.connect(self.search)
+        self.ui.sd_tree.clicked.connect(self.prepare_sd_view)
 
         # Font consistency.
         self.ui.table.setFont(QFont('Verdana', 10))
@@ -144,9 +149,12 @@ class EarlyUIMain(QMainWindow):
         # Ensure the application starts as maximized.
         self.setFocusPolicy(Qt.StrongFocus)
         self.ui.update_patch_notes.setEnabled(False)
-        self.ui.splitter_3.setSizes([500, 500])
-        self.ui.splitter_2.setSizes([500, 500])
         self.ui.splitter.setSizes([500, 500])
+        self.ui.splitter_2.setSizes([500, 500])
+        self.ui.splitter_3.setSizes([500, 500])
+        self.ui.splitter_4.setSizes([500, 500])
+        self.ui.splitter_4.setMinimumHeight(self.width() * 0.6)
+        self.sort()
         self.showMaximized()
 
     def get_local_patches(self):
@@ -186,7 +194,7 @@ class EarlyUIMain(QMainWindow):
             self.set_data_local(False)
         elif self.ui.left_widget.currentIndex() == 2:
             # SD card tab
-            if self.sd_card_path is None:
+            if self.sd_card_root is None:
                 msg = QMessageBox()
                 msg.setWindowTitle("No SD Path")
                 msg.setIcon(QMessageBox.Information)
@@ -195,16 +203,22 @@ class EarlyUIMain(QMainWindow):
                 msg.setStandardButtons(QMessageBox.Ok)
                 msg.exec_()
                 self.ui.left_widget.setCurrentIndex(1)
-            else:
-                self.set_data_sd()
+
+    def prepare_sd_view(self):
+        self.sd_card_path = os.path.join(self.sd_card_root,
+                                         self.ui.sd_tree.currentIndex().data())
+        print(self.sd_card_path)
+        self.set_data_sd()
 
     def set_data_sd(self):
-        """ Sets the data for the PS table. This is done when the tab is
-        returned to.
+        """ Sets the data for the PS table.
+        Currently triggered via a mouse click.
         """
         for i in range(32):
             self.ui.table_3.setItem(i, 0, QTableWidgetItem(None))
+            self.ui.table_3.setCellWidget(i, 1, None)
             self.ui.table_4.setItem(i, 0, QTableWidgetItem(None))
+            self.ui.table_4.setCellWidget(i, 1, None)
 
         for pch in os.listdir(self.sd_card_path):
             # Get the index
@@ -218,8 +232,20 @@ class EarlyUIMain(QMainWindow):
                     index = int(index[1:3])
                 if index < 32:
                     self.ui.table_3.setItem(index, 0, QTableWidgetItem(pch))
+                    push_button = QPushButton("X")
+                    push_button.setObjectName(str(index))
+                    push_button.setFont(QFont('Verdana', 10))
+                    push_button.clicked.connect(self.remove_sd)
+                    self.ui.table_3.setCellWidget(index, 1, push_button)
                 else:
-                    self.ui.table_4.setItem(index - 32, 0, QTableWidgetItem(pch))
+                    self.ui.table_4.setItem(index - 32, 0,
+                                            QTableWidgetItem(pch))
+                    push_button = QPushButton("X")
+                    push_button.setObjectName(str(index))
+                    push_button.setFont(QFont('Verdana', 10))
+                    push_button.clicked.connect(self.remove_sd)
+                    self.ui.table_4.setCellWidget(index - 32, 1, push_button)
+
         self.ui.table_3.resizeColumnsToContents()
         self.ui.table_4.resizeColumnsToContents()
         self.ui.table_3.setColumnWidth(0, 400)
@@ -399,14 +425,14 @@ class EarlyUIMain(QMainWindow):
         """
 
         self.ui.statusbar.showMessage("Starting download...",
-                                      timeout=2000)
+                                      timeout=5000)
 
         # TODO Replace with FCFS thread scheduling
         try:
             util.save_to_backend(ps.download(str(self.sender().objectName())))
             self.sender().setEnabled(False)
             self.sender().setText("Downloaded!")
-            self.ui.statusbar.showMessage("Download complete!", timeout=2000)
+            self.ui.statusbar.showMessage("Download complete!", timeout=5000)
         except errors.SavingError:
             msg = QMessageBox()
             msg.setWindowTitle("Invalid File Type")
@@ -438,7 +464,12 @@ class EarlyUIMain(QMainWindow):
         Currently triggered via a button press.
         """
 
-        if self.sd_card_path is None:
+        # Exporting this way will only export to a directory named "to_zoia"
+        # So we need to check if it exists. If it doesn't, we create it.
+        if "to_zoia" not in os.listdir(self.sd_card_root):
+            os.mkdir(os.path.join(self.sd_card_root, "to_zoia"))
+
+        if self.sd_card_root is None:
             # No SD path.
             msg = QMessageBox()
             msg.setWindowTitle("No SD Path")
@@ -456,13 +487,14 @@ class EarlyUIMain(QMainWindow):
 
                 if slot >= 0 and ok:
                     self.ui.statusbar.showMessage("Patch be movin",
-                                                  timeout=2000)
+                                                  timeout=5000)
                     # Got a slot and the user hit "OK"
                     try:
                         util.export_patch_bin(self.sender().objectName(),
-                                              self.sd_card_path, slot)
+                                              os.path.join(self.sd_card_root,
+                                                           "to_zoia"), slot)
                         self.ui.statusbar.showMessage("Export complete!",
-                                                      timeout=2000)
+                                                      timeout=5000)
                         break
                     except errors.ExportingError:
                         # There was already a patch in that slot.
@@ -479,21 +511,27 @@ class EarlyUIMain(QMainWindow):
                             try:
                                 util.export_patch_bin(
                                     self.sender().objectName(),
-                                    self.sd_card_path, slot,
-                                    True)
+                                    os.path.join(self.sd_card_root, "to_zoia"),
+                                    slot, True)
+                                self.ui.statusbar.showMessage(
+                                    "Export complete!", timeout=5000)
                             except FileNotFoundError:
                                 idx = str(self.sender().objectName()) + "_v1"
-                                util.export_patch_bin(idx,
-                                                      self.sd_card_path, slot,
-                                                      True)
+                                util.export_patch_bin(idx, os.path.join(
+                                    self.sd_card_root, "to_zoia"), slot, True)
+                                self.ui.statusbar.showMessage(
+                                    "Export complete!", timeout=5000)
                             break
                         else:
                             continue
                     except FileNotFoundError:
                         idx = str(self.sender().objectName()) + "_v1"
                         util.export_patch_bin(idx,
-                                              self.sd_card_path, slot,
+                                              os.path.join(self.sd_card_root,
+                                                           "to_zoia"), slot,
                                               True)
+                        self.ui.statusbar.showMessage(
+                            "Export complete!", timeout=5000)
                         break
                 else:
                     # Operation was aborted.
@@ -517,6 +555,23 @@ class EarlyUIMain(QMainWindow):
             self.get_local_patches()
             self.set_data(False)
             self.set_data_local(False)
+
+    def remove_sd(self):
+        """ Removes a patch that is stored on a user's SD card.
+        Currently triggered via a button press.
+        """
+        index = self.sender().objectName()
+        if len(index) < 2:
+            # one digit
+            index = "00{}".format(index)
+        else:
+            # two digits
+            index = "0{}".format(index)
+        for pch in os.listdir(self.sd_card_path):
+            if pch[:3] == index:
+                os.remove(os.path.join(self.sd_card_path, pch))
+                self.set_data_sd(self.sd_card_path)
+                break
 
     def display_patch_info(self):
         """ Queries the PS API for additional patch information whenever
@@ -585,6 +640,7 @@ class EarlyUIMain(QMainWindow):
             f.write(json.dumps(self.data))
         self.ui.searchbar_3.setText("")
         self.set_data(False)
+        self.sort()
 
     def sd_path(self):
         """ Allows the user to specify the path to their SD card via
@@ -593,13 +649,18 @@ class EarlyUIMain(QMainWindow):
         Currently triggered via a menu action.
         """
 
-        input_dir = QFileDialog.getExistingDirectory(None, 'Select a folder:',
+        input_dir = QFileDialog.getExistingDirectory(None, 'Select an SD Card:',
                                                      expanduser("~"))
         if input_dir is not "" and os.path.isdir(input_dir):
-            self.sd_card_path = str(input_dir)
+            if "/" in input_dir:
+                input_dir = input_dir.split("/")[0]
+            self.sd_card_root = str(input_dir)
             self.ui.tab_sd.setEnabled(True)
 
-        self.set_data_sd()
+        # Setup the SD card tree view for the SD Card tab.
+        model = QFileSystemModel()
+        model.setRootPath(self.sd_card_root)
+        self.ui.sd_tree.setModel(model)
 
     def search(self):
         """ Initiates a data search for the metadata that is retrieved
@@ -634,18 +695,23 @@ class EarlyUIMain(QMainWindow):
         """
 
         # Determine how to sort the data.
-        curr_sort = {
-            "actionSort_by_title_A_Z": (1, False),
-            "actionSort_by_title_Z_A": (1, True),
-            "actionSort_by_date_new_old": (6, True),
-            "actionSort_by_date_old_new": (6, False),
-            "actionSort_by_likes_high_low": (3, True),
-            "actionSort_by_likes_low_high": (3, False),
-            "actionSort_by_views_high_low": (5, True),
-            "actionSort_by_views_low_high": (5, False),
-            "actionSort_by_downloads_high_low": (4, True),
-            "actionSort_by_downloads_low_high": (4, False)
-        }[self.sender().objectName()]
+        if self.sender() is None:
+            curr_sort = (6, True)
+        else:
+            curr_sort = {
+                ""
+                "actionSort_by_title_A_Z": (1, False),
+                "actionSort_by_title_Z_A": (1, True),
+                "actionSort_by_date_new_old": (6, True),
+                "actionReload_PatchStorage_patch_list": (6, True),
+                "actionSort_by_date_old_new": (6, False),
+                "actionSort_by_likes_high_low": (3, True),
+                "actionSort_by_likes_low_high": (3, False),
+                "actionSort_by_views_high_low": (5, True),
+                "actionSort_by_views_low_high": (5, False),
+                "actionSort_by_downloads_high_low": (4, True),
+                "actionSort_by_downloads_low_high": (4, False)
+            }[self.sender().objectName()]
 
         # Determine the context in which to perform the sort.
         if self.ui.searchbar_3.text() == "" \
@@ -672,7 +738,7 @@ class EarlyUIMain(QMainWindow):
         """
 
         self.ui.statusbar.showMessage("Checking for updates...",
-                                      timeout=2000)
+                                      timeout=5000)
         count = util.check_for_updates()
         if count == 0:
             msg = QMessageBox()
@@ -715,7 +781,8 @@ class EarlyUIMain(QMainWindow):
             util.modify_data(self.local_selected, text, 3)
         except IndexError:
             util.modify_data(self.local_selected, "", 3)
-        self.ui.statusbar.showMessage("Successfully updated patch notes.")
+        self.ui.statusbar.showMessage("Successfully updated patch notes.",
+                                      timeout=5000)
 
     def import_patch(self):
         """ Attempts to import patches into the librarian.
@@ -797,6 +864,8 @@ class EarlyUIMain(QMainWindow):
                               os.path.join(self.sd_card_path, dest
                                            + src_pch[3:]))
                 self.set_data_sd()
+                if int(dest) > 31:
+                    self.ui.table_3.setRangeSelected()
                 return
 
         # We are doing a move.
@@ -814,13 +883,15 @@ class EarlyUIMain(QMainWindow):
 
         app = QApplication.instance()
         if not self.dark:
-            with open(os.path.join("..", "UI", "resources", "stylesheets",
-                                   "dark.qss"), "r") as f:
+            # Turn on dark mode.
+            with open(os.path.join("zoia_lib", "UI", "resources",
+                                   "stylesheets", "dark.qss"), "r") as f:
                 data = f.read()
             self.dark = True
         else:
-            with open(os.path.join("..", "UI", "resources", "stylesheets",
-                                   "light.qss"), "r") as f:
+            # Turn off dark mode.
+            with open(os.path.join("zoia_lib", "UI", "resources",
+                                   "stylesheets", "light.qss"), "r") as f:
                 data = f.read()
             self.dark = False
 
@@ -837,6 +908,8 @@ class EarlyUIMain(QMainWindow):
                 # We have dropped an item, so now we need to rename it
                 # or swap it with the item that was previously in that
                 # slot.
+                dst_index = None
+
                 if o.objectName() == "table_3":
                     source_index = self.ui.table_3.currentRow()
                 else:
@@ -855,6 +928,11 @@ class EarlyUIMain(QMainWindow):
                             temp = int(temp.text()[1:3])
                         if temp != i:
                             dst_index = i
+                if dst_index is None:
+                    # We need to delete the row that just got created.
+                    self.ui.table_3.removeRow(32)
+                    self.ui.table_4.removeRow(32)
+                    return False
                 self.move_patch_sd(source_index, dst_index)
                 return True
         elif o.objectName() == "searchbar_4" \
@@ -911,7 +989,10 @@ class EarlyUIMain(QMainWindow):
                 util.modify_data(idx, [], 1)
             else:
                 util.modify_data(idx, [], 2)
-        # Case 2 - The text isn't empty
+        # Case 2 - Leftover text from when there are no tags/categories
+        elif text == "No tags" or text == "No categories":
+            pass
+        # Case 3 - The text isn't empty and contains tags/categories
         else:
             # Tags/categories are separated by commas
             items = text.split(",")

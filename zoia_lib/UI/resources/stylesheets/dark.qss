@@ -71,11 +71,7 @@ QWidget:item:selected
 
 QCheckBox
 {
-    spacing: 0.5ex;
-    outline: none;
     color: #eff0f1;
-    margin-bottom: 0.2ex;
-    opacity: 200;
 }
 
 QCheckBox:disabled
@@ -83,126 +79,14 @@ QCheckBox:disabled
     color: #76797c;
 }
 
-QGroupBox::indicator
-{
-    margin-left: 0.2ex;
-}
-
-QCheckBox::indicator:unchecked,
-QCheckBox::indicator:unchecked:focus
-{
-    border-image: url(:/dark/checkbox_unchecked_disabled.svg);
-}
-
-QCheckBox::indicator:unchecked:hover,
-QCheckBox::indicator:unchecked:pressed,
-QGroupBox::indicator:unchecked:hover,
-QGroupBox::indicator:unchecked:focus,
-QGroupBox::indicator:unchecked:pressed
-{
-    border: none;
-    border-image: url(:/dark/checkbox_unchecked.svg);
-}
-
-QCheckBox::indicator:checked
-{
-    border-image: url(:/dark/checkbox_checked.svg);
-}
-
-QCheckBox::indicator:checked:hover,
-QCheckBox::indicator:checked:focus,
-QCheckBox::indicator:checked:pressed,
-QGroupBox::indicator:checked:hover,
-QGroupBox::indicator:checked:focus,
-QGroupBox::indicator:checked:pressed
-{
-    border: none;
-    border-image: url(:/dark/checkbox_checked.svg);
-}
-
-QCheckBox::indicator:indeterminate
-{
-    border-image: url(:/dark/checkbox_indeterminate.svg);
-}
-
-QCheckBox::indicator:indeterminate:focus,
-QCheckBox::indicator:indeterminate:hover,
-QCheckBox::indicator:indeterminate:pressed
-{
-    border-image: url(:/dark/checkbox_indeterminate.svg);
-}
-
-QCheckBox::indicator:indeterminate:disabled
-{
-    border-image: url(:/dark/checkbox_indeterminate_disabled.svg);
-}
-
-QCheckBox::indicator:checked:disabled,
-QGroupBox::indicator:checked:disabled
-{
-    border-image: url(:/dark/checkbox_checked_disabled.svg);
-}
-
-QCheckBox::indicator:unchecked:disabled,
-QGroupBox::indicator:unchecked:disabled
-{
-    border-image: url(:/dark/checkbox_unchecked_disabled.svg);
-}
-
 QRadioButton
 {
-    spacing: 0.5ex;
-    outline: none;
     color: #eff0f1;
-    margin-bottom: 0.2ex;
 }
 
 QRadioButton:disabled
 {
     color: #76797c;
-}
-
-QRadioButton::indicator:unchecked,
-QRadioButton::indicator:unchecked:focus
-{
-    border-image: url(:/dark/radio_unchecked_disabled.svg);
-}
-
-
-QRadioButton::indicator:unchecked:hover,
-QRadioButton::indicator:unchecked:pressed
-{
-    border: none;
-    outline: none;
-    border-image: url(:/dark/radio_unchecked.svg);
-}
-
-
-QRadioButton::indicator:checked
-{
-    border: none;
-    outline: none;
-    border-image: url(:/dark/radio_checked.svg);
-}
-
-QRadioButton::indicator:checked:hover,
-QRadioButton::indicator:checked:focus,
-QRadioButton::indicator:checked:pressed
-{
-    border: none;
-    outline: none;
-    border-image: url(:/dark/radio_checked.svg);
-}
-
-QRadioButton::indicator:checked:disabled
-{
-    outline: none;
-    border-image: url(:/dark/radio_checked_disabled.svg);
-}
-
-QRadioButton::indicator:unchecked:disabled
-{
-    border-image: url(:/dark/radio_unchecked_disabled.svg);
 }
 
 QMenuBar
@@ -224,30 +108,14 @@ QMenuBar::item:selected
 
 QMenuBar::item:pressed
 {
-    border: 0.1ex solid #76797c;
     background-color: #3daee9;
     color: #eff0f1;
-    margin-bottom: -0.1ex;
-    padding-bottom: 0.1ex;
 }
 
 QMenu
 {
-    border: 0.1ex solid #76797c;
     color: #eff0f1;
     margin: 0.2ex;
-}
-
-QMenu::icon
-{
-    margin: 0.5ex;
-}
-
-QMenu::item
-{
-    padding: 0.5ex 3ex 0.5ex 3ex;
-    margin-left: 0.5ex;
-    border: 0.1ex solid transparent; /* reserve space for selection border */
 }
 
 QMenu::item:selected
@@ -257,10 +125,7 @@ QMenu::item:selected
 
 QMenu::separator
 {
-    height: 0.2ex;
     background: lightblue;
-    margin-left: 1ex;
-    margin-right: 0.5ex;
 }
 
 /* non-exclusive indicator = check box style indicator
