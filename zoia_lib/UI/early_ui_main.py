@@ -570,7 +570,7 @@ class EarlyUIMain(QMainWindow):
         for pch in os.listdir(self.sd_card_path):
             if pch[:3] == index:
                 os.remove(os.path.join(self.sd_card_path, pch))
-                self.set_data_sd(self.sd_card_path)
+                self.set_data_sd()
                 break
 
     def display_patch_info(self):
