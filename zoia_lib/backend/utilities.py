@@ -198,9 +198,9 @@ def import_to_backend(path):
             "title": title,
             "revision": "1",
             "preview_url": "",
-            "like_count": "",
-            "download_count": "",
-            "view_count": "",
+            "like_count": 0,
+            "download_count": 0,
+            "view_count": 0,
             "author": {
                 "name": ""
             },
@@ -903,6 +903,7 @@ def search_patches(data, query):
                     if query in category["name"].lower():
                         hits.insert(0, curr)
                         continue
+
     for curr in data:
         # Check the patch title.
         if query in curr["title"].lower():
@@ -922,11 +923,14 @@ def search_patches(data, query):
                     if curr not in hits:
                         hits.append(curr)
                     continue
-
-        # Date search, weirdest case. We need to account for the fact
-        # a user might enter the date in a variety of formats.
-        # TODO Comprehensive date searching
-        continue
+        if query in curr["updated_at"].lower():
+            if curr not in hits:
+                hits.append(curr)
+            continue
+        if query in curr["created_at"].lower():
+            if curr not in hits:
+                hits.append(curr)
+            continue
 
     return hits
 

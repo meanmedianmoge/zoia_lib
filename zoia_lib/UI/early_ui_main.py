@@ -105,8 +105,14 @@ class EarlyUIMain(QMainWindow):
 
         self.ui.table_2.setRowCount(len(self.data))
 
-        self.ui.table_3.setHorizontalHeaderLabels(["Patch", "Remove"])
-        self.ui.table_4.setHorizontalHeaderLabels(["Patch", "Remove"])
+        self.ui.table_3.setHorizontalHeaderLabels(["Patch", "Remove",
+                                                   "Import"])
+        self.ui.table_4.setHorizontalHeaderLabels(["Patch", "Remove",
+                                                   "Import"])
+        self.ui.table_3.setColumnWidth(0, 400)
+        self.ui.table_3.setColumnWidth(1, 100)
+        self.ui.table_4.setColumnWidth(0, 400)
+        self.ui.table_4.setColumnWidth(1, 100)
         self.ui.tab_sd.setEnabled(False)
 
         # Connect buttons and items to methods.
@@ -139,6 +145,7 @@ class EarlyUIMain(QMainWindow):
         self.ui.searchbar_4.installEventFilter(self)
         self.ui.searchbar_4.returnPressed.connect(self.search)
         self.ui.sd_tree.clicked.connect(self.prepare_sd_view)
+        self.ui.import_all_btn.clicked.connect(self.mass_import)
 
         # Font consistency.
         self.ui.table.setFont(QFont('Verdana', 10))
@@ -146,14 +153,17 @@ class EarlyUIMain(QMainWindow):
         self.ui.text_browser.setFont(QFont('Verdana', 16))
         self.ui.text_browser_2.setFont(QFont('Verdana', 16))
 
-        # Ensure the application starts as maximized.
-        self.setFocusPolicy(Qt.StrongFocus)
-        self.ui.update_patch_notes.setEnabled(False)
+        # Modify the display sizes for some widgets.
         self.ui.splitter.setSizes([500, 500])
         self.ui.splitter_2.setSizes([500, 500])
         self.ui.splitter_3.setSizes([500, 500])
         self.ui.splitter_4.setSizes([500, 500])
-        self.ui.splitter_4.setMinimumHeight(self.width() * 0.6)
+        self.ui.splitter_5.setSizes([220, 780])
+
+        # Ensure the application starts as maximized.
+        self.setFocusPolicy(Qt.StrongFocus)
+        self.ui.update_patch_notes.setEnabled(False)
+        self.ui.import_all_btn.setEnabled(False)
         self.sort()
         self.showMaximized()
 
@@ -205,10 +215,27 @@ class EarlyUIMain(QMainWindow):
                 self.ui.left_widget.setCurrentIndex(1)
 
     def prepare_sd_view(self):
-        self.sd_card_path = os.path.join(self.sd_card_root,
-                                         self.ui.sd_tree.currentIndex().data())
-        print(self.sd_card_path)
+        self.ui.import_all_btn.setEnabled(False)
+        path = self.ui.sd_tree.currentIndex().data()
+        temp = self.ui.sd_tree.currentIndex()
+        while True:
+            temp = temp.parent()
+            if temp.data() is not None and self.sd_card_root \
+                    not in temp.data():
+                path = os.path.join(temp.data(), path)
+            else:
+                break
+        self.sd_card_path = os.path.join(self.sd_card_root, path)
         self.set_data_sd()
+        for i in range(64):
+            if i < 32:
+                if self.ui.table_3.item(i, 0).text() != "":
+                    self.ui.import_all_btn.setEnabled(True)
+                    break
+            else:
+                if self.ui.table_4.item(i - 32, 0).text() != "":
+                    self.ui.import_all_btn.setEnabled(True)
+                    break
 
     def set_data_sd(self):
         """ Sets the data for the PS table.
@@ -217,8 +244,13 @@ class EarlyUIMain(QMainWindow):
         for i in range(32):
             self.ui.table_3.setItem(i, 0, QTableWidgetItem(None))
             self.ui.table_3.setCellWidget(i, 1, None)
+            self.ui.table_3.setCellWidget(i, 2, None)
             self.ui.table_4.setItem(i, 0, QTableWidgetItem(None))
             self.ui.table_4.setCellWidget(i, 1, None)
+            self.ui.table_4.setCellWidget(i, 2, None)
+
+        if not os.path.isdir(self.sd_card_path):
+            return
 
         for pch in os.listdir(self.sd_card_path):
             # Get the index
@@ -237,6 +269,11 @@ class EarlyUIMain(QMainWindow):
                     push_button.setFont(QFont('Verdana', 10))
                     push_button.clicked.connect(self.remove_sd)
                     self.ui.table_3.setCellWidget(index, 1, push_button)
+                    import_btn = QPushButton("Click me to import!")
+                    import_btn.setObjectName(str(index))
+                    import_btn.setFont(QFont('Verdana', 10))
+                    import_btn.clicked.connect(self.import_patch)
+                    self.ui.table_3.setCellWidget(index, 2, import_btn)
                 else:
                     self.ui.table_4.setItem(index - 32, 0,
                                             QTableWidgetItem(pch))
@@ -245,17 +282,12 @@ class EarlyUIMain(QMainWindow):
                     push_button.setFont(QFont('Verdana', 10))
                     push_button.clicked.connect(self.remove_sd)
                     self.ui.table_4.setCellWidget(index - 32, 1, push_button)
-
-        self.ui.table_3.resizeColumnsToContents()
-        self.ui.table_4.resizeColumnsToContents()
-        self.ui.table_3.setColumnWidth(0, 400)
-        self.ui.table_3.setColumnWidth(1, 100)
-        self.ui.table_4.setColumnWidth(0, 400)
-        self.ui.table_4.setColumnWidth(1, 100)
-        self.ui.table_3.setHorizontalHeaderLabels(["Patch", "Remove"])
-        self.ui.table_4.setHorizontalHeaderLabels(["Patch", "Remove"])
-        self.ui.table_3.resizeRowsToContents()
-        self.ui.table_4.resizeRowsToContents()
+                    self.ui.table_4.setCellWidget(index - 32, 1, push_button)
+                    import_btn = QPushButton("Click me to import!")
+                    import_btn.setObjectName(str(index))
+                    import_btn.setFont(QFont('Verdana', 10))
+                    import_btn.clicked.connect(self.import_patch)
+                    self.ui.table_4.setCellWidget(index - 32, 2, import_btn)
 
     def set_data(self, search):
         """ Sets the data for the PS table. This is done when the app
@@ -466,9 +498,6 @@ class EarlyUIMain(QMainWindow):
 
         # Exporting this way will only export to a directory named "to_zoia"
         # So we need to check if it exists. If it doesn't, we create it.
-        if "to_zoia" not in os.listdir(self.sd_card_root):
-            os.mkdir(os.path.join(self.sd_card_root, "to_zoia"))
-
         if self.sd_card_root is None:
             # No SD path.
             msg = QMessageBox()
@@ -479,6 +508,8 @@ class EarlyUIMain(QMainWindow):
             msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()
         else:
+            if "to_zoia" not in os.listdir(self.sd_card_root):
+                os.mkdir(os.path.join(self.sd_card_root, "to_zoia"))
             while True:
                 # Ask for a slot
                 slot, ok = QInputDialog().getInt(self, "Patch Export",
@@ -542,19 +573,20 @@ class EarlyUIMain(QMainWindow):
         filesystem.
         """
 
-        msg = QMessageBox()
-        msg.setWindowTitle("Delete")
-        msg.setIcon(QMessageBox.Information)
-        msg.setText("Are you sure you want to delete this patch?\n"
-                    "(This cannot be undone)")
-        msg.setStandardButtons(QMessageBox.Yes |
-                               QMessageBox.No)
-        value = msg.exec_()
-        if value == QMessageBox.Yes:
-            util.delete_patch(self.sender().objectName())
-            self.get_local_patches()
-            self.set_data(False)
-            self.set_data_local(False)
+        # msg = QMessageBox()
+        # msg.setWindowTitle("Delete")
+        # msg.setIcon(QMessageBox.Information)
+        # msg.setText("Are you sure you want to delete this patch?\n"
+        #            "(This cannot be undone)")
+        # msg.setStandardButtons(QMessageBox.Yes |
+        #                       QMessageBox.No)
+        # value = msg.exec_()
+        # if value == QMessageBox.Yes:
+        util.delete_patch(self.sender().objectName())
+        self.get_local_patches()
+        self.set_data(self.ui.searchbar_3.text() != "")
+        self.search()
+        self.set_data_local(self.ui.searchbar_4.text() != "")
 
     def remove_sd(self):
         """ Removes a patch that is stored on a user's SD card.
@@ -661,6 +693,8 @@ class EarlyUIMain(QMainWindow):
         model = QFileSystemModel()
         model.setRootPath(self.sd_card_root)
         self.ui.sd_tree.setModel(model)
+        self.ui.sd_tree.setRootIndex(model.setRootPath(self.sd_card_root))
+        self.ui.sd_tree.setColumnWidth(0, self.width() // 4)
 
     def search(self):
         """ Initiates a data search for the metadata that is retrieved
@@ -699,7 +733,6 @@ class EarlyUIMain(QMainWindow):
             curr_sort = (6, True)
         else:
             curr_sort = {
-                ""
                 "actionSort_by_title_A_Z": (1, False),
                 "actionSort_by_title_Z_A": (1, True),
                 "actionSort_by_date_new_old": (6, True),
@@ -790,6 +823,28 @@ class EarlyUIMain(QMainWindow):
 
         TODO Add the ability to import and entire directory of patches.
         """
+        for sd_pch in os.listdir(self.sd_card_path):
+            index = int(self.sender().objectName())
+            if index < 10:
+                index = "00{}".format(index)
+            else:
+                index = "0{}".format(index)
+            if index == sd_pch[:3]:
+                try:
+                    util.import_to_backend(os.path.join(self.sd_card_path,
+                                                        sd_pch))
+                    self.ui.statusbar.showMessage("Import complete!")
+                    return
+                except errors.SavingError:
+                    msg = QMessageBox()
+                    msg.setWindowTitle("Patch Already In Library")
+                    msg.setIcon(QMessageBox.Information)
+                    msg.setText("That patch exists within your locally "
+                                "saved patches.")
+                    msg.setInformativeText("No importing has occurred.")
+                    msg.setStandardButtons(QMessageBox.Ok)
+                    msg.exec_()
+                    return
 
         pch = QFileDialog.getOpenFileName()[0]
         if pch == "":
@@ -811,11 +866,46 @@ class EarlyUIMain(QMainWindow):
             msg = QMessageBox()
             msg.setWindowTitle("Patch Already In Library")
             msg.setIcon(QMessageBox.Information)
-            msg.setText("That patch exists in within your locally saved "
+            msg.setText("That patch exists within your locally saved "
                         "patches.")
             msg.setInformativeText("No importing has occurred.")
             msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()
+
+    def mass_import(self):
+        """ Attempts to mass import any patches found within a target
+        directory. Unlike import_patch, failing to import a patch will
+        not create a message box. A message box will be displayed at the
+        end indicating how many patches were and were not imported.
+        Currently triggered via a button press.
+        """
+        imp_cnt = 0
+        fail_cnt = 0
+        for pch in os.listdir(self.sd_card_path):
+            if pch[0] == "0" and pch.split(".")[1] == "bin" \
+                    and "_zoia_" in pch:
+                # At this point we have done everything to ensure it's a ZOIA
+                # patch, save for binary analysis.
+                try:
+                    util.import_to_backend(os.path.join(self.sd_card_path,
+                                                        pch))
+                    imp_cnt += 1
+                except errors.SavingError:
+                    fail_cnt += 1
+                    continue
+
+        msg = QMessageBox()
+        msg.setWindowTitle("Import Complete")
+        msg.setIcon(QMessageBox.Information)
+        if imp_cnt > 0:
+            msg.setText("Successfully imported {} patches.".format(imp_cnt))
+        else:
+            msg.setText("Did not import any patches.")
+        if fail_cnt > 0:
+            msg.setInformativeText("{} were already saved in the library "
+                                   "and were not imported.".format(fail_cnt))
+        msg.setStandardButtons(QMessageBox.Ok)
+        msg.exec_()
 
     def move_patch_sd(self, src, dest):
         """ Attempts to move a patch from one SD card slot to another
@@ -824,6 +914,9 @@ class EarlyUIMain(QMainWindow):
         src: The index the item originated from.
         dest: The index the item is being moved to.
         """
+
+        self.ui.table_3.clearSelection()
+        self.ui.table_4.clearSelection()
 
         # We need to find out if we are just doing a simple move or a swap.
         if dest < 10:
@@ -836,6 +929,8 @@ class EarlyUIMain(QMainWindow):
             src = str("0{}".format(src))
         src_pch = None
         dest_pch = None
+        print(src)
+        print(dest)
         for pch in os.listdir(self.sd_card_path):
             if pch[:3] == src:
                 src_pch = pch
@@ -864,14 +959,31 @@ class EarlyUIMain(QMainWindow):
                               os.path.join(self.sd_card_path, dest
                                            + src_pch[3:]))
                 self.set_data_sd()
-                if int(dest) > 31:
-                    self.ui.table_3.setRangeSelected()
+                dest = int(dest)
+                for i in range(64):
+                    if i == dest:
+                        if i > 31:
+                            self.ui.table_4.setRangeSelected(
+                                QTableWidgetSelectionRange(i, 0, i, 0), True)
+                        else:
+                            self.ui.table_3.setRangeSelected(
+                                QTableWidgetSelectionRange(i, 0, i, 0), True)
                 return
 
         # We are doing a move.
 
         os.rename(os.path.join(self.sd_card_path, src_pch),
                   os.path.join(self.sd_card_path, dest + src_pch[3:]))
+
+        dest = int(dest)
+        for i in range(64):
+            if i == dest:
+                if i > 31:
+                    self.ui.table_4.setRangeSelected(
+                        QTableWidgetSelectionRange(i, 0, i, 0), True)
+                else:
+                    self.ui.table_3.setRangeSelected(
+                        QTableWidgetSelectionRange(i, 0, i, 0), True)
 
         self.set_data_sd()
 
@@ -904,37 +1016,70 @@ class EarlyUIMain(QMainWindow):
 
         # SD card tab swap/move
         if o.objectName() == "table_3" or o.objectName() == "table_4":
-            if e.type() == QEvent.ChildRemoved:
+            if e.type() == QEvent.ChildAdded:
+                self.ui.table_3.hideColumn(1)
+                self.ui.table_3.hideColumn(2)
+                self.ui.table_4.hideColumn(1)
+                self.ui.table_4.hideColumn(2)
+
+            elif e.type() == QEvent.ChildRemoved:
                 # We have dropped an item, so now we need to rename it
                 # or swap it with the item that was previously in that
                 # slot.
+                self.ui.table_3.showColumn(1)
+                self.ui.table_3.showColumn(2)
+                self.ui.table_4.showColumn(1)
+                self.ui.table_4.showColumn(2)
+
                 dst_index = None
 
                 if o.objectName() == "table_3":
                     source_index = self.ui.table_3.currentRow()
                 else:
                     source_index = self.ui.table_4.currentRow() + 32
-                for i in range(64):
-                    if i < 32:
-                        temp = self.ui.table_3.item(i, 0)
-                    else:
-                        temp = self.ui.table_4.item(i - 32, 0)
-                    if temp is not None and temp.text() != "":
-                        if temp.text()[1] == "0":
-                            # one digit
-                            temp = int(temp.text()[2])
+
+                if (self.ui.table_3.item(source_index, 0) is not None and
+                    self.ui.table_3.item(source_index, 0).text() == "") or \
+                    (self.ui.table_4.item(source_index - 32, 0) is not None and
+                     self.ui.table_4.item(source_index - 32, 0).text() == ""):
+                    # Then it is actually the destination
+                    dst_index = source_index
+                    # Find the item that just got "deleted"
+                    for i in range(64):
+                        if i < 32:
+                            temp = self.ui.table_3.item(i, 0)
                         else:
-                            # two digits
-                            temp = int(temp.text()[1:3])
-                        if temp != i:
-                            dst_index = i
-                if dst_index is None:
-                    # We need to delete the row that just got created.
-                    self.ui.table_3.removeRow(32)
-                    self.ui.table_4.removeRow(32)
-                    return False
-                self.move_patch_sd(source_index, dst_index)
-                return True
+                            temp = self.ui.table_4.item(i - 32, 0)
+                        if temp.text() == "" and \
+                                ("0{}_zoia_".format(i) in j for j in
+                                 os.listdir(str(self.sd_card_path))
+                                 or "00{}_zoia_".format(i) in j for j in
+                                 os.listdir(str(self.sd_card_path))):
+                            self.move_patch_sd(i, dst_index)
+                            self.set_data_sd()
+                            return True
+                else:
+                    for i in range(64):
+                        if i < 32:
+                            temp = self.ui.table_3.item(i, 0)
+                        else:
+                            temp = self.ui.table_4.item(i - 32, 0)
+                        if temp is not None and temp.text() != "":
+                            if temp.text()[1] == "0":
+                                # one digit
+                                temp = int(temp.text()[2])
+                            else:
+                                # two digits
+                                temp = int(temp.text()[1:3])
+                            if temp != i:
+                                dst_index = i
+                    if dst_index is None:
+                        # We need to delete the row that just got created.
+                        self.ui.table_3.removeRow(32)
+                        self.ui.table_4.removeRow(32)
+                        return False
+                    self.move_patch_sd(source_index, dst_index)
+                    return True
         elif o.objectName() == "searchbar_4" \
                 or o.objectName() == "searchbar_3":
             if e.type() == QEvent.KeyRelease:
