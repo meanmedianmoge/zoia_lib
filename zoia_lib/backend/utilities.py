@@ -166,9 +166,10 @@ def import_to_backend(path):
     if "." not in path:
         raise errors.SavingError(path)
     patch_name, ext = path.split(".")
-    patch_name = patch_name.split("/")[-1]
+    patch_name = patch_name.split(os.path.sep)[-1]
     if "_zoia_" in patch_name:
         title = patch_name.split("_zoia_")[1]
+        print(title)
     else:
         title = patch_name
 

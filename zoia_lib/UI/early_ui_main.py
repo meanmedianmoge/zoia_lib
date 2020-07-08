@@ -202,6 +202,7 @@ class EarlyUIMain(QMainWindow):
                                 self.local_data.append(temp)
                                 break
             self.set_data_local(False)
+            self.sort()
         elif self.ui.left_widget.currentIndex() == 2:
             # SD card tab
             if self.sd_card_root is None:
@@ -681,11 +682,20 @@ class EarlyUIMain(QMainWindow):
         Currently triggered via a menu action.
         """
 
-        input_dir = QFileDialog.getExistingDirectory(None, 'Select an SD Card:',
+        input_dir = QFileDialog.getExistingDirectory(None,
+                                                     'Select an SD Card:',
                                                      expanduser("~"))
         if input_dir is not "" and os.path.isdir(input_dir):
             if "/" in input_dir:
                 input_dir = input_dir.split("/")[0]
+            elif "\\" in input_dir:
+                input_dir = input_dir.split("\\")[0]
+            elif "//" in input_dir:
+                input_dir = input_dir.split("//")[0]
+            elif "\\\\" in input_dir:
+                input_dir = input_dir.split("\\\\")[0]
+            else:
+                input_dir = input_dir.split(os.path.sep)[0]
             self.sd_card_root = str(input_dir)
             self.ui.tab_sd.setEnabled(True)
 
@@ -729,7 +739,10 @@ class EarlyUIMain(QMainWindow):
         """
 
         # Determine how to sort the data.
-        if self.sender() is None:
+        if self.sender() is None or \
+                self.sender().objectName() == \
+                "actionReload_PatchStorage_patch_list"\
+                or self.sender().objectName() == "left_widget":
             curr_sort = (6, True)
         else:
             curr_sort = {
@@ -747,7 +760,11 @@ class EarlyUIMain(QMainWindow):
             }[self.sender().objectName()]
 
         # Determine the context in which to perform the sort.
-        if self.ui.searchbar_3.text() == "" \
+        if self.sender() is not None and self.sender().objectName() == \
+                "actionReload_PatchStorage_patch_list":
+            util.sort_metadata(curr_sort[0], self.data, curr_sort[1])
+            self.set_data(self.ui.searchbar_3.text() != "")
+        elif self.ui.searchbar_3.text() == "" \
                 and self.ui.left_widget.currentIndex() == 0:
             util.sort_metadata(curr_sort[0], self.data, curr_sort[1])
             self.set_data(False)
@@ -785,7 +802,10 @@ class EarlyUIMain(QMainWindow):
             msg = QMessageBox()
             msg.setWindowTitle("Updates")
             msg.setIcon(QMessageBox.Information)
-            msg.setText("Successfully updated " + str(count) + " patches.")
+            if count == 1:
+                msg.setText("Successfully updated " + str(count) + " patch.")
+            else:
+                msg.setText("Successfully updated " + str(count) + " patches.")
             msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()
 
@@ -823,28 +843,30 @@ class EarlyUIMain(QMainWindow):
 
         TODO Add the ability to import and entire directory of patches.
         """
-        for sd_pch in os.listdir(self.sd_card_path):
-            index = int(self.sender().objectName())
-            if index < 10:
-                index = "00{}".format(index)
-            else:
-                index = "0{}".format(index)
-            if index == sd_pch[:3]:
-                try:
-                    util.import_to_backend(os.path.join(self.sd_card_path,
-                                                        sd_pch))
-                    self.ui.statusbar.showMessage("Import complete!")
-                    return
-                except errors.SavingError:
-                    msg = QMessageBox()
-                    msg.setWindowTitle("Patch Already In Library")
-                    msg.setIcon(QMessageBox.Information)
-                    msg.setText("That patch exists within your locally "
-                                "saved patches.")
-                    msg.setInformativeText("No importing has occurred.")
-                    msg.setStandardButtons(QMessageBox.Ok)
-                    msg.exec_()
-                    return
+        if self.sd_card_path is not None and \
+                self.ui.left_widget.currentIndex() == 2:
+            for sd_pch in os.listdir(self.sd_card_path):
+                index = int(self.sender().objectName())
+                if index < 10:
+                    index = "00{}".format(index)
+                else:
+                    index = "0{}".format(index)
+                if index == sd_pch[:3]:
+                    try:
+                        util.import_to_backend(os.path.join(self.sd_card_path,
+                                                            sd_pch))
+                        self.ui.statusbar.showMessage("Import complete!")
+                        return
+                    except errors.SavingError:
+                        msg = QMessageBox()
+                        msg.setWindowTitle("Patch Already In Library")
+                        msg.setIcon(QMessageBox.Information)
+                        msg.setText("That patch exists within your locally "
+                                    "saved patches.")
+                        msg.setInformativeText("No importing has occurred.")
+                        msg.setStandardButtons(QMessageBox.Ok)
+                        msg.exec_()
+                        return
 
         pch = QFileDialog.getOpenFileName()[0]
         if pch == "":
@@ -854,6 +876,7 @@ class EarlyUIMain(QMainWindow):
             if self.ui.left_widget.currentIndex() == 1:
                 self.get_local_patches()
                 self.set_data_local(self.ui.searchbar_4.text() != "")
+                self.sort()
             self.ui.statusbar.showMessage("Import complete!")
         except errors.BadPathError:
             msg = QMessageBox()
@@ -882,6 +905,7 @@ class EarlyUIMain(QMainWindow):
         imp_cnt = 0
         fail_cnt = 0
         for pch in os.listdir(self.sd_card_path):
+            print(self.sd_card_path)
             if pch[0] == "0" and pch.split(".")[1] == "bin" \
                     and "_zoia_" in pch:
                 # At this point we have done everything to ensure it's a ZOIA
@@ -902,8 +926,14 @@ class EarlyUIMain(QMainWindow):
         else:
             msg.setText("Did not import any patches.")
         if fail_cnt > 0:
-            msg.setInformativeText("{} were already saved in the library "
-                                   "and were not imported.".format(fail_cnt))
+            if fail_cnt == 1:
+                msg.setInformativeText("{} was already saved in the library "
+                                       "and was not "
+                                       "imported.".format(fail_cnt))
+            else:
+                msg.setInformativeText("{} were already saved in the library "
+                                       "and were not "
+                                       "imported.".format(fail_cnt))
         msg.setStandardButtons(QMessageBox.Ok)
         msg.exec_()
 
@@ -1040,8 +1070,8 @@ class EarlyUIMain(QMainWindow):
 
                 if (self.ui.table_3.item(source_index, 0) is not None and
                     self.ui.table_3.item(source_index, 0).text() == "") or \
-                    (self.ui.table_4.item(source_index - 32, 0) is not None and
-                     self.ui.table_4.item(source_index - 32, 0).text() == ""):
+                        (self.ui.table_4.item(source_index - 32, 0) is not None and
+                         self.ui.table_4.item(source_index - 32, 0).text() == ""):
                     # Then it is actually the destination
                     dst_index = source_index
                     # Find the item that just got "deleted"
@@ -1142,6 +1172,7 @@ class EarlyUIMain(QMainWindow):
             # Tags/categories are separated by commas
             items = text.split(",")
             done = []
+            # TODO Fix tags and categories getting weird.
             for curr in items:
                 if " and " in curr:
                     done.append({
