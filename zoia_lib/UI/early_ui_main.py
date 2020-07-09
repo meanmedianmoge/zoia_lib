@@ -467,8 +467,8 @@ class EarlyUIMain(QMainWindow):
             delete.setFont(QFont('Verdana', 10))
             delete.clicked.connect(self.initiate_delete)
             self.ui.table_2.setCellWidget(i, 5, delete)
-            if len(os.listdir(os.path.join(backend_path, str(data[i]["id"])))) \
-                    > 2:
+            if len(os.listdir(os.path.join(backend_path,
+                                           str(data[i]["id"])))) > 2:
                 btn_title.setText(data[i]["title"] + "\n[Multiple Versions]")
                 expt.setEnabled(False)
                 expt.setText("See\nVersion\nHistory\nto export!")
@@ -712,7 +712,8 @@ class EarlyUIMain(QMainWindow):
         # Determine if there are multiple versions.
         if "_" not in self.sender().objectName():
             if len(os.listdir(
-                    os.path.join(backend_path, self.sender().objectName()))) > 2 \
+                    os.path.join(backend_path,
+                                 self.sender().objectName()))) > 2 \
                     and not self.ui.back_btn.isEnabled():
                 util.delete_full_patch_directory(self.sender().objectName())
             else:
@@ -1248,8 +1249,10 @@ class EarlyUIMain(QMainWindow):
 
                 if (self.ui.table_3.item(source_index, 0) is not None and
                     self.ui.table_3.item(source_index, 0).text() == "") or \
-                        (self.ui.table_4.item(source_index - 32, 0) is not None and
-                         self.ui.table_4.item(source_index - 32, 0).text() == ""):
+                        (self.ui.table_4.item(source_index - 32, 0)
+                         is not None and
+                         self.ui.table_4.item(source_index - 32, 0).text()
+                         == ""):
                     # Then it is actually the destination
                     dst_index = source_index
                     # Find the item that just got "deleted"
@@ -1258,14 +1261,19 @@ class EarlyUIMain(QMainWindow):
                             temp = self.ui.table_3.item(i, 0)
                         else:
                             temp = self.ui.table_4.item(i - 32, 0)
-                        if temp.text() == "" and \
-                                ("0{}_zoia_".format(i) in j for j in
-                                 os.listdir(str(self.sd_card_path))
-                                 or "00{}_zoia_".format(i) in j for j in
-                                 os.listdir(str(self.sd_card_path))):
-                            self.move_patch_sd(i, dst_index)
-                            self.set_data_sd()
-                            return True
+                        if temp.text() == "":
+                            if i < 10:
+                                temp_index = "00{}".format(i)
+                            else:
+                                temp_index = "0{}".format(i)
+                            for pch in os.listdir(self.sd_card_path):
+                                if "{}_zoia_".format(temp_index) in pch:
+                                    if i != dst_index:
+                                        self.move_patch_sd(i, dst_index)
+                                        self.set_data_sd()
+                                        return True
+                                    else:
+                                        return False
                 else:
                     for i in range(64):
                         if i < 32:
