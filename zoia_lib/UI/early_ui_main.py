@@ -97,6 +97,10 @@ class EarlyUIMain(QMainWindow):
         self.dark = False
         self.table_title_size = None
         self.table_2_title_size = None
+        self.prev_sort = None
+        self.version_data = None
+        self.search_version_data = None
+        self.curr_ver = None
 
         # Setup the tables, but only populate the PS API table
         # (The local table will populate once the user switches tabs).
@@ -130,9 +134,8 @@ class EarlyUIMain(QMainWindow):
         self.ui.actionSort_by_downloads_high_low.triggered.connect(self.sort)
         self.ui.actionSort_by_downloads_low_high.triggered.connect(self.sort)
         self.ui.actionSpecify_SD_Card_Location.triggered.connect(self.sd_path)
-        self.ui.actionCheck_For_Updates.triggered.connect(self.update)
-        self.ui.actionReload_PatchStorage_patch_list.triggered.connect(
-            self.reload_ps)
+        self.ui.check_for_updates_btn.clicked.connect(self.update)
+        self.ui.refresh_pch_btn.clicked.connect(self.reload_ps)
         self.ui.actionQuit.triggered.connect(self.try_quit)
         self.ui.update_patch_notes.clicked.connect(self.update_patch_notes)
         self.ui.actionImport_A_Patch.triggered.connect(self.import_patch)
@@ -146,6 +149,9 @@ class EarlyUIMain(QMainWindow):
         self.ui.searchbar_4.returnPressed.connect(self.search)
         self.ui.sd_tree.clicked.connect(self.prepare_sd_view)
         self.ui.import_all_btn.clicked.connect(self.mass_import)
+        self.ui.searchbar_3.returnPressed.connect(self.search)
+        self.ui.searchbar_4.returnPressed.connect(self.search)
+        self.ui.back_btn.clicked.connect(self.go_back)
 
         # Font consistency.
         self.ui.table.setFont(QFont('Verdana', 10))
@@ -164,15 +170,13 @@ class EarlyUIMain(QMainWindow):
         self.setFocusPolicy(Qt.StrongFocus)
         self.ui.update_patch_notes.setEnabled(False)
         self.ui.import_all_btn.setEnabled(False)
+        self.ui.back_btn.setEnabled(False)
         self.sort()
         self.showMaximized()
 
     def get_local_patches(self):
         """ Gets a list of local patch metadata from the backend
         directory.
-
-        TODO Expand this to accurately deal with version history
-         (array in the array).
         """
 
         self.prev_tag_cat = None
@@ -201,7 +205,8 @@ class EarlyUIMain(QMainWindow):
                                     temp = json.loads(f.read())
                                 self.local_data.append(temp)
                                 break
-            self.set_data_local(False)
+            self.search()
+            self.set_data_local(self.ui.searchbar_4.text() != "")
             self.sort()
         elif self.ui.left_widget.currentIndex() == 2:
             # SD card tab
@@ -214,6 +219,31 @@ class EarlyUIMain(QMainWindow):
                 msg.setStandardButtons(QMessageBox.Ok)
                 msg.exec_()
                 self.ui.left_widget.setCurrentIndex(1)
+
+    def get_version_patches(self):
+        """ Retrieves the versions of a patch that is locally stored to
+        a user's backend local storage.
+        """
+        if self.sender() is None:
+            idx = self.curr_ver
+        else:
+            idx = self.sender().objectName()
+            if "_" in idx:
+                idx = idx.split("_")[0]
+            self.curr_ver = idx
+        self.prev_tag_cat = None
+        self.version_data = []
+
+        # Get all of the patch versions into one place.
+        for pch in os.listdir(os.path.join(backend_path, idx)):
+            if pch.split(".")[1] == "json":
+                # Got the metadata
+                with open(os.path.join(backend_path, idx, pch)) as f:
+                    temp = json.loads(f.read())
+                self.version_data.append(temp)
+
+        self.search()
+        self.sort()
 
     def prepare_sd_view(self):
         self.ui.import_all_btn.setEnabled(False)
@@ -370,6 +400,8 @@ class EarlyUIMain(QMainWindow):
     def set_data_local(self, search):
         """ Sets the data for the PS table. This is done whenever the
         tab is returned to, or whenever a search is initiated.
+
+        search: True if the search bar contains text, false otherwise.
         """
 
         self.ui.table_2.clear()
@@ -435,6 +467,100 @@ class EarlyUIMain(QMainWindow):
             delete.setFont(QFont('Verdana', 10))
             delete.clicked.connect(self.initiate_delete)
             self.ui.table_2.setCellWidget(i, 5, delete)
+            if len(os.listdir(os.path.join(backend_path, str(data[i]["id"])))) \
+                    > 2:
+                btn_title.setText(data[i]["title"] + "\n[Multiple Versions]")
+                expt.setEnabled(False)
+                expt.setText("See\nVersion\nHistory\nto export!")
+                cat_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                tag_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            date.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.ui.table_2.setHorizontalHeaderLabels(hor_headers)
+        self.ui.table_2.resizeColumnsToContents()
+        if self.table_2_title_size is None:
+            self.table_2_title_size = self.ui.table_2.columnWidth(0)
+        else:
+            self.ui.table_2.setColumnWidth(0, self.table_2_title_size)
+        self.ui.table_2.setColumnWidth(1, 140)
+        self.ui.table_2.setColumnWidth(2, 140)
+        self.ui.table_2.setColumnWidth(4, 100)
+        self.ui.table_2.setColumnWidth(5, 100)
+        self.ui.table_2.resizeRowsToContents()
+
+    def set_data_version(self, search):
+        """ Sets the data for the PS table. This is done whenever the
+        tab is returned to, or whenever a search is initiated.
+
+        search: True if the search bar contains text, false otherwise.
+        """
+        self.ui.table_2.clear()
+        if search:
+            data = self.search_version_data
+        else:
+            data = self.version_data
+        self.ui.table_2.setRowCount(len(data))
+        hor_headers = ["Title + Version", "Tags", "Categories",
+                       "Date Modified", "Export", "Delete"]
+        for i in range(len(data)):
+            btn_title = QRadioButton(data[i]["title"] + "\n"
+                                     + data[i]["files"][0]["filename"], self)
+            btn_title.setObjectName(str(data[i]["id"]) + "_v"
+                                    + str(data[i]["revision"]))
+            btn_title.toggled.connect(self.display_patch_info)
+            self.ui.table_2.setCellWidget(i, 0, btn_title)
+            tags = ""
+            if len(data[i]["tags"]) > 2:
+                for j in range(0, len(data[i]["tags"]) - 1):
+                    tags += data[i]["tags"][j]["name"] + ", "
+                tags = tags + "and " \
+                       + data[i]["tags"][len(data[i]["tags"]) - 1]["name"]
+            elif len(data[i]["tags"]) == 2:
+                tags = data[i]["tags"][0]["name"] + " and " \
+                       + data[i]["tags"][1]["name"]
+            elif len(data[i]["tags"]) == 0:
+                tags = "No tags"
+            else:
+                tags = data[i]["tags"][0]["name"]
+
+            tag_item = QTableWidgetItem(tags)
+            tag_item.setTextAlignment(Qt.AlignCenter)
+            self.ui.table_2.setItem(i, 1, tag_item)
+
+            cat = ""
+
+            if len(data[i]["categories"]) > 2:
+                for j in range(0, len(data[i]["categories"]) - 1):
+                    cat += data[i]["categories"][j]["name"] + ", "
+                cat += "and " + \
+                       data[i]["categories"][len(data[i]["categories"])
+                                             - 1]["name"]
+            elif len(data[i]["categories"]) == 2:
+                cat = data[i]["categories"][0]["name"] + " and " \
+                      + data[i]["categories"][1]["name"]
+            elif len(data[i]["categories"]) == 0:
+                cat = "No categories"
+            else:
+                cat = data[i]["categories"][0]["name"]
+
+            cat_item = QTableWidgetItem(cat)
+            cat_item.setTextAlignment(Qt.AlignCenter)
+            self.ui.table_2.setItem(i, 2, cat_item)
+            date = QTableWidgetItem(data[i]["updated_at"][:10])
+            date.setTextAlignment(Qt.AlignCenter)
+            self.ui.table_2.setItem(i, 3, date)
+            expt = QPushButton("Click me\nto export!")
+            expt.setObjectName(str(data[i]["id"]) + "_v"
+                               + str(data[i]["revision"]))
+            expt.setFont(QFont('Verdana', 10))
+            expt.clicked.connect(self.initiate_export)
+            self.ui.table_2.setCellWidget(i, 4, expt)
+            delete = QPushButton("X")
+            delete.setObjectName(str(data[i]["id"]) + "_v"
+                                 + str(data[i]["revision"]))
+            delete.setFont(QFont('Verdana', 10))
+            delete.clicked.connect(self.initiate_delete)
+            self.ui.table_2.setCellWidget(i, 5, delete)
+            date.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.ui.table_2.setHorizontalHeaderLabels(hor_headers)
         self.ui.table_2.resizeColumnsToContents()
         if self.table_2_title_size is None:
@@ -583,11 +709,19 @@ class EarlyUIMain(QMainWindow):
         #                       QMessageBox.No)
         # value = msg.exec_()
         # if value == QMessageBox.Yes:
-        util.delete_patch(self.sender().objectName())
-        self.get_local_patches()
-        self.set_data(self.ui.searchbar_3.text() != "")
-        self.search()
-        self.set_data_local(self.ui.searchbar_4.text() != "")
+        # Determine if there are multiple versions.
+        if "_" not in self.sender().objectName():
+            if len(os.listdir(
+                    os.path.join(backend_path, self.sender().objectName()))) > 2 \
+                    and not self.ui.back_btn.isEnabled():
+                util.delete_full_patch_directory(self.sender().objectName())
+            else:
+                util.delete_patch(self.sender().objectName())
+            self.get_local_patches()
+        else:
+            util.delete_patch(os.path.join(self.curr_ver,
+                                           self.sender().objectName()))
+            self.get_version_patches()
 
     def remove_sd(self):
         """ Removes a patch that is stored on a user's SD card.
@@ -610,30 +744,43 @@ class EarlyUIMain(QMainWindow):
         """ Queries the PS API for additional patch information whenever
         a patch is selected in the PS table or local table. Information
         is displayed via HTML.
+
+        Should the patch contain multiple versions, a call to
+        display_patch_versions is ran instead.
+
         Currently triggered via a radio button selection.
         """
 
         if self.sender().isChecked():
+            if "_" not in self.sender().objectName() and \
+                    len(os.listdir(
+                        os.path.join(backend_path,
+                                     self.sender().objectName()))) > 2:
+                # We are pointing to a version directory.
+                self.display_patch_versions()
+                return
+            name = str(self.sender().objectName())
+            ver = ""
+            if "_" in self.sender().objectName():
+                name, ver = name.split("_")
             temp = None
             if self.ui.left_widget.currentIndex() == 0:
                 temp = self.ui.text_browser
-                self.selected = str(self.sender().objectName())
-                content = ps.get_patch_meta(self.sender().objectName())
+                self.selected = name
+                content = ps.get_patch_meta(int(name))
             elif self.ui.left_widget.currentIndex() == 1:
                 temp = self.ui.text_browser_2
                 self.ui.update_patch_notes.setEnabled(True)
-                self.local_selected = str(self.sender().objectName())
+                self.local_selected = name
+                if ver is not "":
+                    self.local_selected += "_" + ver
                 try:
-                    with open(os.path.join(backend_path,
-                                           str(self.sender().objectName()),
-                                           str(self.sender().objectName())
+                    with open(os.path.join(backend_path, name, name
                                            + ".json")) as f:
                         content = json.loads(f.read())
                 except FileNotFoundError:
-                    with open(os.path.join(backend_path,
-                                           str(self.sender().objectName()),
-                                           str(self.sender().objectName())
-                                           + "_v1.json")) as f:
+                    with open(os.path.join(backend_path, name, name
+                                           + "_{}.json".format(ver))) as f:
                         content = json.loads(f.read())
             if content["preview_url"] == "":
                 content["preview_url"] = "None provided"
@@ -642,9 +789,9 @@ class EarlyUIMain(QMainWindow):
                                          + ">Click here</a>"
             if "license" not in content or content["license"] is None or \
                     content["license"]["name"] == "":
-                license = "None provided"
+                legal = "None provided"
             else:
-                license = content["license"]["name"]
+                legal = content["license"]["name"]
             content["content"] = content["content"].replace("\n", "<br/>")
 
             temp.setHtml("<html><h3>"
@@ -655,10 +802,22 @@ class EarlyUIMain(QMainWindow):
                          + str(content["download_count"])
                          + "<br/><u>Views:</u> "
                          + str(content["view_count"]) + "<br/><u>License:</u> "
-                         + license + "<br/><u>Preview:</u> "
+                         + legal + "<br/><u>Preview:</u> "
                          + content["preview_url"]
                          + "<br/><br/><u>Patch Notes:</u><br/>"
                          + content["content"] + "</html>")
+
+    def display_patch_versions(self):
+        """ Displays the contents of a patch that has multiple versions.
+        Currently triggered via a button press.
+        """
+        # Clean up the tab.
+        self.ui.text_browser_2.setText("")
+        self.ui.searchbar_4.setText("")
+        self.ui.update_patch_notes.setEnabled(False)
+        self.ui.back_btn.setEnabled(True)
+        # Prepare the table.
+        self.get_version_patches()
 
     def reload_ps(self):
         """ Reloads the PS table view to accurately reflect new uploads.
@@ -721,8 +880,17 @@ class EarlyUIMain(QMainWindow):
                     util.search_patches(self.data, self.ui.searchbar_3.text())
                 self.set_data(True)
         else:
-            if self.ui.searchbar_4.text() == "":
+            if self.ui.searchbar_4.text() == "" \
+                    and not self.ui.back_btn.isEnabled():
                 self.set_data_local(False)
+            elif self.ui.searchbar_4.text() == "" \
+                    and self.ui.back_btn.isEnabled():
+                self.set_data_version(False)
+            elif self.ui.back_btn.isEnabled():
+                self.search_version_data = \
+                    util.search_patches(self.version_data,
+                                        self.ui.searchbar_4.text())
+                self.set_data_version(True)
             else:
                 self.search_local_data = \
                     util.search_patches(self.local_data,
@@ -739,17 +907,13 @@ class EarlyUIMain(QMainWindow):
         """
 
         # Determine how to sort the data.
-        if self.sender() is None or \
-                self.sender().objectName() == \
-                "actionReload_PatchStorage_patch_list"\
-                or self.sender().objectName() == "left_widget":
-            curr_sort = (6, True)
-        else:
+        try:
             curr_sort = {
                 "actionSort_by_title_A_Z": (1, False),
                 "actionSort_by_title_Z_A": (1, True),
                 "actionSort_by_date_new_old": (6, True),
                 "actionReload_PatchStorage_patch_list": (6, True),
+                "left_widget": (6, True),
                 "actionSort_by_date_old_new": (6, False),
                 "actionSort_by_likes_high_low": (3, True),
                 "actionSort_by_likes_low_high": (3, False),
@@ -758,6 +922,12 @@ class EarlyUIMain(QMainWindow):
                 "actionSort_by_downloads_high_low": (4, True),
                 "actionSort_by_downloads_low_high": (4, False)
             }[self.sender().objectName()]
+            self.prev_sort = curr_sort
+        except KeyError:
+            curr_sort = self.prev_sort
+        except AttributeError:
+            curr_sort = (6, True)
+            self.prev_sort = curr_sort
 
         # Determine the context in which to perform the sort.
         if self.sender() is not None and self.sender().objectName() == \
@@ -772,9 +942,20 @@ class EarlyUIMain(QMainWindow):
             util.sort_metadata(curr_sort[0], self.search_data, curr_sort[1])
             self.set_data(True)
         elif self.ui.searchbar_4.text() == "" \
-                and self.ui.left_widget.currentIndex() == 1:
+                and self.ui.left_widget.currentIndex() == 1 \
+                and not self.ui.back_btn.isEnabled():
             util.sort_metadata(curr_sort[0], self.local_data, curr_sort[1])
             self.set_data_local(False)
+        elif self.ui.searchbar_4.text() == "" \
+                and self.ui.left_widget.currentIndex() == 1 \
+                and self.ui.back_btn.isEnabled():
+            util.sort_metadata(7, self.version_data, False)
+            self.prev_sort = (6, True)
+            self.set_data_version(False)
+        elif self.ui.left_widget.currentIndex() == 1 \
+                and self.ui.back_btn.isEnabled():
+            util.sort_metadata(curr_sort[0], self.local_data, curr_sort[1])
+            self.set_data_version(True)
         else:
             util.sort_metadata(curr_sort[0], self.search_local_data,
                                curr_sort[1])
@@ -905,7 +1086,6 @@ class EarlyUIMain(QMainWindow):
         imp_cnt = 0
         fail_cnt = 0
         for pch in os.listdir(self.sd_card_path):
-            print(self.sd_card_path)
             if pch[0] == "0" and pch.split(".")[1] == "bin" \
                     and "_zoia_" in pch:
                 # At this point we have done everything to ensure it's a ZOIA
@@ -959,8 +1139,6 @@ class EarlyUIMain(QMainWindow):
             src = str("0{}".format(src))
         src_pch = None
         dest_pch = None
-        print(src)
-        print(dest)
         for pch in os.listdir(self.sd_card_path):
             if pch[:3] == src:
                 src_pch = pch
@@ -1108,18 +1286,29 @@ class EarlyUIMain(QMainWindow):
                         self.ui.table_3.removeRow(32)
                         self.ui.table_4.removeRow(32)
                         return False
-                    self.move_patch_sd(source_index, dst_index)
+                    if source_index != dst_index:
+                        self.move_patch_sd(source_index, dst_index)
                     return True
         elif o.objectName() == "searchbar_4" \
                 or o.objectName() == "searchbar_3":
             if e.type() == QEvent.KeyRelease:
-                self.search()
+                if self.ui.searchbar_4.text() == "" \
+                        and self.ui.left_widget.currentIndex() == 1\
+                        and not self.ui.back_btn.isEnabled():
+                    self.get_local_patches()
+                    self.set_data_local(False)
+                elif self.ui.searchbar_3.text() == "" \
+                        and self.ui.left_widget.currentIndex() == 0:
+                    self.set_data(False)
+                elif self.ui.searchbar_4.text() == "" \
+                        and self.ui.left_widget.currentIndex() == 1\
+                        and self.ui.back_btn.isEnabled():
+                    self.get_version_patches()
+                    self.set_data_version(False)
                 return True
         elif o.objectName() == "table_2":
             if e.type() == QEvent.FocusIn:
                 if self.prev_tag_cat is None:
-                    self.get_local_patches()
-                    self.set_data_local(self.ui.searchbar_4 == "")
                     return False
                 else:
                     new_text = self.ui.table_2.item(self.prev_tag_cat[0],
@@ -1127,16 +1316,13 @@ class EarlyUIMain(QMainWindow):
                                                     ).text()
                     if new_text == self.prev_tag_cat[2] \
                             or self.ui.table_2.currentColumn() == 3:
-                        self.get_local_patches()
-                        self.set_data_local(self.ui.searchbar_4 == "")
                         return False
                     else:
                         self.update_tags_cats(new_text,
                                               self.prev_tag_cat[1] == 1,
                                               self.ui.table_2.cellWidget(
                                                   self.ui.table_2.currentRow(),
-                                                  4)
-                                              .objectName())
+                                                  4).objectName())
                         return True
             elif e.type() == QEvent.FocusOut:
                 try:
@@ -1164,6 +1350,10 @@ class EarlyUIMain(QMainWindow):
                 util.modify_data(idx, [], 1)
             else:
                 util.modify_data(idx, [], 2)
+            if not self.ui.back_btn.isEnabled():
+                self.get_local_patches()
+            else:
+                self.get_version_patches()
         # Case 2 - Leftover text from when there are no tags/categories
         elif text == "No tags" or text == "No categories":
             pass
@@ -1172,15 +1362,17 @@ class EarlyUIMain(QMainWindow):
             # Tags/categories are separated by commas
             items = text.split(",")
             done = []
-            # TODO Fix tags and categories getting weird.
             for curr in items:
-                if " and " in curr:
+                curr = curr.strip()
+                if " and " in curr and curr[0] != " ":
+                    # They listed tags as "This and that"
                     done.append({
                         "name": curr.split(" and ")[0]
                     })
                     curr = curr.split(" and ")[1]
-                elif "and " in curr:
-                    curr = curr.split("and ")[1]
+                elif " and " in curr and curr[0] == " ":
+                    curr = curr.split(" and ")[1]
+                print(curr)
                 done.append({
                     "name": curr
                 })
@@ -1188,8 +1380,21 @@ class EarlyUIMain(QMainWindow):
                 util.modify_data(idx, done, 1)
             else:
                 util.modify_data(idx, done, 2)
-        self.get_local_patches()
-        self.set_data_local(self.ui.searchbar_4 == "")
+            if not self.ui.back_btn.isEnabled():
+                self.get_local_patches()
+            else:
+                self.get_version_patches()
+
+    def go_back(self):
+        """ Returns to the default local patch screen.
+        Currently triggered via a button press.
+        """
+        self.set_data_local(False)
+        self.ui.searchbar_4.setText("")
+        self.ui.text_browser_2.setText("")
+        self.ui.back_btn.setEnabled(False)
+        self.ui.update_patch_notes.setEnabled(False)
+        self.sort()
 
     def try_quit(self):
         """ Forces the application to close.

@@ -169,7 +169,6 @@ def import_to_backend(path):
     patch_name = patch_name.split(os.path.sep)[-1]
     if "_zoia_" in patch_name:
         title = patch_name.split("_zoia_")[1]
-        print(title)
     else:
         title = patch_name
 
@@ -511,10 +510,6 @@ def delete_patch(patch):
         os.remove(os.path.join(new_path, patch + ".bin"))
         os.remove(os.path.join(new_path, patch + ".json"))
         if new_path is not None and len(os.listdir(new_path)) == 2:
-            """ Special case: Deletion from a patch directory. Need to 
-            check if the patch directory only contains one patch, and if 
-            so, remove the version suffix.
-            """
             for left_files in os.listdir(new_path):
                 try:
                     front = left_files.split("_")[0]
@@ -823,6 +818,7 @@ def sort_metadata(mode, data, rev):
           - 4 -> Sort by download count
           - 5 -> Sort by view count
           - 6 -> Sort by date modified (updated_at attribute)
+          - 7 -> Sort by revision
     data: An array of metadata that is to be sorted.
     inc: True if the data should be sorted in reverse,
          false otherwise.
@@ -837,7 +833,7 @@ def sort_metadata(mode, data, rev):
     if mode is None or data is None or rev is None:
         # TODO replace with an error.
         return None
-    if mode < 1 or mode > 6:
+    if mode < 1 or mode > 7:
         raise errors.SortingError(mode, 901)
     if not isinstance(data, list):
         raise errors.SortingError(data, 902)
@@ -864,6 +860,10 @@ def sort_metadata(mode, data, rev):
     elif mode == 6:
         # Sort by date modified
         data.sort(key=lambda x: x["updated_at"].upper(), reverse=rev)
+    elif mode == 7:
+        # Sort by revision #
+        data.sort(key=lambda x: x["revision"] if "revision" in x else 0,
+                  reverse=rev)
 
 
 def search_patches(data, query):
@@ -903,7 +903,7 @@ def search_patches(data, query):
                 for category in curr["categories"]:
                     if query in category["name"].lower():
                         hits.insert(0, curr)
-                        continue
+                        break
 
     for curr in data:
         # Check the patch title.
@@ -963,19 +963,13 @@ def modify_data(idx, data, mode):
     if "_" in idx:
         idx = idx.split("_")[0]
 
-    try:
-        with open(os.path.join(backend_path, idx, "{}.json".format(pch)),
-                  "r") as f:
-            temp = json.loads(f.read())
+    with open(os.path.join(backend_path, idx, "{}.json".format(pch)),
+              "r") as f:
+        temp = json.loads(f.read())
+    if mode == 3:
+        temp[index] = data[1:]
+    else:
         temp[index] = data
-        with open(os.path.join(backend_path, idx, "{}.json".format(pch)),
-                  "w") as f:
-            f.write(json.dumps(temp))
-    except FileNotFoundError:
-        with open(os.path.join(backend_path, idx, "{}_v1.json".format(pch)),
-                  "r") as f:
-            temp = json.loads(f.read())
-        temp[index] = data
-        with open(os.path.join(backend_path, idx, "{}_v1.json".format(pch)),
-                  "w") as f:
-            f.write(json.dumps(temp))
+    with open(os.path.join(backend_path, idx, "{}.json".format(pch)),
+              "w") as f:
+        f.write(json.dumps(temp))

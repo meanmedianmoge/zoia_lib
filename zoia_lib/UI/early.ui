@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1550</width>
-    <height>887</height>
+    <height>1092</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -134,86 +134,37 @@
                    </property>
                    <item>
                     <widget class="QSplitter" name="splitter_2">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="minimumSize">
-                      <size>
-                       <width>640</width>
-                       <height>480</height>
-                      </size>
-                     </property>
-                     <property name="maximumSize">
-                      <size>
-                       <width>16777215</width>
-                       <height>16777215</height>
-                      </size>
-                     </property>
-                     <property name="contextMenuPolicy">
-                      <enum>Qt::DefaultContextMenu</enum>
-                     </property>
-                     <property name="frameShape">
-                      <enum>QFrame::NoFrame</enum>
-                     </property>
-                     <property name="frameShadow">
-                      <enum>QFrame::Plain</enum>
-                     </property>
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>
                      </property>
                      <property name="handleWidth">
                       <number>10</number>
                      </property>
-                     <property name="childrenCollapsible">
-                      <bool>false</bool>
-                     </property>
-                     <widget class="QWidget" name="widget_8" native="true">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <layout class="QVBoxLayout" name="verticalLayout">
-                       <property name="leftMargin">
-                        <number>0</number>
-                       </property>
-                       <property name="topMargin">
-                        <number>0</number>
-                       </property>
-                       <property name="rightMargin">
-                        <number>0</number>
-                       </property>
-                       <property name="bottomMargin">
-                        <number>0</number>
+                     <widget class="QWidget" name="layoutWidget_4">
+                      <layout class="QVBoxLayout" name="verticalLayout_8">
+                       <property name="spacing">
+                        <number>5</number>
                        </property>
                        <item>
-                        <widget class="QWidget" name="widget" native="true">
-                         <layout class="QHBoxLayout" name="horizontalLayout_3">
-                          <property name="leftMargin">
-                           <number>0</number>
-                          </property>
-                          <property name="topMargin">
-                           <number>0</number>
-                          </property>
-                          <property name="rightMargin">
-                           <number>0</number>
-                          </property>
-                          <property name="bottomMargin">
-                           <number>0</number>
-                          </property>
-                          <item>
-                           <widget class="QLineEdit" name="searchbar_3">
-                            <property name="text">
-                             <string/>
-                            </property>
-                           </widget>
-                          </item>
-                         </layout>
-                        </widget>
+                        <layout class="QHBoxLayout" name="horizontalLayout_5">
+                         <property name="spacing">
+                          <number>6</number>
+                         </property>
+                         <item>
+                          <widget class="QLineEdit" name="searchbar_3">
+                           <property name="text">
+                            <string/>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QPushButton" name="refresh_pch_btn">
+                           <property name="text">
+                            <string>Refresh patches</string>
+                           </property>
+                          </widget>
+                         </item>
+                        </layout>
                        </item>
                        <item>
                         <widget class="QTableWidget" name="table">
@@ -393,10 +344,27 @@
                       </property>
                       <widget class="QWidget" name="layoutWidget">
                        <layout class="QVBoxLayout" name="verticalLayout_2">
+                        <property name="spacing">
+                         <number>5</number>
+                        </property>
                         <item>
-                         <layout class="QHBoxLayout" name="horizontalLayout_4">
+                         <layout class="QHBoxLayout" name="horizontalLayout_10">
+                          <item>
+                           <widget class="QPushButton" name="back_btn">
+                            <property name="text">
+                             <string>Back</string>
+                            </property>
+                           </widget>
+                          </item>
                           <item>
                            <widget class="QLineEdit" name="searchbar_4"/>
+                          </item>
+                          <item>
+                           <widget class="QPushButton" name="check_for_updates_btn">
+                            <property name="text">
+                             <string>Check for updates</string>
+                            </property>
+                           </widget>
                           </item>
                          </layout>
                         </item>
@@ -438,7 +406,7 @@
                        </layout>
                       </widget>
                       <widget class="QWidget" name="layoutWidget_2">
-                       <layout class="QVBoxLayout" name="verticalLayout_9">
+                       <layout class="QVBoxLayout" name="verticalLayout_12">
                         <item>
                          <widget class="QPushButton" name="update_patch_notes">
                           <property name="text">
@@ -532,7 +500,7 @@
               <bool>false</bool>
              </property>
              <property name="headerHidden">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
              <attribute name="headerVisible">
               <bool>false</bool>
@@ -975,8 +943,6 @@
      <string>File</string>
     </property>
     <addaction name="actionSpecify_SD_Card_Location"/>
-    <addaction name="actionCheck_For_Updates"/>
-    <addaction name="actionReload_PatchStorage_patch_list"/>
     <addaction name="actionImport_A_Patch"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
@@ -1073,16 +1039,6 @@
   <action name="actionSort_by_downloads_low_high">
    <property name="text">
     <string>Sort by downloads (low-high)</string>
-   </property>
-  </action>
-  <action name="actionCheck_For_Updates">
-   <property name="text">
-    <string>Check For Patch Updates</string>
-   </property>
-  </action>
-  <action name="actionReload_PatchStorage_patch_list">
-   <property name="text">
-    <string>Reload PatchStorage Patch List</string>
    </property>
   </action>
   <action name="actionZOIA_Librarian_Help">
