@@ -753,7 +753,8 @@ class EarlyUIMain(QMainWindow):
         """
 
         if self.sender().isChecked():
-            if "_" not in self.sender().objectName() and \
+            if self.ui.left_widget.currentIndex() == 1 and\
+                    "_" not in self.sender().objectName() and \
                     len(os.listdir(
                         os.path.join(backend_path,
                                      self.sender().objectName()))) > 2:
