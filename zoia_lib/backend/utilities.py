@@ -260,8 +260,9 @@ def save_to_backend(patch):
         # that its a unique binary by checking every patch currently
         # stored. TODO Use binary analysis to improve this process.
         for direc in os.listdir(backend_path):
-            if os.path.isdir(os.path.join(backend_path, direc)) and direc != "Banks" \
-                    and direc != "sample_files" and direc != ".DS_Store":
+            if os.path.isdir(os.path.join(backend_path, direc)) \
+                    and direc != "Banks" and direc != "sample_files" \
+                    and direc != ".DS_Store":
                 for files in os.listdir(os.path.join(backend_path, direc)):
                     if files.split(".")[1] == "bin":
                         with open(os.path.join(

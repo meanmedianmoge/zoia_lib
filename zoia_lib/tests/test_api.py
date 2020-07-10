@@ -4,7 +4,7 @@ import unittest
 from urllib.request import Request, urlopen
 
 from bs4 import BeautifulSoup
-from jsonschema import validate, ValidationError
+from jsonschema import validate
 from numpy import unicode
 
 import zoia_lib.backend.api as api
