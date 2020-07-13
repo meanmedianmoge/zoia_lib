@@ -48,7 +48,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QTabWidget" name="left_widget">
+       <widget class="QTabWidget" name="tabs">
         <property name="tabShape">
          <enum>QTabWidget::Rounded</enum>
         </property>
@@ -58,7 +58,7 @@
         <property name="movable">
          <bool>true</bool>
         </property>
-        <widget class="QWidget" name="tab_ps_2">
+        <widget class="QWidget" name="tab_ps">
          <attribute name="title">
           <string>PatchStorage View</string>
          </attribute>
@@ -133,7 +133,7 @@
                     <number>0</number>
                    </property>
                    <item>
-                    <widget class="QSplitter" name="splitter_2">
+                    <widget class="QSplitter" name="splitter_PS">
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>
                      </property>
@@ -151,7 +151,7 @@
                           <number>6</number>
                          </property>
                          <item>
-                          <widget class="QLineEdit" name="searchbar_3">
+                          <widget class="QLineEdit" name="searchbar_PS">
                            <property name="inputMask">
                             <string/>
                            </property>
@@ -170,7 +170,7 @@
                         </layout>
                        </item>
                        <item>
-                        <widget class="QTableWidget" name="table">
+                        <widget class="QTableWidget" name="table_PS">
                          <property name="frameShadow">
                           <enum>QFrame::Plain</enum>
                          </property>
@@ -217,7 +217,7 @@
                        </item>
                       </layout>
                      </widget>
-                     <widget class="QTextBrowser" name="text_browser">
+                     <widget class="QTextBrowser" name="text_browser_PS">
                       <property name="frameShadow">
                        <enum>QFrame::Plain</enum>
                       </property>
@@ -283,166 +283,110 @@
               <number>9</number>
              </property>
              <item>
-              <widget class="QWidget" name="widget_10" native="true">
-               <layout class="QVBoxLayout" name="verticalLayout_7">
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="QWidget" name="widget_11" native="true">
-                  <layout class="QHBoxLayout" name="horizontalLayout_9">
-                   <property name="leftMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="topMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="rightMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="bottomMargin">
-                    <number>0</number>
-                   </property>
+              <widget class="QSplitter" name="splitter_local">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="handleWidth">
+                <number>10</number>
+               </property>
+               <widget class="QWidget" name="layoutWidget">
+                <layout class="QVBoxLayout" name="verticalLayout_2">
+                 <property name="spacing">
+                  <number>5</number>
+                 </property>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_10">
                    <item>
-                    <widget class="QSplitter" name="splitter_3">
-                     <property name="minimumSize">
-                      <size>
-                       <width>640</width>
-                       <height>480</height>
-                      </size>
+                    <widget class="QPushButton" name="back_btn_local">
+                     <property name="text">
+                      <string>Back</string>
                      </property>
-                     <property name="maximumSize">
-                      <size>
-                       <width>16777215</width>
-                       <height>16777215</height>
-                      </size>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="searchbar_local">
+                     <property name="inputMask">
+                      <string/>
                      </property>
-                     <property name="frameShape">
-                      <enum>QFrame::NoFrame</enum>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="check_for_updates_btn">
+                     <property name="text">
+                      <string>Check for updates</string>
                      </property>
-                     <property name="frameShadow">
-                      <enum>QFrame::Plain</enum>
-                     </property>
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="childrenCollapsible">
-                      <bool>false</bool>
-                     </property>
-                     <widget class="QSplitter" name="splitter">
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="handleWidth">
-                       <number>10</number>
-                      </property>
-                      <widget class="QWidget" name="layoutWidget">
-                       <layout class="QVBoxLayout" name="verticalLayout_2">
-                        <property name="spacing">
-                         <number>5</number>
-                        </property>
-                        <item>
-                         <layout class="QHBoxLayout" name="horizontalLayout_10">
-                          <item>
-                           <widget class="QPushButton" name="back_btn">
-                            <property name="text">
-                             <string>Back</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item>
-                           <widget class="QLineEdit" name="searchbar_4">
-                            <property name="inputMask">
-                             <string/>
-                            </property>
-                           </widget>
-                          </item>
-                          <item>
-                           <widget class="QPushButton" name="check_for_updates_btn">
-                            <property name="text">
-                             <string>Check for updates</string>
-                            </property>
-                           </widget>
-                          </item>
-                         </layout>
-                        </item>
-                        <item>
-                         <widget class="QTableWidget" name="table_2">
-                          <property name="sizeAdjustPolicy">
-                           <enum>QAbstractScrollArea::AdjustToContents</enum>
-                          </property>
-                          <property name="editTriggers">
-                           <set>QAbstractItemView::DoubleClicked</set>
-                          </property>
-                          <property name="selectionMode">
-                           <enum>QAbstractItemView::SingleSelection</enum>
-                          </property>
-                          <property name="horizontalScrollMode">
-                           <enum>QAbstractItemView::ScrollPerPixel</enum>
-                          </property>
-                          <property name="rowCount">
-                           <number>1</number>
-                          </property>
-                          <property name="columnCount">
-                           <number>6</number>
-                          </property>
-                          <attribute name="horizontalHeaderStretchLastSection">
-                           <bool>true</bool>
-                          </attribute>
-                          <attribute name="verticalHeaderVisible">
-                           <bool>false</bool>
-                          </attribute>
-                          <row/>
-                          <column/>
-                          <column/>
-                          <column/>
-                          <column/>
-                          <column/>
-                          <column/>
-                         </widget>
-                        </item>
-                       </layout>
-                      </widget>
-                      <widget class="QWidget" name="layoutWidget_2">
-                       <layout class="QVBoxLayout" name="verticalLayout_12">
-                        <item>
-                         <widget class="QPushButton" name="update_patch_notes">
-                          <property name="text">
-                           <string>Update Patch Notes</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QTextBrowser" name="text_browser_2">
-                          <property name="textInteractionFlags">
-                           <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextEditable|Qt::TextSelectableByMouse</set>
-                          </property>
-                          <property name="openExternalLinks">
-                           <bool>true</bool>
-                          </property>
-                          <property name="openLinks">
-                           <bool>true</bool>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </widget>
-                     </widget>
                     </widget>
                    </item>
                   </layout>
-                 </widget>
-                </item>
-               </layout>
+                 </item>
+                 <item>
+                  <widget class="QTableWidget" name="table_local">
+                   <property name="sizeAdjustPolicy">
+                    <enum>QAbstractScrollArea::AdjustToContents</enum>
+                   </property>
+                   <property name="editTriggers">
+                    <set>QAbstractItemView::DoubleClicked</set>
+                   </property>
+                   <property name="selectionMode">
+                    <enum>QAbstractItemView::SingleSelection</enum>
+                   </property>
+                   <property name="horizontalScrollMode">
+                    <enum>QAbstractItemView::ScrollPerPixel</enum>
+                   </property>
+                   <property name="rowCount">
+                    <number>1</number>
+                   </property>
+                   <property name="columnCount">
+                    <number>6</number>
+                   </property>
+                   <attribute name="horizontalHeaderStretchLastSection">
+                    <bool>true</bool>
+                   </attribute>
+                   <attribute name="verticalHeaderVisible">
+                    <bool>false</bool>
+                   </attribute>
+                   <row/>
+                   <column/>
+                   <column/>
+                   <column/>
+                   <column/>
+                   <column/>
+                   <column/>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="layoutWidget_2">
+                <layout class="QVBoxLayout" name="verticalLayout_12">
+                 <item>
+                  <widget class="QPushButton" name="update_patch_notes">
+                   <property name="text">
+                    <string>Update Patch Notes</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QTextBrowser" name="text_browser_local">
+                   <property name="textInteractionFlags">
+                    <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextEditable|Qt::TextSelectableByMouse</set>
+                   </property>
+                   <property name="openExternalLinks">
+                    <bool>true</bool>
+                   </property>
+                   <property name="openLinks">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
               </widget>
              </item>
             </layout>
@@ -456,7 +400,7 @@
          </attribute>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
-           <widget class="QSplitter" name="splitter_5">
+           <widget class="QSplitter" name="splitter_sd_vert">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>0</horstretch>
@@ -523,14 +467,14 @@
                </widget>
               </item>
               <item>
-               <widget class="QSplitter" name="splitter_4">
+               <widget class="QSplitter" name="splitter_sd_hori">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="handleWidth">
                  <number>10</number>
                 </property>
-                <widget class="QTableWidget" name="table_3">
+                <widget class="QTableWidget" name="table_sd_left">
                  <property name="acceptDrops">
                   <bool>true</bool>
                  </property>
@@ -728,7 +672,7 @@
                  <column/>
                  <column/>
                 </widget>
-                <widget class="QTableWidget" name="table_4">
+                <widget class="QTableWidget" name="table_sd_right">
                  <property name="acceptDrops">
                   <bool>true</bool>
                  </property>
@@ -937,7 +881,7 @@
          </attribute>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
-           <widget class="QSplitter" name="splitter_6">
+           <widget class="QSplitter" name="splitter_bank">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -952,14 +896,14 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_11">
                 <item>
-                 <widget class="QPushButton" name="back_btn_2">
+                 <widget class="QPushButton" name="back_btn_bank">
                   <property name="text">
                    <string>Back</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="searchbar_5">
+                 <widget class="QLineEdit" name="searchbar_bank">
                   <property name="inputMask">
                    <string/>
                   </property>
@@ -968,12 +912,12 @@
                </layout>
               </item>
               <item>
-               <widget class="QTableWidget" name="table_5">
+               <widget class="QTableWidget" name="table_bank_local">
                 <property name="sizeAdjustPolicy">
                  <enum>QAbstractScrollArea::AdjustToContents</enum>
                 </property>
                 <property name="editTriggers">
-                 <set>QAbstractItemView::DoubleClicked</set>
+                 <set>QAbstractItemView::NoEditTriggers</set>
                 </property>
                 <property name="dragEnabled">
                  <bool>true</bool>
@@ -1014,7 +958,7 @@
               </item>
              </layout>
             </widget>
-            <widget class="QTextBrowser" name="text_browser_3">
+            <widget class="QTextBrowser" name="text_browser_bank">
              <property name="textInteractionFlags">
               <set>Qt::TextBrowserInteraction</set>
              </property>
@@ -1053,7 +997,7 @@
                </layout>
               </item>
               <item>
-               <widget class="QSplitter" name="splitter_7">
+               <widget class="QSplitter" name="splitter_bank_tables">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                   <horstretch>0</horstretch>
@@ -1066,7 +1010,7 @@
                 <property name="handleWidth">
                  <number>10</number>
                 </property>
-                <widget class="QTableWidget" name="table_6">
+                <widget class="QTableWidget" name="table_bank_left">
                  <property name="editTriggers">
                   <set>QAbstractItemView::NoEditTriggers</set>
                  </property>
@@ -1251,7 +1195,7 @@
                  <column/>
                  <column/>
                 </widget>
-                <widget class="QTableWidget" name="table_7">
+                <widget class="QTableWidget" name="table_bank_right">
                  <property name="rowCount">
                   <number>32</number>
                  </property>
