@@ -158,7 +158,6 @@ class PatchStorage:
         raw_data.pop("comment_count", None)
         raw_data.pop("platform", None)
         raw_data.pop("code", None)
-        raw_data.pop("artwork", None)
         raw_data.pop("source_code_url", None)
 
         # Return the metadata
