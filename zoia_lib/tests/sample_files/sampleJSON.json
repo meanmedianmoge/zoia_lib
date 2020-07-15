@@ -1,0 +1,52 @@
+{
+  "id": 122661,
+  "link": "",
+  "created_at": "2020-04-22T06:24:14+00:00",
+  "updated_at": "2020-06-09T04:29:27+00:00",
+  "slug": "dream-bender",
+  "title": "sample_patch",
+  "content": "Content",
+  "files": [
+    {
+      "id": 125336,
+      "url": "https://patchstorage.com/api/alpha/patches/122661/files/125336",
+      "filesize": 32768,
+      "filename": "012_zoia_dream_mender.bin"
+    }
+  ],
+  "preview_url": "",
+  "revision": "1.1",
+  "view_count": 467,
+  "like_count": 5,
+  "download_count": 146,
+  "author": {
+    "id": 5201,
+    "slug": "nathanvassiliades",
+    "name": "nathanvassiliades"
+  },
+  "categories": [
+    {
+      "id": 77,
+      "name": "Effect",
+      "slug": "effect"
+    }
+  ],
+  "tags": [
+    {
+      "id": 63,
+      "name": "chorus",
+      "slug": "chorus"
+    }
+  ],
+  "state": {
+    "id": 151,
+    "name": "Ready to Go",
+    "slug": "ready-to-go"
+  },
+  "license": {
+    "id": 4183,
+    "name": "The Unlicense",
+    "slug": "unlicense"
+  },
+  "custom_license_text": ""
+}

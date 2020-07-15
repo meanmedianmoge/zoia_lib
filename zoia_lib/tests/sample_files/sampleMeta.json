@@ -1,0 +1,327 @@
+[
+  {
+    "id": 122243,
+    "updated_at": "2020-06-09T04:29:27+00:00",
+    "slug": "dream-bender",
+    "title": "Dream Bender",
+    "like_count": 12,
+    "download_count": 123,
+    "view_count": 573,
+    "author": {
+      "id": 5201,
+      "slug": "nathanvassiliades",
+      "name": "nathanvassiliades"
+    },
+    "files": [
+      {
+        "id": 122243,
+        "url": "https:\\/\\/patchstorage.com\\/api\\/alpha\\/patches\\/122661\\/files\\/125336",
+        "filesize": 32768,
+        "filename": "012_zoia_dream_mender.bin"
+      }
+    ],
+    "categories": [
+      {
+        "id": 77,
+        "name": "Effect",
+        "slug": "effect"
+      }
+    ],
+    "tags": [
+      {
+        "id": 63,
+        "name": "chorus",
+        "slug": "chorus"
+      },
+      {
+        "id": 130,
+        "name": "delay",
+        "slug": "delay"
+      },
+      {
+        "id": 5113,
+        "name": "Deluxe Memory Man",
+        "slug": "deluxe-memory-man"
+      },
+      {
+        "id": 5112,
+        "name": "Dream Mender",
+        "slug": "dream-mender"
+      },
+      {
+        "id": 21,
+        "name": "tremolo",
+        "slug": "tremolo"
+      }
+    ]
+  },
+  {
+    "id": 124566,
+    "updated_at": "2020-04-30T10:22:24+00:00",
+    "slug": "loveless",
+    "title": "LOVELESS",
+    "like_count": 9,
+    "download_count": 53,
+    "view_count": 230,
+    "author": {
+      "id": 4890,
+      "slug": "meagher",
+      "name": "meagher"
+    },
+    "files": [
+      {
+        "id": 124566,
+        "url": "https:\\/\\/patchstorage.com\\/api\\/alpha\\/patches\\/122661\\/files\\/125336",
+        "filesize": 32768,
+        "filename": "012_loveless.bin"
+      }
+    ],
+    "tags": [
+      {
+        "id": 3126,
+        "name": "fuzz",
+        "slug": "fuzz"
+      },
+      {
+        "id": 5197,
+        "name": "Hold",
+        "slug": "hold"
+      },
+      {
+        "id": 5195,
+        "name": "Loveless",
+        "slug": "loveless"
+      },
+      {
+        "id": 5196,
+        "name": "MBV",
+        "slug": "mbv"
+      },
+      {
+        "id": 232,
+        "name": "reverb",
+        "slug": "reverb"
+      },
+      {
+        "id": 1156,
+        "name": "Reverse",
+        "slug": "reverse"
+      },
+      {
+        "id": 576,
+        "name": "shoegaze",
+        "slug": "shoegaze"
+      }
+    ]
+  },
+  {
+    "id": 121123,
+    "updated_at": "2020-01-09T15:25:56+00:00",
+    "slug": "goldfinger-golden-ratio",
+    "title": "GOLDFINGER (Golden Ratio)",
+    "like_count": 2,
+    "download_count": 87,
+    "view_count": 219,
+    "author": {
+      "id": 4386,
+      "slug": "an-moku",
+      "name": "An Moku"
+    },
+    "files": [
+      {
+        "id": 121123,
+        "url": "https:\\/\\/patchstorage.com\\/api\\/alpha\\/patches\\/122661\\/files\\/125336",
+        "filesize": 32768,
+        "filename": "012_goldfinger.bin"
+      }
+    ],
+    "categories": [
+      {
+        "id": 77,
+        "name": "Effect4",
+        "slug": "effect4"
+      }
+    ],
+    "tags": [
+      {
+        "id": 301,
+        "name": "ambient",
+        "slug": "ambient"
+      },
+      {
+        "id": 4514,
+        "name": "bass guitar",
+        "slug": "bass-guitar"
+      },
+      {
+        "id": 130,
+        "name": "delay",
+        "slug": "delay"
+      },
+      {
+        "id": 62,
+        "name": "effect",
+        "slug": "effect"
+      },
+      {
+        "id": 3236,
+        "name": "Golden ratio",
+        "slug": "golden-ratio"
+      },
+      {
+        "id": 1180,
+        "name": "Plate Reverb",
+        "slug": "plate-reverb"
+      },
+      {
+        "id": 232,
+        "name": "reverb",
+        "slug": "reverb"
+      },
+      {
+        "id": 64,
+        "name": "stereo",
+        "slug": "stereo"
+      },
+      {
+        "id": 4516,
+        "name": "swiss made",
+        "slug": "swiss-made"
+      },
+      {
+        "id": 3054,
+        "name": "tape delay",
+        "slug": "tape-delay"
+      },
+      {
+        "id": 3101,
+        "name": "ZOIA",
+        "slug": "zoia"
+      },
+      {
+        "id": 4517,
+        "name": "zurich",
+        "slug": "zurich"
+      }
+    ]
+  },
+  {
+    "id": 104273,
+    "updated_at": "2019-08-26T01:20:17+00:00",
+    "slug": "subtle-knife",
+    "title": "Subtle Knife",
+    "like_count": 1,
+    "download_count": 34,
+    "view_count": 80,
+    "files": [
+      {
+        "id": 104273,
+        "url": "https:\\/\\/patchstorage.com\\/api\\/alpha\\/patches\\/122661\\/files\\/125336",
+        "filesize": 32768,
+        "filename": "012_subtle_knife.bin"
+      }
+    ],
+    "categories": [
+      {
+        "id": 77,
+        "name": "Effect22",
+        "slug": "effect22"
+      }
+    ],
+    "tags": [
+      {
+        "id": 576,
+        "name": "shoegaze",
+        "slug": "shoegaze"
+      },
+      {
+        "id": 3242,
+        "name": "wobbly",
+        "slug": "wobbly"
+      }
+    ]
+  },
+  {
+    "id": 126563,
+    "updated_at": "2020-04-01T15:44:55+00:00",
+    "slug": "upward",
+    "title": "Upward",
+    "author": {
+      "id": 2956,
+      "slug": "hopefulutopian",
+      "name": "HopefulUtopian"
+    },
+    "files": [
+      {
+        "id": 126563,
+        "url": "https:\\/\\/patchstorage.com\\/api\\/alpha\\/patches\\/122661\\/files\\/125336",
+        "filesize": 32768,
+        "filename": "012_upward.bin"
+      }
+    ],
+    "categories": [
+      {
+        "id": 77,
+        "name": "Effect",
+        "slug": "effect"
+      }
+    ],
+    "tags": [
+      {
+        "id": 301,
+        "name": "ambient",
+        "slug": "ambient"
+      },
+      {
+        "id": 3189,
+        "name": "cooper fx",
+        "slug": "cooper-fx"
+      },
+      {
+        "id": 131,
+        "name": "freeze",
+        "slug": "freeze"
+      },
+      {
+        "id": 93,
+        "name": "granular",
+        "slug": "granular"
+      },
+      {
+        "id": 4816,
+        "name": "hopeful utopian",
+        "slug": "hopeful-utopian"
+      },
+      {
+        "id": 309,
+        "name": "octave",
+        "slug": "octave"
+      },
+      {
+        "id": 4815,
+        "name": "outward",
+        "slug": "outward"
+      },
+      {
+        "id": 167,
+        "name": "pad",
+        "slug": "pad"
+      },
+      {
+        "id": 232,
+        "name": "reverb",
+        "slug": "reverb"
+      },
+      {
+        "id": 4607,
+        "name": "super cool",
+        "slug": "super-cool"
+      },
+      {
+        "id": 4608,
+        "name": "totally awesome",
+        "slug": "totally-awesome"
+      }
+    ]
+  }
+]
