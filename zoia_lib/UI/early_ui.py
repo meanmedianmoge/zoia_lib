@@ -21,6 +21,7 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(1616, 1123)
+        MainWindow.setFocusPolicy(Qt.StrongFocus)
         MainWindow.setTabShape(QTabWidget.Rounded)
         MainWindow.setUnifiedTitleAndToolBarOnMac(True)
         self.actionSpecify_SD_Card_Location = QAction(MainWindow)
@@ -370,7 +371,7 @@ class Ui_MainWindow(object):
         self.table_sd_left.setDragDropOverwriteMode(True)
         self.table_sd_left.setDragDropMode(QAbstractItemView.DragDrop)
         self.table_sd_left.setDefaultDropAction(Qt.IgnoreAction)
-        self.table_sd_left.setSelectionMode(QAbstractItemView.ContiguousSelection)
+        self.table_sd_left.setSelectionMode(QAbstractItemView.SingleSelection)
         self.table_sd_left.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table_sd_left.setRowCount(32)
         self.table_sd_left.setColumnCount(3)
@@ -449,7 +450,7 @@ class Ui_MainWindow(object):
         self.table_sd_right.setAcceptDrops(True)
         self.table_sd_right.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table_sd_right.setDragDropMode(QAbstractItemView.DragDrop)
-        self.table_sd_right.setSelectionMode(QAbstractItemView.ContiguousSelection)
+        self.table_sd_right.setSelectionMode(QAbstractItemView.SingleSelection)
         self.table_sd_right.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table_sd_right.setRowCount(32)
         self.table_sd_right.setColumnCount(3)
@@ -706,6 +707,7 @@ class Ui_MainWindow(object):
         self.table_bank_right.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table_bank_right.setDragDropOverwriteMode(True)
         self.table_bank_right.setDragDropMode(QAbstractItemView.DragDrop)
+        self.table_bank_right.setDefaultDropAction(Qt.IgnoreAction)
         self.table_bank_right.setSelectionMode(QAbstractItemView.SingleSelection)
         self.table_bank_right.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table_bank_right.setRowCount(32)
@@ -734,8 +736,6 @@ class Ui_MainWindow(object):
         self.menuFiel.setObjectName(u"menuFiel")
         self.menuSort = QMenu(self.menubar)
         self.menuSort.setObjectName(u"menuSort")
-        self.menuHelp = QMenu(self.menubar)
-        self.menuHelp.setObjectName(u"menuHelp")
         self.menuOptions = QMenu(self.menubar)
         self.menuOptions.setObjectName(u"menuOptions")
         MainWindow.setMenuBar(self.menubar)
@@ -746,7 +746,6 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuFiel.menuAction())
         self.menubar.addAction(self.menuSort.menuAction())
         self.menubar.addAction(self.menuOptions.menuAction())
-        self.menubar.addAction(self.menuHelp.menuAction())
         self.menuFiel.addAction(self.actionSpecify_SD_Card_Location)
         self.menuFiel.addAction(self.actionImport_A_Patch)
         self.menuFiel.addAction(self.actionImport_Multiple_Patches)
@@ -762,7 +761,6 @@ class Ui_MainWindow(object):
         self.menuSort.addAction(self.actionSort_by_views_low_high)
         self.menuSort.addAction(self.actionSort_by_downloads_high_low)
         self.menuSort.addAction(self.actionSort_by_downloads_low_high)
-        self.menuHelp.addAction(self.actionZOIA_Librarian_Help)
         self.menuOptions.addAction(self.actionAlternating_Row_Colours)
 
         self.retranslateUi(MainWindow)
@@ -774,7 +772,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"ZOIA Librarian", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"ZOIA Librarian -  Beta 1", None))
         self.actionSpecify_SD_Card_Location.setText(QCoreApplication.translate("MainWindow", u"Specify SD Card Location", None))
         self.actionQuit.setText(QCoreApplication.translate("MainWindow", u"Quit", None))
         self.actionSort_by_title_A_Z.setText(QCoreApplication.translate("MainWindow", u"Sort by title (A-Z)", None))
@@ -1073,7 +1071,6 @@ class Ui_MainWindow(object):
         self.tabs.setTabText(self.tabs.indexOf(self.tab_bank), QCoreApplication.translate("MainWindow", u"Banks", None))
         self.menuFiel.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
         self.menuSort.setTitle(QCoreApplication.translate("MainWindow", u"Sort", None))
-        self.menuHelp.setTitle(QCoreApplication.translate("MainWindow", u"Help", None))
         self.menuOptions.setTitle(QCoreApplication.translate("MainWindow", u"Options", None))
     # retranslateUi
 

@@ -609,13 +609,20 @@ class EarlyUIMain(QMainWindow):
         # Cleanup the tables
         for i in range(32):
             self.ui.table_bank_left.setItem(i, 0, QTableWidgetItem(None))
+            self.ui.table_bank_left.setItem(i, 1, QTableWidgetItem(None))
             self.ui.table_bank_left.setCellWidget(i, 1, None)
             self.ui.table_bank_right.setItem(i, 0, QTableWidgetItem(None))
+            self.ui.table_bank_right.setItem(i, 1, QTableWidgetItem(None))
             self.ui.table_bank_right.setCellWidget(i, 1, None)
+
+        # PyQt tables make zero sense.
+        self.ui.table_bank_left.clearContents()
+        self.ui.table_bank_right.clearContents()
 
         for pch in self.data_banks:
             idx = pch["id"]
             slot = pch["slot"]
+            ver = None
             if "_" not in idx:
                 with open(os.path.join(backend_path,
                                        idx, "{}.json".format(idx)), "r") as f:
@@ -623,12 +630,16 @@ class EarlyUIMain(QMainWindow):
             else:
                 idx, ver = idx.split("_")
                 with open(os.path.join(backend_path,
-                                       idx, "{}_v{}.json".format(idx, ver)),
+                                       idx, "{}_{}.json".format(idx, ver)),
                           "r") as f:
                     temp = json.loads(f.read())
             name = temp["files"][0]["filename"]
             rmv_button = QPushButton("Remove")
             rmv_button.setObjectName(str(temp["id"]))
+            if ver is not None:
+                rmv_button.setObjectName(str(temp["id"]) + "_" + ver)
+            else:
+                rmv_button.setObjectName(str(temp["id"]))
             rmv_button.clicked.connect(self.remove_bank_item)
             if "_zoia_" in name and len(name.split("_", 1)[0]) == 3:
                 name = name.split("_", 2)[2]
@@ -931,9 +942,7 @@ class EarlyUIMain(QMainWindow):
                                                      'Select an SD Card:',
                                                      expanduser("~"))
         if input_dir is not "" and os.path.isdir(input_dir):
-            if "/" in input_dir:
-                input_dir = input_dir.split("/")[0]
-            elif "\\" in input_dir:
+            if "\\" in input_dir:
                 input_dir = input_dir.split("\\")[0]
             elif "//" in input_dir:
                 input_dir = input_dir.split("//")[0]
@@ -1311,6 +1320,13 @@ class EarlyUIMain(QMainWindow):
 
         swap = False
 
+        # Setup the new item.
+        if src < 32:
+            idx = self.ui.table_bank_left.cellWidget(src, 1).objectName()
+        else:
+            idx = self.ui.table_bank_right.cellWidget(src - 32,
+                                                      1).objectName()
+
         for pch in self.data_banks:
             if dest == pch["slot"]:
                 # We are doing a swap.
@@ -1318,57 +1334,43 @@ class EarlyUIMain(QMainWindow):
                 break
         if swap:
             # We are doing a swap.
-            # TODO Implement swapping.
-            pass
+            # Get the other item.
+            if dest < 32:
+                idx_dest = self.ui.table_bank_left.cellWidget(dest,
+                                                              1).objectName()
+            else:
+                idx_dest = self.ui.table_bank_right.cellWidget(dest - 32,
+                                                               1).objectName()
+
+            # Get the old values out.
+            for pch in self.data_banks:
+                if pch["slot"] == src or pch["slot"] == dest:
+                    self.data_banks.remove(pch)
+
+            # Add the new values in.
+            self.data_banks.append({
+                "slot": dest,
+                "id": idx
+            })
+            self.data_banks.append({
+                "slot": src,
+                "id": idx_dest
+            })
         else:
             # We are doing a move.
-            # Setup the new item.
-            if src < 32:
-                idx = self.ui.table_bank_left.cellWidget(src, 1).objectName()
-            else:
-                idx = self.ui.table_bank_right.cellWidget(src - 32,
-                                                          1).objectName()
-            if "_" not in idx:
-                with open(os.path.join(backend_path, idx,
-                                       "{}.json".format(idx)), "r") as f:
-                    temp = json.loads(f.read())
-            else:
-                idx, ver = idx.split("_")
-                with open(os.path.join(backend_path,
-                                       idx, "{}_v{}.json".format(idx, ver)),
-                          "r") as f:
-                    temp = json.loads(f.read())
-            name = temp["files"][0]["filename"]
-            rmv_button = QPushButton("Remove")
-            rmv_button.setObjectName(str(temp["id"]))
-            rmv_button.clicked.connect(self.remove_bank_item)
-            if "_zoia_" in name and len(name.split("_", 1)[0]) == 3:
-                name = name.split("_", 2)[2]
-            elif len(name.split("_", 1)[0]) == 3:
-                name = name.split("_", 1)[1]
-            if dest < 10:
-                name = "00{}_zoia_".format(dest) + name
-            else:
-                name = "0{}_zoia_".format(dest) + name
-            if dest < 32:
-                self.ui.table_bank_left.setItem(
-                    dest, 0, QTableWidgetItem(name))
-                self.ui.table_bank_left.setCellWidget(
-                    dest, 1, rmv_button)
-            else:
-                self.ui.table_bank_right.setItem(
-                    dest - 32, 0, QTableWidgetItem(name))
-                self.ui.table_bank_right.setCellWidget(
-                    dest - 32, 1, rmv_button)
 
-            # Remove the old one.
-            if src < 32:
-                self.ui.table_bank_left.setItem(src, 0, QTableWidgetItem(None))
-                self.ui.table_bank_left.setCellWidget(src, 1, None)
-            else:
-                self.ui.table_bank_right.setItem(src - 32, 0, QTableWidgetItem(
-                    None))
-                self.ui.table_bank_right.setCellWidget(src - 32, 1, None)
+            self.data_banks.append({
+                "slot": dest,
+                "id": idx
+            })
+
+            for pch in self.data_banks:
+                if pch["slot"] == src:
+                    self.data_banks.remove(pch)
+                    break
+
+        # Set the data.
+        self.set_data_bank()
 
         for i in range(64):
             if i == dest:
@@ -1564,17 +1566,98 @@ class EarlyUIMain(QMainWindow):
                     if src_index != dst_index:
                         self.move_patch_sd(src_index, dst_index)
                     return True
-        elif o.objectName == "table_bank_local":
+        elif o.objectName() == "table_bank_local":
             if e.type() == QEvent.ChildAdded:
                 self.ui.table_bank_left.hideColumn(1)
                 self.ui.table_bank_right.hideColumn(1)
-        if o.objectName() == "table_bank_left" or o.objectName() == \
+            elif e.type() == QEvent.ChildRemoved:
+                self.ui.table_bank_left.showColumn(1)
+                self.ui.table_bank_right.showColumn(1)
+
+                # Get the current row that was dragged.
+                src = self.ui.table_bank_local.currentRow()
+                # We need to find out where we dragged the item to
+                drop_index = None
+                for i in range(64):
+                    if i < 32:
+                        if self.ui.table_bank_left.item(i, 1) is not None:
+                            drop_index = i
+                            break
+                    else:
+                        if self.ui.table_bank_right.item(i - 32, 1) is not \
+                                None:
+                            drop_index = i
+                            break
+
+                if drop_index is not None:
+                    # We actually dragged it over.
+                    idx = self.ui.table_bank_local.cellWidget(src,
+                                                              0).objectName()
+                    if ("_" not in idx and len(os.listdir(os.path.join(
+                            backend_path, idx))) == 2) or "_" in idx:
+                        # Not working within a version directory.
+                        # Just a single patch
+                        if self.data_banks is not None:
+                            # Drop the patch we dragged to from the list if
+                            # need be.
+                            for pch in self.data_banks:
+                                if pch["slot"] == drop_index:
+                                    self.data_banks.remove(pch)
+                        else:
+                            # Need to enable the buttons now that there is a
+                            # patch in the tables.
+                            self.data_banks = []
+                            self.ui.btn_save_bank.setEnabled(True)
+                            self.ui.btn_export_bank.setEnabled(True)
+
+                        self.data_banks.append({
+                            "slot": drop_index,
+                            "id": idx
+                        })
+
+                        self.set_data_bank()
+                    else:
+                        # An entire version directory was dragged over.
+                        pch_num = int((len(os.listdir(os.path.join(
+                            backend_path, idx))) / 2) - 1)
+                        if drop_index + pch_num > 63:
+                            self.set_data_bank()
+                            msg = QMessageBox()
+                            msg.setWindowTitle("No Space")
+                            msg.setIcon(QMessageBox.Information)
+                            msg.setText("The version directory contain {} "
+                                        "patches, so it must be dragged to "
+                                        "slot {} or lower.".format(pch_num +
+                                                                   1, 63 -
+                                                                   pch_num))
+                            msg.setStandardButtons(QMessageBox.Ok)
+                            msg.exec_()
+                        else:
+                            # Remove all of the patches that are in the way.
+                            if self.data_banks is None:
+                                self.data_banks = []
+                                self.ui.btn_save_bank.setEnabled(True)
+                                self.ui.btn_export_bank.setEnabled(True)
+                            else:
+                                for pch in self.data_banks:
+                                    for i in range(drop_index, drop_index
+                                                               + pch_num):
+                                        if pch["slot"] == i:
+                                            self.data_banks.remove(pch)
+                            # Add all of the version patches
+                            for i in range(1, pch_num + 2):
+                                self.data_banks.append({
+                                    "slot": drop_index + i - 1,
+                                    "id": "{}_v{}".format(idx, i)
+                                })
+
+                            self.set_data_bank()
+        elif o.objectName() == "table_bank_left" or o.objectName() == \
                 "table_bank_right":
             if e.type() == QEvent.ChildAdded:
                 self.ui.table_bank_left.hideColumn(1)
                 self.ui.table_bank_right.hideColumn(1)
                 self.get_bank_data()
-
             elif e.type() == QEvent.ChildRemoved:
                 # We have dropped an item, so now we need to rename it
                 # or swap it with the item that was previously in that
@@ -1589,32 +1672,23 @@ class EarlyUIMain(QMainWindow):
                 else:
                     src_index = self.ui.table_bank_right.currentRow() + 32
 
-                if (self.ui.table_bank_left.item(src_index, 0) is not None and
-                    self.ui.table_bank_left.item(src_index, 0).text() == "") \
-                        or (self.ui.table_bank_right.item(src_index - 32, 0)
-                            is not None and self.ui.table_bank_right.item(
-                            src_index - 32, 0).text() == ""):
+                if (src_index < 32 and self.ui.table_bank_left.item(
+                        src_index, 0)) is None \
+                        or (src_index > 31 and self.ui.table_bank_right.item(
+                    src_index - 32, 0) is None):
                     # Then it is actually the destination
                     dst_index = src_index
                     # Find the item that just got "deleted"
-                    # TODO Fix this mess.
                     for i in range(64):
                         if i < 32:
                             temp = self.ui.table_bank_left.item(i, 0)
+                            temp2 = self.ui.table_bank_left.cellWidget(i, 1)
                         else:
                             temp = self.ui.table_bank_right.item(i - 32, 0)
-                        if temp.text() == "":
-                            if i < 10:
-                                temp_index = "00{}".format(i)
-                            else:
-                                temp_index = "0{}".format(i)
-                            for pch in os.listdir(self.sd_card_path):
-                                if "{}_zoia_".format(temp_index) in pch:
-                                    if i != dst_index:
-                                        self.move_patch_bank(i, dst_index)
-                                        return True
-                                    else:
-                                        return False
+                            temp2 = self.ui.table_bank_right.cellWidget(i - 32
+                                                                        , 1)
+                        if temp is None and temp2 is not None:
+                            self.move_patch_bank(i, dst_index)
                 else:
                     for i in range(64):
                         if i < 32:
@@ -1678,21 +1752,20 @@ class EarlyUIMain(QMainWindow):
                             or self.ui.table_local.currentColumn() == 3:
                         return False
                     else:
-                        self.update_tags_cats(new_text,
-                                              self.prev_tag_cat[1] == 1,
-                                              self.ui.table_local.cellWidget(
-                                                  self.ui.table_local.currentRow(),
-                                                  4).objectName())
+                        self.update_tags_cats(
+                            new_text, self.prev_tag_cat[1] == 1,
+                            self.ui.table_local.cellWidget(
+                                self.ui.table_local.currentRow(),
+                                4).objectName())
                         return True
             elif e.type() == QEvent.FocusOut:
                 try:
                     if self.ui.table_local.currentColumn() != 3:
                         self.prev_tag_cat = (self.ui.table_local.currentRow(),
-                                             self.ui.table_local.currentColumn(),
+                                             self.ui.table_local.currentColumn(
+                                             ),
                                              self.ui.table_local.selectedItems(
-
-                                             )[0]
-                                             .text())
+                                             )[0].text())
                     return True
                 except IndexError:
                     return False
@@ -1831,7 +1904,7 @@ class EarlyUIMain(QMainWindow):
         name, ok = QInputDialog().getText(self, "Save Bank",
                                           "Please enter a name for the Bank:")
         if ok:
-            self.get_data_banks()
+            self.get_bank_data()
             with open(os.path.join(backend_path, "Banks", "{}.json".format(
                     name)),
                       "w") as f:
@@ -1842,7 +1915,52 @@ class EarlyUIMain(QMainWindow):
         Currently triggered via a button press.
         """
 
-        pass
+        if self.sd_card_root is None:
+            msg = QMessageBox()
+            msg.setWindowTitle("No SD Path")
+            msg.setIcon(QMessageBox.Information)
+            msg.setText("Please specify your SD card path!")
+            msg.setInformativeText("File -> Specify SD Card Location")
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.exec_()
+        else:
+            # Ask for a name
+            while True:
+                name, ok = QInputDialog().getText(self, "Export Bank",
+                                              "Please enter a name for the "
+                                              "Bank:")
+                if ok and name not in os.listdir(self.sd_card_root):
+                    self.get_bank_data()
+                    util.export_bank(self.data_banks, self.sd_card_root, name)
+                    msg = QMessageBox()
+                    msg.setWindowTitle("Success!")
+                    msg.setIcon(QMessageBox.Information)
+                    msg.setText("The Bank has been successfully exported to "
+                                "the root of your SD card.")
+                    msg.setStandardButtons(QMessageBox.Ok)
+                    msg.exec_()
+                    break
+                else:
+                    msg = QMessageBox()
+                    msg.setWindowTitle("Directory exists")
+                    msg.setIcon(QMessageBox.Warning)
+                    msg.setText("A directory with that name already exists.")
+                    msg.setInformativeText("Would you like to overwrite it?")
+                    msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+                    value = msg.exec_()
+                    if value == QMessageBox.Yes:
+                        self.get_bank_data()
+                        util.export_bank(self.data_banks, self.sd_card_root,
+                                         name, True)
+                        msg = QMessageBox()
+                        msg.setWindowTitle("Success!")
+                        msg.setIcon(QMessageBox.Information)
+                        msg.setText(
+                            "The Bank has been successfully exported to "
+                            "the root of your SD card.")
+                        msg.setStandardButtons(QMessageBox.Ok)
+                        msg.exec_()
+                        break
 
     def remove_bank_item(self):
         """ Removes an item from one of the bank tables.
@@ -1868,6 +1986,10 @@ class EarlyUIMain(QMainWindow):
                                                      QTableWidgetItem(None))
                     self.ui.table_bank_right.setCellWidget(i - 32, 1, None)
                     break
+
+        for pch in self.data_banks:
+            if pch["slot"] == i:
+                self.data_banks.remove(pch)
 
         # Check to see if we should disable export and save buttons.
         found_item = False

@@ -665,7 +665,7 @@ def export_patch_bin(patch, dest, slot=-1, override=False):
         if -1 < slot < 10:
             # one digit
             name = "00{}_".format(slot) + name
-        elif slot > 10 < 64:
+        elif slot >= 10 < 64:
             # two digits
             name = "0{}_".format(slot) + name
         elif slot < 0:
@@ -693,40 +693,28 @@ def export_patch_bin(patch, dest, slot=-1, override=False):
         raise errors.ExportingError(patch)
 
 
-def export_bank(bank, dest):
+def export_bank(bank, dest, name, overwrite=False):
     """ Exports an entire bank to be ready for use on a ZOIA. Ideally,
     this is used to export a bank from a local user's machine to a
     ZOIA SD card.
 
-    bank: The name of the bank file to be processed.
+    bank: The bank data to be processed.
     """
 
     global backend_path
     if backend_path is None:
         backend_path = determine_backend_path()
 
-    # Load the bank data.
-    try:
-        with open(os.path.join(backend_path, "Banks", bank), "r") as f:
-            content = json.dumps(f)
-    except FileNotFoundError or ValueError:
-        if ValueError:
-            raise errors.JSONError(content)
-        else:
-            raise errors.BadPathError(
-                os.path.join(backend_path, "Banks", bank), 301)
-
-    # Prepare a destination directory. Name it the name of the Bank.
-    try:
-        os.mkdir(os.path.join(dest, bank))
-    except FileExistsError:
-        # TODO Just try again by adding _# to the name.
-        raise errors.ExportingError(bank)
+    # Prepare a destination directory.
+    if overwrite and name in os.listdir(dest):
+        shutil.rmtree(os.path.join(dest, name))
+        os.mkdir(os.path.join(dest, name))
+    else:
+        os.mkdir(os.path.join(dest, name))
 
     # Process the bank and add each to the bank directory.
-    for i in range(64):
-        if content[i] != "":
-            export_patch_bin(content[i], os.path.join(dest, bank), i)
+    for pch in bank:
+        export_patch_bin(pch["id"], os.path.join(dest, name), pch["slot"])
 
 
 def check_for_updates():

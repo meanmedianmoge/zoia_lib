@@ -10,8 +10,11 @@
     <height>1123</height>
    </rect>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::StrongFocus</enum>
+  </property>
   <property name="windowTitle">
-   <string>ZOIA Librarian</string>
+   <string>ZOIA Librarian -  Beta 1</string>
   </property>
   <property name="tabShape">
    <enum>QTabWidget::Rounded</enum>
@@ -494,7 +497,7 @@
                   <enum>Qt::IgnoreAction</enum>
                  </property>
                  <property name="selectionMode">
-                  <enum>QAbstractItemView::ContiguousSelection</enum>
+                  <enum>QAbstractItemView::SingleSelection</enum>
                  </property>
                  <property name="selectionBehavior">
                   <enum>QAbstractItemView::SelectRows</enum>
@@ -683,7 +686,7 @@
                   <enum>QAbstractItemView::DragDrop</enum>
                  </property>
                  <property name="selectionMode">
-                  <enum>QAbstractItemView::ContiguousSelection</enum>
+                  <enum>QAbstractItemView::SingleSelection</enum>
                  </property>
                  <property name="selectionBehavior">
                   <enum>QAbstractItemView::SelectRows</enum>
@@ -1211,6 +1214,9 @@
                  <property name="dragDropMode">
                   <enum>QAbstractItemView::DragDrop</enum>
                  </property>
+                 <property name="defaultDropAction">
+                  <enum>Qt::IgnoreAction</enum>
+                 </property>
                  <property name="selectionMode">
                   <enum>QAbstractItemView::SingleSelection</enum>
                  </property>
@@ -1437,12 +1443,6 @@
     <addaction name="actionSort_by_downloads_high_low"/>
     <addaction name="actionSort_by_downloads_low_high"/>
    </widget>
-   <widget class="QMenu" name="menuHelp">
-    <property name="title">
-     <string>Help</string>
-    </property>
-    <addaction name="actionZOIA_Librarian_Help"/>
-   </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
      <string>Options</string>
@@ -1452,7 +1452,6 @@
    <addaction name="menuFiel"/>
    <addaction name="menuSort"/>
    <addaction name="menuOptions"/>
-   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionSpecify_SD_Card_Location">
