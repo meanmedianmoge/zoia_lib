@@ -942,7 +942,9 @@ class EarlyUIMain(QMainWindow):
                                                      'Select an SD Card:',
                                                      expanduser("~"))
         if input_dir is not "" and os.path.isdir(input_dir):
-            if "\\" in input_dir:
+            if "/" in input_dir:
+                pass
+            elif "\\" in input_dir:
                 input_dir = input_dir.split("\\")[0]
             elif "//" in input_dir:
                 input_dir = input_dir.split("//")[0]
