@@ -547,7 +547,11 @@ class EarlyUIMain(QMainWindow):
             # If we are on tab index 1, we need "Export" and "Delete"
             # header items.
             elif table_index == 1:
-                expt = QPushButton("Click me\nto export!")
+                if "[Multiple Versions]" in btn_title.text():
+                    expt = QPushButton("See Version\nHistory to\nexport!")
+                    expt.setEnabled(False)
+                else:
+                    expt = QPushButton("Click me\nto export!")
                 if self.ui.back_btn_local.isEnabled():
                     expt.setObjectName(str(data[i]["id"]) + "_v"
                                        + str(data[i]["revision"]))
@@ -943,7 +947,10 @@ class EarlyUIMain(QMainWindow):
                                                      expanduser("~"))
         if input_dir is not "" and os.path.isdir(input_dir):
             if "/" in input_dir:
-                pass
+                # THIS IS NEEDED FOR WINDOWS.
+                # This comes from a bug with QFileDialog returning the
+                # wrong path separator on Windows for some odd reason.
+                input_dir = input_dir.split("/")[0]
             elif "\\" in input_dir:
                 input_dir = input_dir.split("\\")[0]
             elif "//" in input_dir:
