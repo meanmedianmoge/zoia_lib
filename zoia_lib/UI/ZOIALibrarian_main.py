@@ -6,30 +6,40 @@ from PySide2.QtCore import QEvent
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
-import zoia_lib.UI.early_ui as ui_main
-import zoia_lib.backend.api as api
+import zoia_lib.UI.ZOIALibrarian as ui_main
 import zoia_lib.backend.utilities as util
 import zoia_lib.common.errors as errors
+from zoia_lib.backend.api import PatchStorage
+from zoia_lib.backend.patch_delete import PatchDelete
+from zoia_lib.backend.patch_export import PatchExport
+from zoia_lib.backend.patch_save import PatchSave
+from zoia_lib.backend.patch_update import PatchUpdate
 
-ps = api.PatchStorage()
-backend_path = util.get_backend_path()
+ps = PatchStorage()
+update = PatchUpdate()
+save = PatchSave()
+export = PatchExport()
+delete = PatchDelete()
+backend_path = save.get_backend_path()
+icon = QIcon(os.path.join(os.getcwd(), "zoia_lib", "UI", "resources",
+                          "logo.ico"))
 
 
-class EarlyUIMain(QMainWindow):
-    """ The EarlyUIMain class represents the frontend for the
+class ZOIALibrarianMain(QMainWindow):
+    """ The ZOIALibrarian_Main class represents the frontend for the
     application. It allows users to interact with the various backend
     functions available. These include searching, downloading, sorting,
     and exporting patches; among other functions.
 
     Any changes made to the .ui file will not be reflected unless the
     following command is run from the UI directory:
-        pyside2-uic.exe .\early.ui -o .\early_ui.py
+        pyside2-uic.exe .\ZOIALibrarian.ui -o .\ZOIALibrarian/.py
 
     Known issues:
      - Sorting order is not maintained when exiting out of the
        version history table of a patch.
-     - Bank creation, re-arranging, and exporting is not implemented.
-     - The code is a mess.
+     - The code is a mess and should be refactored into separate classes
+       where possible.
     """
 
     def __init__(self):
@@ -42,8 +52,8 @@ class EarlyUIMain(QMainWindow):
         cache; and subsequently start the application.
         """
 
-        super(EarlyUIMain, self).__init__()
-        # Setup the UI using early_ui.py
+        super().__init__()
+        # Setup the UI using ZOIALibrarian.py
         self.ui = ui_main.Ui_MainWindow()
         self.ui.setupUi(self)
 
@@ -105,8 +115,7 @@ class EarlyUIMain(QMainWindow):
                     self.data_PS = data
 
         # Set the window icon
-        self.setWindowIcon(QIcon(os.path.join(os.getcwd(), "zoia_lib", "UI",
-                                              "resources", "logo.ico")))
+        self.setWindowIcon(QIcon(icon))
 
         # Setup the headers for the tables.
         self.ui.table_PS.setHorizontalHeaderLabels(["Title", "Tags",
@@ -253,6 +262,7 @@ class EarlyUIMain(QMainWindow):
                 msg = QMessageBox()
                 msg.setWindowTitle("No SD Path")
                 msg.setIcon(QMessageBox.Information)
+                msg.setWindowIcon(icon)
                 msg.setText("Please specify your SD card path!")
                 msg.setInformativeText("File -> Specify SD Card Location")
                 msg.setStandardButtons(QMessageBox.Ok)
@@ -679,7 +689,8 @@ class EarlyUIMain(QMainWindow):
 
         # TODO Replace with FCFS thread scheduling
         try:
-            util.save_to_backend(ps.download(str(self.sender().objectName())))
+            save.save_to_backend(ps.download(str(
+                self.sender().objectName())))
             self.sender().setEnabled(False)
             self.sender().setText("Downloaded!")
             self.ui.statusbar.showMessage("Download complete!", timeout=5000)
@@ -736,9 +747,9 @@ class EarlyUIMain(QMainWindow):
                                                   timeout=5000)
                     # Got a slot and the user hit "OK"
                     try:
-                        util.export_patch_bin(self.sender().objectName(),
-                                              os.path.join(self.sd_card_root,
-                                                           "to_zoia"), slot)
+                        export.export_patch_bin(self.sender().objectName(),
+                                                os.path.join(self.sd_card_root,
+                                                             "to_zoia"), slot)
                         self.ui.statusbar.showMessage("Export complete!",
                                                       timeout=5000)
                         break
@@ -755,7 +766,7 @@ class EarlyUIMain(QMainWindow):
                         if value == QMessageBox.Yes:
                             # Overwrite the other patch.
                             try:
-                                util.export_patch_bin(
+                                export.export_patch_bin(
                                     self.sender().objectName(),
                                     os.path.join(self.sd_card_root, "to_zoia"),
                                     slot, True)
@@ -763,7 +774,7 @@ class EarlyUIMain(QMainWindow):
                                     "Export complete!", timeout=5000)
                             except FileNotFoundError:
                                 idx = str(self.sender().objectName()) + "_v1"
-                                util.export_patch_bin(idx, os.path.join(
+                                export.export_patch_bin(idx, os.path.join(
                                     self.sd_card_root, "to_zoia"), slot, True)
                                 self.ui.statusbar.showMessage(
                                     "Export complete!", timeout=5000)
@@ -772,10 +783,10 @@ class EarlyUIMain(QMainWindow):
                             continue
                     except FileNotFoundError:
                         idx = str(self.sender().objectName()) + "_v1"
-                        util.export_patch_bin(idx,
-                                              os.path.join(self.sd_card_root,
-                                                           "to_zoia"), slot,
-                                              True)
+                        export.export_patch_bin(idx,
+                                                os.path.join(self.sd_card_root,
+                                                             "to_zoia"), slot,
+                                                True)
                         self.ui.statusbar.showMessage(
                             "Export complete!", timeout=5000)
                         break
@@ -793,33 +804,25 @@ class EarlyUIMain(QMainWindow):
                     os.path.join(backend_path,
                                  self.sender().objectName()))) > 2 \
                     and not self.ui.back_btn_local.isEnabled():
-                util.delete_full_patch_directory(self.sender().objectName())
+                delete.delete_full_patch_directory(self.sender().objectName())
             else:
-                util.delete_patch(self.sender().objectName())
+                delete.delete_patch(self.sender().objectName())
             self.get_local_patches()
             self.sort_and_set()
             self.set_data()
         else:
-            util.delete_patch(os.path.join(self.curr_ver,
-                                           self.sender().objectName()))
+            delete.delete_patch(os.path.join(self.curr_ver,
+                                             self.sender().objectName()))
             self.get_version_patches(self.ui.tabs.currentIndex() == 1)
 
     def remove_sd(self):
         """ Removes a patch that is stored on a user's SD card.
         Currently triggered via a button press.
         """
-        index = self.sender().objectName()
-        if len(index) < 2:
-            # one digit
-            index = "00{}".format(index)
-        else:
-            # two digits
-            index = "0{}".format(index)
-        for pch in os.listdir(self.sd_card_path):
-            if pch[:3] == index:
-                os.remove(os.path.join(self.sd_card_path, pch))
-                self.set_data_sd()
-                break
+        row = self.sender().objectName()
+        index = "00{}".format(row) if len(row) < 2 else "0{}".format(row)
+        delete.delete_patch_sd(index, self.sd_card_path)
+        self.set_data_sd()
 
     def display_patch_info(self):
         """ Queries the PS API for additional patch information whenever
@@ -1066,7 +1069,8 @@ class EarlyUIMain(QMainWindow):
         elif table_index == 0 and self.ui.searchbar_PS.text() != "":
             if self.search_data_PS is None:
                 self.search_data_PS = self.data_PS
-            util.sort_metadata(curr_sort[0], self.search_data_PS, curr_sort[1])
+            util.sort_metadata(curr_sort[0], self.search_data_PS,
+                               curr_sort[1])
             self.set_data(True)
         # Case 3: Sorting on the Local Storage View tab.
         # ->Case 3.1: Sorting on the Local tab, no version, and an empty
@@ -1137,7 +1141,7 @@ class EarlyUIMain(QMainWindow):
 
         self.ui.statusbar.showMessage("Checking for updates...",
                                       timeout=5000)
-        count = util.check_for_updates()
+        count = update.check_for_updates()
         if count == 0:
             msg = QMessageBox()
             msg.setWindowTitle("No Updates")
@@ -1187,9 +1191,9 @@ class EarlyUIMain(QMainWindow):
         text = self.ui.text_browser_local.toPlainText()
         try:
             text = text.split("Patch Notes:")[1]
-            util.modify_data(self.local_selected, text, 3)
+            update.update_data(self.local_selected, text.rstrip(), 3)
         except IndexError:
-            util.modify_data(self.local_selected, "", 3)
+            update.update_data(self.local_selected, "", 3)
         self.ui.statusbar.showMessage("Successfully updated patch notes.",
                                       timeout=5000)
 
@@ -1211,7 +1215,7 @@ class EarlyUIMain(QMainWindow):
                     index = "0{}".format(index)
                 if index == sd_pch[:3]:
                     try:
-                        util.import_to_backend(os.path.join(self.sd_card_path,
+                        save.import_to_backend(os.path.join(self.sd_card_path,
                                                             sd_pch))
                         self.ui.statusbar.showMessage("Import complete!")
                         return
@@ -1230,7 +1234,7 @@ class EarlyUIMain(QMainWindow):
         if pch == "":
             return
         try:
-            util.import_to_backend(pch)
+            save.import_to_backend(pch)
             if self.ui.tabs.currentIndex() == 1:
                 self.get_local_patches()
                 self.sort_and_set()
@@ -1291,7 +1295,7 @@ class EarlyUIMain(QMainWindow):
                 # At this point we have done everything to ensure it's a ZOIA
                 # patch, save for binary analysis.
                 try:
-                    util.import_to_backend(os.path.join(input_dir, pch))
+                    save.import_to_backend(os.path.join(input_dir, pch))
                     imp_cnt += 1
                 except errors.SavingError:
                     fail_cnt += 1
@@ -1791,9 +1795,9 @@ class EarlyUIMain(QMainWindow):
         # Case 1 - The text is empty (i.e., delete everything)
         if text == "":
             if mode:
-                util.modify_data(idx, [], 1)
+                update.update_data(idx, [], 1)
             else:
-                util.modify_data(idx, [], 2)
+                update.update_data(idx, [], 2)
             if not self.ui.back_btn_local.isEnabled():
                 self.get_local_patches()
                 self.sort_and_set()
@@ -1822,9 +1826,9 @@ class EarlyUIMain(QMainWindow):
                     "name": curr
                 })
             if mode:
-                util.modify_data(idx, done, 1)
+                update.update_data(idx, done, 1)
             else:
-                util.modify_data(idx, done, 2)
+                update.update_data(idx, done, 2)
             if not self.ui.back_btn_local.isEnabled():
                 self.get_local_patches()
                 self.sort_and_set()
@@ -1926,6 +1930,7 @@ class EarlyUIMain(QMainWindow):
 
         if self.sd_card_root is None:
             msg = QMessageBox()
+            msg.setIcon
             msg.setWindowTitle("No SD Path")
             msg.setIcon(QMessageBox.Information)
             msg.setText("Please specify your SD card path!")
@@ -1936,11 +1941,12 @@ class EarlyUIMain(QMainWindow):
             # Ask for a name
             while True:
                 name, ok = QInputDialog().getText(self, "Export Bank",
-                                              "Please enter a name for the "
-                                              "Bank:")
+                                                  "Please enter a name for the "
+                                                  "Bank:")
                 if ok and name not in os.listdir(self.sd_card_root):
                     self.get_bank_data()
-                    util.export_bank(self.data_banks, self.sd_card_root, name)
+                    export.export_bank(self.data_banks, self.sd_card_root,
+                                       name)
                     msg = QMessageBox()
                     msg.setWindowTitle("Success!")
                     msg.setIcon(QMessageBox.Information)
@@ -1959,8 +1965,8 @@ class EarlyUIMain(QMainWindow):
                     value = msg.exec_()
                     if value == QMessageBox.Yes:
                         self.get_bank_data()
-                        util.export_bank(self.data_banks, self.sd_card_root,
-                                         name, True)
+                        export.export_bank(self.data_banks, self.sd_card_root,
+                                           name, True)
                         msg = QMessageBox()
                         msg.setWindowTitle("Success!")
                         msg.setIcon(QMessageBox.Information)

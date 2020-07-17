@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'early.ui'
+## Form generated from reading UI file 'ZOIALibrarian.ui'
 ##
 ## Created by: Qt User Interface Compiler version 5.15.0
 ##
@@ -138,6 +138,7 @@ class Ui_MainWindow(object):
         self.table_PS.setSelectionMode(QAbstractItemView.SingleSelection)
         self.table_PS.setSelectionBehavior(QAbstractItemView.SelectItems)
         self.table_PS.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.table_PS.setGridStyle(Qt.SolidLine)
         self.table_PS.setRowCount(1)
         self.table_PS.setColumnCount(5)
         self.table_PS.horizontalHeader().setCascadingSectionResizes(True)
@@ -222,6 +223,7 @@ class Ui_MainWindow(object):
         self.table_local.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.table_local.setRowCount(1)
         self.table_local.setColumnCount(6)
+        self.table_local.horizontalHeader().setCascadingSectionResizes(True)
         self.table_local.horizontalHeader().setStretchLastSection(True)
         self.table_local.verticalHeader().setVisible(False)
 
@@ -511,6 +513,7 @@ class Ui_MainWindow(object):
         self.table_bank_local.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.table_bank_local.setRowCount(1)
         self.table_bank_local.setColumnCount(4)
+        self.table_bank_local.horizontalHeader().setCascadingSectionResizes(True)
         self.table_bank_local.horizontalHeader().setStretchLastSection(True)
         self.table_bank_local.verticalHeader().setVisible(False)
 

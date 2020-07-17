@@ -15,24 +15,26 @@ from PySide2.QtCore import Qt
 from PySide2.QtGui import QPixmap
 from PySide2.QtWidgets import QApplication, QSplashScreen
 
-from zoia_lib.UI.early_ui_main import EarlyUIMain
-from zoia_lib.backend import utilities as util
+from zoia_lib.UI.ZOIALibrarian_main import ZOIALibrarianMain
+from zoia_lib.backend.patch import Patch
+
+patch = Patch()
 
 # Entry point for the application.
 if __name__ == "__main__":
     # Launch the GUI.
     app = QApplication(sys.argv)
 
+    # Try to make the backend directories if need be.
+    patch.create_backend_directories()
+
     # Create and display the splash screen
     splash_pix = QPixmap(os.path.join(os.getcwd(), "zoia_lib", "backend",
                                       "splash.png"))
-    splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
+    splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint) 
     splash.show()
 
-    # Try to make the backend directories if need be.
-    util.create_backend_directories()
-
-    window = EarlyUIMain()
+    window = ZOIALibrarianMain()
     window.show()
     splash.finish(window)
 
