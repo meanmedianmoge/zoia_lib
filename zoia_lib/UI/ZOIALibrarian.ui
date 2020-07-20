@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1616</width>
+    <width>1695</width>
     <height>1123</height>
    </rect>
   </property>
@@ -14,7 +14,7 @@
    <enum>Qt::StrongFocus</enum>
   </property>
   <property name="windowTitle">
-   <string>ZOIA Librarian -  Beta 1</string>
+   <string>ZOIA Librarian -  Beta 2</string>
   </property>
   <property name="tabShape">
    <enum>QTabWidget::Rounded</enum>
@@ -52,6 +52,35 @@
       </property>
       <item>
        <widget class="QTabWidget" name="tabs">
+        <property name="accessibleName">
+         <string>Tab List</string>
+        </property>
+        <property name="accessibleDescription">
+         <string>This list contains four tabs, PatchStorage View, Local Storage View, SD Card View, and Banks. It allows you to switch between tabs to access different features contained with the ZOIA Librarian.</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QTabBar::tab:selected{
+background-color: rgb(216, 255, 223);
+border-radius: 8px;
+border: 2px solid gray;
+padding: 5px, 5px, 5px, 5px;
+width: 200%;
+font: bold;
+}
+QTabBar::tab:!selected{
+border-radius: 8px;
+border: 2px solid gray;
+padding: 5px, 5px, 5px, 5px;
+width: 200%;
+}
+QTabWidget::tab-bar { 
+alignment: center; 
+}
+QTabWidget::pane { 
+position: absolute; 
+top: -0.1em; 
+}</string>
+        </property>
         <property name="tabShape">
          <enum>QTabWidget::Rounded</enum>
         </property>
@@ -62,6 +91,9 @@
          <bool>true</bool>
         </property>
         <widget class="QWidget" name="tab_ps">
+         <property name="toolTip">
+          <string/>
+         </property>
          <attribute name="title">
           <string>PatchStorage View</string>
          </attribute>
@@ -155,6 +187,21 @@
                          </property>
                          <item>
                           <widget class="QLineEdit" name="searchbar_PS">
+                           <property name="toolTip">
+                            <string>Search bar: Type and hit enter/return to search!</string>
+                           </property>
+                           <property name="accessibleName">
+                            <string>PatchStorage View search bar</string>
+                           </property>
+                           <property name="accessibleDescription">
+                            <string>Searches through the ZOIA patches currently hosted on PatchStorage for any that match what is written in the search query. Hit enter or return to initiate the search.</string>
+                           </property>
+                           <property name="styleSheet">
+                            <string notr="true">QLineEdit{
+border-radius: 5px;
+border: 1px solid gray;
+}</string>
+                           </property>
                            <property name="inputMask">
                             <string/>
                            </property>
@@ -165,6 +212,29 @@
                          </item>
                          <item>
                           <widget class="QPushButton" name="refresh_pch_btn">
+                           <property name="toolTip">
+                            <string>Click here to refresh the PatchStorage patch list.</string>
+                           </property>
+                           <property name="statusTip">
+                            <string>Click here to refresh the PatchStorage patch list.</string>
+                           </property>
+                           <property name="accessibleName">
+                            <string>Refresh PatchStorage patch list button</string>
+                           </property>
+                           <property name="accessibleDescription">
+                            <string>This button will refresh the data in the PatchStorage patch table with the latest patches on PatchStorage should the list ever become out of sync.</string>
+                           </property>
+                           <property name="styleSheet">
+                            <string notr="true">QPushButton{
+border-radius: 5px;
+padding: 2px 5px 2px 5px;
+border: 1px solid gray;
+background-color: rgb(224, 224, 224);
+}
+QPushButton:hover{
+	background-color: rgb(207, 232, 232);
+}</string>
+                           </property>
                            <property name="text">
                             <string>Refresh patches</string>
                            </property>
@@ -174,6 +244,18 @@
                        </item>
                        <item>
                         <widget class="QTableWidget" name="table_PS">
+                         <property name="cursor" stdset="0">
+                          <cursorShape>ArrowCursor</cursorShape>
+                         </property>
+                         <property name="accessibleName">
+                          <string>PatchStorage Table</string>
+                         </property>
+                         <property name="accessibleDescription">
+                          <string>Displays all of the ZOIA patches that are currently hosted on PatchStorage.</string>
+                         </property>
+                         <property name="frameShape">
+                          <enum>QFrame::StyledPanel</enum>
+                         </property>
                          <property name="frameShadow">
                           <enum>QFrame::Plain</enum>
                          </property>
@@ -224,6 +306,19 @@
                       </layout>
                      </widget>
                      <widget class="QTextBrowser" name="text_browser_PS">
+                      <property name="statusTip">
+                       <string/>
+                      </property>
+                      <property name="accessibleName">
+                       <string>Additional Patch Notes Display</string>
+                      </property>
+                      <property name="accessibleDescription">
+                       <string>Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)</string>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">
+background-color: rgb(251, 255, 255);</string>
+                      </property>
                       <property name="frameShadow">
                        <enum>QFrame::Plain</enum>
                       </property>
@@ -311,6 +406,30 @@
                   <layout class="QHBoxLayout" name="horizontalLayout_10">
                    <item>
                     <widget class="QPushButton" name="back_btn_local">
+                     <property name="toolTip">
+                      <string>Click here to back to the full patch list.</string>
+                     </property>
+                     <property name="statusTip">
+                      <string>Click here to back to the full patch list.</string>
+                     </property>
+                     <property name="accessibleName">
+                      <string>Back button Local Storage View</string>
+                     </property>
+                     <property name="accessibleDescription">
+                      <string>When clicked, exits out of the Version History for a patch and returns to the full list of patches currently stored in the ZOIA Librarian</string>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true">QPushButton{
+border-radius: 5px;
+padding: 2px 25px 2px 25px;
+border: 1px solid gray;
+background-color: rgb(224, 224, 224);
+
+}
+QPushButton:hover{
+	background-color: rgb(207, 232, 232);
+}</string>
+                     </property>
                      <property name="text">
                       <string>Back</string>
                      </property>
@@ -318,6 +437,21 @@
                    </item>
                    <item>
                     <widget class="QLineEdit" name="searchbar_local">
+                     <property name="toolTip">
+                      <string>Search bar: Type and hit enter/return to search!</string>
+                     </property>
+                     <property name="accessibleName">
+                      <string>LocalStorage View search bar</string>
+                     </property>
+                     <property name="accessibleDescription">
+                      <string>Searches through the ZOIA patches currently saved in the ZOIA Librarian for any that match what is written in the search query. Hit enter or return to initiate the search.</string>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true">QLineEdit{
+border-radius: 5px;
+border: 1px solid gray;
+}</string>
+                     </property>
                      <property name="inputMask">
                       <string/>
                      </property>
@@ -325,6 +459,29 @@
                    </item>
                    <item>
                     <widget class="QPushButton" name="check_for_updates_btn">
+                     <property name="toolTip">
+                      <string>Click here to check for updates for all patches listed below.</string>
+                     </property>
+                     <property name="statusTip">
+                      <string>Click here to check for updates for all patches listed below.</string>
+                     </property>
+                     <property name="accessibleName">
+                      <string>Check for updates button</string>
+                     </property>
+                     <property name="accessibleDescription">
+                      <string>Automatically checks for updates to any patches listed in the Local Storage View table when clicked. Should any be found, a popup will let you know how many patches were updated.</string>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true">QPushButton{
+border-radius: 5px;
+padding: 2px 5px 2px 5px;
+border: 1px solid gray;
+background-color: rgb(224, 224, 224);
+}
+QPushButton:hover{
+	background-color: rgb(207, 232, 232);
+}</string>
+                     </property>
                      <property name="text">
                       <string>Check for updates</string>
                      </property>
@@ -334,6 +491,12 @@
                  </item>
                  <item>
                   <widget class="QTableWidget" name="table_local">
+                   <property name="accessibleName">
+                    <string>Local Storage View table</string>
+                   </property>
+                   <property name="accessibleDescription">
+                    <string>Displays all of the patches that have been saved to the ZOIA Librarian</string>
+                   </property>
                    <property name="sizeAdjustPolicy">
                     <enum>QAbstractScrollArea::AdjustToContents</enum>
                    </property>
@@ -376,6 +539,29 @@
                 <layout class="QVBoxLayout" name="verticalLayout_12">
                  <item>
                   <widget class="QPushButton" name="update_patch_notes">
+                   <property name="toolTip">
+                    <string>Click here to update the patch notes for the currently selected patch.</string>
+                   </property>
+                   <property name="statusTip">
+                    <string>Click here to update the patch notes for the currently selected patch.</string>
+                   </property>
+                   <property name="accessibleName">
+                    <string>Update Patch Notes button</string>
+                   </property>
+                   <property name="accessibleDescription">
+                    <string>When clicked, updates the patch notes for the currently selected patch. Patch notes can be add directly below in the Additional Patch Notes Display. </string>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton{
+border-radius: 5px;
+padding: 2px 2px 2px 2px;
+border: 1px solid gray;
+background-color: rgb(224, 224, 224);
+}
+QPushButton:hover{
+	background-color: rgb(207, 232, 232);
+}</string>
+                   </property>
                    <property name="text">
                     <string>Update Patch Notes</string>
                    </property>
@@ -383,6 +569,15 @@
                  </item>
                  <item>
                   <widget class="QTextBrowser" name="text_browser_local">
+                   <property name="accessibleName">
+                    <string>Additional Patch Notes Display</string>
+                   </property>
+                   <property name="accessibleDescription">
+                    <string>Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)</string>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: rgb(251, 255, 255);</string>
+                   </property>
                    <property name="textInteractionFlags">
                     <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextEditable|Qt::TextSelectableByMouse</set>
                    </property>
@@ -407,6 +602,9 @@
          <attribute name="title">
           <string>SD Card View</string>
          </attribute>
+         <attribute name="toolTip">
+          <string>Switch to view your SD card within the ZOIA Librarian</string>
+         </attribute>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
            <widget class="QSplitter" name="splitter_sd_vert">
@@ -423,6 +621,15 @@
              <number>10</number>
             </property>
             <widget class="QTreeView" name="sd_tree">
+             <property name="accessibleName">
+              <string>SD Card Viewer</string>
+             </property>
+             <property name="accessibleDescription">
+              <string>Dispalys the contents of the previously specified SD Card (which is specified via the menu bar at File-&gt;Specify SD Card path, or by using Alt+S and then specifying that way).</string>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background-color: qlineargradient(spread:pad, x1:1, y1:1, x2:1, y2:0, stop:0 rgba(0, 0, 0, 32), stop:1 rgba(255, 255, 255, 255));</string>
+             </property>
              <property name="lineWidth">
               <number>10000</number>
              </property>
@@ -470,6 +677,29 @@
              <layout class="QVBoxLayout" name="verticalLayout_11">
               <item>
                <widget class="QPushButton" name="import_all_btn">
+                <property name="toolTip">
+                 <string>Click here to import all patches currently listed below.</string>
+                </property>
+                <property name="statusTip">
+                 <string>Click here to import all patches currently listed below.</string>
+                </property>
+                <property name="accessibleName">
+                 <string>Import All Patches button</string>
+                </property>
+                <property name="accessibleDescription">
+                 <string>Attempts to import all of the patches listed in the tables below (SD card table left and SD card table right) into the ZOIA Librarian. This requires that a folder is selected from the SD Card Viewer above that contains patches.</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton{
+border-radius: 5px;
+padding: 2px 2px 2px 2px;
+border: 1px solid gray;
+background-color: rgb(224, 224, 224);
+}
+QPushButton:hover{
+	background-color: rgb(207, 232, 232);
+}</string>
+                </property>
                 <property name="text">
                  <string>Import All Patches</string>
                 </property>
@@ -486,6 +716,12 @@
                 <widget class="QTableWidget" name="table_sd_left">
                  <property name="acceptDrops">
                   <bool>true</bool>
+                 </property>
+                 <property name="accessibleName">
+                  <string>SD Card Table left</string>
+                 </property>
+                 <property name="accessibleDescription">
+                  <string>Displays patches that would occupy slots 0-31 on a ZOIA</string>
                  </property>
                  <property name="editTriggers">
                   <set>QAbstractItemView::NoEditTriggers</set>
@@ -684,6 +920,12 @@
                 <widget class="QTableWidget" name="table_sd_right">
                  <property name="acceptDrops">
                   <bool>true</bool>
+                 </property>
+                 <property name="accessibleName">
+                  <string>SD Card Table right</string>
+                 </property>
+                 <property name="accessibleDescription">
+                  <string>Displays patches that would occupy slots 32-63 on a ZOIA</string>
                  </property>
                  <property name="editTriggers">
                   <set>QAbstractItemView::NoEditTriggers</set>
@@ -888,6 +1130,9 @@
          <attribute name="title">
           <string>Banks</string>
          </attribute>
+         <attribute name="toolTip">
+          <string>Switch to view the Bank creator</string>
+         </attribute>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
            <widget class="QSplitter" name="splitter_bank">
@@ -906,6 +1151,30 @@
                <layout class="QHBoxLayout" name="horizontalLayout_11">
                 <item>
                  <widget class="QPushButton" name="back_btn_bank">
+                  <property name="toolTip">
+                   <string>Click here to back to the full patch list.</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Click here to back to the full patch list.</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Back button Bank</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>When clicked, exits out of the Version History for a patch and returns to the full list of patches currently stored in the ZOIA Librarian</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QPushButton{
+border-radius: 5px;
+padding: 2px 25px 2px 25px;
+border: 1px solid gray;
+background-color: rgb(224, 224, 224);
+
+}
+QPushButton:hover{
+	background-color: rgb(207, 232, 232);
+}</string>
+                  </property>
                   <property name="text">
                    <string>Back</string>
                   </property>
@@ -913,6 +1182,21 @@
                 </item>
                 <item>
                  <widget class="QLineEdit" name="searchbar_bank">
+                  <property name="toolTip">
+                   <string>Search bar: Type and hit enter/return to search!</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Banks search bar</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>Searches through the ZOIA patches currently saved in the ZOIA Librarian for any that match what is written in the search query. Hit enter or return to initiate the search.</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QLineEdit{
+border-radius: 5px;
+border: 1px solid gray;
+}</string>
+                  </property>
                   <property name="inputMask">
                    <string/>
                   </property>
@@ -922,6 +1206,21 @@
               </item>
               <item>
                <widget class="QTableWidget" name="table_bank_local">
+                <property name="toolTip">
+                 <string/>
+                </property>
+                <property name="statusTip">
+                 <string>Drag a patch to one of the tables on the right!</string>
+                </property>
+                <property name="accessibleName">
+                 <string>Banks table</string>
+                </property>
+                <property name="accessibleDescription">
+                 <string>Displays all of the patches that have been saved to the ZOIA Librarian</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
                 <property name="sizeAdjustPolicy">
                  <enum>QAbstractScrollArea::AdjustToContents</enum>
                 </property>
@@ -971,6 +1270,15 @@
              </layout>
             </widget>
             <widget class="QTextBrowser" name="text_browser_bank">
+             <property name="accessibleName">
+              <string>Additional Patch Notes Display</string>
+             </property>
+             <property name="accessibleDescription">
+              <string>Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)</string>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background-color: rgb(251, 255, 255);</string>
+             </property>
              <property name="textInteractionFlags">
               <set>Qt::TextBrowserInteraction</set>
              </property>
@@ -987,6 +1295,30 @@
                <layout class="QHBoxLayout" name="horizontalLayout_3">
                 <item>
                  <widget class="QPushButton" name="btn_save_bank">
+                  <property name="toolTip">
+                   <string>Click here to save your Bank.</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Click here to save your Bank.</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Save Bank button</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>When clicked, will open a popup asking for a Bank name, which will then be saved such that it can be loaded at a later time.</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QPushButton{
+border-radius: 5px;
+padding: 2px 25px 2px 25px;
+border: 1px solid gray;
+background-color: rgb(224, 224, 224);
+
+}
+QPushButton:hover{
+	background-color: rgb(207, 232, 232);
+}</string>
+                  </property>
                   <property name="text">
                    <string>Save Bank</string>
                   </property>
@@ -994,6 +1326,30 @@
                 </item>
                 <item>
                  <widget class="QPushButton" name="btn_load_bank">
+                  <property name="toolTip">
+                   <string>Click here to load a Bank.</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Click here to load a Bank.</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Load Bank button</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>When clicked, you will be prompted to select a Bank to load that has been created in a previous session using the ZOIA Librarian.</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QPushButton{
+border-radius: 5px;
+padding: 2px 25px 2px 25px;
+border: 1px solid gray;
+background-color: rgb(224, 224, 224);
+
+}
+QPushButton:hover{
+	background-color: rgb(207, 232, 232);
+}</string>
+                  </property>
                   <property name="text">
                    <string>Load Bank</string>
                   </property>
@@ -1001,6 +1357,30 @@
                 </item>
                 <item>
                  <widget class="QPushButton" name="btn_export_bank">
+                  <property name="toolTip">
+                   <string>Click here to export a Bank as a folder to your SD card.</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Click here to export a Bank as a folder to your SD card.</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Export Bank button</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>When clicked, will open a popup asking for a Bank name, which will then be saved such that it can be exported to an SD card, should it have been specified previously.</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QPushButton{
+border-radius: 5px;
+padding: 2px 25px 2px 25px;
+border: 1px solid gray;
+background-color: rgb(224, 224, 224);
+
+}
+QPushButton:hover{
+	background-color: rgb(207, 232, 232);
+}</string>
+                  </property>
                   <property name="text">
                    <string>Export Bank</string>
                   </property>
@@ -1023,6 +1403,18 @@
                  <number>10</number>
                 </property>
                 <widget class="QTableWidget" name="table_bank_left">
+                 <property name="toolTip">
+                  <string/>
+                 </property>
+                 <property name="statusTip">
+                  <string>Drag and drop a patch here!</string>
+                 </property>
+                 <property name="accessibleName">
+                  <string>Bank Table left</string>
+                 </property>
+                 <property name="accessibleDescription">
+                  <string>Displays patches that would occupy slots 0-31 on a ZOIA</string>
+                 </property>
                  <property name="editTriggers">
                   <set>QAbstractItemView::NoEditTriggers</set>
                  </property>
@@ -1214,6 +1606,18 @@
                  <column/>
                 </widget>
                 <widget class="QTableWidget" name="table_bank_right">
+                 <property name="toolTip">
+                  <string/>
+                 </property>
+                 <property name="statusTip">
+                  <string>Drag and drop a patch here!</string>
+                 </property>
+                 <property name="accessibleName">
+                  <string>Bank table right</string>
+                 </property>
+                 <property name="accessibleDescription">
+                  <string>Displays patches that would occupy slots 32-63 on a ZOIA</string>
+                 </property>
                  <property name="editTriggers">
                   <set>QAbstractItemView::NoEditTriggers</set>
                  </property>
@@ -1423,9 +1827,18 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1616</width>
+     <width>1695</width>
      <height>27</height>
     </rect>
+   </property>
+   <property name="contextMenuPolicy">
+    <enum>Qt::ActionsContextMenu</enum>
+   </property>
+   <property name="acceptDrops">
+    <bool>false</bool>
+   </property>
+   <property name="nativeMenuBar">
+    <bool>false</bool>
    </property>
    <widget class="QMenu" name="menuFiel">
     <property name="title">
@@ -1457,6 +1870,7 @@
      <string>Options</string>
     </property>
     <addaction name="actionAlternating_Row_Colours"/>
+    <addaction name="actionChange_Font"/>
    </widget>
    <addaction name="menuFiel"/>
    <addaction name="menuSort"/>
@@ -1467,60 +1881,135 @@
    <property name="text">
     <string>Specify SD Card Location</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+S</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="actionQuit">
    <property name="text">
     <string>Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionSort_by_title_A_Z">
    <property name="text">
     <string>Sort by title (A-Z)</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+1</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="actionSort_by_title_Z_A">
    <property name="text">
     <string>Sort by title (Z-A)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+2</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionSort_by_date_new_old">
    <property name="text">
     <string>Sort by date (new-old)</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+3</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="actionSort_by_date_old_new">
    <property name="text">
     <string>Sort by date (old-new)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+4</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionSort_by_likes_high_low">
    <property name="text">
     <string>Sort by likes (high-low)</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+5</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="actionSort_by_likes_low_high">
    <property name="text">
     <string>Sort by likes (low-high)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+6</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionSort_by_views_high_low">
    <property name="text">
     <string>Sort by views (high-low)</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+7</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="actionSort_by_views_low_high">
    <property name="text">
     <string>Sort by views (low-high)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+8</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionSort_by_downloads_high_low">
    <property name="text">
     <string>Sort by downloads (high-low)</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+9</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="actionSort_by_downloads_low_high">
    <property name="text">
     <string>Sort by downloads (low-high)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+0</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionZOIA_Librarian_Help">
@@ -1532,10 +2021,22 @@
    <property name="text">
     <string>Alternating Row Colours</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="actionImport_A_Patch">
    <property name="text">
     <string>Import A Patch (.bin)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionToggle_Dark_Mode">
@@ -1546,6 +2047,29 @@
   <action name="actionImport_Multiple_Patches">
    <property name="text">
     <string>Import Multiple Patches (directory)</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+I</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionChange_Font">
+   <property name="text">
+    <string>Change Font</string>
+   </property>
+   <property name="statusTip">
+    <string/>
+   </property>
+   <property name="whatsThis">
+    <string>Opens a window that allows you to select a new font to display thoughout the ZOIA Librarian</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
    </property>
   </action>
  </widget>

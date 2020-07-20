@@ -20,44 +20,63 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1616, 1123)
+        MainWindow.resize(1695, 1123)
         MainWindow.setFocusPolicy(Qt.StrongFocus)
         MainWindow.setTabShape(QTabWidget.Rounded)
         MainWindow.setUnifiedTitleAndToolBarOnMac(True)
         self.actionSpecify_SD_Card_Location = QAction(MainWindow)
         self.actionSpecify_SD_Card_Location.setObjectName(u"actionSpecify_SD_Card_Location")
+        self.actionSpecify_SD_Card_Location.setShortcutVisibleInContextMenu(True)
         self.actionQuit = QAction(MainWindow)
         self.actionQuit.setObjectName(u"actionQuit")
+        self.actionQuit.setShortcutVisibleInContextMenu(True)
         self.actionSort_by_title_A_Z = QAction(MainWindow)
         self.actionSort_by_title_A_Z.setObjectName(u"actionSort_by_title_A_Z")
+        self.actionSort_by_title_A_Z.setShortcutVisibleInContextMenu(True)
         self.actionSort_by_title_Z_A = QAction(MainWindow)
         self.actionSort_by_title_Z_A.setObjectName(u"actionSort_by_title_Z_A")
+        self.actionSort_by_title_Z_A.setShortcutVisibleInContextMenu(True)
         self.actionSort_by_date_new_old = QAction(MainWindow)
         self.actionSort_by_date_new_old.setObjectName(u"actionSort_by_date_new_old")
+        self.actionSort_by_date_new_old.setShortcutContext(Qt.WindowShortcut)
+        self.actionSort_by_date_new_old.setShortcutVisibleInContextMenu(True)
         self.actionSort_by_date_old_new = QAction(MainWindow)
         self.actionSort_by_date_old_new.setObjectName(u"actionSort_by_date_old_new")
+        self.actionSort_by_date_old_new.setShortcutVisibleInContextMenu(True)
         self.actionSort_by_likes_high_low = QAction(MainWindow)
         self.actionSort_by_likes_high_low.setObjectName(u"actionSort_by_likes_high_low")
+        self.actionSort_by_likes_high_low.setShortcutVisibleInContextMenu(True)
         self.actionSort_by_likes_low_high = QAction(MainWindow)
         self.actionSort_by_likes_low_high.setObjectName(u"actionSort_by_likes_low_high")
+        self.actionSort_by_likes_low_high.setShortcutVisibleInContextMenu(True)
         self.actionSort_by_views_high_low = QAction(MainWindow)
         self.actionSort_by_views_high_low.setObjectName(u"actionSort_by_views_high_low")
+        self.actionSort_by_views_high_low.setShortcutVisibleInContextMenu(True)
         self.actionSort_by_views_low_high = QAction(MainWindow)
         self.actionSort_by_views_low_high.setObjectName(u"actionSort_by_views_low_high")
+        self.actionSort_by_views_low_high.setShortcutVisibleInContextMenu(True)
         self.actionSort_by_downloads_high_low = QAction(MainWindow)
         self.actionSort_by_downloads_high_low.setObjectName(u"actionSort_by_downloads_high_low")
+        self.actionSort_by_downloads_high_low.setShortcutVisibleInContextMenu(True)
         self.actionSort_by_downloads_low_high = QAction(MainWindow)
         self.actionSort_by_downloads_low_high.setObjectName(u"actionSort_by_downloads_low_high")
+        self.actionSort_by_downloads_low_high.setShortcutVisibleInContextMenu(True)
         self.actionZOIA_Librarian_Help = QAction(MainWindow)
         self.actionZOIA_Librarian_Help.setObjectName(u"actionZOIA_Librarian_Help")
         self.actionAlternating_Row_Colours = QAction(MainWindow)
         self.actionAlternating_Row_Colours.setObjectName(u"actionAlternating_Row_Colours")
+        self.actionAlternating_Row_Colours.setShortcutVisibleInContextMenu(True)
         self.actionImport_A_Patch = QAction(MainWindow)
         self.actionImport_A_Patch.setObjectName(u"actionImport_A_Patch")
+        self.actionImport_A_Patch.setShortcutVisibleInContextMenu(True)
         self.actionToggle_Dark_Mode = QAction(MainWindow)
         self.actionToggle_Dark_Mode.setObjectName(u"actionToggle_Dark_Mode")
         self.actionImport_Multiple_Patches = QAction(MainWindow)
         self.actionImport_Multiple_Patches.setObjectName(u"actionImport_Multiple_Patches")
+        self.actionImport_Multiple_Patches.setShortcutVisibleInContextMenu(True)
+        self.actionChange_Font = QAction(MainWindow)
+        self.actionChange_Font.setObjectName(u"actionChange_Font")
+        self.actionChange_Font.setShortcutVisibleInContextMenu(True)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayout_5 = QVBoxLayout(self.centralwidget)
@@ -71,6 +90,27 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.setContentsMargins(0, -1, -1, -1)
         self.tabs = QTabWidget(self.centralwidget)
         self.tabs.setObjectName(u"tabs")
+        self.tabs.setStyleSheet(u"QTabBar::tab:selected{\n"
+"background-color: rgb(216, 255, 223);\n"
+"border-radius: 8px;\n"
+"border: 2px solid gray;\n"
+"padding: 5px, 5px, 5px, 5px;\n"
+"width: 200%;\n"
+"font: bold;\n"
+"}\n"
+"QTabBar::tab:!selected{\n"
+"border-radius: 8px;\n"
+"border: 2px solid gray;\n"
+"padding: 5px, 5px, 5px, 5px;\n"
+"width: 200%;\n"
+"}\n"
+"QTabWidget::tab-bar { \n"
+"alignment: center; \n"
+"}\n"
+"QTabWidget::pane { \n"
+"position: absolute; \n"
+"top: -0.1em; \n"
+"}")
         self.tabs.setTabShape(QTabWidget.Rounded)
         self.tabs.setMovable(True)
         self.tab_ps = QWidget()
@@ -114,11 +154,24 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.searchbar_PS = QLineEdit(self.layoutWidget_4)
         self.searchbar_PS.setObjectName(u"searchbar_PS")
+        self.searchbar_PS.setStyleSheet(u"QLineEdit{\n"
+"border-radius: 5px;\n"
+"border: 1px solid gray;\n"
+"}")
 
         self.horizontalLayout_5.addWidget(self.searchbar_PS)
 
         self.refresh_pch_btn = QPushButton(self.layoutWidget_4)
         self.refresh_pch_btn.setObjectName(u"refresh_pch_btn")
+        self.refresh_pch_btn.setStyleSheet(u"QPushButton{\n"
+"border-radius: 5px;\n"
+"padding: 2px 5px 2px 5px;\n"
+"border: 1px solid gray;\n"
+"background-color: rgb(224, 224, 224);\n"
+"}\n"
+"QPushButton:hover{\n"
+"	background-color: rgb(207, 232, 232);\n"
+"}")
 
         self.horizontalLayout_5.addWidget(self.refresh_pch_btn)
 
@@ -131,6 +184,8 @@ class Ui_MainWindow(object):
         if (self.table_PS.rowCount() < 1):
             self.table_PS.setRowCount(1)
         self.table_PS.setObjectName(u"table_PS")
+        self.table_PS.viewport().setProperty("cursor", QCursor(Qt.ArrowCursor))
+        self.table_PS.setFrameShape(QFrame.StyledPanel)
         self.table_PS.setFrameShadow(QFrame.Plain)
         self.table_PS.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
         self.table_PS.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -150,6 +205,8 @@ class Ui_MainWindow(object):
         self.splitter_PS.addWidget(self.layoutWidget_4)
         self.text_browser_PS = QTextBrowser(self.splitter_PS)
         self.text_browser_PS.setObjectName(u"text_browser_PS")
+        self.text_browser_PS.setStyleSheet(u"\n"
+"background-color: rgb(251, 255, 255);")
         self.text_browser_PS.setFrameShadow(QFrame.Plain)
         self.text_browser_PS.setTextInteractionFlags(Qt.TextBrowserInteraction)
         self.text_browser_PS.setOpenExternalLinks(True)
@@ -195,16 +252,39 @@ class Ui_MainWindow(object):
         self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
         self.back_btn_local = QPushButton(self.layoutWidget)
         self.back_btn_local.setObjectName(u"back_btn_local")
+        self.back_btn_local.setStyleSheet(u"QPushButton{\n"
+"border-radius: 5px;\n"
+"padding: 2px 25px 2px 25px;\n"
+"border: 1px solid gray;\n"
+"background-color: rgb(224, 224, 224);\n"
+"\n"
+"}\n"
+"QPushButton:hover{\n"
+"	background-color: rgb(207, 232, 232);\n"
+"}")
 
         self.horizontalLayout_10.addWidget(self.back_btn_local)
 
         self.searchbar_local = QLineEdit(self.layoutWidget)
         self.searchbar_local.setObjectName(u"searchbar_local")
+        self.searchbar_local.setStyleSheet(u"QLineEdit{\n"
+"border-radius: 5px;\n"
+"border: 1px solid gray;\n"
+"}")
 
         self.horizontalLayout_10.addWidget(self.searchbar_local)
 
         self.check_for_updates_btn = QPushButton(self.layoutWidget)
         self.check_for_updates_btn.setObjectName(u"check_for_updates_btn")
+        self.check_for_updates_btn.setStyleSheet(u"QPushButton{\n"
+"border-radius: 5px;\n"
+"padding: 2px 5px 2px 5px;\n"
+"border: 1px solid gray;\n"
+"background-color: rgb(224, 224, 224);\n"
+"}\n"
+"QPushButton:hover{\n"
+"	background-color: rgb(207, 232, 232);\n"
+"}")
 
         self.horizontalLayout_10.addWidget(self.check_for_updates_btn)
 
@@ -237,11 +317,21 @@ class Ui_MainWindow(object):
         self.verticalLayout_12.setContentsMargins(0, 0, 0, 0)
         self.update_patch_notes = QPushButton(self.layoutWidget_2)
         self.update_patch_notes.setObjectName(u"update_patch_notes")
+        self.update_patch_notes.setStyleSheet(u"QPushButton{\n"
+"border-radius: 5px;\n"
+"padding: 2px 2px 2px 2px;\n"
+"border: 1px solid gray;\n"
+"background-color: rgb(224, 224, 224);\n"
+"}\n"
+"QPushButton:hover{\n"
+"	background-color: rgb(207, 232, 232);\n"
+"}")
 
         self.verticalLayout_12.addWidget(self.update_patch_notes)
 
         self.text_browser_local = QTextBrowser(self.layoutWidget_2)
         self.text_browser_local.setObjectName(u"text_browser_local")
+        self.text_browser_local.setStyleSheet(u"background-color: rgb(251, 255, 255);")
         self.text_browser_local.setTextInteractionFlags(Qt.LinksAccessibleByKeyboard|Qt.LinksAccessibleByMouse|Qt.TextBrowserInteraction|Qt.TextEditable|Qt.TextSelectableByMouse)
         self.text_browser_local.setOpenExternalLinks(True)
         self.text_browser_local.setOpenLinks(True)
@@ -268,6 +358,7 @@ class Ui_MainWindow(object):
         self.splitter_sd_vert.setHandleWidth(10)
         self.sd_tree = QTreeView(self.splitter_sd_vert)
         self.sd_tree.setObjectName(u"sd_tree")
+        self.sd_tree.setStyleSheet(u"background-color: qlineargradient(spread:pad, x1:1, y1:1, x2:1, y2:0, stop:0 rgba(0, 0, 0, 32), stop:1 rgba(255, 255, 255, 255));")
         self.sd_tree.setLineWidth(10000)
         self.sd_tree.setMidLineWidth(10000)
         self.sd_tree.setSizeAdjustPolicy(QAbstractScrollArea.AdjustIgnored)
@@ -290,6 +381,15 @@ class Ui_MainWindow(object):
         self.verticalLayout_11.setContentsMargins(0, 0, 0, 0)
         self.import_all_btn = QPushButton(self.layoutWidget_3)
         self.import_all_btn.setObjectName(u"import_all_btn")
+        self.import_all_btn.setStyleSheet(u"QPushButton{\n"
+"border-radius: 5px;\n"
+"padding: 2px 2px 2px 2px;\n"
+"border: 1px solid gray;\n"
+"background-color: rgb(224, 224, 224);\n"
+"}\n"
+"QPushButton:hover{\n"
+"	background-color: rgb(207, 232, 232);\n"
+"}")
 
         self.verticalLayout_11.addWidget(self.import_all_btn)
 
@@ -486,11 +586,25 @@ class Ui_MainWindow(object):
         self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
         self.back_btn_bank = QPushButton(self.layoutWidget_5)
         self.back_btn_bank.setObjectName(u"back_btn_bank")
+        self.back_btn_bank.setStyleSheet(u"QPushButton{\n"
+"border-radius: 5px;\n"
+"padding: 2px 25px 2px 25px;\n"
+"border: 1px solid gray;\n"
+"background-color: rgb(224, 224, 224);\n"
+"\n"
+"}\n"
+"QPushButton:hover{\n"
+"	background-color: rgb(207, 232, 232);\n"
+"}")
 
         self.horizontalLayout_11.addWidget(self.back_btn_bank)
 
         self.searchbar_bank = QLineEdit(self.layoutWidget_5)
         self.searchbar_bank.setObjectName(u"searchbar_bank")
+        self.searchbar_bank.setStyleSheet(u"QLineEdit{\n"
+"border-radius: 5px;\n"
+"border: 1px solid gray;\n"
+"}")
 
         self.horizontalLayout_11.addWidget(self.searchbar_bank)
 
@@ -503,6 +617,7 @@ class Ui_MainWindow(object):
         if (self.table_bank_local.rowCount() < 1):
             self.table_bank_local.setRowCount(1)
         self.table_bank_local.setObjectName(u"table_bank_local")
+        self.table_bank_local.setStyleSheet(u"")
         self.table_bank_local.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
         self.table_bank_local.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table_bank_local.setDragEnabled(True)
@@ -522,6 +637,7 @@ class Ui_MainWindow(object):
         self.splitter_bank.addWidget(self.layoutWidget_5)
         self.text_browser_bank = QTextBrowser(self.splitter_bank)
         self.text_browser_bank.setObjectName(u"text_browser_bank")
+        self.text_browser_bank.setStyleSheet(u"background-color: rgb(251, 255, 255);")
         self.text_browser_bank.setTextInteractionFlags(Qt.TextBrowserInteraction)
         self.text_browser_bank.setOpenExternalLinks(True)
         self.text_browser_bank.setOpenLinks(True)
@@ -535,16 +651,46 @@ class Ui_MainWindow(object):
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.btn_save_bank = QPushButton(self.layoutWidget_6)
         self.btn_save_bank.setObjectName(u"btn_save_bank")
+        self.btn_save_bank.setStyleSheet(u"QPushButton{\n"
+"border-radius: 5px;\n"
+"padding: 2px 25px 2px 25px;\n"
+"border: 1px solid gray;\n"
+"background-color: rgb(224, 224, 224);\n"
+"\n"
+"}\n"
+"QPushButton:hover{\n"
+"	background-color: rgb(207, 232, 232);\n"
+"}")
 
         self.horizontalLayout_3.addWidget(self.btn_save_bank)
 
         self.btn_load_bank = QPushButton(self.layoutWidget_6)
         self.btn_load_bank.setObjectName(u"btn_load_bank")
+        self.btn_load_bank.setStyleSheet(u"QPushButton{\n"
+"border-radius: 5px;\n"
+"padding: 2px 25px 2px 25px;\n"
+"border: 1px solid gray;\n"
+"background-color: rgb(224, 224, 224);\n"
+"\n"
+"}\n"
+"QPushButton:hover{\n"
+"	background-color: rgb(207, 232, 232);\n"
+"}")
 
         self.horizontalLayout_3.addWidget(self.btn_load_bank)
 
         self.btn_export_bank = QPushButton(self.layoutWidget_6)
         self.btn_export_bank.setObjectName(u"btn_export_bank")
+        self.btn_export_bank.setStyleSheet(u"QPushButton{\n"
+"border-radius: 5px;\n"
+"padding: 2px 25px 2px 25px;\n"
+"border: 1px solid gray;\n"
+"background-color: rgb(224, 224, 224);\n"
+"\n"
+"}\n"
+"QPushButton:hover{\n"
+"	background-color: rgb(207, 232, 232);\n"
+"}")
 
         self.horizontalLayout_3.addWidget(self.btn_export_bank)
 
@@ -734,7 +880,10 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1616, 27))
+        self.menubar.setGeometry(QRect(0, 0, 1695, 27))
+        self.menubar.setContextMenuPolicy(Qt.ActionsContextMenu)
+        self.menubar.setAcceptDrops(False)
+        self.menubar.setNativeMenuBar(False)
         self.menuFiel = QMenu(self.menubar)
         self.menuFiel.setObjectName(u"menuFiel")
         self.menuSort = QMenu(self.menubar)
@@ -765,6 +914,7 @@ class Ui_MainWindow(object):
         self.menuSort.addAction(self.actionSort_by_downloads_high_low)
         self.menuSort.addAction(self.actionSort_by_downloads_low_high)
         self.menuOptions.addAction(self.actionAlternating_Row_Colours)
+        self.menuOptions.addAction(self.actionChange_Font)
 
         self.retranslateUi(MainWindow)
 
@@ -775,39 +925,214 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"ZOIA Librarian -  Beta 1", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"ZOIA Librarian -  Beta 2", None))
         self.actionSpecify_SD_Card_Location.setText(QCoreApplication.translate("MainWindow", u"Specify SD Card Location", None))
+#if QT_CONFIG(shortcut)
+        self.actionSpecify_SD_Card_Location.setShortcut(QCoreApplication.translate("MainWindow", u"Alt+S", None))
+#endif // QT_CONFIG(shortcut)
         self.actionQuit.setText(QCoreApplication.translate("MainWindow", u"Quit", None))
+#if QT_CONFIG(shortcut)
+        self.actionQuit.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+Q", None))
+#endif // QT_CONFIG(shortcut)
         self.actionSort_by_title_A_Z.setText(QCoreApplication.translate("MainWindow", u"Sort by title (A-Z)", None))
+#if QT_CONFIG(shortcut)
+        self.actionSort_by_title_A_Z.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+1", None))
+#endif // QT_CONFIG(shortcut)
         self.actionSort_by_title_Z_A.setText(QCoreApplication.translate("MainWindow", u"Sort by title (Z-A)", None))
+#if QT_CONFIG(shortcut)
+        self.actionSort_by_title_Z_A.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+2", None))
+#endif // QT_CONFIG(shortcut)
         self.actionSort_by_date_new_old.setText(QCoreApplication.translate("MainWindow", u"Sort by date (new-old)", None))
+#if QT_CONFIG(shortcut)
+        self.actionSort_by_date_new_old.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+3", None))
+#endif // QT_CONFIG(shortcut)
         self.actionSort_by_date_old_new.setText(QCoreApplication.translate("MainWindow", u"Sort by date (old-new)", None))
+#if QT_CONFIG(shortcut)
+        self.actionSort_by_date_old_new.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+4", None))
+#endif // QT_CONFIG(shortcut)
         self.actionSort_by_likes_high_low.setText(QCoreApplication.translate("MainWindow", u"Sort by likes (high-low)", None))
+#if QT_CONFIG(shortcut)
+        self.actionSort_by_likes_high_low.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+5", None))
+#endif // QT_CONFIG(shortcut)
         self.actionSort_by_likes_low_high.setText(QCoreApplication.translate("MainWindow", u"Sort by likes (low-high)", None))
+#if QT_CONFIG(shortcut)
+        self.actionSort_by_likes_low_high.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+6", None))
+#endif // QT_CONFIG(shortcut)
         self.actionSort_by_views_high_low.setText(QCoreApplication.translate("MainWindow", u"Sort by views (high-low)", None))
+#if QT_CONFIG(shortcut)
+        self.actionSort_by_views_high_low.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+7", None))
+#endif // QT_CONFIG(shortcut)
         self.actionSort_by_views_low_high.setText(QCoreApplication.translate("MainWindow", u"Sort by views (low-high)", None))
+#if QT_CONFIG(shortcut)
+        self.actionSort_by_views_low_high.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+8", None))
+#endif // QT_CONFIG(shortcut)
         self.actionSort_by_downloads_high_low.setText(QCoreApplication.translate("MainWindow", u"Sort by downloads (high-low)", None))
+#if QT_CONFIG(shortcut)
+        self.actionSort_by_downloads_high_low.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+9", None))
+#endif // QT_CONFIG(shortcut)
         self.actionSort_by_downloads_low_high.setText(QCoreApplication.translate("MainWindow", u"Sort by downloads (low-high)", None))
+#if QT_CONFIG(shortcut)
+        self.actionSort_by_downloads_low_high.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+0", None))
+#endif // QT_CONFIG(shortcut)
         self.actionZOIA_Librarian_Help.setText(QCoreApplication.translate("MainWindow", u"ZOIA Librarian Help", None))
         self.actionAlternating_Row_Colours.setText(QCoreApplication.translate("MainWindow", u"Alternating Row Colours", None))
+#if QT_CONFIG(shortcut)
+        self.actionAlternating_Row_Colours.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+R", None))
+#endif // QT_CONFIG(shortcut)
         self.actionImport_A_Patch.setText(QCoreApplication.translate("MainWindow", u"Import A Patch (.bin)", None))
+#if QT_CONFIG(shortcut)
+        self.actionImport_A_Patch.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+I", None))
+#endif // QT_CONFIG(shortcut)
         self.actionToggle_Dark_Mode.setText(QCoreApplication.translate("MainWindow", u"Toggle Dark Mode", None))
         self.actionImport_Multiple_Patches.setText(QCoreApplication.translate("MainWindow", u"Import Multiple Patches (directory)", None))
+#if QT_CONFIG(shortcut)
+        self.actionImport_Multiple_Patches.setShortcut(QCoreApplication.translate("MainWindow", u"Alt+I", None))
+#endif // QT_CONFIG(shortcut)
+        self.actionChange_Font.setText(QCoreApplication.translate("MainWindow", u"Change Font", None))
+#if QT_CONFIG(statustip)
+        self.actionChange_Font.setStatusTip("")
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(whatsthis)
+        self.actionChange_Font.setWhatsThis(QCoreApplication.translate("MainWindow", u"Opens a window that allows you to select a new font to display thoughout the ZOIA Librarian", None))
+#endif // QT_CONFIG(whatsthis)
+#if QT_CONFIG(shortcut)
+        self.actionChange_Font.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+F", None))
+#endif // QT_CONFIG(shortcut)
+#if QT_CONFIG(accessibility)
+        self.tabs.setAccessibleName(QCoreApplication.translate("MainWindow", u"Tab List", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.tabs.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"This list contains four tabs, PatchStorage View, Local Storage View, SD Card View, and Banks. It allows you to switch between tabs to access different features contained with the ZOIA Librarian.", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(tooltip)
+        self.tab_ps.setToolTip("")
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        self.searchbar_PS.setToolTip(QCoreApplication.translate("MainWindow", u"Search bar: Type and hit enter/return to search!", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(accessibility)
+        self.searchbar_PS.setAccessibleName(QCoreApplication.translate("MainWindow", u"PatchStorage View search bar", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.searchbar_PS.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Searches through the ZOIA patches currently hosted on PatchStorage for any that match what is written in the search query. Hit enter or return to initiate the search.", None))
+#endif // QT_CONFIG(accessibility)
         self.searchbar_PS.setInputMask("")
         self.searchbar_PS.setText("")
+#if QT_CONFIG(tooltip)
+        self.refresh_pch_btn.setToolTip(QCoreApplication.translate("MainWindow", u"Click here to refresh the PatchStorage patch list.", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.refresh_pch_btn.setStatusTip(QCoreApplication.translate("MainWindow", u"Click here to refresh the PatchStorage patch list.", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(accessibility)
+        self.refresh_pch_btn.setAccessibleName(QCoreApplication.translate("MainWindow", u"Refresh PatchStorage patch list button", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.refresh_pch_btn.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"This button will refresh the data in the PatchStorage patch table with the latest patches on PatchStorage should the list ever become out of sync.", None))
+#endif // QT_CONFIG(accessibility)
         self.refresh_pch_btn.setText(QCoreApplication.translate("MainWindow", u"Refresh patches", None))
+#if QT_CONFIG(accessibility)
+        self.table_PS.setAccessibleName(QCoreApplication.translate("MainWindow", u"PatchStorage Table", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.table_PS.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Displays all of the ZOIA patches that are currently hosted on PatchStorage.", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(statustip)
+        self.text_browser_PS.setStatusTip("")
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(accessibility)
+        self.text_browser_PS.setAccessibleName(QCoreApplication.translate("MainWindow", u"Additional Patch Notes Display", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.text_browser_PS.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)", None))
+#endif // QT_CONFIG(accessibility)
         self.tabs.setTabText(self.tabs.indexOf(self.tab_ps), QCoreApplication.translate("MainWindow", u"PatchStorage View", None))
 #if QT_CONFIG(tooltip)
         self.tabs.setTabToolTip(self.tabs.indexOf(self.tab_ps), QCoreApplication.translate("MainWindow", u"Switch to view all ZOIA patches on PatchStorage", None))
 #endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        self.back_btn_local.setToolTip(QCoreApplication.translate("MainWindow", u"Click here to back to the full patch list.", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.back_btn_local.setStatusTip(QCoreApplication.translate("MainWindow", u"Click here to back to the full patch list.", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(accessibility)
+        self.back_btn_local.setAccessibleName(QCoreApplication.translate("MainWindow", u"Back button Local Storage View", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.back_btn_local.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"When clicked, exits out of the Version History for a patch and returns to the full list of patches currently stored in the ZOIA Librarian", None))
+#endif // QT_CONFIG(accessibility)
         self.back_btn_local.setText(QCoreApplication.translate("MainWindow", u"Back", None))
+#if QT_CONFIG(tooltip)
+        self.searchbar_local.setToolTip(QCoreApplication.translate("MainWindow", u"Search bar: Type and hit enter/return to search!", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(accessibility)
+        self.searchbar_local.setAccessibleName(QCoreApplication.translate("MainWindow", u"LocalStorage View search bar", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.searchbar_local.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Searches through the ZOIA patches currently saved in the ZOIA Librarian for any that match what is written in the search query. Hit enter or return to initiate the search.", None))
+#endif // QT_CONFIG(accessibility)
         self.searchbar_local.setInputMask("")
+#if QT_CONFIG(tooltip)
+        self.check_for_updates_btn.setToolTip(QCoreApplication.translate("MainWindow", u"Click here to check for updates for all patches listed below.", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.check_for_updates_btn.setStatusTip(QCoreApplication.translate("MainWindow", u"Click here to check for updates for all patches listed below.", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(accessibility)
+        self.check_for_updates_btn.setAccessibleName(QCoreApplication.translate("MainWindow", u"Check for updates button", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.check_for_updates_btn.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Automatically checks for updates to any patches listed in the Local Storage View table when clicked. Should any be found, a popup will let you know how many patches were updated.", None))
+#endif // QT_CONFIG(accessibility)
         self.check_for_updates_btn.setText(QCoreApplication.translate("MainWindow", u"Check for updates", None))
+#if QT_CONFIG(accessibility)
+        self.table_local.setAccessibleName(QCoreApplication.translate("MainWindow", u"Local Storage View table", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.table_local.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Displays all of the patches that have been saved to the ZOIA Librarian", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(tooltip)
+        self.update_patch_notes.setToolTip(QCoreApplication.translate("MainWindow", u"Click here to update the patch notes for the currently selected patch.", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.update_patch_notes.setStatusTip(QCoreApplication.translate("MainWindow", u"Click here to update the patch notes for the currently selected patch.", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(accessibility)
+        self.update_patch_notes.setAccessibleName(QCoreApplication.translate("MainWindow", u"Update Patch Notes button", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.update_patch_notes.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"When clicked, updates the patch notes for the currently selected patch. Patch notes can be add directly below in the Additional Patch Notes Display. ", None))
+#endif // QT_CONFIG(accessibility)
         self.update_patch_notes.setText(QCoreApplication.translate("MainWindow", u"Update Patch Notes", None))
+#if QT_CONFIG(accessibility)
+        self.text_browser_local.setAccessibleName(QCoreApplication.translate("MainWindow", u"Additional Patch Notes Display", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.text_browser_local.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)", None))
+#endif // QT_CONFIG(accessibility)
         self.tabs.setTabText(self.tabs.indexOf(self.tab_ls), QCoreApplication.translate("MainWindow", u"Local Storage View", None))
 #if QT_CONFIG(tooltip)
         self.tabs.setTabToolTip(self.tabs.indexOf(self.tab_ls), QCoreApplication.translate("MainWindow", u"Switch to your locally saved patches", None))
 #endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(accessibility)
+        self.sd_tree.setAccessibleName(QCoreApplication.translate("MainWindow", u"SD Card Viewer", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.sd_tree.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Dispalys the contents of the previously specified SD Card (which is specified via the menu bar at File->Specify SD Card path, or by using Alt+S and then specifying that way).", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(tooltip)
+        self.import_all_btn.setToolTip(QCoreApplication.translate("MainWindow", u"Click here to import all patches currently listed below.", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.import_all_btn.setStatusTip(QCoreApplication.translate("MainWindow", u"Click here to import all patches currently listed below.", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(accessibility)
+        self.import_all_btn.setAccessibleName(QCoreApplication.translate("MainWindow", u"Import All Patches button", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.import_all_btn.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Attempts to import all of the patches listed in the tables below (SD card table left and SD card table right) into the ZOIA Librarian. This requires that a folder is selected from the SD Card Viewer above that contains patches.", None))
+#endif // QT_CONFIG(accessibility)
         self.import_all_btn.setText(QCoreApplication.translate("MainWindow", u"Import All Patches", None))
         ___qtablewidgetitem = self.table_sd_left.verticalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"0", None));
@@ -873,6 +1198,12 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem30.setText(QCoreApplication.translate("MainWindow", u"30", None));
         ___qtablewidgetitem31 = self.table_sd_left.verticalHeaderItem(31)
         ___qtablewidgetitem31.setText(QCoreApplication.translate("MainWindow", u"31", None));
+#if QT_CONFIG(accessibility)
+        self.table_sd_left.setAccessibleName(QCoreApplication.translate("MainWindow", u"SD Card Table left", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.table_sd_left.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Displays patches that would occupy slots 0-31 on a ZOIA", None))
+#endif // QT_CONFIG(accessibility)
         ___qtablewidgetitem32 = self.table_sd_right.verticalHeaderItem(0)
         ___qtablewidgetitem32.setText(QCoreApplication.translate("MainWindow", u"32", None));
         ___qtablewidgetitem33 = self.table_sd_right.verticalHeaderItem(1)
@@ -937,11 +1268,95 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem62.setText(QCoreApplication.translate("MainWindow", u"62", None));
         ___qtablewidgetitem63 = self.table_sd_right.verticalHeaderItem(31)
         ___qtablewidgetitem63.setText(QCoreApplication.translate("MainWindow", u"63", None));
+#if QT_CONFIG(accessibility)
+        self.table_sd_right.setAccessibleName(QCoreApplication.translate("MainWindow", u"SD Card Table right", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.table_sd_right.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Displays patches that would occupy slots 32-63 on a ZOIA", None))
+#endif // QT_CONFIG(accessibility)
         self.tabs.setTabText(self.tabs.indexOf(self.tab_sd), QCoreApplication.translate("MainWindow", u"SD Card View", None))
+#if QT_CONFIG(tooltip)
+        self.tabs.setTabToolTip(self.tabs.indexOf(self.tab_sd), QCoreApplication.translate("MainWindow", u"Switch to view your SD card within the ZOIA Librarian", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        self.back_btn_bank.setToolTip(QCoreApplication.translate("MainWindow", u"Click here to back to the full patch list.", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.back_btn_bank.setStatusTip(QCoreApplication.translate("MainWindow", u"Click here to back to the full patch list.", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(accessibility)
+        self.back_btn_bank.setAccessibleName(QCoreApplication.translate("MainWindow", u"Back button Bank", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.back_btn_bank.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"When clicked, exits out of the Version History for a patch and returns to the full list of patches currently stored in the ZOIA Librarian", None))
+#endif // QT_CONFIG(accessibility)
         self.back_btn_bank.setText(QCoreApplication.translate("MainWindow", u"Back", None))
+#if QT_CONFIG(tooltip)
+        self.searchbar_bank.setToolTip(QCoreApplication.translate("MainWindow", u"Search bar: Type and hit enter/return to search!", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(accessibility)
+        self.searchbar_bank.setAccessibleName(QCoreApplication.translate("MainWindow", u"Banks search bar", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.searchbar_bank.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Searches through the ZOIA patches currently saved in the ZOIA Librarian for any that match what is written in the search query. Hit enter or return to initiate the search.", None))
+#endif // QT_CONFIG(accessibility)
         self.searchbar_bank.setInputMask("")
+#if QT_CONFIG(tooltip)
+        self.table_bank_local.setToolTip("")
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.table_bank_local.setStatusTip(QCoreApplication.translate("MainWindow", u"Drag a patch to one of the tables on the right!", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(accessibility)
+        self.table_bank_local.setAccessibleName(QCoreApplication.translate("MainWindow", u"Banks table", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.table_bank_local.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Displays all of the patches that have been saved to the ZOIA Librarian", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.text_browser_bank.setAccessibleName(QCoreApplication.translate("MainWindow", u"Additional Patch Notes Display", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.text_browser_bank.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(tooltip)
+        self.btn_save_bank.setToolTip(QCoreApplication.translate("MainWindow", u"Click here to save your Bank.", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.btn_save_bank.setStatusTip(QCoreApplication.translate("MainWindow", u"Click here to save your Bank.", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(accessibility)
+        self.btn_save_bank.setAccessibleName(QCoreApplication.translate("MainWindow", u"Save Bank button", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.btn_save_bank.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"When clicked, will open a popup asking for a Bank name, which will then be saved such that it can be loaded at a later time.", None))
+#endif // QT_CONFIG(accessibility)
         self.btn_save_bank.setText(QCoreApplication.translate("MainWindow", u"Save Bank", None))
+#if QT_CONFIG(tooltip)
+        self.btn_load_bank.setToolTip(QCoreApplication.translate("MainWindow", u"Click here to load a Bank.", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.btn_load_bank.setStatusTip(QCoreApplication.translate("MainWindow", u"Click here to load a Bank.", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(accessibility)
+        self.btn_load_bank.setAccessibleName(QCoreApplication.translate("MainWindow", u"Load Bank button", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.btn_load_bank.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"When clicked, you will be prompted to select a Bank to load that has been created in a previous session using the ZOIA Librarian.", None))
+#endif // QT_CONFIG(accessibility)
         self.btn_load_bank.setText(QCoreApplication.translate("MainWindow", u"Load Bank", None))
+#if QT_CONFIG(tooltip)
+        self.btn_export_bank.setToolTip(QCoreApplication.translate("MainWindow", u"Click here to export a Bank as a folder to your SD card.", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.btn_export_bank.setStatusTip(QCoreApplication.translate("MainWindow", u"Click here to export a Bank as a folder to your SD card.", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(accessibility)
+        self.btn_export_bank.setAccessibleName(QCoreApplication.translate("MainWindow", u"Export Bank button", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.btn_export_bank.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"When clicked, will open a popup asking for a Bank name, which will then be saved such that it can be exported to an SD card, should it have been specified previously.", None))
+#endif // QT_CONFIG(accessibility)
         self.btn_export_bank.setText(QCoreApplication.translate("MainWindow", u"Export Bank", None))
         ___qtablewidgetitem64 = self.table_bank_left.verticalHeaderItem(0)
         ___qtablewidgetitem64.setText(QCoreApplication.translate("MainWindow", u"0", None));
@@ -1007,6 +1422,18 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem94.setText(QCoreApplication.translate("MainWindow", u"30", None));
         ___qtablewidgetitem95 = self.table_bank_left.verticalHeaderItem(31)
         ___qtablewidgetitem95.setText(QCoreApplication.translate("MainWindow", u"31", None));
+#if QT_CONFIG(tooltip)
+        self.table_bank_left.setToolTip("")
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.table_bank_left.setStatusTip(QCoreApplication.translate("MainWindow", u"Drag and drop a patch here!", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(accessibility)
+        self.table_bank_left.setAccessibleName(QCoreApplication.translate("MainWindow", u"Bank Table left", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.table_bank_left.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Displays patches that would occupy slots 0-31 on a ZOIA", None))
+#endif // QT_CONFIG(accessibility)
         ___qtablewidgetitem96 = self.table_bank_right.verticalHeaderItem(0)
         ___qtablewidgetitem96.setText(QCoreApplication.translate("MainWindow", u"32", None));
         ___qtablewidgetitem97 = self.table_bank_right.verticalHeaderItem(1)
@@ -1071,7 +1498,22 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem126.setText(QCoreApplication.translate("MainWindow", u"62", None));
         ___qtablewidgetitem127 = self.table_bank_right.verticalHeaderItem(31)
         ___qtablewidgetitem127.setText(QCoreApplication.translate("MainWindow", u"63", None));
+#if QT_CONFIG(tooltip)
+        self.table_bank_right.setToolTip("")
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.table_bank_right.setStatusTip(QCoreApplication.translate("MainWindow", u"Drag and drop a patch here!", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(accessibility)
+        self.table_bank_right.setAccessibleName(QCoreApplication.translate("MainWindow", u"Bank table right", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.table_bank_right.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Displays patches that would occupy slots 32-63 on a ZOIA", None))
+#endif // QT_CONFIG(accessibility)
         self.tabs.setTabText(self.tabs.indexOf(self.tab_bank), QCoreApplication.translate("MainWindow", u"Banks", None))
+#if QT_CONFIG(tooltip)
+        self.tabs.setTabToolTip(self.tabs.indexOf(self.tab_bank), QCoreApplication.translate("MainWindow", u"Switch to view the Bank creator", None))
+#endif // QT_CONFIG(tooltip)
         self.menuFiel.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
         self.menuSort.setTitle(QCoreApplication.translate("MainWindow", u"Sort", None))
         self.menuOptions.setTitle(QCoreApplication.translate("MainWindow", u"Options", None))

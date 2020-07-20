@@ -71,9 +71,12 @@ class PatchExport(Patch):
             idx = idx.split("_")[0]
 
         # Get the metadata for this patch.
-        with open(os.path.join(self.back_path, idx,
-                               "{}.json".format(patch)), "r") as f:
-            metadata = json.loads(f.read())
+        try:
+            with open(os.path.join(self.back_path, idx,
+                                   "{}.json".format(patch)), "r") as f:
+                metadata = json.loads(f.read())
+        except FileNotFoundError:
+            raise errors.BadPathError(301)
 
         # Extract the filename attribute.
         name = metadata["files"][0]["filename"]

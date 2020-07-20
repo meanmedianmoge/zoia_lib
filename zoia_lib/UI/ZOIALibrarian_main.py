@@ -1,10 +1,13 @@
 import json
 import os
 from os.path import expanduser
+import platform
 
-from PySide2.QtCore import QEvent
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
+from PySide2.QtCore import QEvent, Qt
+from PySide2.QtGui import QIcon, QFont
+from PySide2.QtWidgets import QMainWindow, QMessageBox, QTableWidgetItem, \
+    QPushButton, QRadioButton, QInputDialog, QFileDialog, QFileSystemModel, \
+    QTableWidgetSelectionRange, QApplication
 
 import zoia_lib.UI.ZOIALibrarian as ui_main
 import zoia_lib.backend.utilities as util
@@ -33,7 +36,7 @@ class ZOIALibrarianMain(QMainWindow):
 
     Any changes made to the .ui file will not be reflected unless the
     following command is run from the UI directory:
-        pyside2-uic.exe .\ZOIALibrarian.ui -o .\ZOIALibrarian/.py
+        pyside2-uic.exe ZOIALibrarian.ui -o ZOIALibrarian.py
 
     Known issues:
      - Sorting order is not maintained when exiting out of the
@@ -58,6 +61,8 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.setupUi(self)
 
         # Variable initialization.
+        self.icon = QIcon(os.path.join(os.getcwd(), "zoia_lib", "UI",
+                                       "resources", "logo.ico"))
         self.data_PS = None
         self.data_banks = None
         self.search_data_PS = None
@@ -81,6 +86,11 @@ class ZOIALibrarianMain(QMainWindow):
         self.prev_sort = None
         self.curr_ver = None
         self.can_export_bank = False
+        self.font = "Verdana"
+
+        curr_os = platform.system().lower()
+        if curr_os == "darwin":
+            self.ui.menubar.setNativeMenuBar(True)
 
         # Check for metadata in the user's backend.
         if "data.json" not in os.listdir(backend_path):
@@ -154,6 +164,8 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.back_btn_bank.setEnabled(False)
         self.ui.btn_save_bank.setEnabled(False)
         self.ui.btn_export_bank.setEnabled(False)
+        if len(os.listdir(os.path.join(backend_path, "Banks"))) == 0:
+            self.ui.btn_load_bank.setEnabled(False)
 
         # Connect buttons and items to methods.
         self.ui.tabs.currentChanged.connect(self.tab_switch)
@@ -178,6 +190,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.actionSpecify_SD_Card_Location.triggered.connect(self.sd_path)
         self.ui.actionImport_Multiple_Patches.triggered.connect(
             self.mass_import)
+        self.ui.actionChange_Font.triggered.connect(self.change_font)
         self.ui.check_for_updates_btn.clicked.connect(self.update)
         self.ui.refresh_pch_btn.clicked.connect(self.reload_ps)
         self.ui.actionQuit.triggered.connect(self.try_quit)
@@ -205,16 +218,16 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.btn_export_bank.clicked.connect(self.export_bank)
 
         # Font consistency.
-        self.ui.table_PS.setFont(QFont('Verdana', 10))
-        self.ui.table_local.setFont(QFont('Verdana', 10))
-        self.ui.table_sd_left.setFont(QFont('Verdana', 10))
-        self.ui.table_sd_right.setFont(QFont('Verdana', 10))
-        self.ui.table_bank_local.setFont(QFont('Verdana', 10))
-        self.ui.table_bank_left.setFont(QFont('Verdana', 10))
-        self.ui.table_bank_right.setFont(QFont('Verdana', 10))
-        self.ui.text_browser_PS.setFont(QFont('Verdana', 16))
-        self.ui.text_browser_local.setFont(QFont('Verdana', 16))
-        self.ui.text_browser_bank.setFont(QFont('Verdana', 16))
+        self.ui.table_PS.setFont(QFont(self.font, 10))
+        self.ui.table_local.setFont(QFont(self.font, 10))
+        self.ui.table_sd_left.setFont(QFont(self.font, 10))
+        self.ui.table_sd_right.setFont(QFont(self.font, 10))
+        self.ui.table_bank_local.setFont(QFont(self.font, 10))
+        self.ui.table_bank_left.setFont(QFont(self.font, 10))
+        self.ui.table_bank_right.setFont(QFont(self.font, 10))
+        self.ui.text_browser_PS.setFont(QFont(self.font, 16))
+        self.ui.text_browser_local.setFont(QFont(self.font, 16))
+        self.ui.text_browser_bank.setFont(QFont(self.font, 16))
 
         # Modify the display sizes for some widgets.
         self.ui.splitter_PS.setSizes([self.width() * 0.325,
@@ -388,12 +401,12 @@ class ZOIALibrarianMain(QMainWindow):
                 # Setup the buttons we are adding
                 push_button = QPushButton("X")
                 push_button.setObjectName(str(index))
-                push_button.setFont(QFont('Verdana', 10))
+                push_button.setFont(QFont(self.font, 10))
                 push_button.clicked.connect(self.remove_sd)
 
                 import_btn = QPushButton("Click me to import!")
                 import_btn.setObjectName(str(index))
-                import_btn.setFont(QFont('Verdana', 10))
+                import_btn.setFont(QFont(self.font, 10))
                 import_btn.clicked.connect(self.import_patch)
 
                 if index < 32:
@@ -429,6 +442,7 @@ class ZOIALibrarianMain(QMainWindow):
         # Figure out what table we are working with.
         table_index = self.ui.tabs.currentIndex()
 
+        # Get the current table.
         curr_table = {
             0: self.ui.table_PS,
             1: self.ui.table_local,
@@ -439,33 +453,18 @@ class ZOIALibrarianMain(QMainWindow):
         curr_table.clearContents()
 
         # Figure out the data we are using.
-        if table_index == 0:
-            if search:
-                data = self.search_data_PS
-            else:
-                data = self.data_PS
-        elif table_index == 1:
-            if version:
-                if search:
-                    data = self.search_data_local_version
-                else:
-                    data = self.data_local_version
-            else:
-                if search:
-                    data = self.search_data_local
-                else:
-                    data = self.data_local
-        else:
-            if version:
-                if search:
-                    data = self.search_data_bank_version
-                else:
-                    data = self.data_bank_version
-            else:
-                if search:
-                    data = self.search_data_bank
-                else:
-                    data = self.data_bank
+        data = {
+            (0, True, False): self.search_data_PS,
+            (0, False, False): self.data_PS,
+            (1, True, True): self.search_data_local_version,
+            (1, False, True): self.data_local_version,
+            (1, True, False): self.search_data_local,
+            (1, False, False): self.data_local,
+            (3, True, True): self.search_data_bank_version,
+            (3, False, True): self.data_bank_version,
+            (3, True, False): self.search_data_bank,
+            (3, False, False): self.data_bank
+        }[(table_index, search, version)]
 
         data_length = len(data)
 
@@ -544,7 +543,7 @@ class ZOIALibrarianMain(QMainWindow):
             # If we are on tab index 0, we need a "Download" header item.
             if table_index == 0:
                 dwn = QPushButton("Click me\nto download!", self)
-                dwn.setFont(QFont('Verdana', 10))
+                dwn.setFont(QFont(self.font, 10))
                 dwn.clicked.connect(self.initiate_download)
                 dwn.setObjectName(str(data[i]["id"]))
 
@@ -567,7 +566,7 @@ class ZOIALibrarianMain(QMainWindow):
                                        + str(data[i]["revision"]))
                 else:
                     expt.setObjectName(str(data[i]["id"]))
-                expt.setFont(QFont('Verdana', 10))
+                expt.setFont(QFont(self.font, 10))
                 expt.clicked.connect(self.initiate_export)
                 curr_table.setCellWidget(i, 4, expt)
 
@@ -577,7 +576,7 @@ class ZOIALibrarianMain(QMainWindow):
                                          + str(data[i]["revision"]))
                 else:
                     delete.setObjectName(str(data[i]["id"]))
-                delete.setFont(QFont('Verdana', 10))
+                delete.setFont(QFont(self.font, 10))
                 delete.clicked.connect(self.initiate_delete)
                 curr_table.setCellWidget(i, 5, delete)
 
@@ -1856,6 +1855,9 @@ class ZOIALibrarianMain(QMainWindow):
         """ Loads a Bank file that was previously saved to the
         backend directory.
         Currently triggered via a button press.
+
+        TODO Fix the case where the patch has been deleted from the
+         Library.
         """
 
         bnk_file = QFileDialog.getOpenFileName(None,
@@ -1878,6 +1880,9 @@ class ZOIALibrarianMain(QMainWindow):
 
         with open(os.path.join(backend_path, "Banks", bnk_file), "r") as f:
             self.data_banks = json.loads(f.read())
+
+        # TODO Check each item in self.data_banks against those currently saved
+        #  in the backend. If any don't match, remove it from the data.
 
         found_item = False
         for i in range(64):
@@ -1922,6 +1927,7 @@ class ZOIALibrarianMain(QMainWindow):
                     name)),
                       "w") as f:
                 f.write(json.dumps(self.data_banks))
+            self.ui.btn_load_bank.setEnabled(True)
 
     def export_bank(self):
         """ Saves a Bank to the backend application directory.
@@ -1969,6 +1975,7 @@ class ZOIALibrarianMain(QMainWindow):
                                            name, True)
                         msg = QMessageBox()
                         msg.setWindowTitle("Success!")
+                        msg.setWindowIcon(icon)
                         msg.setIcon(QMessageBox.Information)
                         msg.setText(
                             "The Bank has been successfully exported to "
@@ -2036,6 +2043,14 @@ class ZOIALibrarianMain(QMainWindow):
                     "slot": i,
                     "id": temp.objectName()
                 })
+
+    def change_font(self):
+        """ Allows the user to change the font used throughout the
+        application.
+        Currently triggered via a menu action.
+        """
+
+        pass
 
     def try_quit(self):
         """ Forces the application to close.
