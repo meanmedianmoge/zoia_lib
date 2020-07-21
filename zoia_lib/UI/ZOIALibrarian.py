@@ -22,6 +22,9 @@ class Ui_MainWindow(object):
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(1695, 1123)
         MainWindow.setFocusPolicy(Qt.StrongFocus)
+        MainWindow.setStyleSheet(u"QMainWindow {\n"
+"background-color: white;\n"
+"}")
         MainWindow.setTabShape(QTabWidget.Rounded)
         MainWindow.setUnifiedTitleAndToolBarOnMac(True)
         self.actionSpecify_SD_Card_Location = QAction(MainWindow)
@@ -92,29 +95,35 @@ class Ui_MainWindow(object):
         self.tabs.setObjectName(u"tabs")
         self.tabs.setStyleSheet(u"QTabBar::tab:selected{\n"
 "background-color: rgb(216, 255, 223);\n"
-"border-radius: 8px;\n"
-"border: 2px solid gray;\n"
+"border: 1px solid black;\n"
+"border-bottom: 0px;\n"
 "padding: 5px, 5px, 5px, 5px;\n"
 "width: 200%;\n"
 "font: bold;\n"
 "}\n"
 "QTabBar::tab:!selected{\n"
-"border-radius: 8px;\n"
-"border: 2px solid gray;\n"
+"border: 1px solid gray;\n"
+"border-bottom: 0px;\n"
 "padding: 5px, 5px, 5px, 5px;\n"
 "width: 200%;\n"
 "}\n"
+"QTabBar {\n"
+"background-color: white;\n"
+"}\n"
 "QTabWidget::tab-bar { \n"
 "alignment: center; \n"
+"background-color: white;\n"
+"border-bottom: 1px  solid white;\n"
 "}\n"
 "QTabWidget::pane { \n"
 "position: absolute; \n"
-"top: -0.1em; \n"
 "}")
         self.tabs.setTabShape(QTabWidget.Rounded)
-        self.tabs.setMovable(True)
+        self.tabs.setMovable(False)
+        self.tabs.setTabBarAutoHide(False)
         self.tab_ps = QWidget()
         self.tab_ps.setObjectName(u"tab_ps")
+        self.tab_ps.setStyleSheet(u"")
         self.verticalLayout_3 = QVBoxLayout(self.tab_ps)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.verticalLayout_3.setContentsMargins(9, 9, 9, 9)
@@ -205,8 +214,7 @@ class Ui_MainWindow(object):
         self.splitter_PS.addWidget(self.layoutWidget_4)
         self.text_browser_PS = QTextBrowser(self.splitter_PS)
         self.text_browser_PS.setObjectName(u"text_browser_PS")
-        self.text_browser_PS.setStyleSheet(u"\n"
-"background-color: rgb(251, 255, 255);")
+        self.text_browser_PS.setStyleSheet(u"")
         self.text_browser_PS.setFrameShadow(QFrame.Plain)
         self.text_browser_PS.setTextInteractionFlags(Qt.TextBrowserInteraction)
         self.text_browser_PS.setOpenExternalLinks(True)
@@ -331,7 +339,7 @@ class Ui_MainWindow(object):
 
         self.text_browser_local = QTextBrowser(self.layoutWidget_2)
         self.text_browser_local.setObjectName(u"text_browser_local")
-        self.text_browser_local.setStyleSheet(u"background-color: rgb(251, 255, 255);")
+        self.text_browser_local.setStyleSheet(u"")
         self.text_browser_local.setTextInteractionFlags(Qt.LinksAccessibleByKeyboard|Qt.LinksAccessibleByMouse|Qt.TextBrowserInteraction|Qt.TextEditable|Qt.TextSelectableByMouse)
         self.text_browser_local.setOpenExternalLinks(True)
         self.text_browser_local.setOpenLinks(True)
@@ -637,7 +645,7 @@ class Ui_MainWindow(object):
         self.splitter_bank.addWidget(self.layoutWidget_5)
         self.text_browser_bank = QTextBrowser(self.splitter_bank)
         self.text_browser_bank.setObjectName(u"text_browser_bank")
-        self.text_browser_bank.setStyleSheet(u"background-color: rgb(251, 255, 255);")
+        self.text_browser_bank.setStyleSheet(u"")
         self.text_browser_bank.setTextInteractionFlags(Qt.TextBrowserInteraction)
         self.text_browser_bank.setOpenExternalLinks(True)
         self.text_browser_bank.setOpenLinks(True)
@@ -998,6 +1006,12 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(shortcut)
         self.actionChange_Font.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+F", None))
 #endif // QT_CONFIG(shortcut)
+#if QT_CONFIG(tooltip)
+        self.tabs.setToolTip("")
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.tabs.setStatusTip("")
+#endif // QT_CONFIG(statustip)
 #if QT_CONFIG(accessibility)
         self.tabs.setAccessibleName(QCoreApplication.translate("MainWindow", u"Tab List", None))
 #endif // QT_CONFIG(accessibility)
@@ -1008,8 +1022,11 @@ class Ui_MainWindow(object):
         self.tab_ps.setToolTip("")
 #endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(tooltip)
-        self.searchbar_PS.setToolTip(QCoreApplication.translate("MainWindow", u"Search bar: Type and hit enter/return to search!", None))
+        self.searchbar_PS.setToolTip(QCoreApplication.translate("MainWindow", u"Type and hit enter/return to search!", None))
 #endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.searchbar_PS.setStatusTip(QCoreApplication.translate("MainWindow", u"Type and hit enter/return to search!", None))
+#endif // QT_CONFIG(statustip)
 #if QT_CONFIG(accessibility)
         self.searchbar_PS.setAccessibleName(QCoreApplication.translate("MainWindow", u"PatchStorage View search bar", None))
 #endif // QT_CONFIG(accessibility)
@@ -1064,8 +1081,11 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(accessibility)
         self.back_btn_local.setText(QCoreApplication.translate("MainWindow", u"Back", None))
 #if QT_CONFIG(tooltip)
-        self.searchbar_local.setToolTip(QCoreApplication.translate("MainWindow", u"Search bar: Type and hit enter/return to search!", None))
+        self.searchbar_local.setToolTip(QCoreApplication.translate("MainWindow", u"Type and hit enter/return to search!", None))
 #endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.searchbar_local.setStatusTip(QCoreApplication.translate("MainWindow", u"Type and hit enter/return to search!", None))
+#endif // QT_CONFIG(statustip)
 #if QT_CONFIG(accessibility)
         self.searchbar_local.setAccessibleName(QCoreApplication.translate("MainWindow", u"LocalStorage View search bar", None))
 #endif // QT_CONFIG(accessibility)
@@ -1292,8 +1312,14 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(accessibility)
         self.back_btn_bank.setText(QCoreApplication.translate("MainWindow", u"Back", None))
 #if QT_CONFIG(tooltip)
-        self.searchbar_bank.setToolTip(QCoreApplication.translate("MainWindow", u"Search bar: Type and hit enter/return to search!", None))
+        self.searchbar_bank.setToolTip(QCoreApplication.translate("MainWindow", u"Type and hit enter/return to search!", None))
 #endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.searchbar_bank.setStatusTip(QCoreApplication.translate("MainWindow", u"Type and hit enter/return to search!", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(whatsthis)
+        self.searchbar_bank.setWhatsThis("")
+#endif // QT_CONFIG(whatsthis)
 #if QT_CONFIG(accessibility)
         self.searchbar_bank.setAccessibleName(QCoreApplication.translate("MainWindow", u"Banks search bar", None))
 #endif // QT_CONFIG(accessibility)

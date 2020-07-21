@@ -16,6 +16,11 @@
   <property name="windowTitle">
    <string>ZOIA Librarian -  Beta 2</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QMainWindow {
+background-color: white;
+}</string>
+  </property>
   <property name="tabShape">
    <enum>QTabWidget::Rounded</enum>
   </property>
@@ -52,6 +57,12 @@
       </property>
       <item>
        <widget class="QTabWidget" name="tabs">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
         <property name="accessibleName">
          <string>Tab List</string>
         </property>
@@ -61,24 +72,28 @@
         <property name="styleSheet">
          <string notr="true">QTabBar::tab:selected{
 background-color: rgb(216, 255, 223);
-border-radius: 8px;
-border: 2px solid gray;
+border: 1px solid black;
+border-bottom: 0px;
 padding: 5px, 5px, 5px, 5px;
 width: 200%;
 font: bold;
 }
 QTabBar::tab:!selected{
-border-radius: 8px;
-border: 2px solid gray;
+border: 1px solid gray;
+border-bottom: 0px;
 padding: 5px, 5px, 5px, 5px;
 width: 200%;
 }
+QTabBar {
+background-color: white;
+}
 QTabWidget::tab-bar { 
 alignment: center; 
+background-color: white;
+border-bottom: 1px  solid white;
 }
 QTabWidget::pane { 
 position: absolute; 
-top: -0.1em; 
 }</string>
         </property>
         <property name="tabShape">
@@ -88,11 +103,17 @@ top: -0.1em;
          <number>0</number>
         </property>
         <property name="movable">
-         <bool>true</bool>
+         <bool>false</bool>
+        </property>
+        <property name="tabBarAutoHide">
+         <bool>false</bool>
         </property>
         <widget class="QWidget" name="tab_ps">
          <property name="toolTip">
           <string/>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"/>
          </property>
          <attribute name="title">
           <string>PatchStorage View</string>
@@ -188,7 +209,10 @@ top: -0.1em;
                          <item>
                           <widget class="QLineEdit" name="searchbar_PS">
                            <property name="toolTip">
-                            <string>Search bar: Type and hit enter/return to search!</string>
+                            <string>Type and hit enter/return to search!</string>
+                           </property>
+                           <property name="statusTip">
+                            <string>Type and hit enter/return to search!</string>
                            </property>
                            <property name="accessibleName">
                             <string>PatchStorage View search bar</string>
@@ -316,8 +340,7 @@ QPushButton:hover{
                        <string>Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)</string>
                       </property>
                       <property name="styleSheet">
-                       <string notr="true">
-background-color: rgb(251, 255, 255);</string>
+                       <string notr="true"/>
                       </property>
                       <property name="frameShadow">
                        <enum>QFrame::Plain</enum>
@@ -438,7 +461,10 @@ QPushButton:hover{
                    <item>
                     <widget class="QLineEdit" name="searchbar_local">
                      <property name="toolTip">
-                      <string>Search bar: Type and hit enter/return to search!</string>
+                      <string>Type and hit enter/return to search!</string>
+                     </property>
+                     <property name="statusTip">
+                      <string>Type and hit enter/return to search!</string>
                      </property>
                      <property name="accessibleName">
                       <string>LocalStorage View search bar</string>
@@ -576,7 +602,7 @@ QPushButton:hover{
                     <string>Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)</string>
                    </property>
                    <property name="styleSheet">
-                    <string notr="true">background-color: rgb(251, 255, 255);</string>
+                    <string notr="true"/>
                    </property>
                    <property name="textInteractionFlags">
                     <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextEditable|Qt::TextSelectableByMouse</set>
@@ -1183,7 +1209,13 @@ QPushButton:hover{
                 <item>
                  <widget class="QLineEdit" name="searchbar_bank">
                   <property name="toolTip">
-                   <string>Search bar: Type and hit enter/return to search!</string>
+                   <string>Type and hit enter/return to search!</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Type and hit enter/return to search!</string>
+                  </property>
+                  <property name="whatsThis">
+                   <string/>
                   </property>
                   <property name="accessibleName">
                    <string>Banks search bar</string>
@@ -1277,7 +1309,7 @@ border: 1px solid gray;
               <string>Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)</string>
              </property>
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(251, 255, 255);</string>
+              <string notr="true"/>
              </property>
              <property name="textInteractionFlags">
               <set>Qt::TextBrowserInteraction</set>

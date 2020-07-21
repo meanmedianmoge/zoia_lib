@@ -24,8 +24,6 @@ save = PatchSave()
 export = PatchExport()
 delete = PatchDelete()
 backend_path = save.get_backend_path()
-icon = QIcon(os.path.join(os.getcwd(), "zoia_lib", "UI", "resources",
-                          "logo.ico"))
 
 
 class ZOIALibrarianMain(QMainWindow):
@@ -125,7 +123,7 @@ class ZOIALibrarianMain(QMainWindow):
                     self.data_PS = data
 
         # Set the window icon
-        self.setWindowIcon(QIcon(icon))
+        self.setWindowIcon(QIcon(self.icon))
 
         # Setup the headers for the tables.
         self.ui.table_PS.setHorizontalHeaderLabels(["Title", "Tags",
@@ -275,7 +273,7 @@ class ZOIALibrarianMain(QMainWindow):
                 msg = QMessageBox()
                 msg.setWindowTitle("No SD Path")
                 msg.setIcon(QMessageBox.Information)
-                msg.setWindowIcon(icon)
+                msg.setWindowIcon(self.icon)
                 msg.setText("Please specify your SD card path!")
                 msg.setInformativeText("File -> Specify SD Card Location")
                 msg.setStandardButtons(QMessageBox.Ok)
@@ -505,6 +503,7 @@ class ZOIALibrarianMain(QMainWindow):
             else:
                 btn_title.setObjectName(str(data[i]["id"]))
             btn_title.toggled.connect(self.display_patch_info)
+            btn_title.setFont(QFont(self.font, 10))
             curr_table.setCellWidget(i, 0, btn_title)
 
             # Text for the headers "Tags" and "Categories"
@@ -697,6 +696,7 @@ class ZOIALibrarianMain(QMainWindow):
             msg = QMessageBox()
             msg.setWindowTitle("Invalid File Type")
             msg.setIcon(QMessageBox.Information)
+            msg.setWindowIcon(self.icon)
             msg.setText("Unfortunately, that patch is not in a "
                         "supported format.")
             msg.setInformativeText("Supported formats are .bin and .zip")
@@ -728,6 +728,7 @@ class ZOIALibrarianMain(QMainWindow):
             msg = QMessageBox()
             msg.setWindowTitle("No SD Path")
             msg.setIcon(QMessageBox.Information)
+            msg.setWindowIcon(self.icon)
             msg.setText("Please specify your SD card path!")
             msg.setInformativeText("File -> Specify SD Card Location")
             msg.setStandardButtons(QMessageBox.Ok)
@@ -757,6 +758,7 @@ class ZOIALibrarianMain(QMainWindow):
                         msg = QMessageBox()
                         msg.setWindowTitle("Slot Exists")
                         msg.setIcon(QMessageBox.Information)
+                        msg.setWindowIcon(self.icon)
                         msg.setText("That slot is occupied by another patch. "
                                     "Would you like to overwrite it?")
                         msg.setStandardButtons(QMessageBox.Yes |
@@ -930,11 +932,13 @@ class ZOIALibrarianMain(QMainWindow):
         """
 
         # Get the new patch metadata that we don't have (if any).
+        self.ui.refresh_pch_btn.setEnabled(False)
         self.data_PS = ps.get_all_patch_data_init()
         with open(os.path.join(backend_path, "data.json"), "w") as f:
             f.write(json.dumps(self.data_PS))
         self.ui.searchbar_PS.setText("")
         self.sort_and_set()
+        self.ui.refresh_pch_btn.setEnabled(True)
         self.ui.statusbar.showMessage("Patch list refreshed!", timeout=5000)
 
     def sd_path(self):
@@ -948,7 +952,7 @@ class ZOIALibrarianMain(QMainWindow):
                                                      'Select an SD Card:',
                                                      expanduser("~"))
         if input_dir is not "" and os.path.isdir(input_dir):
-            if "/" in input_dir:
+            if "/" in input_dir and platform.system().lower() == "windows":
                 # THIS IS NEEDED FOR WINDOWS.
                 # This comes from a bug with QFileDialog returning the
                 # wrong path separator on Windows for some odd reason.
@@ -1145,6 +1149,7 @@ class ZOIALibrarianMain(QMainWindow):
             msg = QMessageBox()
             msg.setWindowTitle("No Updates")
             msg.setIcon(QMessageBox.Information)
+            msg.setWindowIcon(self.icon)
             msg.setText("All of the patches you have downloaded are "
                         "the latest version!")
             msg.setStandardButtons(QMessageBox.Ok)
@@ -1152,6 +1157,7 @@ class ZOIALibrarianMain(QMainWindow):
         else:
             msg = QMessageBox()
             msg.setWindowTitle("Updates")
+            msg.setWindowIcon(self.icon)
             msg.setIcon(QMessageBox.Information)
             if count == 1:
                 msg.setText("Successfully updated 1 patch.")
@@ -1190,7 +1196,7 @@ class ZOIALibrarianMain(QMainWindow):
         text = self.ui.text_browser_local.toPlainText()
         try:
             text = text.split("Patch Notes:")[1]
-            update.update_data(self.local_selected, text.rstrip(), 3)
+            update.update_data(self.local_selected, text.strip("\n"), 3)
         except IndexError:
             update.update_data(self.local_selected, "", 3)
         self.ui.statusbar.showMessage("Successfully updated patch notes.",
@@ -1222,6 +1228,7 @@ class ZOIALibrarianMain(QMainWindow):
                         msg = QMessageBox()
                         msg.setWindowTitle("Patch Already In Library")
                         msg.setIcon(QMessageBox.Information)
+                        msg.setWindowIcon(self.icon)
                         msg.setText("That patch exists within your locally "
                                     "saved patches.")
                         msg.setInformativeText("No importing has occurred.")
@@ -1250,6 +1257,7 @@ class ZOIALibrarianMain(QMainWindow):
             msg = QMessageBox()
             msg.setWindowTitle("No Patch Found")
             msg.setIcon(QMessageBox.Information)
+            msg.setWindowIcon(self.icon)
             msg.setText("Incorrect file selected, importing failed.")
             msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()
@@ -1282,6 +1290,7 @@ class ZOIALibrarianMain(QMainWindow):
                 msg = QMessageBox()
                 msg.setWindowTitle("Invalid Selection")
                 msg.setIcon(QMessageBox.Information)
+                msg.setWindowIcon(self.icon)
                 msg.setText("Please select a directory.")
                 msg.setStandardButtons(QMessageBox.Ok)
                 msg.exec_()
@@ -1303,6 +1312,7 @@ class ZOIALibrarianMain(QMainWindow):
         msg = QMessageBox()
         msg.setWindowTitle("Import Complete")
         msg.setIcon(QMessageBox.Information)
+        msg.setWindowIcon(self.icon)
         if imp_cnt > 0:
             msg.setText("Successfully imported {} patches.".format(imp_cnt))
         else:
@@ -1637,6 +1647,7 @@ class ZOIALibrarianMain(QMainWindow):
                             msg = QMessageBox()
                             msg.setWindowTitle("No Space")
                             msg.setIcon(QMessageBox.Information)
+                            msg.setWindowIcon(self.icon)
                             msg.setText("The version directory contain {} "
                                         "patches, so it must be dragged to "
                                         "slot {} or lower.".format(pch_num +
@@ -1855,9 +1866,6 @@ class ZOIALibrarianMain(QMainWindow):
         """ Loads a Bank file that was previously saved to the
         backend directory.
         Currently triggered via a button press.
-
-        TODO Fix the case where the patch has been deleted from the
-         Library.
         """
 
         bnk_file = QFileDialog.getOpenFileName(None,
@@ -1865,7 +1873,7 @@ class ZOIALibrarianMain(QMainWindow):
                                                os.path.join(backend_path,
                                                             "Banks"))[0]
         if bnk_file is not "":
-            if "/" in bnk_file:
+            if "/" in bnk_file and platform.system().lower() == "windows":
                 bnk_file = bnk_file.split("/")[-1]
             elif "\\" in bnk_file:
                 bnk_file = bnk_file.split("\\")[-1]
@@ -1881,8 +1889,23 @@ class ZOIALibrarianMain(QMainWindow):
         with open(os.path.join(backend_path, "Banks", bnk_file), "r") as f:
             self.data_banks = json.loads(f.read())
 
-        # TODO Check each item in self.data_banks against those currently saved
-        #  in the backend. If any don't match, remove it from the data.
+        # TODO Deal with the case where a file is not found.
+        fails = []
+        for pch in self.data_banks:
+            if pch["id"] not in os.listdir(backend_path):
+                fails.append(pch)
+                self.data_banks.remove(pch)
+
+        if len(fails) != 0:
+            msg = QMessageBox()
+            msg.setWindowTitle("Warning")
+            msg.setIcon(QMessageBox.Warning)
+            msg.setWindowIcon(self.icon)
+            msg.setText("One or more patches failed to load as they have "
+                        "been deleted from the ZOIA Librarian. Please "
+                        "reacquire them to have them load.")
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.exec_()
 
         found_item = False
         for i in range(64):
@@ -1894,25 +1917,23 @@ class ZOIALibrarianMain(QMainWindow):
                 if self.ui.table_bank_right.cellWidget(i - 32, 1) is not None:
                     found_item = True
                     break
-        if not found_item:
-            self.set_data_bank()
-            self.ui.btn_export_bank.setEnabled(True)
-            self.ui.btn_save_bank.setEnabled(True)
-        else:
+
+        if found_item:
             msg = QMessageBox()
             msg.setWindowTitle("Warning")
             msg.setIcon(QMessageBox.Warning)
+            msg.setWindowIcon(self.icon)
             msg.setText("This will overwrite the current data in the "
                         "table.\nIs that okay?")
             msg.setInformativeText("If you haven't saved your changes they "
                                    "will be lost.")
             msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
             value = msg.exec_()
-            if value == QMessageBox.Yes:
-                self.set_data_bank()
-                self.get_local_patches()
-                self.ui.btn_export_bank.setEnabled(True)
-                self.ui.btn_save_bank.setEnabled(True)
+            if value != QMessageBox.Yes:
+                return
+        self.set_data_bank()
+        self.ui.btn_export_bank.setEnabled(True)
+        self.ui.btn_save_bank.setEnabled(True)
 
     def save_bank(self):
         """ Saves a Bank to the backend application directory.
@@ -1936,53 +1957,84 @@ class ZOIALibrarianMain(QMainWindow):
 
         if self.sd_card_root is None:
             msg = QMessageBox()
-            msg.setIcon
             msg.setWindowTitle("No SD Path")
             msg.setIcon(QMessageBox.Information)
+            msg.setWindowIcon(self.icon)
             msg.setText("Please specify your SD card path!")
             msg.setInformativeText("File -> Specify SD Card Location")
             msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()
         else:
+            fails = []
             # Ask for a name
             while True:
                 name, ok = QInputDialog().getText(self, "Export Bank",
-                                                  "Please enter a name for the "
-                                                  "Bank:")
+                                                  "Please enter a name for "
+                                                  "the Bank:")
                 if ok and name not in os.listdir(self.sd_card_root):
+                    self.ui.statusbar.showMessage("Patches be movin'",
+                                                  timeout=1000)
                     self.get_bank_data()
-                    export.export_bank(self.data_banks, self.sd_card_root,
-                                       name)
-                    msg = QMessageBox()
-                    msg.setWindowTitle("Success!")
-                    msg.setIcon(QMessageBox.Information)
-                    msg.setText("The Bank has been successfully exported to "
-                                "the root of your SD card.")
-                    msg.setStandardButtons(QMessageBox.Ok)
-                    msg.exec_()
+                    fails = export.export_bank(self.data_banks,
+                                               self.sd_card_root, name)
                     break
-                else:
+                elif ok and name in os.listdir(self.sd_card_root):
                     msg = QMessageBox()
                     msg.setWindowTitle("Directory exists")
                     msg.setIcon(QMessageBox.Warning)
+                    msg.setWindowIcon(self.icon)
                     msg.setText("A directory with that name already exists.")
                     msg.setInformativeText("Would you like to overwrite it?")
                     msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
                     value = msg.exec_()
                     if value == QMessageBox.Yes:
+                        self.ui.statusbar.showMessage("Patches be movin'",
+                                                      timeout=1000)
                         self.get_bank_data()
-                        export.export_bank(self.data_banks, self.sd_card_root,
-                                           name, True)
-                        msg = QMessageBox()
-                        msg.setWindowTitle("Success!")
-                        msg.setWindowIcon(icon)
-                        msg.setIcon(QMessageBox.Information)
-                        msg.setText(
-                            "The Bank has been successfully exported to "
-                            "the root of your SD card.")
-                        msg.setStandardButtons(QMessageBox.Ok)
-                        msg.exec_()
+                        fails = export.export_bank(
+                            self.data_banks, self.sd_card_root, name, True)
                         break
+                else:
+                    break
+            if len(fails) == 0:
+                msg = QMessageBox()
+                msg.setWindowTitle("Success!")
+                msg.setIcon(QMessageBox.Information)
+                msg.setWindowIcon(self.icon)
+                msg.setText("The Bank has been successfully exported "
+                            "to the root of your SD card.")
+                msg.setStandardButtons(QMessageBox.Ok)
+                msg.exec_()
+            else:
+                msg = QMessageBox()
+                msg.setWindowTitle("Some export failures")
+                msg.setIcon(QMessageBox.Information)
+                msg.setWindowIcon(self.icon)
+                if len(fails) == len(self.data_banks):
+                    msg.setText("Failed to export any patches because"
+                                "they have all been deleted from the "
+                                "ZOIA Librarian.")
+                else:
+                    msg.setText("Successful exports: {}\n"
+                                "Failed exports: {}\n"
+                                "Failures occur when the Bank "
+                                "contains a patch that has been "
+                                "deleted from the ZOIA Librarian."
+                                "".format(len(self.data_banks)) - len(fails),
+                                len(fails))
+                    temp = "Here is a list of patches that failed to export:\n"
+                    for slot in fails:
+                        if slot < 32:
+                            temp += \
+                                self.ui.table_bank_left.item(slot, 0).text() \
+                                + "\n"
+                        else:
+                            temp += \
+                                self.ui.table_bank_right.item(
+                                    slot - 32, 0).text() + "\n"
+                    msg.setDetailedText(temp.strip("\n"))
+                msg.setStandardButtons(QMessageBox.Ok)
+                msg.exec_()
 
     def remove_bank_item(self):
         """ Removes an item from one of the bank tables.

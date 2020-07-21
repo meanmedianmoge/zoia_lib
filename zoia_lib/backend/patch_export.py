@@ -122,12 +122,14 @@ class PatchExport(Patch):
             raise errors.ExportingError(patch)
 
     def export_bank(self, bank, dest, name, overwrite=False):
-        """ Exports an entire bank to be ready for use on a ZOIA. Ideally,
-        this is used to export a bank from a local user's machine to a
-        ZOIA SD card.
+        """ Exports an entire bank to be ready for use on a ZOIA.
+        Ideally,this is used to export a bank from a local user's
+        machine to a ZOIA SD card.
 
         bank: The bank data to be processed.
         """
+
+        fail_list = []
 
         # Prepare a destination directory.
         if overwrite and name in os.listdir(dest):
@@ -138,5 +140,14 @@ class PatchExport(Patch):
 
         # Process the bank and add each to the bank directory.
         for pch in bank:
-            self.export_patch_bin(pch["id"], os.path.join(dest, name),
-                                  pch["slot"])
+            try:
+                self.export_patch_bin(pch["id"], os.path.join(dest, name),
+                                      pch["slot"])
+            except errors.BadPathError:
+                fail_list.append(pch["slot"])
+
+        # If we failed to export any patches, remove the directory
+        # we just created.
+        if len(fail_list) == len(bank):
+            os.rmdir(os.path.join(dest, name))
+        return fail_list
