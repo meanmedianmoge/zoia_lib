@@ -15,7 +15,7 @@ Please familiarize yourself with the various license agreements for each Patchst
 This software is intended to be free and will be supported by the development team and Empress Effects.
 
 ## How to Install
-- Mac OS X: `beta release-candidate coming soon!`
+- Mac OS X: https://github.com/meanmedianmoge/zoia_lib/releases/tag/Beta-1
 - Windows 10: https://github.com/meanmedianmoge/zoia_lib/releases/tag/Beta-1
 - Linux (Ubuntu): `beta release-candidate coming soon!`
 
