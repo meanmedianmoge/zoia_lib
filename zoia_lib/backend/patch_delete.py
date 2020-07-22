@@ -76,9 +76,6 @@ class PatchDelete(Patch):
         if len(patch_dir.split(".")) > 1:
             # There shouldn't be a file extension.
             raise errors.DeletionError(patch_dir, 401)
-        if len(patch_dir.split("_")) > 1:
-            # There shouldn't be a version extension.
-            raise errors.DeletionError(patch_dir, 402)
 
         try:
             shutil.rmtree(os.path.join(self.back_path, patch_dir))
@@ -121,3 +118,17 @@ class PatchDelete(Patch):
         except FileNotFoundError:
             # Couldn't find the patch at the supplied path.
             raise errors.BadPathError(sd_path, 301)
+
+    @staticmethod
+    def delete_file(path):
+        """ Deletes a file at the specified path.
+
+        path: The path at which the file to be deleted is located.
+        """
+
+        # Delete the patch.
+        try:
+            os.remove(path)
+        except FileNotFoundError:
+            # Couldn't find the file at the supplied path.
+            raise errors.BadPathError(path, 301)

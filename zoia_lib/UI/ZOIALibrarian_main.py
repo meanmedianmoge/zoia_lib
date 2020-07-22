@@ -85,6 +85,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.curr_ver = None
         self.can_export_bank = False
         self.font = "Verdana"
+        self.font_size = 10
 
         curr_os = platform.system().lower()
         if curr_os == "darwin":
@@ -165,6 +166,20 @@ class ZOIALibrarianMain(QMainWindow):
         if len(os.listdir(os.path.join(backend_path, "Banks"))) == 0:
             self.ui.btn_load_bank.setEnabled(False)
 
+        # Load preferences from previous sessions (if they exist)
+        if os.path.exists(os.path.join(backend_path, "pref.json")):
+            # SD Card previously specified.
+            with open(os.path.join(backend_path, "pref.json"), "r") as f:
+                data = json.loads(f.read())
+            self.sd_card_root = data["sd_root"]
+            self.ui.tab_sd.setEnabled(True)
+            self.can_export_bank = True
+            self.sd_path()
+
+            # Fonts
+            self.font = data["font"]
+            self.font_size = data["font_size"]
+
         # Connect buttons and items to methods.
         self.ui.tabs.currentChanged.connect(self.tab_switch)
         self.ui.actionAlternating_Row_Colours.triggered.connect(
@@ -188,10 +203,27 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.actionSpecify_SD_Card_Location.triggered.connect(self.sd_path)
         self.ui.actionImport_Multiple_Patches.triggered.connect(
             self.mass_import)
-        self.ui.actionChange_Font.triggered.connect(self.change_font)
+        self.ui.actionArial.triggered.connect(self.change_font)
+        self.ui.actionArial_Black.triggered.connect(self.change_font)
+        self.ui.actionComic_Sans_MS.triggered.connect(self.change_font)
+        self.ui.actionCourier_New.triggered.connect(self.change_font)
+        self.ui.actionGeorgia.triggered.connect(self.change_font)
+        self.ui.actionLucida_Console.triggered.connect(self.change_font)
+        self.ui.actionLucida_Sans_Unicode.triggered.connect(self.change_font)
+        self.ui.actionPalatino_Linotype.triggered.connect(self.change_font)
+        self.ui.actionPapyrus.triggered.connect(self.change_font)
+        self.ui.actionTahoma.triggered.connect(self.change_font)
+        self.ui.actionTimes_New_Roman.triggered.connect(self.change_font)
+        self.ui.actionTrebuchet_MS.triggered.connect(self.change_font)
+        self.ui.actionVerdana.triggered.connect(self.change_font)
+        self.ui.actionWingdings.triggered.connect(self.change_font)
+        self.ui.actionIncrease_Font_Size.triggered.connect(
+            self.change_font_size)
+        self.ui.actionDecrease_Font_Size.triggered.connect(
+            self.change_font_size)
+        self.ui.actionQuit.triggered.connect(self.try_quit)
         self.ui.check_for_updates_btn.clicked.connect(self.update)
         self.ui.refresh_pch_btn.clicked.connect(self.reload_ps)
-        self.ui.actionQuit.triggered.connect(self.try_quit)
         self.ui.update_patch_notes.clicked.connect(self.update_patch_notes)
         self.ui.actionImport_A_Patch.triggered.connect(self.import_patch)
         self.ui.actionToggle_Dark_Mode.triggered.connect(self.toggle_darkmode)
@@ -214,18 +246,10 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.btn_load_bank.clicked.connect(self.load_bank)
         self.ui.btn_save_bank.clicked.connect(self.save_bank)
         self.ui.btn_export_bank.clicked.connect(self.export_bank)
+        self.ui.delete_folder_sd_btn.clicked.connect(self.delete_sd_item)
 
         # Font consistency.
-        self.ui.table_PS.setFont(QFont(self.font, 10))
-        self.ui.table_local.setFont(QFont(self.font, 10))
-        self.ui.table_sd_left.setFont(QFont(self.font, 10))
-        self.ui.table_sd_right.setFont(QFont(self.font, 10))
-        self.ui.table_bank_local.setFont(QFont(self.font, 10))
-        self.ui.table_bank_left.setFont(QFont(self.font, 10))
-        self.ui.table_bank_right.setFont(QFont(self.font, 10))
-        self.ui.text_browser_PS.setFont(QFont(self.font, 16))
-        self.ui.text_browser_local.setFont(QFont(self.font, 16))
-        self.ui.text_browser_bank.setFont(QFont(self.font, 16))
+        self.change_font()
 
         # Modify the display sizes for some widgets.
         self.ui.splitter_PS.setSizes([self.width() * 0.325,
@@ -238,8 +262,8 @@ class ZOIALibrarianMain(QMainWindow):
                                                self.width() * 0.5])
         self.ui.splitter_sd_vert.setSizes([self.width() * 0.185,
                                            self.width() * 0.815])
-        self.ui.splitter_bank.setSizes([self.width() * 0.25, self.width() *
-                                        0.25, self.width() * 0.5])
+        self.ui.splitter_bank.setSizes([self.width() * 0.5, self.width() *
+                                        0.25, self.width() * 0.25])
 
         # Sort and set the data.
         self.sort_and_set()
@@ -279,6 +303,8 @@ class ZOIALibrarianMain(QMainWindow):
                 msg.setStandardButtons(QMessageBox.Ok)
                 msg.exec_()
                 self.ui.tabs.setCurrentIndex(1)
+        elif self.ui.tabs.currentIndex() == 0:
+            self.sort_and_set()
 
     def get_local_patches(self):
         """ Retrieves the metadata for patches that a user has previously
@@ -293,7 +319,7 @@ class ZOIALibrarianMain(QMainWindow):
         for patches in os.listdir(backend_path):
             # Look for patch directories in the backend.
             if patches != "Banks" and patches != "data.json" and \
-                    patches != '.DS_Store':
+                    patches != '.DS_Store' and patches != "pref.json":
                 for pch in os.listdir(os.path.join(backend_path,
                                                    patches)):
                     # Read the metadata so that we can set up the tables.
@@ -399,12 +425,12 @@ class ZOIALibrarianMain(QMainWindow):
                 # Setup the buttons we are adding
                 push_button = QPushButton("X")
                 push_button.setObjectName(str(index))
-                push_button.setFont(QFont(self.font, 10))
+                push_button.setFont(QFont(self.font, self.font_size))
                 push_button.clicked.connect(self.remove_sd)
 
                 import_btn = QPushButton("Click me to import!")
                 import_btn.setObjectName(str(index))
-                import_btn.setFont(QFont(self.font, 10))
+                import_btn.setFont(QFont(self.font, self.font_size))
                 import_btn.clicked.connect(self.import_patch)
 
                 if index < 32:
@@ -503,7 +529,7 @@ class ZOIALibrarianMain(QMainWindow):
             else:
                 btn_title.setObjectName(str(data[i]["id"]))
             btn_title.toggled.connect(self.display_patch_info)
-            btn_title.setFont(QFont(self.font, 10))
+            btn_title.setFont(QFont(self.font, self.font_size))
             curr_table.setCellWidget(i, 0, btn_title)
 
             # Text for the headers "Tags" and "Categories"
@@ -542,7 +568,7 @@ class ZOIALibrarianMain(QMainWindow):
             # If we are on tab index 0, we need a "Download" header item.
             if table_index == 0:
                 dwn = QPushButton("Click me\nto download!", self)
-                dwn.setFont(QFont(self.font, 10))
+                dwn.setFont(QFont(self.font, self.font_size))
                 dwn.clicked.connect(self.initiate_download)
                 dwn.setObjectName(str(data[i]["id"]))
 
@@ -565,7 +591,7 @@ class ZOIALibrarianMain(QMainWindow):
                                        + str(data[i]["revision"]))
                 else:
                     expt.setObjectName(str(data[i]["id"]))
-                expt.setFont(QFont(self.font, 10))
+                expt.setFont(QFont(self.font, self.font_size))
                 expt.clicked.connect(self.initiate_export)
                 curr_table.setCellWidget(i, 4, expt)
 
@@ -575,7 +601,7 @@ class ZOIALibrarianMain(QMainWindow):
                                          + str(data[i]["revision"]))
                 else:
                     delete.setObjectName(str(data[i]["id"]))
-                delete.setFont(QFont(self.font, 10))
+                delete.setFont(QFont(self.font, self.font_size))
                 delete.clicked.connect(self.initiate_delete)
                 curr_table.setCellWidget(i, 5, delete)
 
@@ -947,31 +973,32 @@ class ZOIALibrarianMain(QMainWindow):
         that the location selected is actually an SD card.
         Currently triggered via a menu action.
         """
-
-        input_dir = QFileDialog.getExistingDirectory(None,
-                                                     'Select an SD Card:',
-                                                     expanduser("~"))
-        if input_dir is not "" and os.path.isdir(input_dir):
-            if "/" in input_dir and platform.system().lower() == "windows":
-                # THIS IS NEEDED FOR WINDOWS.
-                # This comes from a bug with QFileDialog returning the
-                # wrong path separator on Windows for some odd reason.
-                input_dir = input_dir.split("/")[0]
-            elif "\\" in input_dir:
-                input_dir = input_dir.split("\\")[0]
-            elif "//" in input_dir:
-                input_dir = input_dir.split("//")[0]
-            elif "\\\\" in input_dir:
-                input_dir = input_dir.split("\\\\")[0]
+        if self.sender() is not None:
+            print("oh no")
+            input_dir = QFileDialog.getExistingDirectory(None,
+                                                         'Select an SD Card:',
+                                                         expanduser("~"))
+            if input_dir is not "" and os.path.isdir(input_dir):
+                if "/" in input_dir and platform.system().lower() == "windows":
+                    # THIS IS NEEDED FOR WINDOWS.
+                    # This comes from a bug with QFileDialog returning the
+                    # wrong path separator on Windows for some odd reason.
+                    input_dir = input_dir.split("/")[0]
+                elif "\\" in input_dir:
+                    input_dir = input_dir.split("\\")[0]
+                elif "//" in input_dir:
+                    input_dir = input_dir.split("//")[0]
+                elif "\\\\" in input_dir:
+                    input_dir = input_dir.split("\\\\")[0]
+                else:
+                    input_dir = input_dir.split(os.path.sep)[0]
+                self.sd_card_root = str(input_dir)
+                self.ui.tab_sd.setEnabled(True)
+                self.can_export_bank = True
             else:
-                input_dir = input_dir.split(os.path.sep)[0]
-            self.sd_card_root = str(input_dir)
-            self.ui.tab_sd.setEnabled(True)
-            self.can_export_bank = True
-        else:
-            self.ui.tab_sd.setEnabled(False)
-            self.can_export_bank = False
-            self.ui.tabs.setCurrentIndex(1)
+                self.ui.tab_sd.setEnabled(False)
+                self.can_export_bank = False
+                self.ui.tabs.setCurrentIndex(1)
 
         # Setup the SD card tree view for the SD Card tab.
         model = QFileSystemModel()
@@ -1675,6 +1702,13 @@ class ZOIALibrarianMain(QMainWindow):
                                 })
 
                             self.set_data_bank()
+                else:
+                    # Check for phantom rows to delete.
+                    while self.ui.table_bank_left.rowCount() > 32 or \
+                            self.ui.table_bank_right.rowCount() > 32:
+                        self.ui.table_bank_left.removeRow(32)
+                        self.ui.table_bank_right.removeRow(32)
+
         elif o.objectName() == "table_bank_left" or o.objectName() == \
                 "table_bank_right":
             if e.type() == QEvent.ChildAdded:
@@ -2084,6 +2118,7 @@ class ZOIALibrarianMain(QMainWindow):
     def get_bank_data(self):
         """ Gets the data from the current bank tables.
         """
+
         self.data_banks = []
         for i in range(64):
             if i < 32:
@@ -2096,17 +2131,123 @@ class ZOIALibrarianMain(QMainWindow):
                     "id": temp.objectName()
                 })
 
-    def change_font(self):
-        """ Allows the user to change the font used throughout the
+    def change_font_size(self):
+        """ Changes the size of most font used throughout the
         application.
         Currently triggered via a menu action.
         """
 
-        pass
+        if self.sender().objectName() == "actionIncrease_Font_Size":
+            if self.font_size < 72:
+                self.font_size += 2
+        else:
+            if self.font_size > 8:
+                self.font_size -= 2
+
+        self.change_font()
+
+    def change_font(self):
+        """ Changes the font used throughout the
+        application.
+        Currently triggered via a menu action.
+        """
+
+
+        if self.sender() is not None \
+            and self.sender().objectName() != "actionIncrease_Font_Size" and \
+            self.sender().objectName() != "actionDecrease_Font_Size":
+                font = self.sender().objectName()[6:]
+                font = font.replace("_", " ")
+                self.font = font
+
+        self.ui.table_PS.setFont(QFont(self.font, self.font_size))
+        self.ui.table_PS.horizontalHeader().setFont(QFont(
+            self.font, self.font_size))
+        self.ui.table_local.setFont(QFont(self.font, self.font_size))
+        self.ui.table_local.horizontalHeader().setFont(QFont(
+            self.font, self.font_size))
+        self.ui.table_sd_left.setFont(QFont(self.font, self.font_size))
+        self.ui.table_sd_left.horizontalHeader().setFont(QFont(
+            self.font, self.font_size))
+        self.ui.table_sd_right.setFont(QFont(self.font, self.font_size))
+        self.ui.table_sd_right.horizontalHeader().setFont(QFont(
+            self.font, self.font_size))
+        self.ui.table_bank_local.setFont(QFont(self.font, self.font_size))
+        self.ui.table_bank_local.horizontalHeader().setFont(
+            QFont(self.font, self.font_size))
+        self.ui.table_bank_left.setFont(QFont(self.font, self.font_size))
+        self.ui.table_bank_left.horizontalHeader().setFont(
+            QFont(self.font, self.font_size))
+        self.ui.table_bank_right.setFont(QFont(self.font, self.font_size))
+        self.ui.table_bank_right.horizontalHeader().setFont(
+            QFont(self.font, self.font_size))
+        self.ui.tabs.setFont(QFont(self.font, 10))
+        self.ui.text_browser_PS.setFont(QFont(self.font, self.font_size + 6))
+        self.ui.text_browser_local.setFont(QFont(self.font,
+                                                 self.font_size + 6))
+        self.ui.text_browser_bank.setFont(QFont(self.font, self.font_size + 6))
+
+        if self.sender() is not None:
+            for i in range(self.ui.table_PS.rowCount()):
+                self.ui.table_PS.cellWidget(i, 0).setFont(QFont(
+                    self.font, self.font_size))
+                self.ui.table_PS.cellWidget(i, 4).setFont(QFont(
+                    self.font, self.font_size))
+            if self.data_local is not None:
+                for i in range(self.ui.table_local.rowCount()):
+                    self.ui.table_local.cellWidget(i, 0).setFont(QFont(
+                        self.font, self.font_size))
+                    self.ui.table_local.cellWidget(i, 4).setFont(QFont(
+                        self.font, self.font_size))
+                    self.ui.table_local.cellWidget(i, 5).setFont(QFont(
+                        self.font, self.font_size))
+            if self.data_bank is not None:
+                for i in range(self.ui.table_bank_local.rowCount()):
+                    self.ui.table_bank_local.cellWidget(i, 0).setFont(QFont(
+                        self.font, self.font_size))
+
+    def delete_sd_item(self):
+        """ Deletes the currently selected directory from the SD card.
+        Currently triggered via a button press.
+        """
+
+        if os.path.isdir(self.sd_card_path):
+            msg = QMessageBox()
+            msg.setWindowTitle("Warning")
+            msg.setIcon(QMessageBox.Warning)
+            msg.setWindowIcon(self.icon)
+            msg.setText("This will delete everything contained within the \n"
+                        "selected folder. This includes any files or"
+                        "additional \n folders contained within. \n"
+                        "Do you wish to continue?")
+            msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+            val = msg.exec_()
+            if val == QMessageBox.Yes:
+                delete.delete_full_patch_directory(self.sd_card_path)
+                self.prepare_sd_view()
+        else:
+            delete.delete_file(self.sd_card_path)
+            self.prepare_sd_view()
+
+    def closeEvent(self, event):
+        """ Override the default close operation so certain application
+        settings can be saved.
+        """
+
+        if self.sd_card_root is not None:
+            sd = {
+                "sd_root": self.sd_card_root,
+                "font": self.font,
+                "font_size": self.font_size
+            }
+            with open(os.path.join(backend_path, "pref.json"), "w") as f:
+                f.write(json.dumps(sd))
 
     def try_quit(self):
         """ Forces the application to close.
         Currently triggered via a menu action.
         """
 
+        # Save application settings and then exit.
+        self.closeEvent(None)
         self.close()

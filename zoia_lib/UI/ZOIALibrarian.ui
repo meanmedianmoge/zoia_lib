@@ -88,7 +88,6 @@ QTabBar {
 background-color: white;
 }
 QTabWidget::tab-bar { 
-alignment: center; 
 background-color: white;
 border-bottom: 1px  solid white;
 }
@@ -276,6 +275,9 @@ QPushButton:hover{
                          </property>
                          <property name="accessibleDescription">
                           <string>Displays all of the ZOIA patches that are currently hosted on PatchStorage.</string>
+                         </property>
+                         <property name="styleSheet">
+                          <string notr="true"/>
                          </property>
                          <property name="frameShape">
                           <enum>QFrame::StyledPanel</enum>
@@ -690,7 +692,7 @@ QPushButton:hover{
               <bool>true</bool>
              </property>
              <property name="wordWrap">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
              <property name="headerHidden">
               <bool>true</bool>
@@ -701,6 +703,24 @@ QPushButton:hover{
             </widget>
             <widget class="QWidget" name="layoutWidget_3">
              <layout class="QVBoxLayout" name="verticalLayout_11">
+              <item>
+               <widget class="QPushButton" name="delete_folder_sd_btn">
+                <property name="styleSheet">
+                 <string notr="true">QPushButton{
+border-radius: 5px;
+padding: 2px 2px 2px 2px;
+border: 1px solid gray;
+background-color: rgb(224, 224, 224);
+}
+QPushButton:hover{
+	background-color: rgb(207, 232, 232);
+}</string>
+                </property>
+                <property name="text">
+                 <string>Delete Selected Item Above</string>
+                </property>
+               </widget>
+              </item>
               <item>
                <widget class="QPushButton" name="import_all_btn">
                 <property name="toolTip">
@@ -727,7 +747,7 @@ QPushButton:hover{
 }</string>
                 </property>
                 <property name="text">
-                 <string>Import All Patches</string>
+                 <string>Import All Listed Patches Below</string>
                 </property>
                </widget>
               </item>
@@ -1168,159 +1188,6 @@ QPushButton:hover{
             <property name="handleWidth">
              <number>10</number>
             </property>
-            <widget class="QWidget" name="layoutWidget_5">
-             <layout class="QVBoxLayout" name="verticalLayout_9">
-              <property name="spacing">
-               <number>5</number>
-              </property>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_11">
-                <item>
-                 <widget class="QPushButton" name="back_btn_bank">
-                  <property name="toolTip">
-                   <string>Click here to back to the full patch list.</string>
-                  </property>
-                  <property name="statusTip">
-                   <string>Click here to back to the full patch list.</string>
-                  </property>
-                  <property name="accessibleName">
-                   <string>Back button Bank</string>
-                  </property>
-                  <property name="accessibleDescription">
-                   <string>When clicked, exits out of the Version History for a patch and returns to the full list of patches currently stored in the ZOIA Librarian</string>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true">QPushButton{
-border-radius: 5px;
-padding: 2px 25px 2px 25px;
-border: 1px solid gray;
-background-color: rgb(224, 224, 224);
-
-}
-QPushButton:hover{
-	background-color: rgb(207, 232, 232);
-}</string>
-                  </property>
-                  <property name="text">
-                   <string>Back</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLineEdit" name="searchbar_bank">
-                  <property name="toolTip">
-                   <string>Type and hit enter/return to search!</string>
-                  </property>
-                  <property name="statusTip">
-                   <string>Type and hit enter/return to search!</string>
-                  </property>
-                  <property name="whatsThis">
-                   <string/>
-                  </property>
-                  <property name="accessibleName">
-                   <string>Banks search bar</string>
-                  </property>
-                  <property name="accessibleDescription">
-                   <string>Searches through the ZOIA patches currently saved in the ZOIA Librarian for any that match what is written in the search query. Hit enter or return to initiate the search.</string>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true">QLineEdit{
-border-radius: 5px;
-border: 1px solid gray;
-}</string>
-                  </property>
-                  <property name="inputMask">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <widget class="QTableWidget" name="table_bank_local">
-                <property name="toolTip">
-                 <string/>
-                </property>
-                <property name="statusTip">
-                 <string>Drag a patch to one of the tables on the right!</string>
-                </property>
-                <property name="accessibleName">
-                 <string>Banks table</string>
-                </property>
-                <property name="accessibleDescription">
-                 <string>Displays all of the patches that have been saved to the ZOIA Librarian</string>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-                <property name="sizeAdjustPolicy">
-                 <enum>QAbstractScrollArea::AdjustToContents</enum>
-                </property>
-                <property name="editTriggers">
-                 <set>QAbstractItemView::NoEditTriggers</set>
-                </property>
-                <property name="dragEnabled">
-                 <bool>true</bool>
-                </property>
-                <property name="dragDropOverwriteMode">
-                 <bool>false</bool>
-                </property>
-                <property name="dragDropMode">
-                 <enum>QAbstractItemView::DragOnly</enum>
-                </property>
-                <property name="selectionMode">
-                 <enum>QAbstractItemView::SingleSelection</enum>
-                </property>
-                <property name="selectionBehavior">
-                 <enum>QAbstractItemView::SelectRows</enum>
-                </property>
-                <property name="horizontalScrollMode">
-                 <enum>QAbstractItemView::ScrollPerPixel</enum>
-                </property>
-                <property name="rowCount">
-                 <number>1</number>
-                </property>
-                <property name="columnCount">
-                 <number>4</number>
-                </property>
-                <attribute name="horizontalHeaderCascadingSectionResizes">
-                 <bool>true</bool>
-                </attribute>
-                <attribute name="horizontalHeaderStretchLastSection">
-                 <bool>true</bool>
-                </attribute>
-                <attribute name="verticalHeaderVisible">
-                 <bool>false</bool>
-                </attribute>
-                <row/>
-                <column/>
-                <column/>
-                <column/>
-                <column/>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-            <widget class="QTextBrowser" name="text_browser_bank">
-             <property name="accessibleName">
-              <string>Additional Patch Notes Display</string>
-             </property>
-             <property name="accessibleDescription">
-              <string>Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)</string>
-             </property>
-             <property name="styleSheet">
-              <string notr="true"/>
-             </property>
-             <property name="textInteractionFlags">
-              <set>Qt::TextBrowserInteraction</set>
-             </property>
-             <property name="openExternalLinks">
-              <bool>true</bool>
-             </property>
-             <property name="openLinks">
-              <bool>true</bool>
-             </property>
-            </widget>
             <widget class="QWidget" name="layoutWidget_6">
              <layout class="QVBoxLayout" name="verticalLayout">
               <item>
@@ -1844,6 +1711,159 @@ QPushButton:hover{
               </item>
              </layout>
             </widget>
+            <widget class="QWidget" name="layoutWidget_5">
+             <layout class="QVBoxLayout" name="verticalLayout_9">
+              <property name="spacing">
+               <number>5</number>
+              </property>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_11">
+                <item>
+                 <widget class="QPushButton" name="back_btn_bank">
+                  <property name="toolTip">
+                   <string>Click here to back to the full patch list.</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Click here to back to the full patch list.</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Back button Bank</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>When clicked, exits out of the Version History for a patch and returns to the full list of patches currently stored in the ZOIA Librarian</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QPushButton{
+border-radius: 5px;
+padding: 2px 25px 2px 25px;
+border: 1px solid gray;
+background-color: rgb(224, 224, 224);
+
+}
+QPushButton:hover{
+	background-color: rgb(207, 232, 232);
+}</string>
+                  </property>
+                  <property name="text">
+                   <string>Back</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="searchbar_bank">
+                  <property name="toolTip">
+                   <string>Type and hit enter/return to search!</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Type and hit enter/return to search!</string>
+                  </property>
+                  <property name="whatsThis">
+                   <string/>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Banks search bar</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>Searches through the ZOIA patches currently saved in the ZOIA Librarian for any that match what is written in the search query. Hit enter or return to initiate the search.</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QLineEdit{
+border-radius: 5px;
+border: 1px solid gray;
+}</string>
+                  </property>
+                  <property name="inputMask">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QTableWidget" name="table_bank_local">
+                <property name="toolTip">
+                 <string/>
+                </property>
+                <property name="statusTip">
+                 <string>Drag a patch to one of the tables on the left!</string>
+                </property>
+                <property name="accessibleName">
+                 <string>Banks table</string>
+                </property>
+                <property name="accessibleDescription">
+                 <string>Displays all of the patches that have been saved to the ZOIA Librarian</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="sizeAdjustPolicy">
+                 <enum>QAbstractScrollArea::AdjustToContents</enum>
+                </property>
+                <property name="editTriggers">
+                 <set>QAbstractItemView::NoEditTriggers</set>
+                </property>
+                <property name="dragEnabled">
+                 <bool>true</bool>
+                </property>
+                <property name="dragDropOverwriteMode">
+                 <bool>false</bool>
+                </property>
+                <property name="dragDropMode">
+                 <enum>QAbstractItemView::DragOnly</enum>
+                </property>
+                <property name="selectionMode">
+                 <enum>QAbstractItemView::SingleSelection</enum>
+                </property>
+                <property name="selectionBehavior">
+                 <enum>QAbstractItemView::SelectRows</enum>
+                </property>
+                <property name="horizontalScrollMode">
+                 <enum>QAbstractItemView::ScrollPerPixel</enum>
+                </property>
+                <property name="rowCount">
+                 <number>1</number>
+                </property>
+                <property name="columnCount">
+                 <number>4</number>
+                </property>
+                <attribute name="horizontalHeaderCascadingSectionResizes">
+                 <bool>true</bool>
+                </attribute>
+                <attribute name="horizontalHeaderStretchLastSection">
+                 <bool>true</bool>
+                </attribute>
+                <attribute name="verticalHeaderVisible">
+                 <bool>false</bool>
+                </attribute>
+                <row/>
+                <column/>
+                <column/>
+                <column/>
+                <column/>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QTextBrowser" name="text_browser_bank">
+             <property name="accessibleName">
+              <string>Additional Patch Notes Display</string>
+             </property>
+             <property name="accessibleDescription">
+              <string>Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)</string>
+             </property>
+             <property name="styleSheet">
+              <string notr="true"/>
+             </property>
+             <property name="textInteractionFlags">
+              <set>Qt::TextBrowserInteraction</set>
+             </property>
+             <property name="openExternalLinks">
+              <bool>true</bool>
+             </property>
+             <property name="openLinks">
+              <bool>true</bool>
+             </property>
+            </widget>
            </widget>
           </item>
          </layout>
@@ -1901,8 +1921,29 @@ QPushButton:hover{
     <property name="title">
      <string>Options</string>
     </property>
+    <widget class="QMenu" name="menuChange_Font">
+     <property name="title">
+      <string>Change Font</string>
+     </property>
+     <addaction name="actionArial"/>
+     <addaction name="actionArial_Black"/>
+     <addaction name="actionComic_Sans_MS"/>
+     <addaction name="actionCourier_New"/>
+     <addaction name="actionGeorgia"/>
+     <addaction name="actionLucida_Console"/>
+     <addaction name="actionLucida_Sans_Unicode"/>
+     <addaction name="actionPalatino_Linotype"/>
+     <addaction name="actionPapyrus"/>
+     <addaction name="actionTahoma"/>
+     <addaction name="actionTimes_New_Roman"/>
+     <addaction name="actionTrebuchet_MS"/>
+     <addaction name="actionVerdana"/>
+     <addaction name="actionWingdings"/>
+    </widget>
     <addaction name="actionAlternating_Row_Colours"/>
-    <addaction name="actionChange_Font"/>
+    <addaction name="menuChange_Font"/>
+    <addaction name="actionIncrease_Font_Size"/>
+    <addaction name="actionDecrease_Font_Size"/>
    </widget>
    <addaction name="menuFiel"/>
    <addaction name="menuSort"/>
@@ -2087,18 +2128,165 @@ QPushButton:hover{
     <bool>true</bool>
    </property>
   </action>
-  <action name="actionChange_Font">
+  <action name="actionArial">
    <property name="text">
-    <string>Change Font</string>
+    <string>Arial</string>
    </property>
-   <property name="statusTip">
-    <string/>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
    </property>
-   <property name="whatsThis">
-    <string>Opens a window that allows you to select a new font to display thoughout the ZOIA Librarian</string>
+  </action>
+  <action name="actionArial_Black">
+   <property name="text">
+    <string>Arial Black</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial Black</family>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="actionComic_Sans_MS">
+   <property name="text">
+    <string>Comic Sans</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Comic Sans MS</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionCourier_New">
+   <property name="text">
+    <string>Courier New</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Courier New</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionGeorgia">
+   <property name="text">
+    <string>Georgia</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Georgia</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionLucida_Console">
+   <property name="text">
+    <string>Lucida Console</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Lucida Console</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionLucida_Sans_Unicode">
+   <property name="text">
+    <string>Lucida Sans Unicode</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Lucida Sans Unicode</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionPalatino_Linotype">
+   <property name="text">
+    <string>Palatino Linotype</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Palatino Linotype</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionTahoma">
+   <property name="text">
+    <string>Tahoma</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionTimes_New_Roman">
+   <property name="text">
+    <string>Times New Roman</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Times New Roman</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionTrebuchet_MS">
+   <property name="text">
+    <string>Trebuchet MS</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Trebuchet MS</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionVerdana">
+   <property name="text">
+    <string>Verdana (Default)</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Verdana</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionPapyrus">
+   <property name="text">
+    <string>Papyrus</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Papyrus</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionWingdings">
+   <property name="text">
+    <string>Wingdings (Oh no)</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Verdana</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionIncrease_Font_Size">
+   <property name="text">
+    <string>Increase Font Size</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+F</string>
+    <string>Ctrl+Shift+=</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionDecrease_Font_Size">
+   <property name="text">
+    <string>Decrease Font Size</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+-</string>
    </property>
    <property name="shortcutVisibleInContextMenu">
     <bool>true</bool>
