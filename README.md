@@ -12,12 +12,12 @@ This project depends heavily on the Patchstorage API, developed by Blokas: https
 
 Use of this software is subject to GPL 3.0.
 Please familiarize yourself with the various license agreements for each Patchstorage patch.
-This software is intended to be free and will be supported by the development team and Empress Effects.
+This software is intended to be free and will be supported by the development team.
 
 ## How to Install
-- Mac OS X: `beta release-candidate coming soon!`
-- Windows 10: https://github.com/meanmedianmoge/zoia_lib/releases/tag/Beta-1
-- Linux (Ubuntu): `beta release-candidate coming soon!`
+- Mac OS X: https://github.com/meanmedianmoge/zoia_lib/releases/tag/Beta-2
+- Windows 10: https://github.com/meanmedianmoge/zoia_lib/releases/tag/Beta-2
+- Linux (Ubuntu): https://github.com/meanmedianmoge/zoia_lib/releases/tag/Beta-2
 
 ## User Manual
 - Located in `documentation/User Manuals`, available as PDF or docx
@@ -25,7 +25,7 @@ This software is intended to be free and will be supported by the development te
 ## Features
 - Browse Patchstorage uploads and local patches within the UI
 - Search functionality to locate specific patches, tags, and more
-- Sort the results by author, likes, downloads, tags, categories, etc
+- Sort the results by title, date modified, likes, views, or downloads
 - Download patches from Patchstorage
 - Import patches from local storage or SD card
 - View and edit patch notes
