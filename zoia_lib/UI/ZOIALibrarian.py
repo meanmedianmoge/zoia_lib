@@ -166,9 +166,13 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.setContentsMargins(0, -1, -1, -1)
         self.tabs = QTabWidget(self.centralwidget)
         self.tabs.setObjectName(u"tabs")
+        self.tabs.setCursor(QCursor(Qt.ArrowCursor))
+        self.tabs.setMouseTracking(False)
         self.tabs.setStyleSheet(u"QTabBar::tab:selected{\n"
 "background-color: rgb(216, 255, 223);\n"
 "border: 1px solid black;\n"
+"border-top-left-radius: 10px 5px;\n"
+"border-top-right-radius: 10px 5px;\n"
 "border-bottom: 0px;\n"
 "padding: 5px, 5px, 5px, 5px;\n"
 "width: 200%;\n"
@@ -177,8 +181,15 @@ class Ui_MainWindow(object):
 "QTabBar::tab:!selected{\n"
 "border: 1px solid gray;\n"
 "border-bottom: 0px;\n"
+"border-top-left-radius: 10px 5px;\n"
+"border-top-right-radius: 10px 5px;\n"
 "padding: 5px, 5px, 5px, 5px;\n"
 "width: 200%;\n"
+"transition-duration: 0.4s;\n"
+"cursor: pointer;\n"
+"}\n"
+"QTabBar::tab:!selected:hover{\n"
+"background-color: rgb(217, 235, 249)\n"
 "}\n"
 "QTabBar {\n"
 "background-color: white;\n"
@@ -236,22 +247,24 @@ class Ui_MainWindow(object):
         self.searchbar_PS = QLineEdit(self.layoutWidget_4)
         self.searchbar_PS.setObjectName(u"searchbar_PS")
         self.searchbar_PS.setStyleSheet(u"QLineEdit{\n"
-"border-radius: 5px;\n"
-"border: 1px solid gray;\n"
+" border: 0.5px solid black;\n"
+" padding: 1px, 0px, 0px, 0px\n"
 "}")
 
         self.horizontalLayout_5.addWidget(self.searchbar_PS)
 
         self.refresh_pch_btn = QPushButton(self.layoutWidget_4)
         self.refresh_pch_btn.setObjectName(u"refresh_pch_btn")
+        self.refresh_pch_btn.setCursor(QCursor(Qt.PointingHandCursor))
+        self.refresh_pch_btn.setMouseTracking(True)
         self.refresh_pch_btn.setStyleSheet(u"QPushButton{\n"
-"border-radius: 5px;\n"
+"border-top-right-radius: 10px 5px;\n"
 "padding: 2px 5px 2px 5px;\n"
-"border: 1px solid gray;\n"
+"border: 1px solid black;\n"
 "background-color: rgb(224, 224, 224);\n"
 "}\n"
 "QPushButton:hover{\n"
-"	background-color: rgb(207, 232, 232);\n"
+"	background-color: rgb(217, 235, 249);\n"
 "}")
 
         self.horizontalLayout_5.addWidget(self.refresh_pch_btn)
@@ -333,38 +346,47 @@ class Ui_MainWindow(object):
         self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
         self.back_btn_local = QPushButton(self.layoutWidget)
         self.back_btn_local.setObjectName(u"back_btn_local")
+        self.back_btn_local.setCursor(QCursor(Qt.PointingHandCursor))
+        self.back_btn_local.setMouseTracking(True)
         self.back_btn_local.setStyleSheet(u"QPushButton{\n"
-"border-radius: 5px;\n"
+"border-top-left-radius: 10px 5px;\n"
 "padding: 2px 25px 2px 25px;\n"
-"border: 1px solid gray;\n"
+"border: 1px solid black;\n"
 "background-color: rgb(224, 224, 224);\n"
-"\n"
 "}\n"
 "QPushButton:hover{\n"
-"	background-color: rgb(207, 232, 232);\n"
+"	background-color: rgb(217, 235, 249);\n"
 "}")
 
         self.horizontalLayout_10.addWidget(self.back_btn_local)
 
         self.searchbar_local = QLineEdit(self.layoutWidget)
         self.searchbar_local.setObjectName(u"searchbar_local")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.searchbar_local.sizePolicy().hasHeightForWidth())
+        self.searchbar_local.setSizePolicy(sizePolicy1)
+        self.searchbar_local.setAcceptDrops(False)
         self.searchbar_local.setStyleSheet(u"QLineEdit{\n"
-"border-radius: 5px;\n"
-"border: 1px solid gray;\n"
+" border: 0.5px solid black;\n"
+" padding: 1px, 0px, 0px, 0px\n"
 "}")
 
         self.horizontalLayout_10.addWidget(self.searchbar_local)
 
         self.check_for_updates_btn = QPushButton(self.layoutWidget)
         self.check_for_updates_btn.setObjectName(u"check_for_updates_btn")
+        self.check_for_updates_btn.setCursor(QCursor(Qt.PointingHandCursor))
+        self.check_for_updates_btn.setMouseTracking(True)
         self.check_for_updates_btn.setStyleSheet(u"QPushButton{\n"
-"border-radius: 5px;\n"
+"border-top-right-radius: 10px 5px;\n"
 "padding: 2px 5px 2px 5px;\n"
-"border: 1px solid gray;\n"
+"border: 1px solid black;\n"
 "background-color: rgb(224, 224, 224);\n"
 "}\n"
 "QPushButton:hover{\n"
-"	background-color: rgb(207, 232, 232);\n"
+"	background-color: rgb(217, 235, 249);\n"
 "}")
 
         self.horizontalLayout_10.addWidget(self.check_for_updates_btn)
@@ -378,6 +400,7 @@ class Ui_MainWindow(object):
         if (self.table_local.rowCount() < 1):
             self.table_local.setRowCount(1)
         self.table_local.setObjectName(u"table_local")
+        self.table_local.setMouseTracking(True)
         self.table_local.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
         self.table_local.setEditTriggers(QAbstractItemView.DoubleClicked)
         self.table_local.setSelectionMode(QAbstractItemView.SingleSelection)
@@ -398,14 +421,17 @@ class Ui_MainWindow(object):
         self.verticalLayout_12.setContentsMargins(0, 0, 0, 0)
         self.update_patch_notes = QPushButton(self.layoutWidget_2)
         self.update_patch_notes.setObjectName(u"update_patch_notes")
+        self.update_patch_notes.setCursor(QCursor(Qt.PointingHandCursor))
+        self.update_patch_notes.setMouseTracking(True)
         self.update_patch_notes.setStyleSheet(u"QPushButton{\n"
-"border-radius: 5px;\n"
+"border-top-right-radius: 10px 5px;\n"
+"border-top-left-radius: 10px 5px;\n"
 "padding: 2px 2px 2px 2px;\n"
-"border: 1px solid gray;\n"
+"border: 1px solid black;\n"
 "background-color: rgb(224, 224, 224);\n"
 "}\n"
 "QPushButton:hover{\n"
-"	background-color: rgb(207, 232, 232);\n"
+"	background-color: rgb(217, 235, 249)\n"
 "}")
 
         self.verticalLayout_12.addWidget(self.update_patch_notes)
@@ -462,28 +488,32 @@ class Ui_MainWindow(object):
         self.verticalLayout_11.setContentsMargins(0, 0, 0, 0)
         self.delete_folder_sd_btn = QPushButton(self.layoutWidget_3)
         self.delete_folder_sd_btn.setObjectName(u"delete_folder_sd_btn")
+        self.delete_folder_sd_btn.setCursor(QCursor(Qt.PointingHandCursor))
+        self.delete_folder_sd_btn.setMouseTracking(True)
         self.delete_folder_sd_btn.setStyleSheet(u"QPushButton{\n"
 "border-radius: 5px;\n"
 "padding: 2px 2px 2px 2px;\n"
-"border: 1px solid gray;\n"
+"border: 1px solid black;\n"
 "background-color: rgb(224, 224, 224);\n"
 "}\n"
 "QPushButton:hover{\n"
-"	background-color: rgb(207, 232, 232);\n"
+"	background-color: rgb(217, 235, 249)\n"
 "}")
 
         self.verticalLayout_11.addWidget(self.delete_folder_sd_btn)
 
         self.import_all_btn = QPushButton(self.layoutWidget_3)
         self.import_all_btn.setObjectName(u"import_all_btn")
+        self.import_all_btn.setCursor(QCursor(Qt.PointingHandCursor))
+        self.import_all_btn.setMouseTracking(True)
         self.import_all_btn.setStyleSheet(u"QPushButton{\n"
 "border-radius: 5px;\n"
 "padding: 2px 2px 2px 2px;\n"
-"border: 1px solid gray;\n"
+"border: 1px solid black;\n"
 "background-color: rgb(224, 224, 224);\n"
 "}\n"
 "QPushButton:hover{\n"
-"	background-color: rgb(207, 232, 232);\n"
+"	background-color: rgb(217, 235, 249)\n"
 "}")
 
         self.verticalLayout_11.addWidget(self.import_all_btn)
@@ -680,45 +710,48 @@ class Ui_MainWindow(object):
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.btn_save_bank = QPushButton(self.layoutWidget_6)
         self.btn_save_bank.setObjectName(u"btn_save_bank")
+        self.btn_save_bank.setCursor(QCursor(Qt.PointingHandCursor))
+        self.btn_save_bank.setMouseTracking(True)
         self.btn_save_bank.setStyleSheet(u"QPushButton{\n"
-"border-radius: 5px;\n"
+"border-top-left-radius: 10px 5px;\n"
 "padding: 2px 25px 2px 25px;\n"
 "border: 1px solid gray;\n"
 "background-color: rgb(224, 224, 224);\n"
-"\n"
 "}\n"
 "QPushButton:hover{\n"
-"	background-color: rgb(207, 232, 232);\n"
+"	background-color: rgb(217, 235, 249);\n"
 "}")
 
         self.horizontalLayout_3.addWidget(self.btn_save_bank)
 
         self.btn_load_bank = QPushButton(self.layoutWidget_6)
         self.btn_load_bank.setObjectName(u"btn_load_bank")
+        self.btn_load_bank.setCursor(QCursor(Qt.PointingHandCursor))
+        self.btn_load_bank.setMouseTracking(True)
         self.btn_load_bank.setStyleSheet(u"QPushButton{\n"
-"border-radius: 5px;\n"
 "padding: 2px 25px 2px 25px;\n"
 "border: 1px solid gray;\n"
 "background-color: rgb(224, 224, 224);\n"
 "\n"
 "}\n"
 "QPushButton:hover{\n"
-"	background-color: rgb(207, 232, 232);\n"
+"	background-color: rgb(217, 235, 249)\n"
 "}")
 
         self.horizontalLayout_3.addWidget(self.btn_load_bank)
 
         self.btn_export_bank = QPushButton(self.layoutWidget_6)
         self.btn_export_bank.setObjectName(u"btn_export_bank")
+        self.btn_export_bank.setCursor(QCursor(Qt.PointingHandCursor))
+        self.btn_export_bank.setMouseTracking(True)
         self.btn_export_bank.setStyleSheet(u"QPushButton{\n"
-"border-radius: 5px;\n"
-"padding: 2px 25px 2px 25px;\n"
+"border-top-right-radius: 10px 5px;\n"
+"padding: 2px 5px 2px 5px;\n"
 "border: 1px solid gray;\n"
 "background-color: rgb(224, 224, 224);\n"
-"\n"
 "}\n"
 "QPushButton:hover{\n"
-"	background-color: rgb(207, 232, 232);\n"
+"	background-color: rgb(217, 235, 249);\n"
 "}")
 
         self.horizontalLayout_3.addWidget(self.btn_export_bank)
@@ -906,15 +939,16 @@ class Ui_MainWindow(object):
         self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
         self.back_btn_bank = QPushButton(self.layoutWidget_5)
         self.back_btn_bank.setObjectName(u"back_btn_bank")
+        self.back_btn_bank.setCursor(QCursor(Qt.PointingHandCursor))
+        self.back_btn_bank.setMouseTracking(True)
         self.back_btn_bank.setStyleSheet(u"QPushButton{\n"
-"border-radius: 5px;\n"
+"border-top-left-radius: 10px 5px;\n"
 "padding: 2px 25px 2px 25px;\n"
 "border: 1px solid gray;\n"
 "background-color: rgb(224, 224, 224);\n"
-"\n"
 "}\n"
 "QPushButton:hover{\n"
-"	background-color: rgb(207, 232, 232);\n"
+"	background-color: rgb(217, 235, 249);\n"
 "}")
 
         self.horizontalLayout_11.addWidget(self.back_btn_bank)
@@ -922,8 +956,8 @@ class Ui_MainWindow(object):
         self.searchbar_bank = QLineEdit(self.layoutWidget_5)
         self.searchbar_bank.setObjectName(u"searchbar_bank")
         self.searchbar_bank.setStyleSheet(u"QLineEdit{\n"
-"border-radius: 5px;\n"
-"border: 1px solid gray;\n"
+" border: 0.5px solid gray;\n"
+" padding: 1px, 0px, 0px, 0px;\n"
 "}")
 
         self.horizontalLayout_11.addWidget(self.searchbar_bank)
@@ -978,7 +1012,7 @@ class Ui_MainWindow(object):
         self.menubar.setGeometry(QRect(0, 0, 1695, 27))
         self.menubar.setContextMenuPolicy(Qt.ActionsContextMenu)
         self.menubar.setAcceptDrops(False)
-        self.menubar.setNativeMenuBar(False)
+        self.menubar.setNativeMenuBar(True)
         self.menuFiel = QMenu(self.menubar)
         self.menuFiel.setObjectName(u"menuFiel")
         self.menuSort = QMenu(self.menubar)
@@ -1257,6 +1291,18 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(accessibility)
 #if QT_CONFIG(accessibility)
         self.sd_tree.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Dispalys the contents of the previously specified SD Card (which is specified via the menu bar at File->Specify SD Card path, or by using Alt+S and then specifying that way).", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(tooltip)
+        self.delete_folder_sd_btn.setToolTip(QCoreApplication.translate("MainWindow", u"Click here to delete the currently selected item above from your SD card.", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.delete_folder_sd_btn.setStatusTip(QCoreApplication.translate("MainWindow", u"Click here to delete the currently selected item above from your SD card.", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(accessibility)
+        self.delete_folder_sd_btn.setAccessibleName(QCoreApplication.translate("MainWindow", u"Delete Selected Item from SD Card Tree View Button", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.delete_folder_sd_btn.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Will attempt to delete the currently selected item in the SD tree view above from your SD card. Will create a popup if the currently selected item is a folder, at which point a warning will indicate that deletion will delete everything contained within. The options are yes to continue with the deletion and no to abort. ", None))
 #endif // QT_CONFIG(accessibility)
         self.delete_folder_sd_btn.setText(QCoreApplication.translate("MainWindow", u"Delete Selected Item Above", None))
 #if QT_CONFIG(tooltip)

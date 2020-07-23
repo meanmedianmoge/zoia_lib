@@ -275,14 +275,25 @@ class PatchSave(Patch):
             raise errors.SavingError(path)
         patch_name, ext = path.split(".")
         patch_name = patch_name.split(os.path.sep)[-1]
-        if "_zoia_" in patch_name:
-            title = patch_name.split("_zoia_")[1]
-        else:
-            title = patch_name
 
-        count = 1
-        if os.path.isdir(path):
-            count = len(os.listdir(path))
+        title = patch_name
+
+        # Strip ### if it exists.
+        try:
+            int(title[:3])
+            title = title[3:]
+        except ValueError:
+            pass
+
+        # Strip "_zoia_" if needed.
+        if "_zoia_" in title and title[:6] == "_zoia_":
+            title = title[6:]
+
+        # Clean up the title.
+        title = title.replace("_", " ")
+        title = title.strip()
+
+        count = 1 if not os.path.isdir(path) else len(os.listdir(path))
         for i in range(count):
             # Generate a random patch ID to use (must be 5 digits).
             patch_id = str(abs(hash(path)))

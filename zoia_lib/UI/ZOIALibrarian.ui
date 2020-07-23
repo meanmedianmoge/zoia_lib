@@ -57,6 +57,12 @@ background-color: white;
       </property>
       <item>
        <widget class="QTabWidget" name="tabs">
+        <property name="cursor">
+         <cursorShape>ArrowCursor</cursorShape>
+        </property>
+        <property name="mouseTracking">
+         <bool>false</bool>
+        </property>
         <property name="toolTip">
          <string/>
         </property>
@@ -73,6 +79,8 @@ background-color: white;
          <string notr="true">QTabBar::tab:selected{
 background-color: rgb(216, 255, 223);
 border: 1px solid black;
+border-top-left-radius: 10px 5px;
+border-top-right-radius: 10px 5px;
 border-bottom: 0px;
 padding: 5px, 5px, 5px, 5px;
 width: 200%;
@@ -81,8 +89,15 @@ font: bold;
 QTabBar::tab:!selected{
 border: 1px solid gray;
 border-bottom: 0px;
+border-top-left-radius: 10px 5px;
+border-top-right-radius: 10px 5px;
 padding: 5px, 5px, 5px, 5px;
 width: 200%;
+transition-duration: 0.4s;
+cursor: pointer;
+}
+QTabBar::tab:!selected:hover{
+background-color: rgb(217, 235, 249)
 }
 QTabBar {
 background-color: white;
@@ -221,8 +236,8 @@ position: absolute;
                            </property>
                            <property name="styleSheet">
                             <string notr="true">QLineEdit{
-border-radius: 5px;
-border: 1px solid gray;
+ border: 0.5px solid black;
+ padding: 1px, 0px, 0px, 0px
 }</string>
                            </property>
                            <property name="inputMask">
@@ -235,6 +250,12 @@ border: 1px solid gray;
                          </item>
                          <item>
                           <widget class="QPushButton" name="refresh_pch_btn">
+                           <property name="cursor">
+                            <cursorShape>PointingHandCursor</cursorShape>
+                           </property>
+                           <property name="mouseTracking">
+                            <bool>true</bool>
+                           </property>
                            <property name="toolTip">
                             <string>Click here to refresh the PatchStorage patch list.</string>
                            </property>
@@ -249,13 +270,13 @@ border: 1px solid gray;
                            </property>
                            <property name="styleSheet">
                             <string notr="true">QPushButton{
-border-radius: 5px;
+border-top-right-radius: 10px 5px;
 padding: 2px 5px 2px 5px;
-border: 1px solid gray;
+border: 1px solid black;
 background-color: rgb(224, 224, 224);
 }
 QPushButton:hover{
-	background-color: rgb(207, 232, 232);
+	background-color: rgb(217, 235, 249);
 }</string>
                            </property>
                            <property name="text">
@@ -431,6 +452,12 @@ QPushButton:hover{
                   <layout class="QHBoxLayout" name="horizontalLayout_10">
                    <item>
                     <widget class="QPushButton" name="back_btn_local">
+                     <property name="cursor">
+                      <cursorShape>PointingHandCursor</cursorShape>
+                     </property>
+                     <property name="mouseTracking">
+                      <bool>true</bool>
+                     </property>
                      <property name="toolTip">
                       <string>Click here to back to the full patch list.</string>
                      </property>
@@ -445,14 +472,13 @@ QPushButton:hover{
                      </property>
                      <property name="styleSheet">
                       <string notr="true">QPushButton{
-border-radius: 5px;
+border-top-left-radius: 10px 5px;
 padding: 2px 25px 2px 25px;
-border: 1px solid gray;
+border: 1px solid black;
 background-color: rgb(224, 224, 224);
-
 }
 QPushButton:hover{
-	background-color: rgb(207, 232, 232);
+	background-color: rgb(217, 235, 249);
 }</string>
                      </property>
                      <property name="text">
@@ -462,6 +488,15 @@ QPushButton:hover{
                    </item>
                    <item>
                     <widget class="QLineEdit" name="searchbar_local">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="acceptDrops">
+                      <bool>false</bool>
+                     </property>
                      <property name="toolTip">
                       <string>Type and hit enter/return to search!</string>
                      </property>
@@ -476,8 +511,8 @@ QPushButton:hover{
                      </property>
                      <property name="styleSheet">
                       <string notr="true">QLineEdit{
-border-radius: 5px;
-border: 1px solid gray;
+ border: 0.5px solid black;
+ padding: 1px, 0px, 0px, 0px
 }</string>
                      </property>
                      <property name="inputMask">
@@ -487,6 +522,12 @@ border: 1px solid gray;
                    </item>
                    <item>
                     <widget class="QPushButton" name="check_for_updates_btn">
+                     <property name="cursor">
+                      <cursorShape>PointingHandCursor</cursorShape>
+                     </property>
+                     <property name="mouseTracking">
+                      <bool>true</bool>
+                     </property>
                      <property name="toolTip">
                       <string>Click here to check for updates for all patches listed below.</string>
                      </property>
@@ -501,13 +542,13 @@ border: 1px solid gray;
                      </property>
                      <property name="styleSheet">
                       <string notr="true">QPushButton{
-border-radius: 5px;
+border-top-right-radius: 10px 5px;
 padding: 2px 5px 2px 5px;
-border: 1px solid gray;
+border: 1px solid black;
 background-color: rgb(224, 224, 224);
 }
 QPushButton:hover{
-	background-color: rgb(207, 232, 232);
+	background-color: rgb(217, 235, 249);
 }</string>
                      </property>
                      <property name="text">
@@ -519,6 +560,9 @@ QPushButton:hover{
                  </item>
                  <item>
                   <widget class="QTableWidget" name="table_local">
+                   <property name="mouseTracking">
+                    <bool>true</bool>
+                   </property>
                    <property name="accessibleName">
                     <string>Local Storage View table</string>
                    </property>
@@ -567,6 +611,12 @@ QPushButton:hover{
                 <layout class="QVBoxLayout" name="verticalLayout_12">
                  <item>
                   <widget class="QPushButton" name="update_patch_notes">
+                   <property name="cursor">
+                    <cursorShape>PointingHandCursor</cursorShape>
+                   </property>
+                   <property name="mouseTracking">
+                    <bool>true</bool>
+                   </property>
                    <property name="toolTip">
                     <string>Click here to update the patch notes for the currently selected patch.</string>
                    </property>
@@ -581,13 +631,14 @@ QPushButton:hover{
                    </property>
                    <property name="styleSheet">
                     <string notr="true">QPushButton{
-border-radius: 5px;
+border-top-right-radius: 10px 5px;
+border-top-left-radius: 10px 5px;
 padding: 2px 2px 2px 2px;
-border: 1px solid gray;
+border: 1px solid black;
 background-color: rgb(224, 224, 224);
 }
 QPushButton:hover{
-	background-color: rgb(207, 232, 232);
+	background-color: rgb(217, 235, 249)
 }</string>
                    </property>
                    <property name="text">
@@ -705,15 +756,33 @@ QPushButton:hover{
              <layout class="QVBoxLayout" name="verticalLayout_11">
               <item>
                <widget class="QPushButton" name="delete_folder_sd_btn">
+                <property name="cursor">
+                 <cursorShape>PointingHandCursor</cursorShape>
+                </property>
+                <property name="mouseTracking">
+                 <bool>true</bool>
+                </property>
+                <property name="toolTip">
+                 <string>Click here to delete the currently selected item above from your SD card.</string>
+                </property>
+                <property name="statusTip">
+                 <string>Click here to delete the currently selected item above from your SD card.</string>
+                </property>
+                <property name="accessibleName">
+                 <string>Delete Selected Item from SD Card Tree View Button</string>
+                </property>
+                <property name="accessibleDescription">
+                 <string>Will attempt to delete the currently selected item in the SD tree view above from your SD card. Will create a popup if the currently selected item is a folder, at which point a warning will indicate that deletion will delete everything contained within. The options are yes to continue with the deletion and no to abort. </string>
+                </property>
                 <property name="styleSheet">
                  <string notr="true">QPushButton{
 border-radius: 5px;
 padding: 2px 2px 2px 2px;
-border: 1px solid gray;
+border: 1px solid black;
 background-color: rgb(224, 224, 224);
 }
 QPushButton:hover{
-	background-color: rgb(207, 232, 232);
+	background-color: rgb(217, 235, 249)
 }</string>
                 </property>
                 <property name="text">
@@ -723,6 +792,12 @@ QPushButton:hover{
               </item>
               <item>
                <widget class="QPushButton" name="import_all_btn">
+                <property name="cursor">
+                 <cursorShape>PointingHandCursor</cursorShape>
+                </property>
+                <property name="mouseTracking">
+                 <bool>true</bool>
+                </property>
                 <property name="toolTip">
                  <string>Click here to import all patches currently listed below.</string>
                 </property>
@@ -739,11 +814,11 @@ QPushButton:hover{
                  <string notr="true">QPushButton{
 border-radius: 5px;
 padding: 2px 2px 2px 2px;
-border: 1px solid gray;
+border: 1px solid black;
 background-color: rgb(224, 224, 224);
 }
 QPushButton:hover{
-	background-color: rgb(207, 232, 232);
+	background-color: rgb(217, 235, 249)
 }</string>
                 </property>
                 <property name="text">
@@ -1194,6 +1269,12 @@ QPushButton:hover{
                <layout class="QHBoxLayout" name="horizontalLayout_3">
                 <item>
                  <widget class="QPushButton" name="btn_save_bank">
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="mouseTracking">
+                   <bool>true</bool>
+                  </property>
                   <property name="toolTip">
                    <string>Click here to save your Bank.</string>
                   </property>
@@ -1208,14 +1289,13 @@ QPushButton:hover{
                   </property>
                   <property name="styleSheet">
                    <string notr="true">QPushButton{
-border-radius: 5px;
+border-top-left-radius: 10px 5px;
 padding: 2px 25px 2px 25px;
 border: 1px solid gray;
 background-color: rgb(224, 224, 224);
-
 }
 QPushButton:hover{
-	background-color: rgb(207, 232, 232);
+	background-color: rgb(217, 235, 249);
 }</string>
                   </property>
                   <property name="text">
@@ -1225,6 +1305,12 @@ QPushButton:hover{
                 </item>
                 <item>
                  <widget class="QPushButton" name="btn_load_bank">
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="mouseTracking">
+                   <bool>true</bool>
+                  </property>
                   <property name="toolTip">
                    <string>Click here to load a Bank.</string>
                   </property>
@@ -1239,14 +1325,13 @@ QPushButton:hover{
                   </property>
                   <property name="styleSheet">
                    <string notr="true">QPushButton{
-border-radius: 5px;
 padding: 2px 25px 2px 25px;
 border: 1px solid gray;
 background-color: rgb(224, 224, 224);
 
 }
 QPushButton:hover{
-	background-color: rgb(207, 232, 232);
+	background-color: rgb(217, 235, 249)
 }</string>
                   </property>
                   <property name="text">
@@ -1256,6 +1341,12 @@ QPushButton:hover{
                 </item>
                 <item>
                  <widget class="QPushButton" name="btn_export_bank">
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="mouseTracking">
+                   <bool>true</bool>
+                  </property>
                   <property name="toolTip">
                    <string>Click here to export a Bank as a folder to your SD card.</string>
                   </property>
@@ -1270,14 +1361,13 @@ QPushButton:hover{
                   </property>
                   <property name="styleSheet">
                    <string notr="true">QPushButton{
-border-radius: 5px;
-padding: 2px 25px 2px 25px;
+border-top-right-radius: 10px 5px;
+padding: 2px 5px 2px 5px;
 border: 1px solid gray;
 background-color: rgb(224, 224, 224);
-
 }
 QPushButton:hover{
-	background-color: rgb(207, 232, 232);
+	background-color: rgb(217, 235, 249);
 }</string>
                   </property>
                   <property name="text">
@@ -1720,6 +1810,12 @@ QPushButton:hover{
                <layout class="QHBoxLayout" name="horizontalLayout_11">
                 <item>
                  <widget class="QPushButton" name="back_btn_bank">
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="mouseTracking">
+                   <bool>true</bool>
+                  </property>
                   <property name="toolTip">
                    <string>Click here to back to the full patch list.</string>
                   </property>
@@ -1734,14 +1830,13 @@ QPushButton:hover{
                   </property>
                   <property name="styleSheet">
                    <string notr="true">QPushButton{
-border-radius: 5px;
+border-top-left-radius: 10px 5px;
 padding: 2px 25px 2px 25px;
 border: 1px solid gray;
 background-color: rgb(224, 224, 224);
-
 }
 QPushButton:hover{
-	background-color: rgb(207, 232, 232);
+	background-color: rgb(217, 235, 249);
 }</string>
                   </property>
                   <property name="text">
@@ -1768,8 +1863,8 @@ QPushButton:hover{
                   </property>
                   <property name="styleSheet">
                    <string notr="true">QLineEdit{
-border-radius: 5px;
-border: 1px solid gray;
+ border: 0.5px solid gray;
+ padding: 1px, 0px, 0px, 0px;
 }</string>
                   </property>
                   <property name="inputMask">
@@ -1890,7 +1985,7 @@ border: 1px solid gray;
     <bool>false</bool>
    </property>
    <property name="nativeMenuBar">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <widget class="QMenu" name="menuFiel">
     <property name="title">

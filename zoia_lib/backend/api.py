@@ -63,7 +63,7 @@ class PatchStorage:
             raise ValueError('Incorrect date format, should be YYYY-MM-DD')
 
     def search(self, more_params=None):
-        """make query and output json body
+        """ Make a query to the PS API and return a JSON
         default args:
             - page (int): current page, default 1
             - per_page (int): max number to return, default 10
@@ -166,7 +166,8 @@ class PatchStorage:
     def download(self, idx: str):
         """ Download a file using patch id
 
-        Raises a KeyError should no patch with the supplied id is found.
+        return: The raw binary data for the patch if it was found,
+                None otherwise.
         """
 
         # Patches stored on PS use a 6-digit unique id number.
