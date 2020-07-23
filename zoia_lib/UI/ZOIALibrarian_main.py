@@ -984,6 +984,8 @@ class ZOIALibrarianMain(QMainWindow):
                     # This comes from a bug with QFileDialog returning the
                     # wrong path separator on Windows for some odd reason.
                     input_dir = input_dir.split("/")[0]
+                elif "/" in input_dir and platform.system().lower() != "windows":
+                    pass
                 elif "\\" in input_dir:
                     input_dir = input_dir.split("\\")[0]
                 elif "//" in input_dir:
