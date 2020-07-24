@@ -1,17 +1,19 @@
 import json
 import os
-from os.path import expanduser
 import platform
+from os.path import expanduser
 
-from PySide2.QtCore import QEvent, Qt
+from PySide2.QtCore import QEvent, QSize, Qt
 from PySide2.QtGui import QIcon, QFont
-from PySide2.QtWidgets import QMainWindow, QMessageBox, QTableWidgetItem, \
-    QPushButton, QRadioButton, QInputDialog, QFileDialog, QFileSystemModel, \
-    QTableWidgetSelectionRange, QApplication
+from PySide2.QtWidgets import QMainWindow, QMessageBox, QInputDialog, \
+    QFileDialog, QFileSystemModel, QTableWidgetSelectionRange, \
+    QPushButton, QTableWidgetItem, QRadioButton
 
 import zoia_lib.UI.ZOIALibrarian as ui_main
 import zoia_lib.backend.utilities as util
 import zoia_lib.common.errors as errors
+from zoia_lib.UI.ZOIALibrarian_table_set import set_data_sd, set_data_bank
+from zoia_lib.UI.ZOIALibrarian_util import change_font, save_pref
 from zoia_lib.backend.api import PatchStorage
 from zoia_lib.backend.patch_delete import PatchDelete
 from zoia_lib.backend.patch_export import PatchExport
@@ -23,7 +25,6 @@ update = PatchUpdate()
 save = PatchSave()
 export = PatchExport()
 delete = PatchDelete()
-backend_path = save.get_backend_path()
 
 
 class ZOIALibrarianMain(QMainWindow):
@@ -39,7 +40,7 @@ class ZOIALibrarianMain(QMainWindow):
     Known issues:
      - Sorting order is not maintained when exiting out of the
        version history table of a patch.
-     - The code is a mess and should be refactored into separate classes
+     - The code is a mess and should be refactored into separate modules
        where possible.
     """
 
@@ -57,6 +58,8 @@ class ZOIALibrarianMain(QMainWindow):
         # Setup the UI using ZOIALibrarian.py
         self.ui = ui_main.Ui_MainWindow()
         self.ui.setupUi(self)
+
+        self.backend_path = save.get_backend_path()
 
         # Variable initialization.
         self.icon = QIcon(os.path.join(os.getcwd(), "zoia_lib", "UI",
@@ -77,7 +80,6 @@ class ZOIALibrarianMain(QMainWindow):
         self.local_selected = None
         self.selected = None
         self.prev_tag_cat = None
-        self.dark = False
         self.table_title_size = None
         self.table_local_title_size = None
         self.table_bank_local_title_size = None
@@ -88,24 +90,22 @@ class ZOIALibrarianMain(QMainWindow):
         self.local_sizes = None
         self.sd_sizes = None
         self.bank_sizes = None
-        self.font = "Verdana"
-        self.font_size = 10
+        self.font = None
 
-        curr_os = platform.system().lower()
-        if curr_os == "darwin":
-            self.ui.menubar.setNativeMenuBar(True)
+        self.sd_import_btn = QPushButton("Click me to import!")
+        self.sd_import_btn.clicked.connect(self.import_patch)
 
         # Check for metadata in the user's backend.
-        if "data.json" not in os.listdir(backend_path):
+        if "data.json" not in os.listdir(self.backend_path):
             ps_data = ps.get_all_patch_data_init()
-            with open(os.path.join(backend_path, "data.json"),
+            with open(os.path.join(self.backend_path, "data.json"),
                       "w") as f:
                 f.write(json.dumps(ps_data))
                 self.data_PS = ps_data
         else:
             # Got previous metadata, need to ensure that there are no
             # new patches.
-            with open(os.path.join(backend_path, "data.json"),
+            with open(os.path.join(self.backend_path, "data.json"),
                       "r") as f:
                 data = json.loads(f.read())
             if len(data) == ps.patch_count:
@@ -114,7 +114,7 @@ class ZOIALibrarianMain(QMainWindow):
             elif len(data) > ps.patch_count:
                 # Uh oh, some patches got deleted on PatchStorage.
                 ps_data = ps.get_all_patch_data_init()
-                with open(os.path.join(backend_path, "data.json"),
+                with open(os.path.join(self.backend_path, "data.json"),
                           "w") as f:
                     f.write(json.dumps(ps_data))
                     self.data_PS = ps_data
@@ -122,7 +122,7 @@ class ZOIALibrarianMain(QMainWindow):
                 # Get the new patch metadata that we don't have.
                 new_patches = ps.get_newest_patches(len(data))
                 data = new_patches + data
-                with open(os.path.join(backend_path, "data.json"),
+                with open(os.path.join(self.backend_path, "data.json"),
                           "w") as f:
                     f.write(json.dumps(data))
                     self.data_PS = data
@@ -158,13 +158,13 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.btn_save_bank.setEnabled(False)
         self.ui.btn_export_bank.setEnabled(False)
         self.ui.delete_folder_sd_btn.setEnabled(False)
-        if len(os.listdir(os.path.join(backend_path, "Banks"))) == 0:
+        if len(os.listdir(os.path.join(self.backend_path, "Banks"))) == 0:
             self.ui.btn_load_bank.setEnabled(False)
 
         # Load preferences from previous sessions (if they exist)
-        if os.path.exists(os.path.join(backend_path, "pref.json")):
+        if os.path.exists(os.path.join(self.backend_path, "pref.json")):
             # SD Card previously specified.
-            with open(os.path.join(backend_path, "pref.json"), "r") as f:
+            with open(os.path.join(self.backend_path, "pref.json"), "r") as f:
                 data = json.loads(f.read())
             if data[0]["sd_root"] is not "":
                 self.sd_card_root = data[0]["sd_root"]
@@ -172,12 +172,10 @@ class ZOIALibrarianMain(QMainWindow):
                 self.can_export_bank = True
                 self.sd_path()
 
-            # Fonts
-            self.font = data[0]["font"]
-            self.font_size = data[0]["font_size"]
+            self.setBaseSize(QSize(data[0]["width"], data[0]["height"]))
 
-            # Window Height
-            self.setBaseSize(data[0]["width"], data[0]["height"])
+            # Font
+            self.font = QFont(data[0]["font"], data[0]["font_size"])
 
             self.ps_sizes = data[1]
             self.local_sizes = data[2]
@@ -185,10 +183,10 @@ class ZOIALibrarianMain(QMainWindow):
             self.bank_sizes = data[4]
 
             # PS Table
-            self.ui.table_local.setColumnWidth(0, self.ps_sizes["col_0"])
-            self.ui.table_local.setColumnWidth(1, self.ps_sizes["col_1"])
-            self.ui.table_local.setColumnWidth(2, self.ps_sizes["col_2"])
-            self.ui.table_local.setColumnWidth(3, self.ps_sizes["col_3"])
+            self.ui.table_PS.setColumnWidth(0, self.ps_sizes["col_0"])
+            self.ui.table_PS.setColumnWidth(1, self.ps_sizes["col_1"])
+            self.ui.table_PS.setColumnWidth(2, self.ps_sizes["col_2"])
+            self.ui.table_PS.setColumnWidth(3, self.ps_sizes["col_3"])
 
             # Local Table
             self.ui.table_local.setColumnWidth(0, self.local_sizes["col_0"])
@@ -248,30 +246,16 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.actionSpecify_SD_Card_Location.triggered.connect(self.sd_path)
         self.ui.actionImport_Multiple_Patches.triggered.connect(
             self.mass_import)
-        self.ui.actionArial.triggered.connect(self.change_font)
-        self.ui.actionArial_Black.triggered.connect(self.change_font)
-        self.ui.actionComic_Sans_MS.triggered.connect(self.change_font)
-        self.ui.actionCourier_New.triggered.connect(self.change_font)
-        self.ui.actionGeorgia.triggered.connect(self.change_font)
-        self.ui.actionLucida_Console.triggered.connect(self.change_font)
-        self.ui.actionLucida_Sans_Unicode.triggered.connect(self.change_font)
-        self.ui.actionPalatino_Linotype.triggered.connect(self.change_font)
-        self.ui.actionPapyrus.triggered.connect(self.change_font)
-        self.ui.actionTahoma.triggered.connect(self.change_font)
-        self.ui.actionTimes_New_Roman.triggered.connect(self.change_font)
-        self.ui.actionTrebuchet_MS.triggered.connect(self.change_font)
-        self.ui.actionVerdana.triggered.connect(self.change_font)
-        self.ui.actionWingdings.triggered.connect(self.change_font)
+        self.ui.actionFont.triggered.connect(lambda: change_font("", self.ui))
         self.ui.actionIncrease_Font_Size.triggered.connect(
-            self.change_font_size)
+            lambda: change_font("+", self.ui))
         self.ui.actionDecrease_Font_Size.triggered.connect(
-            self.change_font_size)
+            lambda: change_font("-", self.ui))
         self.ui.actionQuit.triggered.connect(self.try_quit)
         self.ui.check_for_updates_btn.clicked.connect(self.update)
         self.ui.refresh_pch_btn.clicked.connect(self.reload_ps)
         self.ui.update_patch_notes.clicked.connect(self.update_patch_notes)
         self.ui.actionImport_A_Patch.triggered.connect(self.import_patch)
-        self.ui.actionToggle_Dark_Mode.triggered.connect(self.toggle_darkmode)
         self.ui.table_local.installEventFilter(self)
         self.ui.table_sd_left.installEventFilter(self)
         self.ui.table_sd_right.installEventFilter(self)
@@ -294,7 +278,8 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.delete_folder_sd_btn.clicked.connect(self.delete_sd_item)
 
         # Font consistency.
-        self.change_font()
+        change_font(QFont("Verdana", 10) if self.font is None else
+                    data[0]["font"] + "%" + str(data[0]["font_size"]), self.ui)
 
         # Modify the display sizes for some widgets.
         if self.ps_sizes is None:
@@ -319,16 +304,21 @@ class ZOIALibrarianMain(QMainWindow):
                                                self.sd_sizes["split_bottom"]])
             self.ui.splitter_sd_hori.setSizes([self.sd_sizes["split_left"],
                                                self.sd_sizes["split_right"]])
-        self.ui.splitter_bank_tables.setSizes([self.width() * 0.5,
-                                               self.width() * 0.5])
-        self.ui.splitter_bank.setSizes([self.width() * 0.5, self.width() *
-                                        0.25, self.width() * 0.25])
+        if self.bank_sizes is None:
+            self.ui.splitter_bank_tables.setSizes([self.width() * 0.5,
+                                                   self.width() * 0.5])
+            self.ui.splitter_bank.setSizes([self.width() * 0.5, self.width() *
+                                            0.25, self.width() * 0.25])
+        else:
+            self.ui.splitter_bank_tables.setSizes(
+                [self.bank_sizes["split_bank_left"],
+                 self.bank_sizes["split_bank_right"]])
+            self.ui.splitter_bank.setSizes([self.bank_sizes["split_left"],
+                                            self.bank_sizes["split_middle"],
+                                            self.bank_sizes["split_right"]])
 
         # Sort and set the data.
         self.sort_and_set()
-
-        # Ensure the application starts as maximized.
-        self.setFocusPolicy(Qt.StrongFocus)
 
     def tab_switch(self):
         """ Actions performed whenever a tab is switched to within the
@@ -363,150 +353,7 @@ class ZOIALibrarianMain(QMainWindow):
                 self.ui.tabs.setCurrentIndex(1)
         elif self.ui.tabs.currentIndex() == 0:
             pass
-            #self.sort_and_set()
-
-    def get_local_patches(self):
-        """ Retrieves the metadata for patches that a user has previously
-        downloaded and saved to their machine's backend.
-        """
-        if self.ui.tabs.currentIndex() == 1:
-            self.data_local = []
-            curr_data = self.data_local
-        else:
-            self.data_bank = []
-            curr_data = self.data_bank
-        for patches in os.listdir(backend_path):
-            # Look for patch directories in the backend.
-            if patches != "Banks" and patches != "data.json" and \
-                    patches != '.DS_Store' and patches != "pref.json":
-                for pch in os.listdir(os.path.join(backend_path,
-                                                   patches)):
-                    # Read the metadata so that we can set up the tables.
-                    if pch.split(".")[1] == "json":
-                        with open(os.path.join(backend_path,
-                                               patches, pch)) as f:
-                            temp = json.loads(f.read())
-                        curr_data.append(temp)
-                        break
-
-    def get_version_patches(self, context):
-        """ Retrieves the versions of a patch that is locally stored to
-        a user's backend local storage.
-
-        context: True for the Local Storage View tab, False for the
-                 Banks tab.
-        """
-        if self.sender() is None:
-            idx = self.curr_ver
-        else:
-            idx = self.sender().objectName()
-            if "_" in idx:
-                idx = idx.split("_")[0]
-            self.curr_ver = idx
-        self.prev_tag_cat = None
-        if context:
-            self.data_local_version = []
-            curr_data = self.data_local_version
-        else:
-            self.data_bank_version = []
-            curr_data = self.data_bank_version
-
-        # Get all of the patch versions into one place.
-        for pch in os.listdir(os.path.join(backend_path, idx)):
-            if pch.split(".")[1] == "json":
-                # Got the metadata
-                with open(os.path.join(backend_path, idx, pch)) as f:
-                    temp = json.loads(f.read())
-                curr_data.append(temp)
-
-        if context:
-            self.ui.text_browser_local.setText("")
-            self.ui.update_patch_notes.setEnabled(False)
-            self.sort_and_set()
-        else:
-            self.ui.text_browser_bank.setText("")
-            self.sort_and_set()
-
-    def prepare_sd_view(self):
-        """ Prepare the SD Card tab after an SD card location
-        has been specified.
-        """
-
-        self.ui.import_all_btn.setEnabled(False)
-        path = self.ui.sd_tree.currentIndex().data()
-        temp = self.ui.sd_tree.currentIndex()
-        while True:
-            temp = temp.parent()
-            if temp.data() is not None and self.sd_card_root \
-                    not in temp.data():
-                path = os.path.join(temp.data(), path)
-                continue
-            break
-        self.sd_card_path = os.path.join(self.sd_card_root, path)
-        self.set_data_sd()
-        # If any patches populate the tables, enable the import all button.
-        # TODO Find out if this can be determined without iterating through the
-        #  entire table.
-        for i in range(64):
-            if i < 32:
-                if self.ui.table_sd_left.item(i, 0).text() != "":
-                    self.ui.import_all_btn.setEnabled(True)
-                    break
-            else:
-                if self.ui.table_sd_right.item(i - 32, 0).text() != "":
-                    self.ui.import_all_btn.setEnabled(True)
-                    break
-        self.ui.delete_folder_sd_btn.setEnabled(True)
-
-    def set_data_sd(self):
-        """ Sets the data for the SD card table.
-        """
-
-        # Cleanup the tables
-        for i in range(32):
-            self.ui.table_sd_left.setItem(i, 0, QTableWidgetItem(None))
-            self.ui.table_sd_left.setCellWidget(i, 1, None)
-            self.ui.table_sd_left.setCellWidget(i, 2, None)
-            self.ui.table_sd_right.setItem(i, 0, QTableWidgetItem(None))
-            self.ui.table_sd_right.setCellWidget(i, 1, None)
-            self.ui.table_sd_right.setCellWidget(i, 2, None)
-
-        # Make sure we have an sd_card_path to work with.
-        if not os.path.isdir(self.sd_card_path):
-            return
-
-        for pch in os.listdir(self.sd_card_path):
-            # Get the index
-            index = pch.split("_")[0]
-            if index[0] == "0":
-                # Get the useful int index.
-                index = int(index[1:3])
-
-                # Setup the buttons we are adding
-                push_button = QPushButton("X")
-                push_button.setObjectName(str(index))
-                push_button.setFont(QFont(self.font, self.font_size))
-                push_button.clicked.connect(self.remove_sd)
-
-                import_btn = QPushButton("Click me to import!")
-                import_btn.setObjectName(str(index))
-                import_btn.setFont(QFont(self.font, self.font_size))
-                import_btn.clicked.connect(self.import_patch)
-
-                if index < 32:
-                    # Left sd table.
-                    self.ui.table_sd_left.setItem(index, 0,
-                                                  QTableWidgetItem(pch))
-                    self.ui.table_sd_left.setCellWidget(index, 1, push_button)
-                    self.ui.table_sd_left.setCellWidget(index, 2, import_btn)
-                else:
-                    # Right sd table.
-                    self.ui.table_sd_right.setItem(index - 32, 0,
-                                                   QTableWidgetItem(pch))
-                    self.ui.table_sd_right.setCellWidget(index - 32, 1,
-                                                         push_button)
-                    self.ui.table_sd_right.setCellWidget(index - 32, 2,
-                                                         import_btn)
+            # self.sort_and_set()
 
     def set_data(self, search=False, version=False):
         """ Sets the data for the various patch tables. This is done
@@ -582,14 +429,14 @@ class ZOIALibrarianMain(QMainWindow):
                   not self.ui.back_btn_local.isEnabled()) \
                     or (table_index == 3 and
                         not self.ui.back_btn_bank.isEnabled()):
-                if len(os.listdir(os.path.join(backend_path,
+                if len(os.listdir(os.path.join(self.backend_path,
                                                str(data[i]["id"])))) > 2:
                     btn_title.setText(title.rstrip() + "\n[Multiple Versions]")
                 btn_title.setObjectName(str(data[i]["id"]))
             else:
                 btn_title.setObjectName(str(data[i]["id"]))
             btn_title.toggled.connect(self.display_patch_info)
-            btn_title.setFont(QFont(self.font, self.font_size))
+            btn_title.setFont(self.ui.table_PS.font())
             curr_table.setCellWidget(i, 0, btn_title)
 
             # Text for the headers "Tags" and "Categories"
@@ -613,8 +460,8 @@ class ZOIALibrarianMain(QMainWindow):
                 text_item = QTableWidgetItem(text)
                 text_item.setTextAlignment(Qt.AlignCenter)
                 if table_index == 1 and not \
-                    self.ui.back_btn_local.isEnabled() and len(os.listdir(
-                        os.path.join(backend_path, str(data[i]["id"])))) > 2:
+                        self.ui.back_btn_local.isEnabled() and len(os.listdir(
+                    os.path.join(self.backend_path, str(data[i]["id"])))) > 2:
                     text_item.setFlags(
                         Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 curr_table.setItem(i, j + 1, text_item)
@@ -628,12 +475,12 @@ class ZOIALibrarianMain(QMainWindow):
             # If we are on tab index 0, we need a "Download" header item.
             if table_index == 0:
                 dwn = QPushButton("Click me\nto download!", self)
-                dwn.setFont(QFont(self.font, self.font_size))
+                dwn.setFont(self.ui.table_PS.horizontalHeader().font())
                 dwn.clicked.connect(self.initiate_download)
                 dwn.setObjectName(str(data[i]["id"]))
 
                 # Only enable it if we haven't already downloaded the patch.
-                if (str(data[i]["id"])) in os.listdir(backend_path):
+                if (str(data[i]["id"])) in os.listdir(self.backend_path):
                     dwn.setEnabled(False)
                     dwn.setText("Downloaded!")
                 curr_table.setCellWidget(i, 4, dwn)
@@ -651,7 +498,7 @@ class ZOIALibrarianMain(QMainWindow):
                                        + str(data[i]["revision"]))
                 else:
                     expt.setObjectName(str(data[i]["id"]))
-                expt.setFont(QFont(self.font, self.font_size))
+                expt.setFont(self.ui.table_PS.horizontalHeader().font())
                 expt.clicked.connect(self.initiate_export)
                 curr_table.setCellWidget(i, 4, expt)
 
@@ -661,13 +508,13 @@ class ZOIALibrarianMain(QMainWindow):
                                          + str(data[i]["revision"]))
                 else:
                     delete.setObjectName(str(data[i]["id"]))
-                delete.setFont(QFont(self.font, self.font_size))
+                delete.setFont(self.ui.table_PS.horizontalHeader().font())
                 delete.clicked.connect(self.initiate_delete)
                 curr_table.setCellWidget(i, 5, delete)
 
         # Also set the title size and resize the columns.
         if table_index == 0:
-            if self.ps_sizes is not None:
+            if self.ps_sizes is None:
                 curr_table.resizeColumnsToContents()
                 curr_table.setColumnWidth(1, self.width() * 0.1)
                 curr_table.setColumnWidth(2, self.width() * 0.1)
@@ -677,15 +524,6 @@ class ZOIALibrarianMain(QMainWindow):
                 curr_table.resizeRowsToContents()
             else:
                 curr_table.resizeRowsToContents()
-            self.ps_sizes = {
-                "col_0": curr_table.columnWidth(0),
-                "col_1": curr_table.columnWidth(1),
-                "col_2": curr_table.columnWidth(2),
-                "col_3": curr_table.columnWidth(3),
-                "split_left": self.ui.splitter_PS.sizes()[0],
-                "split_right": self.ui.splitter_PS.sizes()[1]
-            }
-        elif table_index == 1:
             if self.local_sizes is None:
                 curr_table.resizeColumnsToContents()
                 curr_table.setColumnWidth(1, self.width() * 0.1)
@@ -695,92 +533,113 @@ class ZOIALibrarianMain(QMainWindow):
                 curr_table.setColumnWidth(5, self.width() * 0.03)
                 self.ui.splitter_local.setSizes([self.width() * 0.6,
                                                  self.width() * 0.4])
+                curr_table.resizeRowsToContents()
             else:
                 curr_table.resizeRowsToContents()
-            self.local_sizes = {
-                "col_0": curr_table.columnWidth(0),
-                "col_1": curr_table.columnWidth(1),
-                "col_2": curr_table.columnWidth(2),
-                "col_3": curr_table.columnWidth(3),
-                "col_4": curr_table.columnWidth(4),
-                "col_5": curr_table.columnWidth(5),
-                "split_left": self.ui.splitter_local.sizes()[0],
-                "split_right": self.ui.splitter_local.sizes()[1]
-            }
 
         else:
             if self.bank_sizes is None:
                 curr_table.resizeColumnsToContents()
                 curr_table.setColumnWidth(1, self.width() * 0.14)
                 curr_table.setColumnWidth(2, self.width() * 0.14)
-
+                curr_table.resizeRowsToContents()
             else:
                 curr_table.resizeRowsToContents()
-            self.bank_sizes = {
-                "col_0": self.ui.table_bank_left.columnWidth(0),
-                "col_0": self.ui.table_bank_right.columnWidth(0),
-                "col_2": curr_table.columnWidth(0),
-                "col_3": curr_table.columnWidth(1),
-                "col_4": curr_table.columnWidth(2)
-            }
 
-    def set_data_bank(self):
-        """ Populates the bank export tables with data.
+    def get_local_patches(self):
+        """ Retrieves the metadata for patches that a user has previously
+        downloaded and saved to their machine's backend.
+        """
+        if self.ui.tabs.currentIndex() == 1:
+            self.data_local = []
+            curr_data = self.data_local
+        else:
+            self.data_bank = []
+            curr_data = self.data_bank
+        for patches in os.listdir(self.backend_path):
+            # Look for patch directories in the backend.
+            if patches != "Banks" and patches != "data.json" and \
+                    patches != '.DS_Store' and patches != "pref.json":
+                for pch in os.listdir(os.path.join(self.backend_path,
+                                                   patches)):
+                    # Read the metadata so that we can set up the tables.
+                    if pch.split(".")[1] == "json":
+                        with open(os.path.join(self.backend_path,
+                                               patches, pch)) as f:
+                            temp = json.loads(f.read())
+                        curr_data.append(temp)
+                        break
+
+    def get_version_patches(self, context):
+        """ Retrieves the versions of a patch that is locally stored to
+        a user's backend local storage.
+
+        context: True for the Local Storage View tab, False for the
+                 Banks tab.
+        """
+        if self.sender() is None:
+            idx = self.curr_ver
+        else:
+            idx = self.sender().objectName()
+            if "_" in idx:
+                idx = idx.split("_")[0]
+            self.curr_ver = idx
+        self.prev_tag_cat = None
+        if context:
+            self.data_local_version = []
+            curr_data = self.data_local_version
+        else:
+            self.data_bank_version = []
+            curr_data = self.data_bank_version
+
+        # Get all of the patch versions into one place.
+        for pch in os.listdir(os.path.join(self.backend_path, idx)):
+            if pch.split(".")[1] == "json":
+                # Got the metadata
+                with open(os.path.join(self.backend_path, idx, pch)) as f:
+                    temp = json.loads(f.read())
+                curr_data.append(temp)
+
+        if context:
+            self.ui.text_browser_local.setText("")
+            self.ui.update_patch_notes.setEnabled(False)
+            self.sort_and_set()
+        else:
+            self.ui.text_browser_bank.setText("")
+            self.sort_and_set()
+
+    def prepare_sd_view(self):
+        """ Prepare the SD Card tab after an SD card location
+        has been specified.
         """
 
-        # Cleanup the tables
-        for i in range(32):
-            self.ui.table_bank_left.setItem(i, 0, QTableWidgetItem(None))
-            self.ui.table_bank_left.setItem(i, 1, QTableWidgetItem(None))
-            self.ui.table_bank_left.setCellWidget(i, 1, None)
-            self.ui.table_bank_right.setItem(i, 0, QTableWidgetItem(None))
-            self.ui.table_bank_right.setItem(i, 1, QTableWidgetItem(None))
-            self.ui.table_bank_right.setCellWidget(i, 1, None)
+        self.ui.import_all_btn.setEnabled(False)
+        path = self.ui.sd_tree.currentIndex().data()
+        temp = self.ui.sd_tree.currentIndex()
+        while True:
+            temp = temp.parent()
+            if temp.data() is not None and self.sd_card_root \
+                    not in temp.data():
+                path = os.path.join(temp.data(), path)
+                continue
+            break
+        self.sd_card_path = os.path.join(self.sd_card_root, path)
 
-        # PyQt tables make zero sense.
-        self.ui.table_bank_left.clearContents()
-        self.ui.table_bank_right.clearContents()
-
-        for pch in self.data_banks:
-            idx = pch["id"]
-            slot = pch["slot"]
-            ver = None
-            if "_" not in idx:
-                with open(os.path.join(backend_path,
-                                       idx, "{}.json".format(idx)), "r") as f:
-                    temp = json.loads(f.read())
+        set_data_sd(self.sd_card_path, self.ui, self.remove_sd,
+                    self.import_patch)
+        # If any patches populate the tables, enable the import all button.
+        # TODO Find out if this can be determined without iterating through the
+        #  entire table.
+        for i in range(64):
+            if i < 32:
+                if self.ui.table_sd_left.item(i, 0).text() != "":
+                    self.ui.import_all_btn.setEnabled(True)
+                    break
             else:
-                idx, ver = idx.split("_")
-                with open(os.path.join(backend_path,
-                                       idx, "{}_{}.json".format(idx, ver)),
-                          "r") as f:
-                    temp = json.loads(f.read())
-            name = temp["files"][0]["filename"]
-            rmv_button = QPushButton("Remove")
-            rmv_button.setObjectName(str(temp["id"]))
-            if ver is not None:
-                rmv_button.setObjectName(str(temp["id"]) + "_" + ver)
-            else:
-                rmv_button.setObjectName(str(temp["id"]))
-            rmv_button.clicked.connect(self.remove_bank_item)
-            if "_zoia_" in name and len(name.split("_", 1)[0]) == 3:
-                name = name.split("_", 2)[2]
-            elif len(name.split("_", 1)[0]) == 3:
-                name = name.split("_", 1)[1]
-            if slot < 10:
-                name = "00{}_zoia_".format(slot) + name
-            else:
-                name = "0{}_zoia_".format(slot) + name
-            if slot < 32:
-                self.ui.table_bank_left.setItem(
-                    slot, 0, QTableWidgetItem(name))
-                self.ui.table_bank_left.setCellWidget(
-                    slot, 1, rmv_button)
-            else:
-                self.ui.table_bank_right.setItem(
-                    slot - 32, 0, QTableWidgetItem(name))
-                self.ui.table_bank_right.setCellWidget(
-                    slot - 32, 1, rmv_button)
+                if self.ui.table_sd_right.item(i - 32, 0).text() != "":
+                    self.ui.import_all_btn.setEnabled(True)
+                    break
+        self.ui.delete_folder_sd_btn.setEnabled(True)
 
     def initiate_download(self):
         """ Attempts to download a patch from the PS API. Once the
@@ -912,7 +771,7 @@ class ZOIALibrarianMain(QMainWindow):
 
         if "_" not in self.sender().objectName():
             if len(os.listdir(
-                    os.path.join(backend_path,
+                    os.path.join(self.backend_path,
                                  self.sender().objectName()))) > 2 \
                     and not self.ui.back_btn_local.isEnabled():
                 delete.delete_full_patch_directory(self.sender().objectName())
@@ -933,7 +792,8 @@ class ZOIALibrarianMain(QMainWindow):
         row = self.sender().objectName()
         index = "00{}".format(row) if len(row) < 2 else "0{}".format(row)
         delete.delete_patch_sd(index, self.sd_card_path)
-        self.set_data_sd()
+        set_data_sd(self.sd_card_path, self.ui, self.remove_sd,
+                    self.import_patch)
 
     def display_patch_info(self):
         """ Queries the PS API for additional patch information whenever
@@ -951,7 +811,7 @@ class ZOIALibrarianMain(QMainWindow):
                 or self.ui.tabs.currentIndex() == 3) and \
                     "_" not in self.sender().objectName() and \
                     len(os.listdir(
-                        os.path.join(backend_path,
+                        os.path.join(self.backend_path,
                                      self.sender().objectName()))) > 2:
                 # We are pointing to a version directory.
                 self.display_patch_versions(
@@ -976,12 +836,12 @@ class ZOIALibrarianMain(QMainWindow):
                 if ver is not "":
                     self.local_selected += "_" + ver
                 try:
-                    with open(os.path.join(backend_path, name,
+                    with open(os.path.join(self.backend_path, name,
                                            name + ".json")) \
                             as f:
                         content = json.loads(f.read())
                 except FileNotFoundError:
-                    with open(os.path.join(backend_path,
+                    with open(os.path.join(self.backend_path,
                                            name,
                                            name + "_{}.json".format(ver))) \
                             as f:
@@ -1044,7 +904,7 @@ class ZOIALibrarianMain(QMainWindow):
         # Get the new patch metadata that we don't have (if any).
         self.ui.refresh_pch_btn.setEnabled(False)
         self.data_PS = ps.get_all_patch_data_init()
-        with open(os.path.join(backend_path, "data.json"), "w") as f:
+        with open(os.path.join(self.backend_path, "data.json"), "w") as f:
             f.write(json.dumps(self.data_PS))
         self.ui.searchbar_PS.setText("")
         self.sort_and_set()
@@ -1067,7 +927,9 @@ class ZOIALibrarianMain(QMainWindow):
                     # This comes from a bug with QFileDialog returning the
                     # wrong path separator on Windows for some odd reason.
                     input_dir = input_dir.split("/")[0]
-                elif "/" in input_dir and platform.system().lower() != "windows":
+                elif "/" in input_dir and platform.system().lower() != \
+                        "windows":
+                    # OSX case.
                     pass
                 elif "\\" in input_dir:
                     input_dir = input_dir.split("\\")[0]
@@ -1319,6 +1181,16 @@ class ZOIALibrarianMain(QMainWindow):
         Currently triggered via a menu action.
         """
 
+        # Prepare a message box.
+        msg = QMessageBox()
+        msg.setWindowTitle("Patch Already In Library")
+        msg.setIcon(QMessageBox.Information)
+        msg.setWindowIcon(self.icon)
+        msg.setText("That patch exists within your locally "
+                    "saved patches.")
+        msg.setInformativeText("No importing has occurred.")
+        msg.setStandardButtons(QMessageBox.Ok)
+
         if self.sd_card_path is not None and \
                 self.ui.tabs.currentIndex() == 2:
             for sd_pch in os.listdir(self.sd_card_path):
@@ -1337,14 +1209,6 @@ class ZOIALibrarianMain(QMainWindow):
                         self.ui.statusbar.showMessage("Import complete!")
                         return
                     except errors.SavingError:
-                        msg = QMessageBox()
-                        msg.setWindowTitle("Patch Already In Library")
-                        msg.setIcon(QMessageBox.Information)
-                        msg.setWindowIcon(self.icon)
-                        msg.setText("That patch exists within your locally "
-                                    "saved patches.")
-                        msg.setInformativeText("No importing has occurred.")
-                        msg.setStandardButtons(QMessageBox.Ok)
                         msg.exec_()
                         return
 
@@ -1366,21 +1230,10 @@ class ZOIALibrarianMain(QMainWindow):
                 self.sort_and_set()
 
         except errors.BadPathError:
-            msg = QMessageBox()
             msg.setWindowTitle("No Patch Found")
-            msg.setIcon(QMessageBox.Information)
-            msg.setWindowIcon(self.icon)
             msg.setText("Incorrect file selected, importing failed.")
-            msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()
         except errors.SavingError:
-            msg = QMessageBox()
-            msg.setWindowTitle("Patch Already In Library")
-            msg.setIcon(QMessageBox.Information)
-            msg.setText("That patch exists within your locally saved "
-                        "patches.")
-            msg.setInformativeText("No importing has occurred.")
-            msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()
 
     def mass_import(self):
@@ -1504,7 +1357,8 @@ class ZOIALibrarianMain(QMainWindow):
                     break
 
         # Set the data.
-        self.set_data_bank()
+        set_data_bank(self.ui, self.backend_path,
+                      self.remove_bank_item, self.data_banks)
 
         for i in range(64):
             if i == dest:
@@ -1566,7 +1420,8 @@ class ZOIALibrarianMain(QMainWindow):
                                            + src_pch[3:]),
                               os.path.join(self.sd_card_path, dest
                                            + src_pch[3:]))
-                self.set_data_sd()
+                set_data_sd(self.sd_card_path, self.ui, self.remove_sd,
+                            self.import_patch)
                 dest = int(dest)
                 for i in range(64):
                     if i == dest:
@@ -1593,31 +1448,8 @@ class ZOIALibrarianMain(QMainWindow):
                     self.ui.table_sd_left.setRangeSelected(
                         QTableWidgetSelectionRange(i, 0, i, 0), True)
 
-        self.set_data_sd()
-
-    def toggle_darkmode(self):
-        """ Toggles dark mode for the application.
-        Currently not implemented in the UI.
-
-        TODO Modify the stylesheets to have them conform to the initial
-             application style.
-        """
-
-        app = QApplication.instance()
-        if not self.dark:
-            # Turn on dark mode.
-            with open(os.path.join("zoia_lib", "UI", "resources",
-                                   "stylesheets", "dark.qss"), "r") as f:
-                data = f.read()
-            self.dark = True
-        else:
-            # Turn off dark mode.
-            with open(os.path.join("zoia_lib", "UI", "resources",
-                                   "stylesheets", "light.qss"), "r") as f:
-                data = f.read()
-            self.dark = False
-
-        app.setStyleSheet(data)
+        set_data_sd(self.sd_card_path, self.ui, self.remove_sd,
+                    self.import_patch)
 
     def eventFilter(self, o, e):
         """ Deals with events that originate from various widgets
@@ -1733,7 +1565,7 @@ class ZOIALibrarianMain(QMainWindow):
                     idx = self.ui.table_bank_local.cellWidget(src,
                                                               0).objectName()
                     if ("_" not in idx and len(os.listdir(os.path.join(
-                            backend_path, idx))) == 2) or "_" in idx:
+                            self.backend_path, idx))) == 2) or "_" in idx:
                         # Not working within a version directory.
                         # Just a single patch
                         if self.data_banks is not None:
@@ -1754,13 +1586,16 @@ class ZOIALibrarianMain(QMainWindow):
                             "id": idx
                         })
 
-                        self.set_data_bank()
+                        set_data_bank(self.ui, self.backend_path,
+                                      self.remove_bank_item, self.data_banks)
                     else:
                         # An entire version directory was dragged over.
                         pch_num = int((len(os.listdir(os.path.join(
-                            backend_path, idx))) / 2) - 1)
+                            self.backend_path, idx))) / 2) - 1)
                         if drop_index + pch_num > 63:
-                            self.set_data_bank()
+                            set_data_bank(self.ui, self.backend_path,
+                                          self.remove_bank_item,
+                                          self.data_banks)
                             msg = QMessageBox()
                             msg.setWindowTitle("No Space")
                             msg.setIcon(QMessageBox.Information)
@@ -1791,7 +1626,9 @@ class ZOIALibrarianMain(QMainWindow):
                                     "id": "{}_v{}".format(idx, i)
                                 })
 
-                            self.set_data_bank()
+                            set_data_bank(self.ui, self.backend_path,
+                                          self.remove_bank_item,
+                                          self.data_banks)
                 else:
                     # Check for phantom rows to delete.
                     while self.ui.table_bank_left.rowCount() > 32 or \
@@ -1999,7 +1836,7 @@ class ZOIALibrarianMain(QMainWindow):
 
         bnk_file = QFileDialog.getOpenFileName(None,
                                                "Select A Patch Bank:",
-                                               os.path.join(backend_path,
+                                               os.path.join(self.backend_path,
                                                             "Banks"))[0]
         if bnk_file is not "":
             if "/" in bnk_file and platform.system().lower() == "windows":
@@ -2015,13 +1852,14 @@ class ZOIALibrarianMain(QMainWindow):
         else:
             return
 
-        with open(os.path.join(backend_path, "Banks", bnk_file), "r") as f:
+        with open(os.path.join(self.backend_path, "Banks", bnk_file),
+                  "r") as f:
             self.data_banks = json.loads(f.read())
 
         # TODO Deal with the case where a file is not found.
         fails = []
         for pch in self.data_banks:
-            if pch["id"] not in os.listdir(backend_path):
+            if pch["id"] not in os.listdir(self.backend_path):
                 fails.append(pch)
                 self.data_banks.remove(pch)
 
@@ -2060,7 +1898,8 @@ class ZOIALibrarianMain(QMainWindow):
             value = msg.exec_()
             if value != QMessageBox.Yes:
                 return
-        self.set_data_bank()
+        set_data_bank(self.ui, self.backend_path,
+                      self.remove_bank_item, self.data_banks)
         self.ui.btn_export_bank.setEnabled(True)
         self.ui.btn_save_bank.setEnabled(True)
 
@@ -2073,9 +1912,10 @@ class ZOIALibrarianMain(QMainWindow):
                                           "Please enter a name for the Bank:")
         if ok:
             self.get_bank_data()
-            with open(os.path.join(backend_path, "Banks", "{}.json".format(
-                    name)),
-                      "w") as f:
+            with open(
+                    os.path.join(self.backend_path, "Banks", "{}.json".format(
+                        name)),
+                    "w") as f:
                 f.write(json.dumps(self.data_banks))
             self.ui.btn_load_bank.setEnabled(True)
 
@@ -2230,113 +2070,6 @@ class ZOIALibrarianMain(QMainWindow):
                     "id": temp.objectName()
                 })
 
-    def change_font_size(self):
-        """ Changes the size of most font used throughout the
-        application.
-        Currently triggered via a menu action.
-        """
-
-        if self.sender().objectName() == "actionIncrease_Font_Size":
-            if self.font_size < 72:
-                self.font_size += 2
-        else:
-            if self.font_size > 8:
-                self.font_size -= 2
-
-        self.change_font()
-
-    def change_font(self):
-        """ Changes the font used throughout the
-        application.
-        Currently triggered via a menu action.
-        """
-
-        if self.sender() is not None \
-                and self.sender().objectName() != "actionIncrease_Font_Size" and \
-                self.sender().objectName() != "actionDecrease_Font_Size":
-            font = self.sender().objectName()[6:]
-            font = font.replace("_", " ")
-            self.font = font
-
-        self.ui.table_PS.setFont(QFont(self.font, self.font_size))
-        self.ui.table_PS.horizontalHeader().setFont(QFont(
-            self.font, self.font_size))
-        self.ui.table_local.setFont(QFont(self.font, self.font_size))
-        self.ui.table_local.horizontalHeader().setFont(QFont(
-            self.font, self.font_size))
-        self.ui.table_sd_left.setFont(QFont(self.font, self.font_size))
-        self.ui.table_sd_left.horizontalHeader().setFont(QFont(
-            self.font, self.font_size))
-        self.ui.table_sd_left.verticalHeader().setFont(QFont(
-            self.font, self.font_size))
-        self.ui.table_sd_right.setFont(QFont(self.font, self.font_size))
-        self.ui.table_sd_right.horizontalHeader().setFont(QFont(
-            self.font, self.font_size))
-        self.ui.table_sd_right.verticalHeader().setFont(QFont(
-            self.font, self.font_size))
-        self.ui.table_bank_local.setFont(QFont(self.font, self.font_size))
-        self.ui.table_bank_local.horizontalHeader().setFont(
-            QFont(self.font, self.font_size))
-        self.ui.table_bank_left.setFont(QFont(self.font, self.font_size))
-        self.ui.table_bank_left.horizontalHeader().setFont(
-            QFont(self.font, self.font_size))
-        self.ui.table_bank_left.verticalHeader().setFont(QFont(
-            self.font, self.font_size))
-        self.ui.table_bank_right.setFont(QFont(self.font, self.font_size))
-        self.ui.table_bank_right.horizontalHeader().setFont(
-            QFont(self.font, self.font_size))
-        self.ui.table_bank_right.verticalHeader().setFont(QFont(
-            self.font, self.font_size))
-        self.ui.tabs.setFont(QFont(self.font, 10))
-        self.ui.text_browser_PS.setFont(QFont(self.font, self.font_size + 6))
-        self.ui.text_browser_local.setFont(QFont(self.font,
-                                                 self.font_size + 6))
-        self.ui.text_browser_bank.setFont(QFont(self.font, self.font_size + 6))
-
-        if self.sender() is not None:
-            for i in range(self.ui.table_PS.rowCount()):
-                self.ui.table_PS.cellWidget(i, 0).setFont(QFont(
-                    self.font, self.font_size))
-                self.ui.table_PS.cellWidget(i, 4).setFont(QFont(
-                    self.font, self.font_size))
-            if self.data_local is not None:
-                for i in range(self.ui.table_local.rowCount()):
-                    self.ui.table_local.cellWidget(i, 0).setFont(QFont(
-                        self.font, self.font_size))
-                    self.ui.table_local.cellWidget(i, 4).setFont(QFont(
-                        self.font, self.font_size))
-                    self.ui.table_local.cellWidget(i, 5).setFont(QFont(
-                        self.font, self.font_size))
-            for i in range(32):
-                if self.ui.table_sd_left.cellWidget(i, 1) is not None:
-                    self.ui.table_sd_left.cellWidget(i, 1).setFont(QFont(
-                        self.font, self.font_size))
-                if self.ui.table_sd_left.cellWidget(i, 2) is not None:
-                    self.ui.table_sd_left.cellWidget(i, 2).setFont(QFont(
-                        self.font, self.font_size))
-                if self.ui.table_sd_right.cellWidget(i, 1) is not None:
-                    self.ui.table_sd_right.cellWidget(i, 1).setFont(QFont(
-                        self.font, self.font_size))
-                if self.ui.table_sd_right.cellWidget(i, 2) is not None:
-                    self.ui.table_sd_right.cellWidget(i, 2).setFont(QFont(
-                        self.font, self.font_size))
-                if self.ui.table_bank_left.cellWidget(i, 1) is not None:
-                    self.ui.table_bank_left.cellWidget(i, 1).setFont(QFont(
-                        self.font, self.font_size))
-                if self.ui.table_bank_left.cellWidget(i, 2) is not None:
-                    self.ui.table_bank_left.cellWidget(i, 2).setFont(QFont(
-                        self.font, self.font_size))
-                if self.ui.table_bank_right.cellWidget(i, 1) is not None:
-                    self.ui.table_bank_right.cellWidget(i, 1).setFont(QFont(
-                        self.font, self.font_size))
-                if self.ui.table_bank_right.cellWidget(i, 2) is not None:
-                    self.ui.table_bank_right.cellWidget(i, 2).setFont(QFont(
-                        self.font, self.font_size))
-            if self.data_bank is not None:
-                for i in range(self.ui.table_bank_local.rowCount()):
-                    self.ui.table_bank_local.cellWidget(i, 0).setFont(QFont(
-                        self.font, self.font_size))
-
     def delete_sd_item(self):
         """ Deletes the currently selected directory from the SD card.
         Currently triggered via a button press.
@@ -2365,56 +2098,8 @@ class ZOIALibrarianMain(QMainWindow):
         settings can be saved.
         """
 
-        # Capture the necessary specs on exit.
-        window = {
-            "width": self.width(),
-            "height": self.height(),
-            "font": self.font,
-            "font_size": self.font_size,
-            "sd_root": "" if self.sd_card_root is None else self.sd_card_root
-        }
-        self.ps_sizes = {
-            "col_0": self.ui.table_PS.columnWidth(0),
-            "col_1": self.ui.table_PS.columnWidth(1),
-            "col_2": self.ui.table_PS.columnWidth(2),
-            "col_3": self.ui.table_PS.columnWidth(3),
-            "split_left": self.ui.splitter_PS.sizes()[0],
-            "split_right": self.ui.splitter_PS.sizes()[1]
-        }
-        self.local_sizes = {
-            "col_0": self.ui.table_local.columnWidth(0),
-            "col_1": self.ui.table_local.columnWidth(1),
-            "col_2": self.ui.table_local.columnWidth(2),
-            "col_3": self.ui.table_local.columnWidth(3),
-            "col_4": self.ui.table_local.columnWidth(4),
-            "col_5": self.ui.table_local.columnWidth(5),
-            "split_left": self.ui.splitter_local.sizes()[0],
-            "split_right": self.ui.splitter_local.sizes()[1]
-        }
-        self.sd_sizes = {
-            "col_0": self.ui.table_sd_left.columnWidth(0),
-            "col_1": self.ui.table_sd_left.columnWidth(1),
-            "col_2": self.ui.table_sd_right.columnWidth(0),
-            "col_3": self.ui.table_sd_right.columnWidth(1),
-            "split_top": self.ui.splitter_sd_vert.sizes()[0],
-            "split_bottom": self.ui.splitter_sd_vert.sizes()[1],
-            "split_left": self.ui.splitter_sd_hori.sizes()[0],
-            "split_right": self.ui.splitter_sd_hori.sizes()[1]
-        }
-        self.bank_sizes = {
-            "col_0": self.ui.table_bank_left.columnWidth(0),
-            "col_1": self.ui.table_bank_right.columnWidth(0),
-            "col_2": self.ui.table_bank_local.columnWidth(0),
-            "col_3": self.ui.table_bank_local.columnWidth(1),
-            "col_4": self.ui.table_bank_local.columnWidth(2),
-            "split_left": self.ui.splitter_bank.sizes()[0],
-            "split_middle": self.ui.splitter_bank.sizes()[1],
-            "split_right": self.ui.splitter_bank.sizes()[2]
-        }
-
-        with open(os.path.join(backend_path, "pref.json"), "w") as f:
-            f.write(json.dumps([window, self.ps_sizes, self.local_sizes,
-                                self.sd_sizes, self.bank_sizes]))
+        save_pref(self.width(), self.height(), self.sd_card_root, self.ui,
+                  self.backend_path)
 
     def try_quit(self):
         """ Forces the application to close.

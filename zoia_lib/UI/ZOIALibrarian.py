@@ -153,6 +153,9 @@ class Ui_MainWindow(object):
         self.actionDecrease_Font_Size = QAction(MainWindow)
         self.actionDecrease_Font_Size.setObjectName(u"actionDecrease_Font_Size")
         self.actionDecrease_Font_Size.setShortcutVisibleInContextMenu(True)
+        self.actionFont = QAction(MainWindow)
+        self.actionFont.setObjectName(u"actionFont")
+        self.actionFont.setShortcutVisibleInContextMenu(True)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayout_5 = QVBoxLayout(self.centralwidget)
@@ -292,6 +295,8 @@ class Ui_MainWindow(object):
         self.table_PS.setRowCount(1)
         self.table_PS.setColumnCount(5)
         self.table_PS.horizontalHeader().setCascadingSectionResizes(True)
+        self.table_PS.horizontalHeader().setMinimumSectionSize(0)
+        self.table_PS.horizontalHeader().setDefaultSectionSize(100)
         self.table_PS.horizontalHeader().setStretchLastSection(True)
         self.table_PS.verticalHeader().setVisible(False)
 
@@ -408,8 +413,12 @@ class Ui_MainWindow(object):
         self.table_local.setRowCount(1)
         self.table_local.setColumnCount(6)
         self.table_local.horizontalHeader().setCascadingSectionResizes(True)
+        self.table_local.horizontalHeader().setMinimumSectionSize(0)
+        self.table_local.horizontalHeader().setDefaultSectionSize(100)
         self.table_local.horizontalHeader().setStretchLastSection(True)
         self.table_local.verticalHeader().setVisible(False)
+        self.table_local.verticalHeader().setMinimumSectionSize(0)
+        self.table_local.verticalHeader().setDefaultSectionSize(0)
 
         self.verticalLayout_2.addWidget(self.table_local)
 
@@ -603,7 +612,9 @@ class Ui_MainWindow(object):
         self.table_sd_left.setRowCount(32)
         self.table_sd_left.setColumnCount(3)
         self.splitter_sd_hori.addWidget(self.table_sd_left)
+        self.table_sd_left.horizontalHeader().setMinimumSectionSize(0)
         self.table_sd_left.horizontalHeader().setStretchLastSection(True)
+        self.table_sd_left.verticalHeader().setMinimumSectionSize(0)
         self.table_sd_right = QTableWidget(self.splitter_sd_hori)
         if (self.table_sd_right.columnCount() < 3):
             self.table_sd_right.setColumnCount(3)
@@ -682,7 +693,9 @@ class Ui_MainWindow(object):
         self.table_sd_right.setRowCount(32)
         self.table_sd_right.setColumnCount(3)
         self.splitter_sd_hori.addWidget(self.table_sd_right)
+        self.table_sd_right.horizontalHeader().setMinimumSectionSize(0)
         self.table_sd_right.horizontalHeader().setStretchLastSection(True)
+        self.table_sd_right.verticalHeader().setMinimumSectionSize(0)
 
         self.verticalLayout_11.addWidget(self.splitter_sd_hori)
 
@@ -844,7 +857,9 @@ class Ui_MainWindow(object):
         self.table_bank_left.setRowCount(32)
         self.table_bank_left.setColumnCount(2)
         self.splitter_bank_tables.addWidget(self.table_bank_left)
+        self.table_bank_left.horizontalHeader().setMinimumSectionSize(0)
         self.table_bank_left.horizontalHeader().setStretchLastSection(True)
+        self.table_bank_left.verticalHeader().setMinimumSectionSize(0)
         self.table_bank_right = QTableWidget(self.splitter_bank_tables)
         if (self.table_bank_right.columnCount() < 2):
             self.table_bank_right.setColumnCount(2)
@@ -924,7 +939,9 @@ class Ui_MainWindow(object):
         self.table_bank_right.setRowCount(32)
         self.table_bank_right.setColumnCount(2)
         self.splitter_bank_tables.addWidget(self.table_bank_right)
+        self.table_bank_right.horizontalHeader().setMinimumSectionSize(0)
         self.table_bank_right.horizontalHeader().setStretchLastSection(True)
+        self.table_bank_right.verticalHeader().setMinimumSectionSize(0)
 
         self.verticalLayout.addWidget(self.splitter_bank_tables)
 
@@ -983,8 +1000,10 @@ class Ui_MainWindow(object):
         self.table_bank_local.setRowCount(1)
         self.table_bank_local.setColumnCount(4)
         self.table_bank_local.horizontalHeader().setCascadingSectionResizes(True)
+        self.table_bank_local.horizontalHeader().setMinimumSectionSize(0)
         self.table_bank_local.horizontalHeader().setStretchLastSection(True)
         self.table_bank_local.verticalHeader().setVisible(False)
+        self.table_bank_local.verticalHeader().setMinimumSectionSize(0)
 
         self.verticalLayout_9.addWidget(self.table_bank_local)
 
@@ -1019,8 +1038,6 @@ class Ui_MainWindow(object):
         self.menuSort.setObjectName(u"menuSort")
         self.menuOptions = QMenu(self.menubar)
         self.menuOptions.setObjectName(u"menuOptions")
-        self.menuChange_Font = QMenu(self.menuOptions)
-        self.menuChange_Font.setObjectName(u"menuChange_Font")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -1045,23 +1062,9 @@ class Ui_MainWindow(object):
         self.menuSort.addAction(self.actionSort_by_downloads_high_low)
         self.menuSort.addAction(self.actionSort_by_downloads_low_high)
         self.menuOptions.addAction(self.actionAlternating_Row_Colours)
-        self.menuOptions.addAction(self.menuChange_Font.menuAction())
+        self.menuOptions.addAction(self.actionFont)
         self.menuOptions.addAction(self.actionIncrease_Font_Size)
         self.menuOptions.addAction(self.actionDecrease_Font_Size)
-        self.menuChange_Font.addAction(self.actionArial)
-        self.menuChange_Font.addAction(self.actionArial_Black)
-        self.menuChange_Font.addAction(self.actionComic_Sans_MS)
-        self.menuChange_Font.addAction(self.actionCourier_New)
-        self.menuChange_Font.addAction(self.actionGeorgia)
-        self.menuChange_Font.addAction(self.actionLucida_Console)
-        self.menuChange_Font.addAction(self.actionLucida_Sans_Unicode)
-        self.menuChange_Font.addAction(self.actionPalatino_Linotype)
-        self.menuChange_Font.addAction(self.actionPapyrus)
-        self.menuChange_Font.addAction(self.actionTahoma)
-        self.menuChange_Font.addAction(self.actionTimes_New_Roman)
-        self.menuChange_Font.addAction(self.actionTrebuchet_MS)
-        self.menuChange_Font.addAction(self.actionVerdana)
-        self.menuChange_Font.addAction(self.actionWingdings)
 
         self.retranslateUi(MainWindow)
 
@@ -1156,6 +1159,10 @@ class Ui_MainWindow(object):
         self.actionDecrease_Font_Size.setText(QCoreApplication.translate("MainWindow", u"Decrease Font Size", None))
 #if QT_CONFIG(shortcut)
         self.actionDecrease_Font_Size.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+Shift+-", None))
+#endif // QT_CONFIG(shortcut)
+        self.actionFont.setText(QCoreApplication.translate("MainWindow", u"Change Font", None))
+#if QT_CONFIG(shortcut)
+        self.actionFont.setShortcut(QCoreApplication.translate("MainWindow", u"Alt+F", None))
 #endif // QT_CONFIG(shortcut)
 #if QT_CONFIG(tooltip)
         self.tabs.setToolTip("")
@@ -1707,6 +1714,5 @@ class Ui_MainWindow(object):
         self.menuFiel.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
         self.menuSort.setTitle(QCoreApplication.translate("MainWindow", u"Sort", None))
         self.menuOptions.setTitle(QCoreApplication.translate("MainWindow", u"Options", None))
-        self.menuChange_Font.setTitle(QCoreApplication.translate("MainWindow", u"Change Font", None))
     # retranslateUi
 

@@ -355,7 +355,7 @@ class PatchSave(Patch):
         if not os.path.isdir(pch):
             os.mkdir(pch)
 
-        if patch[1]["files"][0]["filename"].split(".")[1] == "zip":
+        if patch[1]["files"][0]["filename"].split(".")[-1] == "zip":
             # .zip files
             name_zip = os.path.join(pch, "{}.zip".format(patch_name))
             with open(name_zip, "wb") as f:
@@ -381,8 +381,6 @@ class PatchSave(Patch):
                     try:
                         name = file
                         # Rename the file to follow the conventional format
-                        # TODO Change this to rename the file based on the
-                        #  date modified.
                         os.rename(os.path.join(pch, file),
                                   os.path.join(pch, "{}_v{}.bin".format(
                                       patch[1]["id"], i)))
@@ -410,4 +408,5 @@ class PatchSave(Patch):
         else:
             # Unexpected file extension encountered.
             # TODO Handle this case gracefully.
+            print(patch)
             raise errors.SavingError(patch[1]["title"], 501)

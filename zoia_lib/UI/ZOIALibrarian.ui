@@ -336,6 +336,12 @@ QPushButton:hover{
                          <attribute name="horizontalHeaderCascadingSectionResizes">
                           <bool>true</bool>
                          </attribute>
+                         <attribute name="horizontalHeaderDefaultSectionSize">
+                          <number>100</number>
+                         </attribute>
+                         <attribute name="horizontalHeaderMinimumSectionSize">
+                          <number>0</number>
+                         </attribute>
                          <attribute name="horizontalHeaderStretchLastSection">
                           <bool>true</bool>
                          </attribute>
@@ -590,11 +596,23 @@ QPushButton:hover{
                    <attribute name="horizontalHeaderCascadingSectionResizes">
                     <bool>true</bool>
                    </attribute>
+                   <attribute name="horizontalHeaderDefaultSectionSize">
+                    <number>100</number>
+                   </attribute>
+                   <attribute name="horizontalHeaderMinimumSectionSize">
+                    <number>0</number>
+                   </attribute>
                    <attribute name="horizontalHeaderStretchLastSection">
                     <bool>true</bool>
                    </attribute>
                    <attribute name="verticalHeaderVisible">
                     <bool>false</bool>
+                   </attribute>
+                   <attribute name="verticalHeaderDefaultSectionSize">
+                    <number>0</number>
+                   </attribute>
+                   <attribute name="verticalHeaderMinimumSectionSize">
+                    <number>0</number>
                    </attribute>
                    <row/>
                    <column/>
@@ -871,8 +889,14 @@ QPushButton:hover{
                  <property name="columnCount">
                   <number>3</number>
                  </property>
+                 <attribute name="horizontalHeaderMinimumSectionSize">
+                  <number>0</number>
+                 </attribute>
                  <attribute name="horizontalHeaderStretchLastSection">
                   <bool>true</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderMinimumSectionSize">
+                  <number>0</number>
                  </attribute>
                  <row>
                   <property name="text">
@@ -1066,8 +1090,14 @@ QPushButton:hover{
                  <property name="columnCount">
                   <number>3</number>
                  </property>
+                 <attribute name="horizontalHeaderMinimumSectionSize">
+                  <number>0</number>
+                 </attribute>
                  <attribute name="horizontalHeaderStretchLastSection">
                   <bool>true</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderMinimumSectionSize">
+                  <number>0</number>
                  </attribute>
                  <row>
                   <property name="text">
@@ -1428,8 +1458,14 @@ QPushButton:hover{
                  <property name="columnCount">
                   <number>2</number>
                  </property>
+                 <attribute name="horizontalHeaderMinimumSectionSize">
+                  <number>0</number>
+                 </attribute>
                  <attribute name="horizontalHeaderStretchLastSection">
                   <bool>true</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderMinimumSectionSize">
+                  <number>0</number>
                  </attribute>
                  <row>
                   <property name="text">
@@ -1631,8 +1667,14 @@ QPushButton:hover{
                  <property name="columnCount">
                   <number>2</number>
                  </property>
+                 <attribute name="horizontalHeaderMinimumSectionSize">
+                  <number>0</number>
+                 </attribute>
                  <attribute name="horizontalHeaderStretchLastSection">
                   <bool>true</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderMinimumSectionSize">
+                  <number>0</number>
                  </attribute>
                  <row>
                   <property name="text">
@@ -1924,11 +1966,17 @@ QPushButton:hover{
                 <attribute name="horizontalHeaderCascadingSectionResizes">
                  <bool>true</bool>
                 </attribute>
+                <attribute name="horizontalHeaderMinimumSectionSize">
+                 <number>0</number>
+                </attribute>
                 <attribute name="horizontalHeaderStretchLastSection">
                  <bool>true</bool>
                 </attribute>
                 <attribute name="verticalHeaderVisible">
                  <bool>false</bool>
+                </attribute>
+                <attribute name="verticalHeaderMinimumSectionSize">
+                 <number>0</number>
                 </attribute>
                 <row/>
                 <column/>
@@ -2016,27 +2064,8 @@ QPushButton:hover{
     <property name="title">
      <string>Options</string>
     </property>
-    <widget class="QMenu" name="menuChange_Font">
-     <property name="title">
-      <string>Change Font</string>
-     </property>
-     <addaction name="actionArial"/>
-     <addaction name="actionArial_Black"/>
-     <addaction name="actionComic_Sans_MS"/>
-     <addaction name="actionCourier_New"/>
-     <addaction name="actionGeorgia"/>
-     <addaction name="actionLucida_Console"/>
-     <addaction name="actionLucida_Sans_Unicode"/>
-     <addaction name="actionPalatino_Linotype"/>
-     <addaction name="actionPapyrus"/>
-     <addaction name="actionTahoma"/>
-     <addaction name="actionTimes_New_Roman"/>
-     <addaction name="actionTrebuchet_MS"/>
-     <addaction name="actionVerdana"/>
-     <addaction name="actionWingdings"/>
-    </widget>
     <addaction name="actionAlternating_Row_Colours"/>
-    <addaction name="menuChange_Font"/>
+    <addaction name="actionFont"/>
     <addaction name="actionIncrease_Font_Size"/>
     <addaction name="actionDecrease_Font_Size"/>
    </widget>
@@ -2382,6 +2411,17 @@ QPushButton:hover{
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+-</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionFont">
+   <property name="text">
+    <string>Change Font</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+F</string>
    </property>
    <property name="shortcutVisibleInContextMenu">
     <bool>true</bool>
