@@ -84,6 +84,10 @@ class ZOIALibrarianMain(QMainWindow):
         self.prev_sort = None
         self.curr_ver = None
         self.can_export_bank = False
+        self.ps_sizes = None
+        self.local_sizes = None
+        self.sd_sizes = None
+        self.bank_sizes = None
         self.font = "Verdana"
         self.font_size = 10
 
@@ -145,16 +149,6 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.table_bank_left.setHorizontalHeaderLabels(["Patch", "Remove"])
         self.ui.table_bank_right.setHorizontalHeaderLabels(["Patch", "Remove"])
 
-        # Forcing some column widths ahead of time.
-        self.ui.table_sd_left.setColumnWidth(0, self.width() * 0.4)
-        self.ui.table_sd_left.setColumnWidth(1, self.width() * 0.1)
-        self.ui.table_sd_right.setColumnWidth(0, self.width() * 0.4)
-        self.ui.table_sd_right.setColumnWidth(1, self.width() * 0.1)
-        self.ui.table_bank_left.setColumnWidth(0, self.width() * 0.2)
-        self.ui.table_bank_left.setColumnWidth(1, self.width() * 0.1)
-        self.ui.table_bank_right.setColumnWidth(0, self.width() * 0.2)
-        self.ui.table_bank_right.setColumnWidth(1, self.width() * 0.1)
-
         # Disabling widgets the user doesn't have access to on startup.
         self.ui.tab_sd.setEnabled(False)
         self.ui.update_patch_notes.setEnabled(False)
@@ -163,6 +157,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.back_btn_bank.setEnabled(False)
         self.ui.btn_save_bank.setEnabled(False)
         self.ui.btn_export_bank.setEnabled(False)
+        self.ui.delete_folder_sd_btn.setEnabled(False)
         if len(os.listdir(os.path.join(backend_path, "Banks"))) == 0:
             self.ui.btn_load_bank.setEnabled(False)
 
@@ -171,14 +166,64 @@ class ZOIALibrarianMain(QMainWindow):
             # SD Card previously specified.
             with open(os.path.join(backend_path, "pref.json"), "r") as f:
                 data = json.loads(f.read())
-            self.sd_card_root = data["sd_root"]
-            self.ui.tab_sd.setEnabled(True)
-            self.can_export_bank = True
-            self.sd_path()
+            if data[0]["sd_root"] is not "":
+                self.sd_card_root = data[0]["sd_root"]
+                self.ui.tab_sd.setEnabled(True)
+                self.can_export_bank = True
+                self.sd_path()
 
             # Fonts
-            self.font = data["font"]
-            self.font_size = data["font_size"]
+            self.font = data[0]["font"]
+            self.font_size = data[0]["font_size"]
+
+            # Window Height
+            self.setBaseSize(data[0]["width"], data[0]["height"])
+
+            self.ps_sizes = data[1]
+            self.local_sizes = data[2]
+            self.sd_sizes = data[3]
+            self.bank_sizes = data[4]
+
+            # PS Table
+            self.ui.table_local.setColumnWidth(0, self.ps_sizes["col_0"])
+            self.ui.table_local.setColumnWidth(1, self.ps_sizes["col_1"])
+            self.ui.table_local.setColumnWidth(2, self.ps_sizes["col_2"])
+            self.ui.table_local.setColumnWidth(3, self.ps_sizes["col_3"])
+
+            # Local Table
+            self.ui.table_local.setColumnWidth(0, self.local_sizes["col_0"])
+            self.ui.table_local.setColumnWidth(1, self.local_sizes["col_1"])
+            self.ui.table_local.setColumnWidth(2, self.local_sizes["col_2"])
+            self.ui.table_local.setColumnWidth(3, self.local_sizes["col_3"])
+            self.ui.table_local.setColumnWidth(4, self.local_sizes["col_4"])
+
+            # SD Tables
+            self.ui.table_sd_left.setColumnWidth(0, self.sd_sizes["col_0"])
+            self.ui.table_sd_left.setColumnWidth(1, self.sd_sizes["col_1"])
+            self.ui.table_sd_right.setColumnWidth(0, self.sd_sizes["col_2"])
+            self.ui.table_sd_right.setColumnWidth(1, self.sd_sizes["col_3"])
+
+            # Bank Tables
+            self.ui.table_bank_left.setColumnWidth(0, self.bank_sizes["col_0"])
+            self.ui.table_bank_right.setColumnWidth(0,
+                                                    self.bank_sizes["col_1"])
+            self.ui.table_bank_local.setColumnWidth(0,
+                                                    self.bank_sizes["col_2"])
+            self.ui.table_bank_local.setColumnWidth(1,
+                                                    self.bank_sizes["col_3"])
+            self.ui.table_bank_local.setColumnWidth(2,
+                                                    self.bank_sizes["col_4"])
+
+        else:
+            self.ui.table_sd_left.setColumnWidth(0, self.width() * 0.4)
+            self.ui.table_sd_left.setColumnWidth(1, self.width() * 0.1)
+            self.ui.table_sd_right.setColumnWidth(0, self.width() * 0.4)
+            self.ui.table_sd_right.setColumnWidth(1, self.width() * 0.1)
+            self.ui.table_bank_left.setColumnWidth(0, self.width() * 0.2)
+            self.ui.table_bank_left.setColumnWidth(1, self.width() * 0.1)
+            self.ui.table_bank_right.setColumnWidth(0, self.width() * 0.2)
+            self.ui.table_bank_right.setColumnWidth(1, self.width() * 0.1)
+            self.showMaximized()
 
         # Connect buttons and items to methods.
         self.ui.tabs.currentChanged.connect(self.tab_switch)
@@ -252,16 +297,30 @@ class ZOIALibrarianMain(QMainWindow):
         self.change_font()
 
         # Modify the display sizes for some widgets.
-        self.ui.splitter_PS.setSizes([self.width() * 0.325,
-                                      self.width() * 0.675])
-        self.ui.splitter_local.setSizes([self.width() * 0.325,
-                                         self.width() * 0.675])
-        self.ui.splitter_sd_hori.setSizes([self.width() * 0.5,
-                                           self.width() * 0.5])
+        if self.ps_sizes is None:
+            self.ui.splitter_PS.setSizes([self.width() * 0.325,
+                                          self.width() * 0.675])
+        else:
+            self.ui.splitter_PS.setSizes([self.ps_sizes["split_left"],
+                                          self.ps_sizes["split_right"]])
+        if self.local_sizes is None:
+            self.ui.splitter_local.setSizes([self.width() * 0.325,
+                                             self.width() * 0.675])
+        else:
+            self.ui.splitter_local.setSizes([self.local_sizes["split_left"],
+                                             self.local_sizes["split_right"]])
+        if self.sd_sizes is None:
+            self.ui.splitter_sd_hori.setSizes([self.width() * 0.5,
+                                               self.width() * 0.5])
+            self.ui.splitter_sd_vert.setSizes([self.width() * 0.185,
+                                               self.width() * 0.815])
+        else:
+            self.ui.splitter_sd_vert.setSizes([self.sd_sizes["split_top"],
+                                               self.sd_sizes["split_bottom"]])
+            self.ui.splitter_sd_hori.setSizes([self.sd_sizes["split_left"],
+                                               self.sd_sizes["split_right"]])
         self.ui.splitter_bank_tables.setSizes([self.width() * 0.5,
                                                self.width() * 0.5])
-        self.ui.splitter_sd_vert.setSizes([self.width() * 0.185,
-                                           self.width() * 0.815])
         self.ui.splitter_bank.setSizes([self.width() * 0.5, self.width() *
                                         0.25, self.width() * 0.25])
 
@@ -270,7 +329,6 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Ensure the application starts as maximized.
         self.setFocusPolicy(Qt.StrongFocus)
-        self.showMaximized()
 
     def tab_switch(self):
         """ Actions performed whenever a tab is switched to within the
@@ -304,7 +362,8 @@ class ZOIALibrarianMain(QMainWindow):
                 msg.exec_()
                 self.ui.tabs.setCurrentIndex(1)
         elif self.ui.tabs.currentIndex() == 0:
-            self.sort_and_set()
+            pass
+            #self.sort_and_set()
 
     def get_local_patches(self):
         """ Retrieves the metadata for patches that a user has previously
@@ -397,6 +456,7 @@ class ZOIALibrarianMain(QMainWindow):
                 if self.ui.table_sd_right.item(i - 32, 0).text() != "":
                     self.ui.import_all_btn.setEnabled(True)
                     break
+        self.ui.delete_folder_sd_btn.setEnabled(True)
 
     def set_data_sd(self):
         """ Sets the data for the SD card table.
@@ -553,8 +613,8 @@ class ZOIALibrarianMain(QMainWindow):
                 text_item = QTableWidgetItem(text)
                 text_item.setTextAlignment(Qt.AlignCenter)
                 if table_index == 1 and not \
-                        self.ui.back_btn_local.isEnabled() and len(os.listdir(
-                    os.path.join(backend_path, str(data[i]["id"])))) > 2:
+                    self.ui.back_btn_local.isEnabled() and len(os.listdir(
+                        os.path.join(backend_path, str(data[i]["id"])))) > 2:
                     text_item.setFlags(
                         Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 curr_table.setItem(i, j + 1, text_item)
@@ -606,42 +666,66 @@ class ZOIALibrarianMain(QMainWindow):
                 curr_table.setCellWidget(i, 5, delete)
 
         # Also set the title size and resize the columns.
-        # TODO Replace magic numbers with calculated values.
         if table_index == 0:
-            curr_table.resizeColumnsToContents()
-            if self.table_title_size is None:
-                self.table_title_size = curr_table.columnWidth(0)
+            if self.ps_sizes is not None:
+                curr_table.resizeColumnsToContents()
+                curr_table.setColumnWidth(1, self.width() * 0.1)
+                curr_table.setColumnWidth(2, self.width() * 0.1)
+                curr_table.setColumnWidth(3, self.width() * 0.1)
+                self.ui.splitter_PS.setSizes([self.width() * 0.6,
+                                              self.width() * 0.4])
+                curr_table.resizeRowsToContents()
             else:
-                curr_table.setColumnWidth(0, self.table_title_size)
-            curr_table.setColumnWidth(1, 140)
-            curr_table.setColumnWidth(2, 140)
-            curr_table.resizeRowsToContents()
+                curr_table.resizeRowsToContents()
+            self.ps_sizes = {
+                "col_0": curr_table.columnWidth(0),
+                "col_1": curr_table.columnWidth(1),
+                "col_2": curr_table.columnWidth(2),
+                "col_3": curr_table.columnWidth(3),
+                "split_left": self.ui.splitter_PS.sizes()[0],
+                "split_right": self.ui.splitter_PS.sizes()[1]
+            }
         elif table_index == 1:
-            curr_table.resizeColumnsToContents()
-            if self.table_local_title_size is None:
-                self.table_local_title_size = curr_table.columnWidth(0)
+            if self.local_sizes is None:
+                curr_table.resizeColumnsToContents()
+                curr_table.setColumnWidth(1, self.width() * 0.1)
+                curr_table.setColumnWidth(2, self.width() * 0.1)
+                curr_table.setColumnWidth(3, self.width() * 0.1)
+                curr_table.setColumnWidth(4, self.width() * 0.05)
+                curr_table.setColumnWidth(5, self.width() * 0.03)
+                self.ui.splitter_local.setSizes([self.width() * 0.6,
+                                                 self.width() * 0.4])
             else:
-                curr_table.setColumnWidth(0, self.table_local_title_size)
-            curr_table.setColumnWidth(1, 140)
-            curr_table.setColumnWidth(2, 140)
-            curr_table.setColumnWidth(4, 100)
-            curr_table.setColumnWidth(5, 50)
-            curr_table.resizeRowsToContents()
+                curr_table.resizeRowsToContents()
+            self.local_sizes = {
+                "col_0": curr_table.columnWidth(0),
+                "col_1": curr_table.columnWidth(1),
+                "col_2": curr_table.columnWidth(2),
+                "col_3": curr_table.columnWidth(3),
+                "col_4": curr_table.columnWidth(4),
+                "col_5": curr_table.columnWidth(5),
+                "split_left": self.ui.splitter_local.sizes()[0],
+                "split_right": self.ui.splitter_local.sizes()[1]
+            }
+
         else:
-            curr_table.resizeColumnsToContents()
-            if self.table_bank_local_title_size is None:
-                self.table_bank_local_title_size = curr_table.columnWidth(
-                    0)
+            if self.bank_sizes is None:
+                curr_table.resizeColumnsToContents()
+                curr_table.setColumnWidth(1, self.width() * 0.14)
+                curr_table.setColumnWidth(2, self.width() * 0.14)
+
             else:
-                curr_table.setColumnWidth(0,
-                                          self.table_bank_local_title_size)
-            curr_table.setColumnWidth(1, 140)
-            curr_table.setColumnWidth(2, 140)
-            curr_table.setColumnWidth(3, 100)
-            curr_table.resizeRowsToContents()
+                curr_table.resizeRowsToContents()
+            self.bank_sizes = {
+                "col_0": self.ui.table_bank_left.columnWidth(0),
+                "col_0": self.ui.table_bank_right.columnWidth(0),
+                "col_2": curr_table.columnWidth(0),
+                "col_3": curr_table.columnWidth(1),
+                "col_4": curr_table.columnWidth(2)
+            }
 
     def set_data_bank(self):
-        """ Populates the bank export tables with data..
+        """ Populates the bank export tables with data.
         """
 
         # Cleanup the tables
@@ -974,7 +1058,6 @@ class ZOIALibrarianMain(QMainWindow):
         Currently triggered via a menu action.
         """
         if self.sender() is not None:
-            print("oh no")
             input_dir = QFileDialog.getExistingDirectory(None,
                                                          'Select an SD Card:',
                                                          expanduser("~"))
@@ -984,6 +1067,8 @@ class ZOIALibrarianMain(QMainWindow):
                     # This comes from a bug with QFileDialog returning the
                     # wrong path separator on Windows for some odd reason.
                     input_dir = input_dir.split("/")[0]
+                elif "/" in input_dir and platform.system().lower() != "windows":
+                    pass
                 elif "\\" in input_dir:
                     input_dir = input_dir.split("\\")[0]
                 elif "//" in input_dir:
@@ -1545,6 +1630,11 @@ class ZOIALibrarianMain(QMainWindow):
         # SD card tab swap/move
         if o.objectName() == "table_sd_left" or o.objectName() == \
                 "table_sd_right":
+            if e.type() == QEvent.FocusAboutToChange:
+                if o.objectName() == "table_sd_left":
+                    self.ui.table_sd_left.clearSelection()
+                else:
+                    self.ui.table_sd_right.clearSelection()
             if e.type() == QEvent.ChildAdded:
                 self.ui.table_sd_left.hideColumn(1)
                 self.ui.table_sd_left.hideColumn(2)
@@ -1711,6 +1801,11 @@ class ZOIALibrarianMain(QMainWindow):
 
         elif o.objectName() == "table_bank_left" or o.objectName() == \
                 "table_bank_right":
+            if e.type() == QEvent.FocusAboutToChange:
+                if o.objectName() == "table_bank_left":
+                    self.ui.table_bank_left.clearSelection()
+                else:
+                    self.ui.table_bank_right.clearSelection()
             if e.type() == QEvent.ChildAdded:
                 self.ui.table_bank_left.hideColumn(1)
                 self.ui.table_bank_right.hideColumn(1)
@@ -2080,19 +2175,23 @@ class ZOIALibrarianMain(QMainWindow):
                 item = self.ui.table_bank_left.cellWidget(i, 1)
                 if item is None:
                     continue
-                elif item.objectName() == self.sender().objectName():
+                elif item.objectName() == self.sender().objectName() and \
+                        i == self.ui.table_bank_left.currentRow():
                     self.ui.table_bank_left.setItem(i, 0, QTableWidgetItem(
                         None))
                     self.ui.table_bank_left.setCellWidget(i, 1, None)
+                    self.ui.table_bank_right.clearSelection()
                     break
             else:
                 item = self.ui.table_bank_right.cellWidget(i - 32, 1)
                 if item is None:
                     continue
-                elif item.objectName() == self.sender().objectName():
+                elif item.objectName() == self.sender().objectName() and \
+                        i - 32 == self.ui.table_bank_right.currentRow():
                     self.ui.table_bank_right.setItem(i - 32, 0,
                                                      QTableWidgetItem(None))
                     self.ui.table_bank_right.setCellWidget(i - 32, 1, None)
+                    self.ui.table_bank_right.clearSelection()
                     break
 
         for pch in self.data_banks:
@@ -2152,13 +2251,12 @@ class ZOIALibrarianMain(QMainWindow):
         Currently triggered via a menu action.
         """
 
-
         if self.sender() is not None \
-            and self.sender().objectName() != "actionIncrease_Font_Size" and \
-            self.sender().objectName() != "actionDecrease_Font_Size":
-                font = self.sender().objectName()[6:]
-                font = font.replace("_", " ")
-                self.font = font
+                and self.sender().objectName() != "actionIncrease_Font_Size" and \
+                self.sender().objectName() != "actionDecrease_Font_Size":
+            font = self.sender().objectName()[6:]
+            font = font.replace("_", " ")
+            self.font = font
 
         self.ui.table_PS.setFont(QFont(self.font, self.font_size))
         self.ui.table_PS.horizontalHeader().setFont(QFont(
@@ -2169,8 +2267,12 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.table_sd_left.setFont(QFont(self.font, self.font_size))
         self.ui.table_sd_left.horizontalHeader().setFont(QFont(
             self.font, self.font_size))
+        self.ui.table_sd_left.verticalHeader().setFont(QFont(
+            self.font, self.font_size))
         self.ui.table_sd_right.setFont(QFont(self.font, self.font_size))
         self.ui.table_sd_right.horizontalHeader().setFont(QFont(
+            self.font, self.font_size))
+        self.ui.table_sd_right.verticalHeader().setFont(QFont(
             self.font, self.font_size))
         self.ui.table_bank_local.setFont(QFont(self.font, self.font_size))
         self.ui.table_bank_local.horizontalHeader().setFont(
@@ -2178,9 +2280,13 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.table_bank_left.setFont(QFont(self.font, self.font_size))
         self.ui.table_bank_left.horizontalHeader().setFont(
             QFont(self.font, self.font_size))
+        self.ui.table_bank_left.verticalHeader().setFont(QFont(
+            self.font, self.font_size))
         self.ui.table_bank_right.setFont(QFont(self.font, self.font_size))
         self.ui.table_bank_right.horizontalHeader().setFont(
             QFont(self.font, self.font_size))
+        self.ui.table_bank_right.verticalHeader().setFont(QFont(
+            self.font, self.font_size))
         self.ui.tabs.setFont(QFont(self.font, 10))
         self.ui.text_browser_PS.setFont(QFont(self.font, self.font_size + 6))
         self.ui.text_browser_local.setFont(QFont(self.font,
@@ -2200,6 +2306,31 @@ class ZOIALibrarianMain(QMainWindow):
                     self.ui.table_local.cellWidget(i, 4).setFont(QFont(
                         self.font, self.font_size))
                     self.ui.table_local.cellWidget(i, 5).setFont(QFont(
+                        self.font, self.font_size))
+            for i in range(32):
+                if self.ui.table_sd_left.cellWidget(i, 1) is not None:
+                    self.ui.table_sd_left.cellWidget(i, 1).setFont(QFont(
+                        self.font, self.font_size))
+                if self.ui.table_sd_left.cellWidget(i, 2) is not None:
+                    self.ui.table_sd_left.cellWidget(i, 2).setFont(QFont(
+                        self.font, self.font_size))
+                if self.ui.table_sd_right.cellWidget(i, 1) is not None:
+                    self.ui.table_sd_right.cellWidget(i, 1).setFont(QFont(
+                        self.font, self.font_size))
+                if self.ui.table_sd_right.cellWidget(i, 2) is not None:
+                    self.ui.table_sd_right.cellWidget(i, 2).setFont(QFont(
+                        self.font, self.font_size))
+                if self.ui.table_bank_left.cellWidget(i, 1) is not None:
+                    self.ui.table_bank_left.cellWidget(i, 1).setFont(QFont(
+                        self.font, self.font_size))
+                if self.ui.table_bank_left.cellWidget(i, 2) is not None:
+                    self.ui.table_bank_left.cellWidget(i, 2).setFont(QFont(
+                        self.font, self.font_size))
+                if self.ui.table_bank_right.cellWidget(i, 1) is not None:
+                    self.ui.table_bank_right.cellWidget(i, 1).setFont(QFont(
+                        self.font, self.font_size))
+                if self.ui.table_bank_right.cellWidget(i, 2) is not None:
+                    self.ui.table_bank_right.cellWidget(i, 2).setFont(QFont(
                         self.font, self.font_size))
             if self.data_bank is not None:
                 for i in range(self.ui.table_bank_local.rowCount()):
@@ -2234,14 +2365,56 @@ class ZOIALibrarianMain(QMainWindow):
         settings can be saved.
         """
 
-        if self.sd_card_root is not None:
-            sd = {
-                "sd_root": self.sd_card_root,
-                "font": self.font,
-                "font_size": self.font_size
-            }
-            with open(os.path.join(backend_path, "pref.json"), "w") as f:
-                f.write(json.dumps(sd))
+        # Capture the necessary specs on exit.
+        window = {
+            "width": self.width(),
+            "height": self.height(),
+            "font": self.font,
+            "font_size": self.font_size,
+            "sd_root": "" if self.sd_card_root is None else self.sd_card_root
+        }
+        self.ps_sizes = {
+            "col_0": self.ui.table_PS.columnWidth(0),
+            "col_1": self.ui.table_PS.columnWidth(1),
+            "col_2": self.ui.table_PS.columnWidth(2),
+            "col_3": self.ui.table_PS.columnWidth(3),
+            "split_left": self.ui.splitter_PS.sizes()[0],
+            "split_right": self.ui.splitter_PS.sizes()[1]
+        }
+        self.local_sizes = {
+            "col_0": self.ui.table_local.columnWidth(0),
+            "col_1": self.ui.table_local.columnWidth(1),
+            "col_2": self.ui.table_local.columnWidth(2),
+            "col_3": self.ui.table_local.columnWidth(3),
+            "col_4": self.ui.table_local.columnWidth(4),
+            "col_5": self.ui.table_local.columnWidth(5),
+            "split_left": self.ui.splitter_local.sizes()[0],
+            "split_right": self.ui.splitter_local.sizes()[1]
+        }
+        self.sd_sizes = {
+            "col_0": self.ui.table_sd_left.columnWidth(0),
+            "col_1": self.ui.table_sd_left.columnWidth(1),
+            "col_2": self.ui.table_sd_right.columnWidth(0),
+            "col_3": self.ui.table_sd_right.columnWidth(1),
+            "split_top": self.ui.splitter_sd_vert.sizes()[0],
+            "split_bottom": self.ui.splitter_sd_vert.sizes()[1],
+            "split_left": self.ui.splitter_sd_hori.sizes()[0],
+            "split_right": self.ui.splitter_sd_hori.sizes()[1]
+        }
+        self.bank_sizes = {
+            "col_0": self.ui.table_bank_left.columnWidth(0),
+            "col_1": self.ui.table_bank_right.columnWidth(0),
+            "col_2": self.ui.table_bank_local.columnWidth(0),
+            "col_3": self.ui.table_bank_local.columnWidth(1),
+            "col_4": self.ui.table_bank_local.columnWidth(2),
+            "split_left": self.ui.splitter_bank.sizes()[0],
+            "split_middle": self.ui.splitter_bank.sizes()[1],
+            "split_right": self.ui.splitter_bank.sizes()[2]
+        }
+
+        with open(os.path.join(backend_path, "pref.json"), "w") as f:
+            f.write(json.dumps([window, self.ps_sizes, self.local_sizes,
+                                self.sd_sizes, self.bank_sizes]))
 
     def try_quit(self):
         """ Forces the application to close.
