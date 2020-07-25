@@ -115,8 +115,8 @@ namespace ZoiaFormatInterpreterTest
                     case 67: moduleTypeDescription = "Ghostverb"; break;
                     case 68: moduleTypeDescription = "Cabinet Sim"; break;
                     case 69: moduleTypeDescription = "Flanger"; break;
-                    case 70: moduleTypeDescription = "Vibrato"; break;
-                    case 71: moduleTypeDescription = "Chorus"; break;
+                    case 70: moduleTypeDescription = "Chorus"; break;
+                    case 71: moduleTypeDescription = "Vibrato"; break;
                     case 72: moduleTypeDescription = "Env Filter"; break;
                     case 73: moduleTypeDescription = "Ring Modulator"; break;
                     case 74: moduleTypeDescription = "Hall Reverb"; break;
