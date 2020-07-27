@@ -145,3 +145,25 @@ def save_pref(w, h, sd, ui, path):
     with open(os.path.join(path, "pref.json"), "w") as f:
         f.write(json.dumps([window, ps_sizes, local_sizes,
                             sd_sizes, bank_sizes]))
+
+
+def row_invert(ui):
+    """ Either enables of disables alternating row colours for
+    tables; depending on the previous state of the tables.
+    Currently triggered via a menu action.
+    """
+
+    ui.table_PS.setAlternatingRowColors(
+        not ui.table_PS.alternatingRowColors())
+    ui.table_local.setAlternatingRowColors(
+        not ui.table_local.alternatingRowColors())
+    ui.table_sd_left.setAlternatingRowColors(
+        not ui.table_sd_left.alternatingRowColors())
+    ui.table_sd_right.setAlternatingRowColors(
+        not ui.table_sd_right.alternatingRowColors())
+    ui.table_bank_local.setAlternatingRowColors(
+        not ui.table_bank_local.alternatingRowColors())
+    ui.table_bank_left.setAlternatingRowColors(
+        not ui.table_bank_left.alternatingRowColors())
+    ui.table_bank_right.setAlternatingRowColors(
+        not ui.table_bank_right.alternatingRowColors())

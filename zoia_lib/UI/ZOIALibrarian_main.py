@@ -6,14 +6,14 @@ from os.path import expanduser
 from PySide2.QtCore import QEvent, QSize, Qt
 from PySide2.QtGui import QIcon, QFont
 from PySide2.QtWidgets import QMainWindow, QMessageBox, QInputDialog, \
-    QFileDialog, QFileSystemModel, QTableWidgetSelectionRange, \
-    QPushButton, QTableWidgetItem, QRadioButton
+    QFileDialog, QPushButton, QTableWidgetItem, QRadioButton
 
 import zoia_lib.UI.ZOIALibrarian as ui_main
 import zoia_lib.backend.utilities as util
 import zoia_lib.common.errors as errors
-from zoia_lib.UI.ZOIALibrarian_table_set import set_data_sd, set_data_bank
-from zoia_lib.UI.ZOIALibrarian_util import change_font, save_pref
+from zoia_lib.UI.ZOIALibrarian_bank import ZOIALibrarianBank
+from zoia_lib.UI.ZOIALibrarian_util import change_font, save_pref, row_invert
+from zoia_lib.UI.ZOIALibrarian_sd import ZOIALibrarianSD
 from zoia_lib.backend.api import PatchStorage
 from zoia_lib.backend.patch_delete import PatchDelete
 from zoia_lib.backend.patch_export import PatchExport
@@ -61,9 +61,17 @@ class ZOIALibrarianMain(QMainWindow):
 
         self.backend_path = save.get_backend_path()
 
-        # Variable initialization.
-        self.icon = QIcon(os.path.join(os.getcwd(), "zoia_lib", "UI",
-                                       "resources", "logo.ico"))
+        # Message box init
+        self.msg = QMessageBox()
+        self.msg.setWindowIcon(QIcon(
+            os.path.join(os.getcwd(), "zoia_lib", "UI", "resources",
+                         "logo.ico")))
+
+        # Helper classes init
+        self.sd = ZOIALibrarianSD(self.remove_sd, self.import_patch)
+        self.bank = ZOIALibrarianBank(self.backend_path, self.msg,
+                                      self.remove_bank_item)
+
         self.data_PS = None
         self.data_banks = None
         self.search_data_PS = None
@@ -75,8 +83,6 @@ class ZOIALibrarianMain(QMainWindow):
         self.data_local_version = None
         self.data_bank = None
         self.data_bank_version = None
-        self.sd_card_root = None
-        self.sd_card_path = None
         self.local_selected = None
         self.selected = None
         self.prev_tag_cat = None
@@ -91,9 +97,6 @@ class ZOIALibrarianMain(QMainWindow):
         self.sd_sizes = None
         self.bank_sizes = None
         self.font = None
-
-        self.sd_import_btn = QPushButton("Click me to import!")
-        self.sd_import_btn.clicked.connect(self.import_patch)
 
         # Check for metadata in the user's backend.
         if "data.json" not in os.listdir(self.backend_path):
@@ -167,10 +170,10 @@ class ZOIALibrarianMain(QMainWindow):
             with open(os.path.join(self.backend_path, "pref.json"), "r") as f:
                 data = json.loads(f.read())
             if data[0]["sd_root"] is not "":
-                self.sd_card_root = data[0]["sd_root"]
+                self.sd.set_sd_root(data[0]["sd_root"])
                 self.ui.tab_sd.setEnabled(True)
-                self.can_export_bank = True
-                self.sd_path()
+                self.sd.set_export(True)
+                self.sd.sd_path(self.ui, True, self.width())
 
             self.setBaseSize(QSize(data[0]["width"], data[0]["height"]))
 
@@ -226,7 +229,7 @@ class ZOIALibrarianMain(QMainWindow):
         # Connect buttons and items to methods.
         self.ui.tabs.currentChanged.connect(self.tab_switch)
         self.ui.actionAlternating_Row_Colours.triggered.connect(
-            self.row_invert)
+            lambda: row_invert(self.ui))
         self.ui.actionSort_by_title_A_Z.triggered.connect(self.sort_and_set)
         self.ui.actionSort_by_title_Z_A.triggered.connect(self.sort_and_set)
         self.ui.actionSort_by_date_new_old.triggered.connect(self.sort_and_set)
@@ -243,7 +246,8 @@ class ZOIALibrarianMain(QMainWindow):
             self.sort_and_set)
         self.ui.actionSort_by_downloads_low_high.triggered.connect(
             self.sort_and_set)
-        self.ui.actionSpecify_SD_Card_Location.triggered.connect(self.sd_path)
+        self.ui.actionSpecify_SD_Card_Location.triggered.connect(
+            lambda: self.sd.sd_path(self.ui, False, self.width()))
         self.ui.actionImport_Multiple_Patches.triggered.connect(
             self.mass_import)
         self.ui.actionFont.triggered.connect(lambda: change_font("", self.ui))
@@ -268,14 +272,17 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.searchbar_PS.installEventFilter(self)
         self.ui.searchbar_local.installEventFilter(self)
         self.ui.searchbar_bank.installEventFilter(self)
-        self.ui.sd_tree.clicked.connect(self.prepare_sd_view)
+        self.ui.sd_tree.clicked.connect(
+            lambda: self.sd.prepare_sd_view(self.ui))
         self.ui.import_all_btn.clicked.connect(self.mass_import)
         self.ui.back_btn_local.clicked.connect(self.go_back)
         self.ui.back_btn_bank.clicked.connect(self.go_back)
-        self.ui.btn_load_bank.clicked.connect(self.load_bank)
-        self.ui.btn_save_bank.clicked.connect(self.save_bank)
-        self.ui.btn_export_bank.clicked.connect(self.export_bank)
-        self.ui.delete_folder_sd_btn.clicked.connect(self.delete_sd_item)
+        self.ui.btn_load_bank.clicked.connect(self.bank.load_bank)
+        self.ui.btn_save_bank.clicked.connect(self.bank.save_bank)
+        self.ui.btn_export_bank.clicked.connect(
+            lambda: self.bank.export_bank(self.ui, self.msg, self.sd, export))
+        self.ui.delete_folder_sd_btn.clicked.connect(
+            lambda: self.sd.delete_sd_item(self.ui, delete, self.msg))
 
         # Font consistency.
         change_font(QFont("Verdana", 10) if self.font is None else
@@ -341,7 +348,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.sort_and_set()
         elif self.ui.tabs.currentIndex() == 2:
             # SD card tab, need to check if an SD card has been specified.
-            if self.sd_card_root is None:
+            if self.sd.get_sd_root() is None:
                 msg = QMessageBox()
                 msg.setWindowTitle("No SD Path")
                 msg.setIcon(QMessageBox.Information)
@@ -546,30 +553,6 @@ class ZOIALibrarianMain(QMainWindow):
             else:
                 curr_table.resizeRowsToContents()
 
-    def get_local_patches(self):
-        """ Retrieves the metadata for patches that a user has previously
-        downloaded and saved to their machine's backend.
-        """
-        if self.ui.tabs.currentIndex() == 1:
-            self.data_local = []
-            curr_data = self.data_local
-        else:
-            self.data_bank = []
-            curr_data = self.data_bank
-        for patches in os.listdir(self.backend_path):
-            # Look for patch directories in the backend.
-            if patches != "Banks" and patches != "data.json" and \
-                    patches != '.DS_Store' and patches != "pref.json":
-                for pch in os.listdir(os.path.join(self.backend_path,
-                                                   patches)):
-                    # Read the metadata so that we can set up the tables.
-                    if pch.split(".")[1] == "json":
-                        with open(os.path.join(self.backend_path,
-                                               patches, pch)) as f:
-                            temp = json.loads(f.read())
-                        curr_data.append(temp)
-                        break
-
     def get_version_patches(self, context):
         """ Retrieves the versions of a patch that is locally stored to
         a user's backend local storage.
@@ -607,39 +590,6 @@ class ZOIALibrarianMain(QMainWindow):
         else:
             self.ui.text_browser_bank.setText("")
             self.sort_and_set()
-
-    def prepare_sd_view(self):
-        """ Prepare the SD Card tab after an SD card location
-        has been specified.
-        """
-
-        self.ui.import_all_btn.setEnabled(False)
-        path = self.ui.sd_tree.currentIndex().data()
-        temp = self.ui.sd_tree.currentIndex()
-        while True:
-            temp = temp.parent()
-            if temp.data() is not None and self.sd_card_root \
-                    not in temp.data():
-                path = os.path.join(temp.data(), path)
-                continue
-            break
-        self.sd_card_path = os.path.join(self.sd_card_root, path)
-
-        set_data_sd(self.sd_card_path, self.ui, self.remove_sd,
-                    self.import_patch)
-        # If any patches populate the tables, enable the import all button.
-        # TODO Find out if this can be determined without iterating through the
-        #  entire table.
-        for i in range(64):
-            if i < 32:
-                if self.ui.table_sd_left.item(i, 0).text() != "":
-                    self.ui.import_all_btn.setEnabled(True)
-                    break
-            else:
-                if self.ui.table_sd_right.item(i - 32, 0).text() != "":
-                    self.ui.import_all_btn.setEnabled(True)
-                    break
-        self.ui.delete_folder_sd_btn.setEnabled(True)
 
     def initiate_download(self):
         """ Attempts to download a patch from the PS API. Once the
@@ -692,7 +642,7 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Exporting this way will only export to a directory named "to_zoia"
         # So we need to check if it exists. If it doesn't, we create it.
-        if self.sd_card_root is None:
+        if self.sd.get_sd_root is None:
             # No SD path.
             msg = QMessageBox()
             msg.setWindowTitle("No SD Path")
@@ -703,8 +653,8 @@ class ZOIALibrarianMain(QMainWindow):
             msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()
         else:
-            if "to_zoia" not in os.listdir(self.sd_card_root):
-                os.mkdir(os.path.join(self.sd_card_root, "to_zoia"))
+            if "to_zoia" not in os.listdir(self.sd.get_sd_root()):
+                os.mkdir(os.path.join(self.sd.get_sd_root(), "to_zoia"))
             while True:
                 # Ask for a slot
                 slot, ok = QInputDialog().getInt(self, "Patch Export",
@@ -717,7 +667,8 @@ class ZOIALibrarianMain(QMainWindow):
                     # Got a slot and the user hit "OK"
                     try:
                         export.export_patch_bin(self.sender().objectName(),
-                                                os.path.join(self.sd_card_root,
+                                                os.path.join(
+                                                    self.sd.get_sd_root(),
                                                              "to_zoia"), slot)
                         self.ui.statusbar.showMessage("Export complete!",
                                                       timeout=5000)
@@ -738,14 +689,14 @@ class ZOIALibrarianMain(QMainWindow):
                             try:
                                 export.export_patch_bin(
                                     self.sender().objectName(),
-                                    os.path.join(self.sd_card_root, "to_zoia"),
+                                    os.path.join(self.sd.get_sd_root(), "to_zoia"),
                                     slot, True)
                                 self.ui.statusbar.showMessage(
                                     "Export complete!", timeout=5000)
                             except FileNotFoundError:
                                 idx = str(self.sender().objectName()) + "_v1"
                                 export.export_patch_bin(idx, os.path.join(
-                                    self.sd_card_root, "to_zoia"), slot, True)
+                                    self.sd.get_sd_root(), "to_zoia"), slot, True)
                                 self.ui.statusbar.showMessage(
                                     "Export complete!", timeout=5000)
                             break
@@ -754,7 +705,8 @@ class ZOIALibrarianMain(QMainWindow):
                     except FileNotFoundError:
                         idx = str(self.sender().objectName()) + "_v1"
                         export.export_patch_bin(idx,
-                                                os.path.join(self.sd_card_root,
+                                                os.path.join(
+                                                    self.sd.get_sd_root(),
                                                              "to_zoia"), slot,
                                                 True)
                         self.ui.statusbar.showMessage(
@@ -785,15 +737,87 @@ class ZOIALibrarianMain(QMainWindow):
                                              self.sender().objectName()))
             self.get_version_patches(self.ui.tabs.currentIndex() == 1)
 
+    def remove_bank_item(self):
+        """ Removes an item from one of the bank tables.
+        Currently triggered via a button press.
+        """
+
+        for i in range(64):
+            if i < 32:
+                item = self.ui.table_bank_left.cellWidget(i, 1)
+                if item is None:
+                    continue
+                elif item.objectName() == self.sender().objectName() and \
+                        i == self.ui.table_bank_left.currentRow():
+                    self.ui.table_bank_left.setItem(i, 0, QTableWidgetItem(
+                        None))
+                    self.ui.table_bank_left.setCellWidget(i, 1, None)
+                    self.ui.table_bank_right.clearSelection()
+                    break
+            else:
+                item = self.ui.table_bank_right.cellWidget(i - 32, 1)
+                if item is None:
+                    continue
+                elif item.objectName() == self.sender().objectName() and \
+                        i - 32 == self.ui.table_bank_right.currentRow():
+                    self.ui.table_bank_right.setItem(i - 32, 0,
+                                                     QTableWidgetItem(None))
+                    self.ui.table_bank_right.setCellWidget(i - 32, 1, None)
+                    self.ui.table_bank_right.clearSelection()
+                    break
+
+        for pch in self.bank.get_data_banks():
+            if pch["slot"] == i:
+                self.bank.get_data_banks().remove(pch)
+
+        # Check to see if we should disable export and save buttons.
+        found_item = False
+        for i in range(64):
+            if i < 32:
+                if self.ui.table_bank_left.cellWidget(i, 1) is not None:
+                    found_item = True
+                    break
+            else:
+                if self.ui.table_bank_right.cellWidget(i - 32, 1) is not None:
+                    found_item = True
+                    break
+
+        if not found_item:
+            self.ui.btn_export_bank.setEnabled(False)
+            self.ui.btn_save_bank.setEnabled(False)
+
+    def get_local_patches(self):
+        """ Retrieves the metadata for patches that a user has previously
+        downloaded and saved to their machine's backend.
+        """
+        if self.ui.tabs.currentIndex() == 1:
+            self.data_local = []
+            curr_data = self.data_local
+        else:
+            self.data_bank = []
+            curr_data = self.data_bank
+        for patches in os.listdir(self.backend_path):
+            # Look for patch directories in the backend.
+            if patches != "Banks" and patches != "data.json" and \
+                    patches != '.DS_Store' and patches != "pref.json":
+                for pch in os.listdir(os.path.join(self.backend_path,
+                                                   patches)):
+                    # Read the metadata so that we can set up the tables.
+                    if pch.split(".")[1] == "json":
+                        with open(os.path.join(self.backend_path,
+                                               patches, pch)) as f:
+                            temp = json.loads(f.read())
+                        curr_data.append(temp)
+                        break
+
     def remove_sd(self):
         """ Removes a patch that is stored on a user's SD card.
         Currently triggered via a button press.
         """
         row = self.sender().objectName()
         index = "00{}".format(row) if len(row) < 2 else "0{}".format(row)
-        delete.delete_patch_sd(index, self.sd_card_path)
-        set_data_sd(self.sd_card_path, self.ui, self.remove_sd,
-                    self.import_patch)
+        delete.delete_patch_sd(index, self.sd.get_sd_path())
+        self.sd.set_data_sd(self.ui, self.remove_sd, self.import_patch)
 
     def display_patch_info(self):
         """ Queries the PS API for additional patch information whenever
@@ -910,49 +934,6 @@ class ZOIALibrarianMain(QMainWindow):
         self.sort_and_set()
         self.ui.refresh_pch_btn.setEnabled(True)
         self.ui.statusbar.showMessage("Patch list refreshed!", timeout=5000)
-
-    def sd_path(self):
-        """ Allows the user to specify the path to their SD card via
-        their OS file explorer dialog. Note, nothing is done to ensure
-        that the location selected is actually an SD card.
-        Currently triggered via a menu action.
-        """
-        if self.sender() is not None:
-            input_dir = QFileDialog.getExistingDirectory(None,
-                                                         'Select an SD Card:',
-                                                         expanduser("~"))
-            if input_dir is not "" and os.path.isdir(input_dir):
-                if "/" in input_dir and platform.system().lower() == "windows":
-                    # THIS IS NEEDED FOR WINDOWS.
-                    # This comes from a bug with QFileDialog returning the
-                    # wrong path separator on Windows for some odd reason.
-                    input_dir = input_dir.split("/")[0]
-                elif "/" in input_dir and platform.system().lower() != \
-                        "windows":
-                    # OSX case.
-                    pass
-                elif "\\" in input_dir:
-                    input_dir = input_dir.split("\\")[0]
-                elif "//" in input_dir:
-                    input_dir = input_dir.split("//")[0]
-                elif "\\\\" in input_dir:
-                    input_dir = input_dir.split("\\\\")[0]
-                else:
-                    input_dir = input_dir.split(os.path.sep)[0]
-                self.sd_card_root = str(input_dir)
-                self.ui.tab_sd.setEnabled(True)
-                self.can_export_bank = True
-            else:
-                self.ui.tab_sd.setEnabled(False)
-                self.can_export_bank = False
-                self.ui.tabs.setCurrentIndex(1)
-
-        # Setup the SD card tree view for the SD Card tab.
-        model = QFileSystemModel()
-        model.setRootPath(self.sd_card_root)
-        self.ui.sd_tree.setModel(model)
-        self.ui.sd_tree.setRootIndex(model.setRootPath(self.sd_card_root))
-        self.ui.sd_tree.setColumnWidth(0, self.width() // 4)
 
     def search(self):
         """ Initiates a data search for the metadata that is retrieved
@@ -1140,27 +1121,6 @@ class ZOIALibrarianMain(QMainWindow):
             msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()
 
-    def row_invert(self):
-        """ Either enables of disables alternating row colours for
-        tables; depending on the previous state of the tables.
-        Currently triggered via a menu action.
-        """
-
-        self.ui.table_PS.setAlternatingRowColors(
-            not self.ui.table_PS.alternatingRowColors())
-        self.ui.table_local.setAlternatingRowColors(
-            not self.ui.table_local.alternatingRowColors())
-        self.ui.table_sd_left.setAlternatingRowColors(
-            not self.ui.table_sd_left.alternatingRowColors())
-        self.ui.table_sd_right.setAlternatingRowColors(
-            not self.ui.table_sd_right.alternatingRowColors())
-        self.ui.table_bank_local.setAlternatingRowColors(
-            not self.ui.table_bank_local.alternatingRowColors())
-        self.ui.table_bank_left.setAlternatingRowColors(
-            not self.ui.table_bank_left.alternatingRowColors())
-        self.ui.table_bank_right.setAlternatingRowColors(
-            not self.ui.table_bank_right.alternatingRowColors())
-
     def update_patch_notes(self):
         """ Updates the patch notes for a patch that has been previously
         locally saved to a user's machine.
@@ -1191,9 +1151,9 @@ class ZOIALibrarianMain(QMainWindow):
         msg.setInformativeText("No importing has occurred.")
         msg.setStandardButtons(QMessageBox.Ok)
 
-        if self.sd_card_path is not None and \
+        if self.sd.get_sd_path() is not None and \
                 self.ui.tabs.currentIndex() == 2:
-            for sd_pch in os.listdir(self.sd_card_path):
+            for sd_pch in os.listdir(self.sd.get_sd_path()):
                 try:
                     index = int(self.sender().objectName())
                 except ValueError:
@@ -1204,8 +1164,8 @@ class ZOIALibrarianMain(QMainWindow):
                     index = "0{}".format(index)
                 if index == sd_pch[:3]:
                     try:
-                        save.import_to_backend(os.path.join(self.sd_card_path,
-                                                            sd_pch))
+                        save.import_to_backend(
+                            os.path.join(self.sd.get_sd_path(), sd_pch))
                         self.ui.statusbar.showMessage("Import complete!")
                         return
                     except errors.SavingError:
@@ -1261,7 +1221,7 @@ class ZOIALibrarianMain(QMainWindow):
                 msg.exec_()
                 return
         else:
-            input_dir = self.sd_card_path
+            input_dir = self.sd.get_sd_path()
         for pch in os.listdir(input_dir):
             if pch[0] == "0" and pch.split(".")[1] == "bin" \
                     and "_zoia_" in pch:
@@ -1293,163 +1253,6 @@ class ZOIALibrarianMain(QMainWindow):
                                        "imported.".format(fail_cnt))
         msg.setStandardButtons(QMessageBox.Ok)
         msg.exec_()
-
-    def move_patch_bank(self, src, dest):
-        """ Attempts to move a patch from one bank slot to another
-        Currently triggered via a QTableWidget move event.
-
-        src: The index the item originated from.
-        dest: The index the item is being moved to.
-        """
-
-        self.ui.table_bank_left.clearSelection()
-        self.ui.table_bank_right.clearSelection()
-
-        swap = False
-
-        # Setup the new item.
-        if src < 32:
-            idx = self.ui.table_bank_left.cellWidget(src, 1).objectName()
-        else:
-            idx = self.ui.table_bank_right.cellWidget(src - 32,
-                                                      1).objectName()
-
-        for pch in self.data_banks:
-            if dest == pch["slot"]:
-                # We are doing a swap.
-                swap = True
-                break
-        if swap:
-            # We are doing a swap.
-            # Get the other item.
-            if dest < 32:
-                idx_dest = self.ui.table_bank_left.cellWidget(dest,
-                                                              1).objectName()
-            else:
-                idx_dest = self.ui.table_bank_right.cellWidget(dest - 32,
-                                                               1).objectName()
-
-            # Get the old values out.
-            for pch in self.data_banks:
-                if pch["slot"] == src or pch["slot"] == dest:
-                    self.data_banks.remove(pch)
-
-            # Add the new values in.
-            self.data_banks.append({
-                "slot": dest,
-                "id": idx
-            })
-            self.data_banks.append({
-                "slot": src,
-                "id": idx_dest
-            })
-        else:
-            # We are doing a move.
-
-            self.data_banks.append({
-                "slot": dest,
-                "id": idx
-            })
-
-            for pch in self.data_banks:
-                if pch["slot"] == src:
-                    self.data_banks.remove(pch)
-                    break
-
-        # Set the data.
-        set_data_bank(self.ui, self.backend_path,
-                      self.remove_bank_item, self.data_banks)
-
-        for i in range(64):
-            if i == dest:
-                if i > 31:
-                    self.ui.table_bank_right.setRangeSelected(
-                        QTableWidgetSelectionRange(i, 0, i, 0), True)
-                else:
-                    self.ui.table_bank_left.setRangeSelected(
-                        QTableWidgetSelectionRange(i, 0, i, 0), True)
-
-        self.get_bank_data()
-
-    def move_patch_sd(self, src, dest):
-        """ Attempts to move a patch from one SD card slot to another
-        Currently triggered via a QTableWidget move event.
-
-        src: The index the item originated from.
-        dest: The index the item is being moved to.
-        """
-
-        self.ui.table_sd_left.clearSelection()
-        self.ui.table_sd_right.clearSelection()
-
-        # We need to find out if we are just doing a simple move or a swap.
-        if dest < 10:
-            dest = str("00{}".format(dest))
-        else:
-            dest = str("0{}".format(dest))
-        if src < 10:
-            src = str("00{}".format(src))
-        else:
-            src = str("0{}".format(src))
-        src_pch = None
-        dest_pch = None
-        for pch in os.listdir(self.sd_card_path):
-            if pch[:3] == src:
-                src_pch = pch
-            if pch[:3] == dest:
-                dest_pch = pch
-            if src_pch is not None and dest_pch is not None:
-                # We are doing a swap.
-                try:
-                    os.rename(os.path.join(self.sd_card_path, src_pch),
-                              os.path.join(self.sd_card_path, dest
-                                           + src_pch[3:]))
-                    os.rename(os.path.join(self.sd_card_path, dest_pch),
-                              os.path.join(self.sd_card_path, src
-                                           + dest_pch[3:]))
-                except FileExistsError:
-                    # Swapping files that are named the same thing.
-                    os.rename(os.path.join(self.sd_card_path, src_pch),
-                              os.path.join(self.sd_card_path, "064"
-                                           + src_pch[3:]))
-                    # Swapping files that are named the same thing.
-                    os.rename(os.path.join(self.sd_card_path, dest_pch),
-                              os.path.join(self.sd_card_path, src
-                                           + dest_pch[3:]))
-                    os.rename(os.path.join(self.sd_card_path, "064"
-                                           + src_pch[3:]),
-                              os.path.join(self.sd_card_path, dest
-                                           + src_pch[3:]))
-                set_data_sd(self.sd_card_path, self.ui, self.remove_sd,
-                            self.import_patch)
-                dest = int(dest)
-                for i in range(64):
-                    if i == dest:
-                        if i > 31:
-                            self.ui.table_sd_right.setRangeSelected(
-                                QTableWidgetSelectionRange(i, 0, i, 0), True)
-                        else:
-                            self.ui.table_sd_left.setRangeSelected(
-                                QTableWidgetSelectionRange(i, 0, i, 0), True)
-                return
-
-        # We are doing a move.
-
-        os.rename(os.path.join(self.sd_card_path, src_pch),
-                  os.path.join(self.sd_card_path, dest + src_pch[3:]))
-
-        dest = int(dest)
-        for i in range(64):
-            if i == dest:
-                if i > 31:
-                    self.ui.table_sd_right.setRangeSelected(
-                        QTableWidgetSelectionRange(i, 0, i, 0), True)
-                else:
-                    self.ui.table_sd_left.setRangeSelected(
-                        QTableWidgetSelectionRange(i, 0, i, 0), True)
-
-        set_data_sd(self.sd_card_path, self.ui, self.remove_sd,
-                    self.import_patch)
 
     def eventFilter(self, o, e):
         """ Deals with events that originate from various widgets
@@ -1507,10 +1310,11 @@ class ZOIALibrarianMain(QMainWindow):
                                 temp_index = "00{}".format(i)
                             else:
                                 temp_index = "0{}".format(i)
-                            for pch in os.listdir(self.sd_card_path):
+                            for pch in os.listdir(self.sd.get_sd_path()):
                                 if "{}_zoia_".format(temp_index) in pch:
                                     if i != dst_index:
-                                        self.move_patch_sd(i, dst_index)
+                                        self.sd.move_patch_sd(self.ui,
+                                                              i, dst_index)
                                         return True
                                     else:
                                         return False
@@ -1535,7 +1339,7 @@ class ZOIALibrarianMain(QMainWindow):
                         self.ui.table_sd_right.removeRow(32)
                         return False
                     if src_index != dst_index:
-                        self.move_patch_sd(src_index, dst_index)
+                        self.sd.move_patch_sd(self.ui, src_index, dst_index)
                     return True
         elif o.objectName() == "table_bank_local":
             if e.type() == QEvent.ChildAdded:
@@ -1568,12 +1372,12 @@ class ZOIALibrarianMain(QMainWindow):
                             self.backend_path, idx))) == 2) or "_" in idx:
                         # Not working within a version directory.
                         # Just a single patch
-                        if self.data_banks is not None:
+                        if self.bank.get_data_banks() is not None:
                             # Drop the patch we dragged to from the list if
                             # need be.
-                            for pch in self.data_banks:
+                            for pch in self.bank.get_data_banks():
                                 if pch["slot"] == drop_index:
-                                    self.data_banks.remove(pch)
+                                    self.bank.get_data_banks().remove(pch)
                         else:
                             # Need to enable the buttons now that there is a
                             # patch in the tables.
@@ -1586,14 +1390,14 @@ class ZOIALibrarianMain(QMainWindow):
                             "id": idx
                         })
 
-                        set_data_bank(self.ui, self.backend_path,
+                        self.bank.set_data_bank(self.ui, self.backend_path,
                                       self.remove_bank_item, self.data_banks)
                     else:
                         # An entire version directory was dragged over.
                         pch_num = int((len(os.listdir(os.path.join(
                             self.backend_path, idx))) / 2) - 1)
                         if drop_index + pch_num > 63:
-                            set_data_bank(self.ui, self.backend_path,
+                            self.bank.set_data_bank(self.ui, self.backend_path,
                                           self.remove_bank_item,
                                           self.data_banks)
                             msg = QMessageBox()
@@ -1626,7 +1430,7 @@ class ZOIALibrarianMain(QMainWindow):
                                     "id": "{}_v{}".format(idx, i)
                                 })
 
-                            set_data_bank(self.ui, self.backend_path,
+                            self.bank.set_data_bank(self.ui, self.backend_path,
                                           self.remove_bank_item,
                                           self.data_banks)
                 else:
@@ -1677,7 +1481,7 @@ class ZOIALibrarianMain(QMainWindow):
                             temp2 = self.ui.table_bank_right.cellWidget(i - 32
                                                                         , 1)
                         if temp is None and temp2 is not None:
-                            self.move_patch_bank(i, dst_index)
+                            self.sd.move_patch_bank(self.ui, i, dst_index)
                 else:
                     for i in range(64):
                         if i < 32:
@@ -1699,7 +1503,7 @@ class ZOIALibrarianMain(QMainWindow):
                         self.ui.table_bank_right.removeRow(32)
                         return False
                     if src_index != dst_index:
-                        self.move_patch_bank(src_index, dst_index)
+                        self.sd.move_patch_bank(self.ui, src_index, dst_index)
                     return True
 
         elif o.objectName() == "searchbar_PS" \
@@ -1828,277 +1632,12 @@ class ZOIALibrarianMain(QMainWindow):
         # Sort and display the data.
         self.sort_and_set()
 
-    def load_bank(self):
-        """ Loads a Bank file that was previously saved to the
-        backend directory.
-        Currently triggered via a button press.
-        """
-
-        bnk_file = QFileDialog.getOpenFileName(None,
-                                               "Select A Patch Bank:",
-                                               os.path.join(self.backend_path,
-                                                            "Banks"))[0]
-        if bnk_file is not "":
-            if "/" in bnk_file and platform.system().lower() == "windows":
-                bnk_file = bnk_file.split("/")[-1]
-            elif "\\" in bnk_file:
-                bnk_file = bnk_file.split("\\")[-1]
-            elif "//" in bnk_file:
-                bnk_file = bnk_file.split("//")[-1]
-            elif "\\\\" in bnk_file:
-                bnk_file = bnk_file.split("\\\\")[-1]
-            else:
-                bnk_file = bnk_file.split(os.path.sep)[-1]
-        else:
-            return
-
-        with open(os.path.join(self.backend_path, "Banks", bnk_file),
-                  "r") as f:
-            self.data_banks = json.loads(f.read())
-
-        # TODO Deal with the case where a file is not found.
-        fails = []
-        for pch in self.data_banks:
-            if pch["id"] not in os.listdir(self.backend_path):
-                fails.append(pch)
-                self.data_banks.remove(pch)
-
-        if len(fails) != 0:
-            msg = QMessageBox()
-            msg.setWindowTitle("Warning")
-            msg.setIcon(QMessageBox.Warning)
-            msg.setWindowIcon(self.icon)
-            msg.setText("One or more patches failed to load as they have "
-                        "been deleted from the ZOIA Librarian. Please "
-                        "reacquire them to have them load.")
-            msg.setStandardButtons(QMessageBox.Ok)
-            msg.exec_()
-
-        found_item = False
-        for i in range(64):
-            if i < 32:
-                if self.ui.table_bank_left.cellWidget(i, 1) is not None:
-                    found_item = True
-                    break
-            else:
-                if self.ui.table_bank_right.cellWidget(i - 32, 1) is not None:
-                    found_item = True
-                    break
-
-        if found_item:
-            msg = QMessageBox()
-            msg.setWindowTitle("Warning")
-            msg.setIcon(QMessageBox.Warning)
-            msg.setWindowIcon(self.icon)
-            msg.setText("This will overwrite the current data in the "
-                        "table.\nIs that okay?")
-            msg.setInformativeText("If you haven't saved your changes they "
-                                   "will be lost.")
-            msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-            value = msg.exec_()
-            if value != QMessageBox.Yes:
-                return
-        set_data_bank(self.ui, self.backend_path,
-                      self.remove_bank_item, self.data_banks)
-        self.ui.btn_export_bank.setEnabled(True)
-        self.ui.btn_save_bank.setEnabled(True)
-
-    def save_bank(self):
-        """ Saves a Bank to the backend application directory.
-        Currently triggered via a button press.
-        """
-        # Ask for a name
-        name, ok = QInputDialog().getText(self, "Save Bank",
-                                          "Please enter a name for the Bank:")
-        if ok:
-            self.get_bank_data()
-            with open(
-                    os.path.join(self.backend_path, "Banks", "{}.json".format(
-                        name)),
-                    "w") as f:
-                f.write(json.dumps(self.data_banks))
-            self.ui.btn_load_bank.setEnabled(True)
-
-    def export_bank(self):
-        """ Saves a Bank to the backend application directory.
-        Currently triggered via a button press.
-        """
-
-        if self.sd_card_root is None:
-            msg = QMessageBox()
-            msg.setWindowTitle("No SD Path")
-            msg.setIcon(QMessageBox.Information)
-            msg.setWindowIcon(self.icon)
-            msg.setText("Please specify your SD card path!")
-            msg.setInformativeText("File -> Specify SD Card Location")
-            msg.setStandardButtons(QMessageBox.Ok)
-            msg.exec_()
-        else:
-            fails = []
-            # Ask for a name
-            while True:
-                name, ok = QInputDialog().getText(self, "Export Bank",
-                                                  "Please enter a name for "
-                                                  "the Bank:")
-                if ok and name not in os.listdir(self.sd_card_root):
-                    self.ui.statusbar.showMessage("Patches be movin'",
-                                                  timeout=1000)
-                    self.get_bank_data()
-                    fails = export.export_bank(self.data_banks,
-                                               self.sd_card_root, name)
-                    break
-                elif ok and name in os.listdir(self.sd_card_root):
-                    msg = QMessageBox()
-                    msg.setWindowTitle("Directory exists")
-                    msg.setIcon(QMessageBox.Warning)
-                    msg.setWindowIcon(self.icon)
-                    msg.setText("A directory with that name already exists.")
-                    msg.setInformativeText("Would you like to overwrite it?")
-                    msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-                    value = msg.exec_()
-                    if value == QMessageBox.Yes:
-                        self.ui.statusbar.showMessage("Patches be movin'",
-                                                      timeout=1000)
-                        self.get_bank_data()
-                        fails = export.export_bank(
-                            self.data_banks, self.sd_card_root, name, True)
-                        break
-                else:
-                    break
-            if len(fails) == 0:
-                msg = QMessageBox()
-                msg.setWindowTitle("Success!")
-                msg.setIcon(QMessageBox.Information)
-                msg.setWindowIcon(self.icon)
-                msg.setText("The Bank has been successfully exported "
-                            "to the root of your SD card.")
-                msg.setStandardButtons(QMessageBox.Ok)
-                msg.exec_()
-            else:
-                msg = QMessageBox()
-                msg.setWindowTitle("Some export failures")
-                msg.setIcon(QMessageBox.Information)
-                msg.setWindowIcon(self.icon)
-                if len(fails) == len(self.data_banks):
-                    msg.setText("Failed to export any patches because"
-                                "they have all been deleted from the "
-                                "ZOIA Librarian.")
-                else:
-                    msg.setText("Successful exports: {}\n"
-                                "Failed exports: {}\n"
-                                "Failures occur when the Bank "
-                                "contains a patch that has been "
-                                "deleted from the ZOIA Librarian."
-                                "".format(len(self.data_banks)) - len(fails),
-                                len(fails))
-                    temp = "Here is a list of patches that failed to export:\n"
-                    for slot in fails:
-                        if slot < 32:
-                            temp += \
-                                self.ui.table_bank_left.item(slot, 0).text() \
-                                + "\n"
-                        else:
-                            temp += \
-                                self.ui.table_bank_right.item(
-                                    slot - 32, 0).text() + "\n"
-                    msg.setDetailedText(temp.strip("\n"))
-                msg.setStandardButtons(QMessageBox.Ok)
-                msg.exec_()
-
-    def remove_bank_item(self):
-        """ Removes an item from one of the bank tables.
-        Currently triggered via a button press.
-        """
-
-        for i in range(64):
-            if i < 32:
-                item = self.ui.table_bank_left.cellWidget(i, 1)
-                if item is None:
-                    continue
-                elif item.objectName() == self.sender().objectName() and \
-                        i == self.ui.table_bank_left.currentRow():
-                    self.ui.table_bank_left.setItem(i, 0, QTableWidgetItem(
-                        None))
-                    self.ui.table_bank_left.setCellWidget(i, 1, None)
-                    self.ui.table_bank_right.clearSelection()
-                    break
-            else:
-                item = self.ui.table_bank_right.cellWidget(i - 32, 1)
-                if item is None:
-                    continue
-                elif item.objectName() == self.sender().objectName() and \
-                        i - 32 == self.ui.table_bank_right.currentRow():
-                    self.ui.table_bank_right.setItem(i - 32, 0,
-                                                     QTableWidgetItem(None))
-                    self.ui.table_bank_right.setCellWidget(i - 32, 1, None)
-                    self.ui.table_bank_right.clearSelection()
-                    break
-
-        for pch in self.data_banks:
-            if pch["slot"] == i:
-                self.data_banks.remove(pch)
-
-        # Check to see if we should disable export and save buttons.
-        found_item = False
-        for i in range(64):
-            if i < 32:
-                if self.ui.table_bank_left.cellWidget(i, 1) is not None:
-                    found_item = True
-                    break
-            else:
-                if self.ui.table_bank_right.cellWidget(i - 32, 1) is not None:
-                    found_item = True
-                    break
-
-        if not found_item:
-            self.ui.btn_export_bank.setEnabled(False)
-            self.ui.btn_save_bank.setEnabled(False)
-
-    def get_bank_data(self):
-        """ Gets the data from the current bank tables.
-        """
-
-        self.data_banks = []
-        for i in range(64):
-            if i < 32:
-                temp = self.ui.table_bank_left.cellWidget(i, 1)
-            else:
-                temp = self.ui.table_bank_right.cellWidget(i - 32, 1)
-            if temp is not None:
-                self.data_banks.append({
-                    "slot": i,
-                    "id": temp.objectName()
-                })
-
-    def delete_sd_item(self):
-        """ Deletes the currently selected directory from the SD card.
-        Currently triggered via a button press.
-        """
-
-        if os.path.isdir(self.sd_card_path):
-            msg = QMessageBox()
-            msg.setWindowTitle("Warning")
-            msg.setIcon(QMessageBox.Warning)
-            msg.setWindowIcon(self.icon)
-            msg.setText("This will delete everything contained within the \n"
-                        "selected folder. This includes any files or"
-                        "additional \n folders contained within. \n"
-                        "Do you wish to continue?")
-            msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-            val = msg.exec_()
-            if val == QMessageBox.Yes:
-                delete.delete_full_patch_directory(self.sd_card_path)
-                self.prepare_sd_view()
-        else:
-            delete.delete_file(self.sd_card_path)
-            self.prepare_sd_view()
-
     def closeEvent(self, event):
         """ Override the default close operation so certain application
         settings can be saved.
         """
 
-        save_pref(self.width(), self.height(), self.sd_card_root, self.ui,
+        save_pref(self.width(), self.height(), self.sd.get_sd_root(), self.ui,
                   self.backend_path)
 
     def try_quit(self):
