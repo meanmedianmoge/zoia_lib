@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1695</width>
-    <height>1123</height>
+    <width>1577</width>
+    <height>1203</height>
    </rect>
   </property>
   <property name="focusPolicy">
@@ -28,6 +28,9 @@ background-color: white;
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout_5">
     <property name="sizeConstraint">
      <enum>QLayout::SetNoConstraint</enum>
@@ -77,8 +80,7 @@ background-color: white;
         </property>
         <property name="styleSheet">
          <string notr="true">QTabBar::tab:selected{
-background-color: rgb(216, 255, 223);
-border: 1px solid black;
+	background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(140, 224, 241, 255), stop:1 rgba(121, 243, 145, 255));
 border-top-left-radius: 10px 5px;
 border-top-right-radius: 10px 5px;
 border-bottom: 0px;
@@ -87,7 +89,7 @@ width: 200%;
 font: bold;
 }
 QTabBar::tab:!selected{
-border: 1px solid gray;
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0.289773 rgba(137, 141, 218, 255), stop:1 rgba(82, 90, 105, 255));
 border-bottom: 0px;
 border-top-left-radius: 10px 5px;
 border-top-right-radius: 10px 5px;
@@ -95,16 +97,17 @@ padding: 5px, 5px, 5px, 5px;
 width: 200%;
 transition-duration: 0.4s;
 cursor: pointer;
+color:white;
 }
 QTabBar::tab:!selected:hover{
-background-color: rgb(217, 235, 249)
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(123, 129, 236, 255), stop:1 rgba(59, 209, 211, 255));
 }
 QTabBar {
 background-color: white;
 }
 QTabWidget::tab-bar { 
 background-color: white;
-border-bottom: 1px  solid white;
+border-bottom: 1px solid white;
 }
 QTabWidget::pane { 
 position: absolute; 
@@ -127,7 +130,7 @@ position: absolute;
           <string/>
          </property>
          <property name="styleSheet">
-          <string notr="true"/>
+          <string notr="true">background-color:qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(140, 224, 241, 255), stop:1 rgba(121, 243, 145, 255))</string>
          </property>
          <attribute name="title">
           <string>PatchStorage View</string>
@@ -150,6 +153,10 @@ position: absolute;
           </property>
           <item>
            <widget class="QWidget" name="widget_5" native="true">
+            <property name="styleSheet">
+             <string notr="true">
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(140, 224, 241, 255), stop:1 rgba(121, 243, 145, 255));</string>
+            </property>
             <layout class="QHBoxLayout" name="horizontalLayout_6">
              <property name="spacing">
               <number>0</number>
@@ -237,7 +244,8 @@ position: absolute;
                            <property name="styleSheet">
                             <string notr="true">QLineEdit{
  border: 0.5px solid black;
- padding: 1px, 0px, 0px, 0px
+ padding: 1px, 0px, 0px, 0px;
+background-color:white;
 }</string>
                            </property>
                            <property name="inputMask">
@@ -291,6 +299,9 @@ QPushButton:hover{
                          <property name="cursor" stdset="0">
                           <cursorShape>ArrowCursor</cursorShape>
                          </property>
+                         <property name="mouseTracking">
+                          <bool>false</bool>
+                         </property>
                          <property name="accessibleName">
                           <string>PatchStorage Table</string>
                          </property>
@@ -298,7 +309,7 @@ QPushButton:hover{
                           <string>Displays all of the ZOIA patches that are currently hosted on PatchStorage.</string>
                          </property>
                          <property name="styleSheet">
-                          <string notr="true"/>
+                          <string notr="true">background-color:white;</string>
                          </property>
                          <property name="frameShape">
                           <enum>QFrame::StyledPanel</enum>
@@ -349,11 +360,31 @@ QPushButton:hover{
                           <bool>false</bool>
                          </attribute>
                          <row/>
-                         <column/>
-                         <column/>
-                         <column/>
-                         <column/>
-                         <column/>
+                         <column>
+                          <property name="text">
+                           <string>Title</string>
+                          </property>
+                         </column>
+                         <column>
+                          <property name="text">
+                           <string>Tags</string>
+                          </property>
+                         </column>
+                         <column>
+                          <property name="text">
+                           <string>Categories</string>
+                          </property>
+                         </column>
+                         <column>
+                          <property name="text">
+                           <string>Date Modified</string>
+                          </property>
+                         </column>
+                         <column>
+                          <property name="text">
+                           <string>Download</string>
+                          </property>
+                         </column>
                         </widget>
                        </item>
                       </layout>
@@ -369,7 +400,7 @@ QPushButton:hover{
                        <string>Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)</string>
                       </property>
                       <property name="styleSheet">
-                       <string notr="true"/>
+                       <string notr="true">background-color:white;</string>
                       </property>
                       <property name="frameShadow">
                        <enum>QFrame::Plain</enum>
@@ -398,6 +429,9 @@ QPushButton:hover{
          </layout>
         </widget>
         <widget class="QWidget" name="tab_ls">
+         <property name="styleSheet">
+          <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(140, 224, 241, 255), stop:1 rgba(121, 243, 145, 255));</string>
+         </property>
          <attribute name="title">
           <string>Local Storage View</string>
          </attribute>
@@ -518,7 +552,8 @@ QPushButton:hover{
                      <property name="styleSheet">
                       <string notr="true">QLineEdit{
  border: 0.5px solid black;
- padding: 1px, 0px, 0px, 0px
+ padding: 1px, 0px, 0px, 0px;
+background-color:white;
 }</string>
                      </property>
                      <property name="inputMask">
@@ -567,13 +602,16 @@ QPushButton:hover{
                  <item>
                   <widget class="QTableWidget" name="table_local">
                    <property name="mouseTracking">
-                    <bool>true</bool>
+                    <bool>false</bool>
                    </property>
                    <property name="accessibleName">
                     <string>Local Storage View table</string>
                    </property>
                    <property name="accessibleDescription">
                     <string>Displays all of the patches that have been saved to the ZOIA Librarian</string>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color:white;</string>
                    </property>
                    <property name="sizeAdjustPolicy">
                     <enum>QAbstractScrollArea::AdjustToContents</enum>
@@ -615,12 +653,36 @@ QPushButton:hover{
                     <number>0</number>
                    </attribute>
                    <row/>
-                   <column/>
-                   <column/>
-                   <column/>
-                   <column/>
-                   <column/>
-                   <column/>
+                   <column>
+                    <property name="text">
+                     <string>Title</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Tags</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Categories</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Date Modified</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Export</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Delete</string>
+                    </property>
+                   </column>
                   </widget>
                  </item>
                 </layout>
@@ -673,7 +735,7 @@ QPushButton:hover{
                     <string>Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)</string>
                    </property>
                    <property name="styleSheet">
-                    <string notr="true"/>
+                    <string notr="true">background-color:white;</string>
                    </property>
                    <property name="textInteractionFlags">
                     <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextEditable|Qt::TextSelectableByMouse</set>
@@ -696,6 +758,9 @@ QPushButton:hover{
          </layout>
         </widget>
         <widget class="QWidget" name="tab_sd">
+         <property name="styleSheet">
+          <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(140, 224, 241, 255), stop:1 rgba(121, 243, 145, 255));</string>
+         </property>
          <attribute name="title">
           <string>SD Card View</string>
          </attribute>
@@ -725,7 +790,7 @@ QPushButton:hover{
               <string>Dispalys the contents of the previously specified SD Card (which is specified via the menu bar at File-&gt;Specify SD Card path, or by using Alt+S and then specifying that way).</string>
              </property>
              <property name="styleSheet">
-              <string notr="true">background-color: qlineargradient(spread:pad, x1:1, y1:1, x2:1, y2:0, stop:0 rgba(0, 0, 0, 32), stop:1 rgba(255, 255, 255, 255));</string>
+              <string notr="true">background-color: white</string>
              </property>
              <property name="lineWidth">
               <number>10000</number>
@@ -853,6 +918,9 @@ QPushButton:hover{
                  <number>10</number>
                 </property>
                 <widget class="QTableWidget" name="table_sd_left">
+                 <property name="mouseTracking">
+                  <bool>false</bool>
+                 </property>
                  <property name="acceptDrops">
                   <bool>true</bool>
                  </property>
@@ -861,6 +929,9 @@ QPushButton:hover{
                  </property>
                  <property name="accessibleDescription">
                   <string>Displays patches that would occupy slots 0-31 on a ZOIA</string>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">background-color:white;</string>
                  </property>
                  <property name="editTriggers">
                   <set>QAbstractItemView::NoEditTriggers</set>
@@ -1058,11 +1129,26 @@ QPushButton:hover{
                    <string>31</string>
                   </property>
                  </row>
-                 <column/>
-                 <column/>
-                 <column/>
+                 <column>
+                  <property name="text">
+                   <string>Patch</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Remove</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Import</string>
+                  </property>
+                 </column>
                 </widget>
                 <widget class="QTableWidget" name="table_sd_right">
+                 <property name="mouseTracking">
+                  <bool>false</bool>
+                 </property>
                  <property name="acceptDrops">
                   <bool>true</bool>
                  </property>
@@ -1071,6 +1157,9 @@ QPushButton:hover{
                  </property>
                  <property name="accessibleDescription">
                   <string>Displays patches that would occupy slots 32-63 on a ZOIA</string>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">background-color:white;</string>
                  </property>
                  <property name="editTriggers">
                   <set>QAbstractItemView::NoEditTriggers</set>
@@ -1259,9 +1348,21 @@ QPushButton:hover{
                    <string>63</string>
                   </property>
                  </row>
-                 <column/>
-                 <column/>
-                 <column/>
+                 <column>
+                  <property name="text">
+                   <string>Patch</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Remove</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Import</string>
+                  </property>
+                 </column>
                 </widget>
                </widget>
               </item>
@@ -1277,6 +1378,9 @@ QPushButton:hover{
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(140, 224, 241, 255), stop:1 rgba(121, 243, 145, 255));</string>
          </property>
          <attribute name="title">
           <string>Banks</string>
@@ -1415,6 +1519,9 @@ QPushButton:hover{
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
                 </property>
@@ -1422,6 +1529,9 @@ QPushButton:hover{
                  <number>10</number>
                 </property>
                 <widget class="QTableWidget" name="table_bank_left">
+                 <property name="mouseTracking">
+                  <bool>false</bool>
+                 </property>
                  <property name="toolTip">
                   <string/>
                  </property>
@@ -1433,6 +1543,9 @@ QPushButton:hover{
                  </property>
                  <property name="accessibleDescription">
                   <string>Displays patches that would occupy slots 0-31 on a ZOIA</string>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">background-color:white;</string>
                  </property>
                  <property name="editTriggers">
                   <set>QAbstractItemView::NoEditTriggers</set>
@@ -1627,10 +1740,21 @@ QPushButton:hover{
                    <string>31</string>
                   </property>
                  </row>
-                 <column/>
-                 <column/>
+                 <column>
+                  <property name="text">
+                   <string>Patch</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Remove</string>
+                  </property>
+                 </column>
                 </widget>
                 <widget class="QTableWidget" name="table_bank_right">
+                 <property name="mouseTracking">
+                  <bool>false</bool>
+                 </property>
                  <property name="toolTip">
                   <string/>
                  </property>
@@ -1642,6 +1766,9 @@ QPushButton:hover{
                  </property>
                  <property name="accessibleDescription">
                   <string>Displays patches that would occupy slots 32-63 on a ZOIA</string>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">background-color:white;</string>
                  </property>
                  <property name="editTriggers">
                   <set>QAbstractItemView::NoEditTriggers</set>
@@ -1836,8 +1963,16 @@ QPushButton:hover{
                    <string>63</string>
                   </property>
                  </row>
-                 <column/>
-                 <column/>
+                 <column>
+                  <property name="text">
+                   <string>Patch</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Remove</string>
+                  </property>
+                 </column>
                 </widget>
                </widget>
               </item>
@@ -1907,6 +2042,7 @@ QPushButton:hover{
                    <string notr="true">QLineEdit{
  border: 0.5px solid gray;
  padding: 1px, 0px, 0px, 0px;
+background-color:white;
 }</string>
                   </property>
                   <property name="inputMask">
@@ -1931,7 +2067,7 @@ QPushButton:hover{
                  <string>Displays all of the patches that have been saved to the ZOIA Librarian</string>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true"/>
+                 <string notr="true">background-color:white;</string>
                 </property>
                 <property name="sizeAdjustPolicy">
                  <enum>QAbstractScrollArea::AdjustToContents</enum>
@@ -1979,10 +2115,26 @@ QPushButton:hover{
                  <number>0</number>
                 </attribute>
                 <row/>
-                <column/>
-                <column/>
-                <column/>
-                <column/>
+                <column>
+                 <property name="text">
+                  <string>Title</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Tags</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Categories</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Date Modified</string>
+                 </property>
+                </column>
                </widget>
               </item>
              </layout>
@@ -1995,7 +2147,7 @@ QPushButton:hover{
               <string>Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)</string>
              </property>
              <property name="styleSheet">
-              <string notr="true"/>
+              <string notr="true">background-color:white;</string>
              </property>
              <property name="textInteractionFlags">
               <set>Qt::TextBrowserInteraction</set>
@@ -2022,7 +2174,7 @@ QPushButton:hover{
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1695</width>
+     <width>1577</width>
      <height>27</height>
     </rect>
    </property>
