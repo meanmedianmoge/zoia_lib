@@ -73,6 +73,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.util = ZOIALibrarianUtil(self.ui)
 
         self.data_PS = None
+        self.patch_cache = []
         self.search_data_PS = None
         self.search_data_local = None
         self.search_data_bank = None
@@ -136,6 +137,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.tab_sd.setEnabled(False)
         self.ui.update_patch_notes.setEnabled(False)
         self.ui.import_all_btn.setEnabled(False)
+        self.ui.import_all_ver_btn.setEnabled(False)
         self.ui.back_btn_local.setEnabled(False)
         self.ui.back_btn_bank.setEnabled(False)
         self.ui.btn_save_bank.setEnabled(False)
@@ -260,6 +262,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.sd_tree.clicked.connect(
             lambda: self.sd.prepare_sd_view())
         self.ui.import_all_btn.clicked.connect(self.mass_import)
+        self.ui.import_all_ver_btn.clicked.connect(self.version_import)
         self.ui.back_btn_local.clicked.connect(self.go_back)
         self.ui.back_btn_bank.clicked.connect(self.go_back)
         self.ui.btn_load_bank.clicked.connect(self.bank.load_bank)
@@ -794,7 +797,18 @@ class ZOIALibrarianMain(QMainWindow):
             if self.ui.tabs.currentIndex() == 0:
                 temp = self.ui.text_browser_PS
                 self.selected = name
-                content = ps.get_patch_meta(name)
+                if len(self.patch_cache) == 0:
+                    content = ps.get_patch_meta(name)
+                    self.patch_cache.append(content)
+                else:
+                    content = None
+                    for pch in self.patch_cache:
+                        if str(pch["id"]) == name:
+                            content = pch
+                            break
+                    if content is None:
+                        content = ps.get_patch_meta(name)
+                        self.patch_cache.append(content)
             else:
                 if self.ui.tabs.currentIndex() == 1:
                     temp = self.ui.text_browser_local
@@ -879,6 +893,11 @@ class ZOIALibrarianMain(QMainWindow):
         self.sort_and_set()
         self.ui.refresh_pch_btn.setEnabled(True)
         self.ui.statusbar.showMessage("Patch list refreshed!", timeout=5000)
+        self.msg.setWindowTitle("Patches Refreshed")
+        self.msg.setText("The PatchStorage patch list has been refreshed.")
+        self.msg.setIcon(QMessageBox.Information)
+        self.msg.setStandardButtons(QMessageBox.Ok)
+        self.msg.exec_()
 
     def search(self):
         """ Initiates a data search for the metadata that is retrieved
@@ -1203,16 +1222,19 @@ class ZOIALibrarianMain(QMainWindow):
         self.sort_and_set()
 
     def version_import(self):
-        input_dir = QFileDialog.getExistingDirectory(None,
-                                                     'Select a directory',
-                                                     expanduser("~"))
-        if input_dir is "" or not os.path.isdir(input_dir):
-            self.msg.setWindowTitle("Invalid Selection")
-            self.msg.setIcon(QMessageBox.Information)
-            self.msg.setText("Please select a directory.")
-            self.msg.setStandardButtons(QMessageBox.Ok)
-            self.msg.exec_()
-            return
+        if self.sender().objectName() != "import_all_ver_btn":
+            input_dir = QFileDialog.getExistingDirectory(None,
+                                                         'Select a directory',
+                                                         expanduser("~"))
+            if input_dir is "" or not os.path.isdir(input_dir):
+                self.msg.setWindowTitle("Invalid Selection")
+                self.msg.setIcon(QMessageBox.Information)
+                self.msg.setText("Please select a directory.")
+                self.msg.setStandardButtons(QMessageBox.Ok)
+                self.msg.exec_()
+                return
+        else:
+            input_dir = self.sd.get_sd_path()
         fails = save.import_to_backend(input_dir, True)
         if fails == 0:
             self.msg.setWindowTitle("Success")

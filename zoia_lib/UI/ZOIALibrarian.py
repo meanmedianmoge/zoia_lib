@@ -562,6 +562,20 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_11.addWidget(self.import_all_btn)
 
+        self.import_all_ver_btn = QPushButton(self.layoutWidget_3)
+        self.import_all_ver_btn.setObjectName(u"import_all_ver_btn")
+        self.import_all_ver_btn.setStyleSheet(u"QPushButton{\n"
+"border-radius: 5px;\n"
+"padding: 2px 2px 2px 2px;\n"
+"border: 1px solid black;\n"
+"background-color: rgb(224, 224, 224);\n"
+"}\n"
+"QPushButton:hover{\n"
+"	background-color: rgb(217, 235, 249)\n"
+"}")
+
+        self.verticalLayout_11.addWidget(self.import_all_ver_btn)
+
         self.splitter_sd_hori = QSplitter(self.layoutWidget_3)
         self.splitter_sd_hori.setObjectName(u"splitter_sd_hori")
         self.splitter_sd_hori.setOrientation(Qt.Horizontal)
@@ -1426,6 +1440,7 @@ class Ui_MainWindow(object):
         self.import_all_btn.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Attempts to import all of the patches listed in the tables below (SD card table left and SD card table right) into the ZOIA Librarian. This requires that a folder is selected from the SD Card Viewer above that contains patches.", None))
 #endif // QT_CONFIG(accessibility)
         self.import_all_btn.setText(QCoreApplication.translate("MainWindow", u"Import All Listed Patches Below", None))
+        self.import_all_ver_btn.setText(QCoreApplication.translate("MainWindow", u"Import All Listed Patches Below As A Version History", None))
         ___qtablewidgetitem11 = self.table_sd_left.horizontalHeaderItem(0)
         ___qtablewidgetitem11.setText(QCoreApplication.translate("MainWindow", u"Patch", None));
         ___qtablewidgetitem12 = self.table_sd_left.horizontalHeaderItem(1)

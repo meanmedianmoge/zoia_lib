@@ -80,6 +80,7 @@ class ZOIALibrarianSD(QMainWindow):
         """
 
         self.ui.import_all_btn.setEnabled(False)
+        self.ui.import_all_ver_btn.setEnabled(False)
         path = self.ui.sd_tree.currentIndex().data()
         temp = self.ui.sd_tree.currentIndex()
         while True:
@@ -100,10 +101,12 @@ class ZOIALibrarianSD(QMainWindow):
             if i < 32:
                 if self.ui.table_sd_left.item(i, 0).text() != "":
                     self.ui.import_all_btn.setEnabled(True)
+                    self.ui.import_all_ver_btn.setEnabled(True)
                     break
             else:
                 if self.ui.table_sd_right.item(i - 32, 0).text() != "":
                     self.ui.import_all_btn.setEnabled(True)
+                    self.ui.import_all_ver_btn.setEnabled(True)
                     break
         self.ui.delete_folder_sd_btn.setEnabled(True)
 

@@ -910,6 +910,24 @@ QPushButton:hover{
                </widget>
               </item>
               <item>
+               <widget class="QPushButton" name="import_all_ver_btn">
+                <property name="styleSheet">
+                 <string notr="true">QPushButton{
+border-radius: 5px;
+padding: 2px 2px 2px 2px;
+border: 1px solid black;
+background-color: rgb(224, 224, 224);
+}
+QPushButton:hover{
+	background-color: rgb(217, 235, 249)
+}</string>
+                </property>
+                <property name="text">
+                 <string>Import All Listed Patches Below As A Version History</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QSplitter" name="splitter_sd_hori">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
