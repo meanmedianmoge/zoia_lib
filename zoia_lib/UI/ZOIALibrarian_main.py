@@ -238,7 +238,8 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.actionDecrease_Font_Size.triggered.connect(
             lambda: self.util.change_font("-"))
         self.ui.actionQuit.triggered.connect(self.try_quit)
-        self.ui.check_for_updates_btn.clicked.connect(self.update_local_patches)
+        self.ui.check_for_updates_btn.clicked.connect(
+            self.update_local_patches)
         self.ui.refresh_pch_btn.clicked.connect(self.reload_ps)
         self.ui.update_patch_notes.clicked.connect(self.update_patch_notes)
         self.ui.actionImport_A_Patch.triggered.connect(self.import_patch)
@@ -268,7 +269,8 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Font consistency.
         self.util.change_font(QFont("Verdana", 10) if self.font is None else
-                    data[0]["font"] + "%" + str(data[0]["font_size"]))
+                              data[0]["font"] + "%" + str(
+                                  data[0]["font_size"]))
 
         # Modify the display sizes for some widgets.
         if self.ps_sizes is None:
@@ -672,10 +674,11 @@ class ZOIALibrarianMain(QMainWindow):
                         # There was already a patch in that slot.
                         self.msg.setWindowTitle("Slot Exists")
                         self.msg.setIcon(QMessageBox.Information)
-                        self.msg.setText("That slot is occupied by another patch. "
-                                    "Would you like to overwrite it?")
+                        self.msg.setText(
+                            "That slot is occupied by another patch. "
+                            "Would you like to overwrite it?")
                         self.msg.setStandardButtons(QMessageBox.Yes |
-                                               QMessageBox.No)
+                                                    QMessageBox.No)
                         value = self.msg.exec_()
                         if value == QMessageBox.Yes:
                             # Overwrite the other patch.
@@ -1079,8 +1082,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.msg.setWindowTitle("Patch Already In Library")
         self.msg.setIcon(QMessageBox.Information)
         self.msg.setText("That patch exists within your locally "
-                         "saved patches.")
-        self.msg.setInformativeText("No importing has occurred.")
+                         "saved patches.\nNo importing has occurred.")
         self.msg.setStandardButtons(QMessageBox.Ok)
 
         if self.sd.get_sd_path() is not None and \
@@ -1116,9 +1118,9 @@ class ZOIALibrarianMain(QMainWindow):
                 self.set_data(self.ui.searchbar_local.text() != "")
             self.ui.statusbar.showMessage("Import complete!")
             if (self.ui.tabs.currentIndex() == 1 and not
-                self.ui.back_btn_local.isEnabled()) or \
-               (self.ui.tabs.currentIndex() == 3 and not
-                self.ui.back_btn_bank.isEnabled()):
+            self.ui.back_btn_local.isEnabled()) or \
+                    (self.ui.tabs.currentIndex() == 3 and not
+                    self.ui.back_btn_bank.isEnabled()):
                 self.get_local_patches()
                 self.sort_and_set()
 
@@ -1169,21 +1171,26 @@ class ZOIALibrarianMain(QMainWindow):
         self.msg.setWindowTitle("Import Complete")
         self.msg.setIcon(QMessageBox.Information)
         if imp_cnt > 0:
-            self.msg.setText("Successfully imported {} patches.".format(imp_cnt))
+            self.msg.setText(
+                "Successfully imported {} patches.".format(imp_cnt))
         else:
             self.msg.setText("Did not import any patches.")
         if fail_cnt > 0:
             if fail_cnt == 1:
-                self.msg.setInformativeText("{} was already saved in the library "
-                                       "and was not "
-                                       "imported.".format(fail_cnt))
+                self.msg.setInformativeText(
+                    "{} was already saved in the library "
+                    "and was not "
+                    "imported.".format(fail_cnt))
             else:
-                self.msg.setInformativeText("{} were already saved in the library "
-                                       "and were not "
-                                       "imported.".format(fail_cnt))
+                self.msg.setInformativeText(
+                    "{} were already saved in the library "
+                    "and were not "
+                    "imported.".format(fail_cnt))
         self.msg.setStandardButtons(QMessageBox.Ok)
         self.msg.exec_()
         self.msg.setInformativeText(None)
+        self.get_local_patches()
+        self.sort_and_set()
 
     def eventFilter(self, o, e):
         """ Deals with events that originate from various widgets
@@ -1332,7 +1339,7 @@ class ZOIALibrarianMain(QMainWindow):
         """
 
         self.util.save_pref(self.width(), self.height(), self.sd.get_sd_root(),
-                  self.backend_path)
+                            self.backend_path)
 
     def try_quit(self):
         """ Forces the application to close.

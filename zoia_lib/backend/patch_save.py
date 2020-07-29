@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import platform
 import shutil
 import zipfile
 
@@ -275,6 +276,8 @@ class PatchSave(Patch):
             raise errors.SavingError(path)
         patch_name, ext = path.split(".")
         patch_name = patch_name.split(os.path.sep)[-1]
+        # PySide2 bug where the path separator is incorrect on Windows
+        patch_name = patch_name.split("/")[-1]
 
         title = patch_name
 
@@ -288,6 +291,10 @@ class PatchSave(Patch):
         # Strip "_zoia_" if needed.
         if "_zoia_" in title and title[:6] == "_zoia_":
             title = title[6:]
+
+        # Strip "zoia_" if needed.
+        if "zoia_" in title and title[:5] == "zoia_":
+            title = title[5:]
 
         # Clean up the title.
         title = title.replace("_", " ")
