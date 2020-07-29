@@ -11,8 +11,9 @@ updated by visiting https://github.com/meanmedianmoge/zoia_lib/
 import os
 import sys
 
-from PySide2.QtGui import QPixmap, Qt
-from PySide2.QtWidgets import QApplication, QSplashScreen
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QApplication, QSplashScreen
 
 from zoia_lib.UI.ZOIALibrarian_main import ZOIALibrarianMain
 

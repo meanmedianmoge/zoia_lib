@@ -2,13 +2,14 @@ import os
 import platform
 from os.path import expanduser
 
-from PySide2.QtCore import QEvent
-from PySide2.QtWidgets import QTableWidgetItem, QPushButton, QFileDialog, \
-    QFileSystemModel, QMessageBox, QTableWidgetSelectionRange, QMainWindow
+from PyQt5.QtCore import QEvent
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, \
+    QTableWidgetSelectionRange, QMessageBox, QTableWidgetItem, \
+    QFileSystemModel, QPushButton
 
 
 class ZOIALibrarianSD(QMainWindow):
-    """ The ZoiaLibrarianSD class is responsible for all
+    """ The ZOIALibrarianSD class is responsible for all
     activities contained within the SD Card View tab of the application.
     """
 

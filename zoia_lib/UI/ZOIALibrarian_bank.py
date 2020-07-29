@@ -2,13 +2,13 @@ import json
 import os
 import platform
 
-from PySide2.QtCore import QEvent
-from PySide2.QtWidgets import QTableWidgetItem, QPushButton, QFileDialog, \
-    QMessageBox, QInputDialog, QTableWidgetSelectionRange, QMainWindow
+from PyQt5.QtCore import QEvent
+from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, \
+    QMessageBox, QInputDialog, QPushButton, QTableWidgetSelectionRange
 
 
 class ZOIALibrarianBank(QMainWindow):
-    """ The ZoiaLibrarianBank class is responsible for all
+    """ The ZOIALibrarianBank class is responsible for all
     activities contained within the Banks tab of the application.
     """
 

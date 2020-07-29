@@ -1,7 +1,8 @@
-from PySide2.QtGui import QFont
-from PySide2.QtWidgets import QFontDialog
 import os
 import json
+
+from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import QFontDialog
 
 
 class ZOIALibrarianUtil:

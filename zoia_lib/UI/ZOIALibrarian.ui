@@ -347,11 +347,11 @@ QPushButton:hover{
                          <attribute name="horizontalHeaderCascadingSectionResizes">
                           <bool>true</bool>
                          </attribute>
-                         <attribute name="horizontalHeaderDefaultSectionSize">
-                          <number>100</number>
-                         </attribute>
                          <attribute name="horizontalHeaderMinimumSectionSize">
                           <number>0</number>
+                         </attribute>
+                         <attribute name="horizontalHeaderDefaultSectionSize">
+                          <number>100</number>
                          </attribute>
                          <attribute name="horizontalHeaderStretchLastSection">
                           <bool>true</bool>
@@ -634,11 +634,11 @@ QPushButton:hover{
                    <attribute name="horizontalHeaderCascadingSectionResizes">
                     <bool>true</bool>
                    </attribute>
-                   <attribute name="horizontalHeaderDefaultSectionSize">
-                    <number>100</number>
-                   </attribute>
                    <attribute name="horizontalHeaderMinimumSectionSize">
                     <number>0</number>
+                   </attribute>
+                   <attribute name="horizontalHeaderDefaultSectionSize">
+                    <number>100</number>
                    </attribute>
                    <attribute name="horizontalHeaderStretchLastSection">
                     <bool>true</bool>
@@ -646,10 +646,10 @@ QPushButton:hover{
                    <attribute name="verticalHeaderVisible">
                     <bool>false</bool>
                    </attribute>
-                   <attribute name="verticalHeaderDefaultSectionSize">
+                   <attribute name="verticalHeaderMinimumSectionSize">
                     <number>0</number>
                    </attribute>
-                   <attribute name="verticalHeaderMinimumSectionSize">
+                   <attribute name="verticalHeaderDefaultSectionSize">
                     <number>0</number>
                    </attribute>
                    <row/>

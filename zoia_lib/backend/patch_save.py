@@ -287,7 +287,7 @@ class PatchSave(Patch):
                 patch_name = patch_name.split(":")[-1]
             ext = "bin"
         patch_name = patch_name.split(os.path.sep)[-1]
-        # PySide2 bug where the path separator is incorrect on Windows
+        # PyQt5 bug where the path separator is incorrect on Windows
         patch_name = patch_name.split("/")[-1]
 
         title = patch_name

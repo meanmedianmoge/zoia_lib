@@ -2,10 +2,10 @@ import json
 import os
 from os.path import expanduser
 
-from PySide2.QtCore import QEvent, Qt
-from PySide2.QtGui import QIcon, QFont
-from PySide2.QtWidgets import QMainWindow, QMessageBox, QInputDialog, \
-    QFileDialog, QPushButton, QTableWidgetItem, QRadioButton, QDesktopWidget
+from PyQt5.QtCore import QEvent, Qt
+from PyQt5.QtGui import QFont, QIcon
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QPushButton, \
+    QTableWidgetItem, QInputDialog, QFileDialog, QRadioButton, QDesktopWidget
 
 import zoia_lib.UI.ZOIALibrarian as ui_main
 import zoia_lib.backend.utilities as util
@@ -34,7 +34,7 @@ class ZOIALibrarianMain(QMainWindow):
 
     Any changes made to the .ui file will not be reflected unless the
     following command is run from the UI directory:
-        pyside2-uic.exe ZOIALibrarian.ui -o ZOIALibrarian.py
+        pyuic5.exe ZOIALibrarian.ui -o ZOIALibrarian.py
 
     Known issues:
      - Sorting order is not maintained when exiting out of the
