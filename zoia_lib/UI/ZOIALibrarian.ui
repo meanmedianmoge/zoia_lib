@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1577</width>
+    <width>1567</width>
     <height>1203</height>
    </rect>
   </property>
@@ -2174,7 +2174,7 @@ background-color:white;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1577</width>
+     <width>1567</width>
      <height>27</height>
     </rect>
    </property>
@@ -2194,6 +2194,7 @@ background-color:white;
     <addaction name="actionSpecify_SD_Card_Location"/>
     <addaction name="actionImport_A_Patch"/>
     <addaction name="actionImport_Multiple_Patches"/>
+    <addaction name="actionImport_Version_History_directory"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -2574,6 +2575,17 @@ background-color:white;
    </property>
    <property name="shortcut">
     <string>Alt+F</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionImport_Version_History_directory">
+   <property name="text">
+    <string>Import Version History (directory)</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+V</string>
    </property>
    <property name="shortcutVisibleInContextMenu">
     <bool>true</bool>

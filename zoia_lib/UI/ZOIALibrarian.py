@@ -20,7 +20,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1577, 1203)
+        MainWindow.resize(1567, 1203)
         MainWindow.setFocusPolicy(Qt.StrongFocus)
         MainWindow.setStyleSheet(u"QMainWindow {\n"
 "background-color: white;\n"
@@ -156,6 +156,9 @@ class Ui_MainWindow(object):
         self.actionFont = QAction(MainWindow)
         self.actionFont.setObjectName(u"actionFont")
         self.actionFont.setShortcutVisibleInContextMenu(True)
+        self.actionImport_Version_History_directory = QAction(MainWindow)
+        self.actionImport_Version_History_directory.setObjectName(u"actionImport_Version_History_directory")
+        self.actionImport_Version_History_directory.setShortcutVisibleInContextMenu(True)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.centralwidget.setStyleSheet(u"")
@@ -1099,7 +1102,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1577, 27))
+        self.menubar.setGeometry(QRect(0, 0, 1567, 27))
         self.menubar.setContextMenuPolicy(Qt.ActionsContextMenu)
         self.menubar.setAcceptDrops(False)
         self.menubar.setNativeMenuBar(True)
@@ -1120,6 +1123,7 @@ class Ui_MainWindow(object):
         self.menuFiel.addAction(self.actionSpecify_SD_Card_Location)
         self.menuFiel.addAction(self.actionImport_A_Patch)
         self.menuFiel.addAction(self.actionImport_Multiple_Patches)
+        self.menuFiel.addAction(self.actionImport_Version_History_directory)
         self.menuFiel.addSeparator()
         self.menuFiel.addAction(self.actionQuit)
         self.menuSort.addAction(self.actionSort_by_title_A_Z)
@@ -1234,6 +1238,10 @@ class Ui_MainWindow(object):
         self.actionFont.setText(QCoreApplication.translate("MainWindow", u"Change Font", None))
 #if QT_CONFIG(shortcut)
         self.actionFont.setShortcut(QCoreApplication.translate("MainWindow", u"Alt+F", None))
+#endif // QT_CONFIG(shortcut)
+        self.actionImport_Version_History_directory.setText(QCoreApplication.translate("MainWindow", u"Import Version History (directory)", None))
+#if QT_CONFIG(shortcut)
+        self.actionImport_Version_History_directory.setShortcut(QCoreApplication.translate("MainWindow", u"Alt+V", None))
 #endif // QT_CONFIG(shortcut)
 #if QT_CONFIG(tooltip)
         self.tabs.setToolTip("")

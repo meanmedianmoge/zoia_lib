@@ -1,12 +1,14 @@
 import datetime
 import json
 import os
-import platform
 import shutil
 import zipfile
 
 from zoia_lib.backend.patch import Patch
 from zoia_lib.common import errors
+from zoia_lib.backend.api import PatchStorage
+
+ps = PatchStorage()
 
 
 class PatchSave(Patch):
@@ -99,8 +101,8 @@ class PatchSave(Patch):
             """
             # Case 1: Check if this is a compressed patch download.
             if "files" in patch[1] \
-                    and patch[1]["files"][0]["filename"].split(".")[
-                1] != "bin":
+                    and patch[1]["files"][0]["filename"].split(".")[1] \
+                    != "bin":
                 # We need to check the individual binary files to see which,
                 # if any, differ from the ones currently stored.
 
@@ -224,8 +226,7 @@ class PatchSave(Patch):
                 raise errors.SavingError(patch[1]["title"])
 
     def save_metadata_json(self, metadata, version=0):
-        """ Method stub for saving metadata. Should be expanded to work
-        for patches that do not originate from the PS API.
+        """ Saves metadata for patches to the backend directory.
 
         metadata: A string containing the JSON data that will be used for
                   the metadata file that is being created.
@@ -250,7 +251,7 @@ class PatchSave(Patch):
         with open(name_json, "w") as jf:
             json.dump(metadata, jf)
 
-    def import_to_backend(self, path):
+    def import_to_backend(self, path, version=False):
         """Attempts to import a patch to the backend
         ZoiaLibraryApp directory. This method is meant to work
         for patches that originate from a local user's machine,
@@ -263,8 +264,12 @@ class PatchSave(Patch):
 
         path: The filepath that leads to the local patch that is
               being imported.
+        version: True if the directory being imported should be treated
+                 as a version directory.
         Raises a SavingError should the patch fail to save.
         """
+
+        fails = 0
 
         if path is None:
             raise errors.SavingError(None)
@@ -272,9 +277,13 @@ class PatchSave(Patch):
         # TODO Add a binary check to ensure this is a ZOIA patch.
 
         # Get the file extension for the patch that is being imported.
-        if "." not in path:
+        if not version and "." not in path:
             raise errors.SavingError(path)
-        patch_name, ext = path.split(".")
+        if not version:
+            patch_name, ext = path.rsplit(".", 1)
+        else:
+            patch_name = path
+            ext = "bin"
         patch_name = patch_name.split(os.path.sep)[-1]
         # PySide2 bug where the path separator is incorrect on Windows
         patch_name = patch_name.split("/")[-1]
@@ -300,20 +309,27 @@ class PatchSave(Patch):
         title = title.replace("_", " ")
         title = title.strip()
 
+        if version:
+            patch_id = self.generate_patch_id(path)
+
         count = 1 if not os.path.isdir(path) else len(os.listdir(path))
         for i in range(count):
             # Generate a random patch ID to use (must be 5 digits).
-            patch_id = str(abs(hash(path)))
-            if len(patch_id) > 5:
-                patch_id = patch_id[:5]
-            else:
-                while len(patch_id) < 5:
-                    patch_id += "0"
-            patch_id = int(patch_id)
+            if not version:
+                patch_id = self.generate_patch_id(path)
             # Binary file, easiest case.
             # Get the bytes.
-            with open(path, "rb") as f:
-                temp_data = f.read()
+            if not version:
+                if path.split(".")[-1] != "bin":
+                    continue
+                with open(path, "rb") as f:
+                    temp_data = f.read()
+            else:
+                temp_path = os.path.join(path, os.listdir(path)[i])
+                if temp_path.split(".")[-1] != "bin":
+                    continue
+                with open(temp_path, "rb") as f:
+                    temp_data = f.read()
             # Prepare the JSON.
             js_data = {
                 "id": patch_id,
@@ -343,8 +359,47 @@ class PatchSave(Patch):
                     "name": ""
                 }
             }
+            if os.path.exists(os.path.join(self.back_path, "data.json")):
+                with open(os.path.join(self.back_path, "data.json"), "r") as f:
+                    data = json.loads(f.read())
+                for pch in data:
+                    if pch["title"] == js_data["title"]:
+                        temp = ps.get_patch_meta(pch["id"])
+                        js_data = temp
+                        js_data["updated_at"] = \
+                            datetime.datetime.fromtimestamp(
+                            os.path.getmtime(path)).strftime(
+                                '%Y-%m-%dT%H:%M:%S+00:00')
+                        break
+            if version:
+                js_data["updated_at"] = \
+                    datetime.datetime.fromtimestamp(
+                        os.path.getmtime(temp_path)).strftime(
+                        '%Y-%m-%dT%H:%M:%S+00:00')
             # Try to save the patch.
-            self.save_to_backend((temp_data, js_data))
+            if not version:
+                self.save_to_backend((temp_data, js_data))
+            else:
+                try:
+                    self.save_to_backend((temp_data, js_data))
+                except errors.SavingError:
+                    fails += 1
+                    continue
+        return fails
+
+    @staticmethod
+    def generate_patch_id(path):
+        """ Generates a 5-digit patch ID for a supplied path.
+        """
+
+        patch_id = str(abs(hash(path)))
+        if len(patch_id) > 5:
+            patch_id = patch_id[:5]
+        else:
+            while len(patch_id) < 5:
+                patch_id += "0"
+        patch_id = int(patch_id)
+        return patch_id
 
     def patch_decompress(self, patch):
         """ Method stub for decompressing files retrieved from the PS API.

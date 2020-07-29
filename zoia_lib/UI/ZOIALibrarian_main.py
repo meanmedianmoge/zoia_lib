@@ -240,6 +240,8 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.actionQuit.triggered.connect(self.try_quit)
         self.ui.check_for_updates_btn.clicked.connect(
             self.update_local_patches)
+        self.ui.actionImport_Version_History_directory.triggered.connect(
+            self.version_import)
         self.ui.refresh_pch_btn.clicked.connect(self.reload_ps)
         self.ui.update_patch_notes.clicked.connect(self.update_patch_notes)
         self.ui.actionImport_A_Patch.triggered.connect(self.import_patch)
@@ -342,10 +344,10 @@ class ZOIALibrarianMain(QMainWindow):
                 self.msg.setWindowTitle("No SD Path")
                 self.msg.setIcon(QMessageBox.Information)
                 self.msg.setText("Please specify your SD card path!")
-                self.msg.setInformativeText("File -> Specify SD Card Location")
                 self.msg.setStandardButtons(QMessageBox.Ok)
                 self.msg.exec_()
                 self.msg.setInformativeText(None)
+                self.sd.sd_path(False, self.width())
                 self.ui.tabs.setCurrentIndex(1)
         elif self.ui.tabs.currentIndex() == 0:
             pass
@@ -645,9 +647,9 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setWindowTitle("No SD Path")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText("Please specify your SD card path!")
-            self.msg.setInformativeText("File -> Specify SD Card Location")
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
+            self.sd.sd_path(False, self.width())
             self.msg.setInformativeText(None)
         else:
             if "to_zoia" not in os.listdir(self.sd.get_sd_root()):
@@ -734,6 +736,9 @@ class ZOIALibrarianMain(QMainWindow):
             delete.delete_patch(os.path.join(self.curr_ver,
                                              self.sender().objectName()))
             self.get_version_patches(self.ui.tabs.currentIndex() == 1)
+
+        # Reset the text browser.
+        self.ui.text_browser_local.setText("")
 
     def get_local_patches(self):
         """ Retrieves the metadata for patches that a user has previously
@@ -1101,6 +1106,10 @@ class ZOIALibrarianMain(QMainWindow):
                         save.import_to_backend(
                             os.path.join(self.sd.get_sd_path(), sd_pch))
                         self.ui.statusbar.showMessage("Import complete!")
+                        self.msg.setWindowTitle("Import Complete")
+                        self.msg.setText(
+                            "The patch has been successfully imported!")
+                        self.msg.exec_()
                         return
                     except errors.SavingError:
                         self.msg.exec_()
@@ -1117,10 +1126,13 @@ class ZOIALibrarianMain(QMainWindow):
                 self.sort_and_set()
                 self.set_data(self.ui.searchbar_local.text() != "")
             self.ui.statusbar.showMessage("Import complete!")
+            self.msg.setWindowTitle("Import Complete")
+            self.msg.setText("The patch has been successfully imported!")
+            self.msg.exec_()
             if (self.ui.tabs.currentIndex() == 1 and not
-            self.ui.back_btn_local.isEnabled()) or \
+                self.ui.back_btn_local.isEnabled()) or \
                     (self.ui.tabs.currentIndex() == 3 and not
-                    self.ui.back_btn_bank.isEnabled()):
+                     self.ui.back_btn_bank.isEnabled()):
                 self.get_local_patches()
                 self.sort_and_set()
 
@@ -1128,10 +1140,8 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setWindowTitle("No Patch Found")
             self.msg.setText("Incorrect file selected, importing failed.")
             self.msg.exec_()
-            self.msg.setInformativeText(None)
         except errors.SavingError:
             self.msg.exec_()
-            self.msg.setInformativeText(None)
 
     def mass_import(self):
         """ Attempts to mass import any patches found within a target
@@ -1191,6 +1201,42 @@ class ZOIALibrarianMain(QMainWindow):
         self.msg.setInformativeText(None)
         self.get_local_patches()
         self.sort_and_set()
+
+    def version_import(self):
+        input_dir = QFileDialog.getExistingDirectory(None,
+                                                     'Select a directory',
+                                                     expanduser("~"))
+        if input_dir is "" or not os.path.isdir(input_dir):
+            self.msg.setWindowTitle("Invalid Selection")
+            self.msg.setIcon(QMessageBox.Information)
+            self.msg.setText("Please select a directory.")
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+            return
+        fails = save.import_to_backend(input_dir, True)
+        if fails == 0:
+            self.msg.setWindowTitle("Success")
+            self.msg.setText("Successfully created a Version History.")
+            self.msg.setIcon(QMessageBox.Information)
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+            return
+        else:
+            self.msg.setWindowTitle("Warning")
+            self.msg.setText("Certain patches in the specified Version History"
+                             "already existed in the Librarian. Please delete"
+                             "them before attempting to import a version "
+                             "history if you would like them to appear.")
+            self.msg.setIcon(QMessageBox.Warning)
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+            return
+        if (self.ui.tabs.currentIndex() == 1 and not
+            self.ui.back_btn_local.isEnabled()) or \
+                (self.ui.tabs.currentIndex() == 3 and not
+                 self.ui.back_btn_bank.isEnabled()):
+            self.get_local_patches()
+            self.sort_and_set()
 
     def eventFilter(self, o, e):
         """ Deals with events that originate from various widgets
@@ -1331,6 +1377,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.ui.text_browser_bank.setText("")
             self.ui.back_btn_bank.setEnabled(False)
         # Sort and display the data.
+        self.get_local_patches()
         self.sort_and_set()
 
     def closeEvent(self, event):
