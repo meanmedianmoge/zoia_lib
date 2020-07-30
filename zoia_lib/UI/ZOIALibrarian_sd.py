@@ -2,14 +2,13 @@ import os
 import platform
 from os.path import expanduser
 
-from PyQt5.QtCore import QEvent
-from PyQt5.QtWidgets import QMainWindow, QFileDialog, \
-    QTableWidgetSelectionRange, QMessageBox, QTableWidgetItem, \
-    QFileSystemModel, QPushButton
+from PySide2.QtCore import QEvent
+from PySide2.QtWidgets import QTableWidgetItem, QPushButton, QFileDialog, \
+    QFileSystemModel, QMessageBox, QTableWidgetSelectionRange, QMainWindow
 
 
 class ZOIALibrarianSD(QMainWindow):
-    """ The ZOIALibrarianSD class is responsible for all
+    """ The ZoiaLibrarianSD class is responsible for all
     activities contained within the SD Card View tab of the application.
     """
 
@@ -139,18 +138,10 @@ class ZOIALibrarianSD(QMainWindow):
                 rmv_btn.setObjectName(str(index))
                 rmv_btn.setFont(self.ui.table_PS.horizontalHeader().font())
                 rmv_btn.clicked.connect(self.remove_sd)
-                rmv_btn.setStyleSheet(
-                    "background-color: qlineargradient(spread:pad, "
-                    "x1:1, y1:1, x2:1, y2:0, stop:0 rgba(0, 0, 0, 19), "
-                    "stop:1 rgba(255, 255, 255, 255));")
                 import_btn = QPushButton("Click me to import!", self)
                 import_btn.setObjectName(str(index))
                 import_btn.setFont(self.ui.table_PS.horizontalHeader().font())
                 import_btn.clicked.connect(self.f2)
-                import_btn.setStyleSheet(
-                    "background-color: qlineargradient(spread:pad, "
-                    "x1:1, y1:1, x2:1, y2:0, stop:0 rgba(0, 0, 0, 19), "
-                    "stop:1 rgba(255, 255, 255, 255));")
 
                 if index < 32:
                     # Left sd table.
@@ -298,6 +289,9 @@ class ZOIALibrarianSD(QMainWindow):
             self.ui.table_sd_left.showColumn(2)
             self.ui.table_sd_right.showColumn(1)
             self.ui.table_sd_right.showColumn(2)
+
+            if self.sd_path_full is None:
+                return
 
             dst_index = None
 

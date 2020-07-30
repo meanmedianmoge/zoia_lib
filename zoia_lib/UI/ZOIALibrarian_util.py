@@ -1,8 +1,7 @@
+from PySide2.QtGui import QFont
+from PySide2.QtWidgets import QFontDialog
 import os
 import json
-
-from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QFontDialog
 
 
 class ZOIALibrarianUtil:
@@ -106,7 +105,7 @@ class ZOIALibrarianUtil:
                         self.ui.table_bank_local.cellWidget(i, 0).setFont(
                             new_font)
 
-    def save_pref(self, w, h, sd, path):
+    def save_pref(self, w, h, sd, path, dark):
         """ Saves and writes the state of a UI window to pref.json
         """
 
@@ -160,10 +159,13 @@ class ZOIALibrarianUtil:
             "split_bank_left": self.ui.splitter_bank_tables.sizes()[0],
             "split_bank_right": self.ui.splitter_bank_tables.sizes()[1]
         }
+        dark_mode = {
+            "enabled": dark
+        }
 
         with open(os.path.join(path, "pref.json"), "w") as f:
             f.write(json.dumps([window, ps_sizes, local_sizes,
-                                sd_sizes, bank_sizes]))
+                                sd_sizes, bank_sizes, dark_mode]))
 
     def row_invert(self):
         """ Either enables of disables alternating row colours for

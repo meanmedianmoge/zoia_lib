@@ -2,9 +2,9 @@ import json
 import os
 import platform
 
-from PyQt5.QtCore import QEvent
-from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QFileDialog, \
-    QMessageBox, QInputDialog, QPushButton, QTableWidgetSelectionRange
+from PySide2.QtCore import QEvent
+from PySide2.QtWidgets import QTableWidgetItem, QPushButton, QFileDialog, \
+    QMessageBox, QInputDialog, QTableWidgetSelectionRange, QMainWindow
 
 
 class ZOIALibrarianBank(QMainWindow):
@@ -62,10 +62,6 @@ class ZOIALibrarianBank(QMainWindow):
                     temp = json.loads(f.read())
             name = temp["files"][0]["filename"]
             rmv_btn = QPushButton("Remove")
-            rmv_btn.setStyleSheet(
-                "background-color: qlineargradient(spread:pad, "
-                "x1:1, y1:1, x2:1, y2:0, stop:0 rgba(0, 0, 0, 19), "
-                "stop:1 rgba(255, 255, 255, 255));")
             rmv_btn.setObjectName(str(temp["id"]))
             rmv_btn.setFont(self.ui.table_PS.horizontalHeader().font())
             if ver is not None:

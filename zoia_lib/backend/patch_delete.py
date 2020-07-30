@@ -73,10 +73,6 @@ class PatchDelete(Patch):
         if patch_dir is None:
             raise errors.DeletionError(None)
 
-        if len(patch_dir.split(".")) > 1:
-            # There shouldn't be a file extension.
-            raise errors.DeletionError(patch_dir, 401)
-
         try:
             shutil.rmtree(os.path.join(self.back_path, patch_dir))
         except FileNotFoundError:

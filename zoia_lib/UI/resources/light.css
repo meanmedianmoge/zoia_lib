@@ -1,0 +1,241 @@
+QTabBar::tab:selected {
+    background-color: qlineargradient(spread:pad,
+    x1: 0,
+    y1: 0,
+    x2: 1,
+    y2: 0,
+    stop: 0 rgba(140, 224, 241, 255),
+    stop: 1 rgba(121, 243, 145, 255));
+    border-top-left-radius: 10px 5px;
+    border-top-right-radius: 10px 5px;
+    border-bottom: 0px;
+    padding: 5px, 5px, 5px, 5px;
+    width: 200%;
+    font: bold;
+}
+
+QTableView::item:selected {
+    color: black;
+}
+
+QMainWindow {
+    background-color: white;
+}
+
+QTextBrowser {
+    color: black;
+    background-color: white;
+}
+
+QMenuBar {
+    background-color: white;
+    color: black;
+}
+
+QSplitter {
+    background-color: qlineargradient(spread:pad,
+    x1: 0,
+    y1: 0,
+    x2: 1,
+    y2: 0,
+    stop: 0 rgba(140, 224, 241, 255),
+    stop: 1 rgba(121, 243, 145, 255));
+}
+
+QTableView {
+    color: black;
+    background-color: white;
+}
+
+QTreeWidget {
+    color: black;
+    background-color: white;
+}
+
+QHeaderView {
+    color: black;
+    background-color: #dddddd;
+}
+
+QTableView::item:selected {
+    background-color: #dddddd;
+}
+
+QHeaderView::section:selected {
+    background-color: #dddddd;
+    color: black;
+}
+
+QToolTip {
+    border: 0.1ex solid #eff0f1;
+    background-color: #ffffff;
+    alternate-background-color: #ffffff;
+    color: #000000;
+    padding: 0.5ex;
+}
+
+QTableCornerButton::section {
+    background-color: white;
+}
+
+QHeaderView::section {
+    background-color: white;
+    color: black;
+}
+
+QRadioButton {
+    black: white;
+}
+
+QSplitter::handle {
+    background-color: qlineargradient(spread:pad,
+    x1: 0,
+    y1: 0,
+    x2: 1,
+    y2: 0,
+    stop: 0 rgba(140, 224, 241, 255),
+    stop: 1 rgba(121, 243, 145, 255));
+}
+
+
+QPushButton {
+    background-color: qlineargradient(spread:pad,
+    x1: 1,
+    y1: 1,
+    x2: 1,
+    y2: 0,
+    stop: 0 rgba(0, 0, 0, 19),
+    stop: 1 rgba(255, 255, 255, 255));
+}
+
+QPushButton#refresh_pch_btn,
+QPushButton#back_btn_local,
+QPushButton#back_btn_bank,
+QPushButton#import_all_ver_btn,
+QPushButton#import_all_btn,
+QPushButton#update_patch_notes,
+QPushButton#btn_save_bank,
+QPushButton#btn_load_bank,
+QPushButton#btn_export_bank,
+QPushButton#check_for_updates_btn,
+QPushButton#delete_folder_sd_btn{
+    background-color: #eaeaea;
+    color:black;
+}
+
+QPushButton#refresh_pch_btn:hover,
+QPushButton#back_btn_local:hover,
+QPushButton#back_btn_bank:hover,
+QPushButton#import_all_ver_btn:hover,
+QPushButton#import_all_btn:hover,
+QPushButton#update_patch_notes:hover,
+QPushButton#btn_save_bank:hover,
+QPushButton#btn_load_bank:hover,
+QPushButton#btn_export_bank:hover,
+QPushButton#check_for_updates_btn:hover,
+QPushButton#delete_folder_sd_btn:hover{
+    background-color: rgb(217, 235, 249);
+}
+
+QStatusBar {
+    color:black;
+}
+
+QPushButton#refresh_pch_btn:disabled,
+QPushButton#back_btn_local:disabled,
+QPushButton#back_btn_bank:disabled,
+QPushButton#import_all_ver_btn:disabled,
+QPushButton#import_all_btn:disabled,
+QPushButton#update_patch_notes:disabled,
+QPushButton#btn_save_bank:disabled,
+QPushButton#btn_load_bank:disabled,
+QPushButton#btn_export_bank:disabled,
+QPushButton#check_for_updates_btn:disabled,
+QPushButton#delete_folder_sd_btn:disabled{
+    background-color: #c1c1c1;
+    border: 0px;
+    color: #545b66;
+}
+
+QTableView::item:selected {
+    background-color: #eaeaea;
+    color: black;
+}
+
+QPushButton:hover {
+    background-color: qlineargradient(spread:pad,
+    x1: 0.469,
+    y1: 0,
+    x2: 0.52,
+    y2: 0.994318,
+    stop: 0 rgb(255, 255, 255),
+    stop: 1 rgb(217, 235, 249));
+}
+
+QPushButton:hover:pressed {
+    background-color: #bababa;
+}
+
+QPushButton:disabled {
+    background-color: white;
+    border: 0px;
+}
+
+QTabBar::tab:!selected {
+    background-color: qlineargradient(spread:pad,
+    x1: 0,
+    y1: 0,
+    x2: 1,
+    y2: 1,
+    stop: 0.289773 rgba(137, 141, 218, 255),
+    stop: 1 rgba(82, 90, 105, 255));
+    border-bottom: 0px;
+    border-top-left-radius: 10px 5px;
+    border-top-right-radius: 10px 5px;
+    padding: 5px, 5px, 5px, 5px;
+    width: 200%;
+    color: white;
+}
+
+QWidget#widget_9,
+QWidget#tab_ps,
+QWidget#tab_sd,
+QWidget#tab_bank{
+    background-color: qlineargradient(spread:pad,
+    x1: 0,
+    y1: 0,
+    x2: 1,
+    y2: 0,
+    stop: 0 rgba(140, 224, 241, 255),
+    stop: 1 rgba(121, 243, 145, 255));
+}
+
+QLineEdit {
+    border: 0.5px solid black;
+    padding: 1px, 0px, 0px, 0px;
+    background-color: white;
+    color:black;
+}
+
+QTabBar::tab:!selected:hover {
+    background-color: qlineargradient(spread:pad,
+    x1: 0,
+    y1: 0,
+    x2: 1,
+    y2: 0,
+    stop: 0 rgba(123, 129, 236, 255),
+    stop: 1 rgba(59, 209, 211, 255));
+}
+
+QTabBar {
+    background-color: white;
+}
+
+QTabWidget::tab-bar {
+    background-color: white;
+    border-bottom: 1px solid white;
+}
+
+QTabWidget::pane {
+    position: absolute;
+}

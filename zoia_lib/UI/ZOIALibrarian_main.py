@@ -2,10 +2,11 @@ import json
 import os
 from os.path import expanduser
 
-from PyQt5.QtCore import QEvent, Qt
-from PyQt5.QtGui import QFont, QIcon
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QPushButton, \
-    QTableWidgetItem, QInputDialog, QFileDialog, QRadioButton, QDesktopWidget
+from PySide2.QtCore import QEvent, Qt
+from PySide2.QtGui import QIcon, QFont
+from PySide2.QtWidgets import QMainWindow, QMessageBox, QInputDialog, \
+    QFileDialog, QPushButton, QTableWidgetItem, QRadioButton, QDesktopWidget, \
+    QApplication
 
 import zoia_lib.UI.ZOIALibrarian as ui_main
 import zoia_lib.backend.utilities as util
@@ -34,7 +35,7 @@ class ZOIALibrarianMain(QMainWindow):
 
     Any changes made to the .ui file will not be reflected unless the
     following command is run from the UI directory:
-        pyuic5.exe ZOIALibrarian.ui -o ZOIALibrarian.py
+        pyside2-uic.exe ZOIALibrarian.ui -o ZOIALibrarian.py
 
     Known issues:
      - Sorting order is not maintained when exiting out of the
@@ -97,6 +98,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.sd_sizes = None
         self.bank_sizes = None
         self.font = None
+        self.dark = False
 
         # Check for metadata in the user's backend.
         if "data.json" not in os.listdir(self.backend_path):
@@ -198,6 +200,8 @@ class ZOIALibrarianMain(QMainWindow):
             self.ui.table_bank_local.setColumnWidth(2,
                                                     self.bank_sizes["col_4"])
 
+            self.dark = data[5]["enabled"]
+
         else:
             self.ui.table_sd_left.setColumnWidth(0, self.width() * 0.4)
             self.ui.table_sd_left.setColumnWidth(1, self.width() * 0.1)
@@ -271,6 +275,7 @@ class ZOIALibrarianMain(QMainWindow):
             lambda: self.bank.export_bank(self.sd, export))
         self.ui.delete_folder_sd_btn.clicked.connect(
             lambda: self.sd.delete_sd_item(delete))
+        self.ui.actionToggle_Dark_Mode_2.triggered.connect(self.toggle_dark)
 
         # Font consistency.
         self.util.change_font(QFont("Verdana", 10) if self.font is None else
@@ -321,6 +326,7 @@ class ZOIALibrarianMain(QMainWindow):
         center = QDesktopWidget().availableGeometry().center()
         frame.moveCenter(center)
         self.move(frame.topLeft())
+        self.toggle_dark()
 
     def tab_switch(self):
         """ Actions performed whenever a tab is switched to within the
@@ -476,14 +482,9 @@ class ZOIALibrarianMain(QMainWindow):
             # If we are on tab index 0, we need a "Download" header item.
             if table_index == 0:
                 dwn = QPushButton("Click me\nto download!", self)
+                dwn.setObjectName(str(data[i]["id"]))
                 dwn.setFont(self.ui.table_PS.horizontalHeader().font())
                 dwn.clicked.connect(self.initiate_download)
-                dwn.setObjectName(str(data[i]["id"]))
-                dwn.setStyleSheet(
-                    "background-color: qlineargradient(spread:pad, "
-                    "x1:1, y1:1, x2:1, y2:0, stop:0 rgba(0, 0, 0, 19), "
-                    "stop:1 rgba(255, 255, 255, 255));")
-
                 # Only enable it if we haven't already downloaded the patch.
                 if (str(data[i]["id"])) in os.listdir(self.backend_path):
                     dwn.setEnabled(False)
@@ -504,10 +505,6 @@ class ZOIALibrarianMain(QMainWindow):
                 else:
                     expt.setObjectName(str(data[i]["id"]))
                 expt.setFont(self.ui.table_PS.horizontalHeader().font())
-                expt.setStyleSheet(
-                    "background-color: qlineargradient(spread:pad, "
-                    "x1:1, y1:1, x2:1, y2:0, stop:0 rgba(0, 0, 0, 19), "
-                    "stop:1 rgba(255, 255, 255, 255));")
                 expt.clicked.connect(self.initiate_export)
                 curr_table.setCellWidget(i, 4, expt)
 
@@ -518,10 +515,6 @@ class ZOIALibrarianMain(QMainWindow):
                 else:
                     delete.setObjectName(str(data[i]["id"]))
                 delete.setFont(self.ui.table_PS.horizontalHeader().font())
-                delete.setStyleSheet(
-                    "background-color: qlineargradient(spread:pad, "
-                    "x1:1, y1:1, x2:1, y2:0, stop:0 rgba(0, 0, 0, 19), "
-                    "stop:1 rgba(255, 255, 255, 255));")
                 delete.clicked.connect(self.initiate_delete)
                 curr_table.setCellWidget(i, 5, delete)
 
@@ -778,6 +771,8 @@ class ZOIALibrarianMain(QMainWindow):
         Currently triggered via a radio button selection.
         """
 
+        skip = False
+
         if self.sender().isChecked():
             if (self.ui.tabs.currentIndex() == 1
                 or self.ui.tabs.currentIndex() == 3) and \
@@ -805,6 +800,7 @@ class ZOIALibrarianMain(QMainWindow):
                     for pch in self.patch_cache:
                         if str(pch["id"]) == name:
                             content = pch
+                            skip = True
                             break
                     if content is None:
                         content = ps.get_patch_meta(name)
@@ -829,11 +825,13 @@ class ZOIALibrarianMain(QMainWindow):
                                            name + "_{}.json".format(ver))) \
                             as f:
                         content = json.loads(f.read())
-            if content["preview_url"] == "":
-                content["preview_url"] = "None provided"
-            else:
-                content["preview_url"] = "<a href=" + content["preview_url"] \
-                                         + ">Click here</a>"
+            if not skip:
+                if content["preview_url"] == "":
+                    content["preview_url"] = "None provided"
+                else:
+                    content["preview_url"] = "<a href=" + \
+                                             content["preview_url"] \
+                                             + ">Click here</a>"
             if "license" not in content or content["license"] is None or \
                     content["license"]["name"] == "":
                 legal = "None provided"
@@ -1402,13 +1400,27 @@ class ZOIALibrarianMain(QMainWindow):
         self.get_local_patches()
         self.sort_and_set()
 
+    def toggle_dark(self):
+        app = QApplication.instance()
+        if self.dark:
+            with open(os.path.join("zoia_lib", "UI", "resources",
+                                   "light.css"), "r") as f:
+                data = f.read()
+            self.dark = False
+        else:
+            with open(os.path.join("zoia_lib", "UI", "resources",
+                                   "dark.css"), "r") as f:
+                data = f.read()
+            self.dark = True
+        app.setStyleSheet(data)
+
     def closeEvent(self, event):
         """ Override the default close operation so certain application
         settings can be saved.
         """
 
         self.util.save_pref(self.width(), self.height(), self.sd.get_sd_root(),
-                            self.backend_path)
+                            self.backend_path, not self.dark)
 
     def try_quit(self):
         """ Forces the application to close.
