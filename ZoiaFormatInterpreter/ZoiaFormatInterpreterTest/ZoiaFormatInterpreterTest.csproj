@@ -49,5 +49,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ZoiaFormatInterpreter\ZoiaFormatInterpreter.csproj">
+      <Project>{C5C48448-1CF7-4AA5-95B8-C588255E4400}</Project>
+      <Name>ZoiaFormatInterpreter</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
