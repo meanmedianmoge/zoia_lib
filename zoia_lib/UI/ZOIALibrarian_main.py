@@ -638,7 +638,7 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Exporting this way will only export to a directory named "to_zoia"
         # So we need to check if it exists. If it doesn't, we create it.
-        if self.sd.get_sd_root is None:
+        if self.sd.get_sd_root() is None:
             # No SD path.
             self.msg.setWindowTitle("No SD Path")
             self.msg.setIcon(QMessageBox.Information)
@@ -1301,6 +1301,7 @@ class ZOIALibrarianMain(QMainWindow):
                     self.set_data(version=True)
                 return True
         elif o.objectName() == "table_local":
+            print(e.type())
             if e.type() == QEvent.FocusIn:
                 if self.prev_tag_cat is None:
                     return False

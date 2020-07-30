@@ -290,6 +290,8 @@ class ZOIALibrarianSD(QMainWindow):
             self.ui.table_sd_right.showColumn(1)
             self.ui.table_sd_right.showColumn(2)
 
+            print(self.ui.table_sd_left.selectedItems())
+
             if self.sd_path_full is None:
                 return
 

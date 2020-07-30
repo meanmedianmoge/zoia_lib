@@ -905,7 +905,7 @@ border: 1px solid black;
                   <enum>Qt::IgnoreAction</enum>
                  </property>
                  <property name="selectionMode">
-                  <enum>QAbstractItemView::SingleSelection</enum>
+                  <enum>QAbstractItemView::ContiguousSelection</enum>
                  </property>
                  <property name="selectionBehavior">
                   <enum>QAbstractItemView::SelectRows</enum>
@@ -1124,7 +1124,7 @@ border: 1px solid black;
                   <enum>QAbstractItemView::DragDrop</enum>
                  </property>
                  <property name="selectionMode">
-                  <enum>QAbstractItemView::SingleSelection</enum>
+                  <enum>QAbstractItemView::ContiguousSelection</enum>
                  </property>
                  <property name="selectionBehavior">
                   <enum>QAbstractItemView::SelectRows</enum>
