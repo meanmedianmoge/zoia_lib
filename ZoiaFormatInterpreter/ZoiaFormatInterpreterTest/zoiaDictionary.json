@@ -1,0 +1,63 @@
+{
+	"name": "gate",
+	"category": "effect",
+	"max_blocks": 8,
+	"params": 3,
+	"cpu": 3,
+	"blocks": [
+		{   
+			"name" : "audio_in_L",
+			"isDefault": true,
+			"isParam": false,
+			"position": 0
+		},
+		{
+			"name" : "audio_in_R",
+			"isDefault": false,
+			"isParam": false,
+			"position": 1
+		},
+		{
+			"name" : "threshold",
+			"isDefault": true,
+			"isParam": true,
+			"position": 2
+		},
+		{
+			"name" : "attack",
+			"isDefault": true,
+			"isParam": true,
+			"position": 3
+		},
+		{
+			"name" : "release",
+			"isDefault": true,
+			"isParam": true,
+			"position": 4
+		},
+		{
+			"name" : "sidechain_in",
+			"isDefault": false,
+			"isParam": false,
+			"position": 5
+		},
+		{
+			"name" : "audio_out_L",
+			"isDefault": true,
+			"isParam": false,
+			"position": 6
+		},
+		{
+			"name" : "audio_out_R",
+			"isDefault": false,
+			"isParam": false,
+			"position": 7
+		}
+	],
+	"options": {
+		"attack_ctrl": ["off", "on"],
+		"release_ctrl": ["off", "on"],
+		"channels": ["1in->1out", "1in->2out", "2in->2out"],
+		"sidechain": ["internal", "external"]
+	}
+}

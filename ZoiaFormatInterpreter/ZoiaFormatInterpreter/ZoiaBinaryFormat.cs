@@ -6,6 +6,7 @@ namespace ZoiaFormatInterpreter
 {
     public class ZoiaPatch
     {
+        public ZoiaFormatDictionary FormatDictionary { get; set; }
         public byte[] PatchData { get; protected set; }
         public int PresetSize { get; set; }
         public string PresetName { get; set; }
@@ -77,9 +78,10 @@ namespace ZoiaFormatInterpreter
 
         public int NumberOfBytesParsed { get; protected set; }
 
-        public ZoiaPatch(byte[] patchData) 
+        public ZoiaPatch(byte[] patchData, ZoiaFormatDictionary zoiaFormatDictionary) 
         {
             PatchData = patchData;
+            FormatDictionary = zoiaFormatDictionary;
             ParseData();
         }        
 
@@ -96,7 +98,7 @@ namespace ZoiaFormatInterpreter
                 int moduleSize = BitConverter.ToInt32(PatchData, dataPosition) * dataSizeUnit;                
                 byte[] moduleData = new byte[moduleSize];
                 Array.Copy(PatchData, dataPosition, moduleData, 0, moduleSize);
-                ModuleList.Add(new ZoiaModule(moduleData));
+                ModuleList.Add(new ZoiaModule(moduleData, FormatDictionary));
                 dataPosition += moduleSize;
             }
                         
@@ -201,6 +203,8 @@ namespace ZoiaFormatInterpreter
 
     public class ZoiaModule
     {
+
+        public ZoiaFormatDictionary FormatDictionary {get; set;}
         public byte[] ModuleData { get; protected set; }
         public int ModuleTypeId { get; set; }
         public int ModuleSize { get; protected set; }
@@ -234,116 +238,27 @@ namespace ZoiaFormatInterpreter
             get { return GetColorName(ModuleColorId); }
         }
 
-        public ZoiaModule(byte[] moduleData)
+        public ZoiaModule(byte[] moduleData, ZoiaFormatDictionary formatDictionary)
         {
             ModuleData = moduleData;
+            FormatDictionary = formatDictionary;
             ParseData();
         }
 
         public string GetModuleTypeName(int moduleTypeId)
         {
-            string moduleTypeName = "<unknown>";
-            switch (moduleTypeId)
-            {
-                case 0: moduleTypeName = "SV Filter"; break;
-                case 1: moduleTypeName = "Audio Input"; break;
-                case 2: moduleTypeName = "Audio Out"; break;
-                case 3: moduleTypeName = "Aliaser"; break;
-                case 4: moduleTypeName = "Sequencer"; break;
-                case 5: moduleTypeName = "LFO"; break;
-                case 6: moduleTypeName = "ADSR"; break;
-                case 7: moduleTypeName = "VCA"; break;
-                case 8: moduleTypeName = "Audio Multiply"; break;
-                case 9: moduleTypeName = "Bit Crusher"; break;
-                case 10: moduleTypeName = "Sample and Hold"; break;
-                case 11: moduleTypeName = "OD & Distortion"; break;
-                case 12: moduleTypeName = "Env Follower"; break;
-                case 13: moduleTypeName = "Delay line"; break;
-                case 14: moduleTypeName = "Oscillator"; break;
-                case 15: moduleTypeName = "Pushbutton"; break;
-                case 16: moduleTypeName = "Keyboard"; break;
-                case 17: moduleTypeName = "CV Invert"; break;
-                case 18: moduleTypeName = "Steps"; break;
-                case 19: moduleTypeName = "Slew Limiter"; break;
-                case 20: moduleTypeName = "MIDI Notes in"; break;
-                case 21: moduleTypeName = "MIDI CC in"; break;
-                case 22: moduleTypeName = "Multiplier"; break;
-                case 23: moduleTypeName = "Compressor"; break;
-                case 24: moduleTypeName = "Multi-filter"; break;
-                case 25: moduleTypeName = "Plate Reverb"; break;
-                case 26: moduleTypeName = "Buffer delay"; break;
-                case 27: moduleTypeName = "All-pass filter"; break;
-                case 28: moduleTypeName = "Quantizer"; break;
-                case 29: moduleTypeName = "Phaser"; break;
-                case 30: moduleTypeName = "Looper"; break;
-                case 31: moduleTypeName = "In Switch"; break;
-                case 32: moduleTypeName = "Out Switch"; break;
-                case 33: moduleTypeName = "Audio In Switch"; break;
-                case 34: moduleTypeName = "Audio Out Switch"; break;
-                case 35: moduleTypeName = "Midi pressure"; break;
-                case 36: moduleTypeName = "Onset Detector"; break;
-                case 37: moduleTypeName = "Rhythm"; break;
-                case 38: moduleTypeName = "Noise"; break;
-                case 39: moduleTypeName = "Random"; break;
-                case 40: moduleTypeName = "Gate"; break;
-                case 41: moduleTypeName = "Tremolo"; break;
-                case 42: moduleTypeName = "Tone Control"; break;
-                case 43: moduleTypeName = "Delay w/Mod"; break;
-                case 44: moduleTypeName = "Stompswitch"; break;
-                case 45: moduleTypeName = "Value"; break;
-                case 46: moduleTypeName = "CV Delay"; break;
-                case 47: moduleTypeName = "CV Loop"; break;
-                case 48: moduleTypeName = "CV Filter"; break;
-                case 49: moduleTypeName = "Clock Divider"; break;
-                case 50: moduleTypeName = "Comparator"; break;
-                case 51: moduleTypeName = "CV Rectify"; break;
-                case 52: moduleTypeName = "Trigger"; break;
-                case 53: moduleTypeName = "Stereo Spread"; break;
-                case 54: moduleTypeName = "Cport Exp/CV in"; break;
-                case 55: moduleTypeName = "Cport CV out"; break;
-                case 56: moduleTypeName = "UI Button"; break;
-                case 57: moduleTypeName = "Audio Panner"; break;
-                case 58: moduleTypeName = "Pitch Detector"; break;
-                case 59: moduleTypeName = "Pitch Shifter"; break;
-                case 60: moduleTypeName = "Midi Note out"; break;
-                case 61: moduleTypeName = "Midi CC out"; break;
-                case 62: moduleTypeName = "Midi PC out"; break;
-                case 63: moduleTypeName = "Bit Modulator"; break;
-                case 64: moduleTypeName = "Audio Balance"; break;
-                case 65: moduleTypeName = "Inverter"; break;
-                case 66: moduleTypeName = "Fuzz"; break;
-                case 67: moduleTypeName = "Ghostverb"; break;
-                case 68: moduleTypeName = "Cabinet Sim"; break;
-                case 69: moduleTypeName = "Flanger"; break;
-                case 70: moduleTypeName = "Chorus"; break;
-                case 71: moduleTypeName = "Vibrato"; break;
-                case 72: moduleTypeName = "Env Filter"; break;
-                case 73: moduleTypeName = "Ring Modulator"; break;
-                case 74: moduleTypeName = "Hall Reverb"; break;
-                case 75: moduleTypeName = "Ping Pong Delay"; break;
-                case 76: moduleTypeName = "Audio Mixer"; break;
-                case 77: moduleTypeName = "CV Flip Flop"; break;
-                case 78: moduleTypeName = "Diffuser"; break;
-                case 79: moduleTypeName = "Reverb Lite"; break;
-                case 80: moduleTypeName = "Room Reverb"; break;
-                case 81: moduleTypeName = "Pixel"; break;
-                case 82: moduleTypeName = "Midi Clock In"; break;
-                case 83: moduleTypeName = "Granular"; break;
-            }
-
-            return moduleTypeName;
+            return FormatDictionary.getModuleName(moduleTypeId);            
         }
 
         public void ParseData()
         {
             ModuleSize = BitConverter.ToInt32(ModuleData, 0);
             ModuleTypeId = BitConverter.ToInt32(ModuleData, 4);
+            ZoiaDictionaryModule dictionaryModule = FormatDictionary.findModuleByTypeId(ModuleTypeId);
             ModuleUserName = Encoding.UTF8.GetString(ModuleData, ModuleData.Length - 16, 16);
-
-            int numberOfParameterBlocks = ModuleSize - 5; // excluding ModuleSize(1), ModuleUserName(4)
-            for (int moduleSection = 0; moduleSection < numberOfParameterBlocks; moduleSection++)
-            {
-                
+            
+            for (int moduleSection = 0; moduleSection < 9; moduleSection++)
+            {                
                 string parameterName = GetParameterName(moduleSection);
 
                 int moduleParameterValue = BitConverter.ToInt32(ModuleData, (moduleSection + 1) * 4);
@@ -355,7 +270,7 @@ namespace ZoiaFormatInterpreter
                 if (moduleSection == 3)
                 {
                     moduleParameterValueDescription = GetColorName(moduleParameterValue);
-                }
+                }                                 
                 
                 int parameterSize = 4;
                 byte[] parameterData = new byte[parameterSize];
@@ -367,6 +282,23 @@ namespace ZoiaFormatInterpreter
                 };
                 ParameterList.Add(parameter);
             }
+            for (int i = 0; i < dictionaryModule.options.Count; i++)
+            {
+                byte[] parameterData = new byte[1];
+                Array.Copy(ModuleData, 8 * 4 + i, parameterData, 0, 1);
+                ZoiaDictionaryOption dictionaryOption = dictionaryModule.options[i];
+                string parameterName = dictionaryOption.name;
+                int moduleParameterValue = parameterData[0];
+                string moduleParameterValueDescription = dictionaryOption.values[moduleParameterValue];
+                ZoiaModuleParameter parameter = new ZoiaModuleParameter(parameterData)
+                {
+                    ParameterName = parameterName,
+                    ParameterValue = moduleParameterValue,
+                    ParameterValueDescription = moduleParameterValueDescription
+                };
+                ParameterList.Add(parameter);
+            }
+            int numberOfParameterBlocks = ModuleSize - 5; // excluding ModuleSize(1), ModuleUserName(4)
         }
 
         public string GetParameterName(int moduleSection)
