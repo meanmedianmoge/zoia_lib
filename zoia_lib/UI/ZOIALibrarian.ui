@@ -238,11 +238,7 @@
                             <string>This button will refresh the data in the PatchStorage patch table with the latest patches on PatchStorage should the list ever become out of sync.</string>
                            </property>
                            <property name="styleSheet">
-                            <string notr="true">QPushButton{
-border-top-right-radius: 10px 5px;
-padding: 2px 5px 2px 5px;
-border: 1px solid black;
-}</string>
+                            <string notr="true"/>
                            </property>
                            <property name="text">
                             <string>Refresh patches</string>
@@ -468,11 +464,7 @@ border: 1px solid black;
                       <string>When clicked, exits out of the Version History for a patch and returns to the full list of patches currently stored in the ZOIA Librarian</string>
                      </property>
                      <property name="styleSheet">
-                      <string notr="true">QPushButton{
-border-top-left-radius: 10px 5px;
-padding: 2px 25px 2px 25px;
-border: 1px solid black;
-}</string>
+                      <string notr="true"/>
                      </property>
                      <property name="text">
                       <string>Back</string>
@@ -531,11 +523,7 @@ border: 1px solid black;
                       <string>Automatically checks for updates to any patches listed in the Local Storage View table when clicked. Should any be found, a popup will let you know how many patches were updated.</string>
                      </property>
                      <property name="styleSheet">
-                      <string notr="true">QPushButton{
-border-top-right-radius: 10px 5px;
-padding: 2px 5px 2px 5px;
-border: 1px solid black;
-}</string>
+                      <string notr="true"/>
                      </property>
                      <property name="text">
                       <string>Check for updates</string>
@@ -655,12 +643,7 @@ border: 1px solid black;
                     <string>When clicked, updates the patch notes for the currently selected patch. Patch notes can be add directly below in the Additional Patch Notes Display. </string>
                    </property>
                    <property name="styleSheet">
-                    <string notr="true">QPushButton{
-border-top-right-radius: 10px 5px;
-border-top-left-radius: 10px 5px;
-padding: 2px 2px 2px 2px;
-border: 1px solid black;
-}</string>
+                    <string notr="true"/>
                    </property>
                    <property name="text">
                     <string>Update Patch Notes</string>
@@ -802,11 +785,7 @@ border: 1px solid black;
                  <string>Will attempt to delete the currently selected item in the SD tree view above from your SD card. Will create a popup if the currently selected item is a folder, at which point a warning will indicate that deletion will delete everything contained within. The options are yes to continue with the deletion and no to abort. </string>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">QPushButton{
-border-radius: 5px;
-padding: 2px 2px 2px 2px;
-border: 1px solid black;
-}</string>
+                 <string notr="true"/>
                 </property>
                 <property name="text">
                  <string>Delete Selected Item Above</string>
@@ -834,11 +813,7 @@ border: 1px solid black;
                  <string>Attempts to import all of the patches listed in the tables below (SD card table left and SD card table right) into the ZOIA Librarian. This requires that a folder is selected from the SD Card Viewer above that contains patches.</string>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">QPushButton{
-border-radius: 5px;
-padding: 2px 2px 2px 2px;
-border: 1px solid black;
-}</string>
+                 <string notr="true"/>
                 </property>
                 <property name="text">
                  <string>Import All Listed Patches Below</string>
@@ -851,11 +826,7 @@ border: 1px solid black;
                  <cursorShape>PointingHandCursor</cursorShape>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">QPushButton{
-border-radius: 5px;
-padding: 2px 2px 2px 2px;
-border: 1px solid black;
-}</string>
+                 <string notr="true"/>
                 </property>
                 <property name="text">
                  <string>Import All Listed Patches Below As A Version History</string>
@@ -1378,11 +1349,7 @@ border: 1px solid black;
                    <string>When clicked, will open a popup asking for a Bank name, which will then be saved such that it can be loaded at a later time.</string>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">QPushButton{
-border-top-left-radius: 10px 5px;
-padding: 2px 25px 2px 25px;
-border: 1px solid gray;
-}</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>Save Bank</string>
@@ -1410,10 +1377,7 @@ border: 1px solid gray;
                    <string>When clicked, you will be prompted to select a Bank to load that has been created in a previous session using the ZOIA Librarian.</string>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">QPushButton{
-padding: 2px 25px 2px 25px;
-border: 1px solid gray;
-}</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>Load Bank</string>
@@ -1441,11 +1405,7 @@ border: 1px solid gray;
                    <string>When clicked, will open a popup asking for a Bank name, which will then be saved such that it can be exported to an SD card, should it have been specified previously.</string>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">QPushButton{
-border-top-right-radius: 10px 5px;
-padding: 2px 5px 2px 5px;
-border: 1px solid gray;
-}</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>Export Bank</string>
@@ -1949,11 +1909,7 @@ border: 1px solid gray;
                    <string>When clicked, exits out of the Version History for a patch and returns to the full list of patches currently stored in the ZOIA Librarian</string>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">QPushButton{
-border-top-left-radius: 10px 5px;
-padding: 2px 25px 2px 25px;
-border: 1px solid gray;
-}</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>Back</string>

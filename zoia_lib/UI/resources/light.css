@@ -153,7 +153,6 @@ QPushButton#btn_export_bank:disabled,
 QPushButton#check_for_updates_btn:disabled,
 QPushButton#delete_folder_sd_btn:disabled{
     background-color: #c1c1c1;
-    border: 0px;
     color: #545b66;
 }
 

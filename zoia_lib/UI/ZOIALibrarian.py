@@ -230,11 +230,7 @@ class Ui_MainWindow(object):
         self.refresh_pch_btn.setObjectName(u"refresh_pch_btn")
         self.refresh_pch_btn.setCursor(QCursor(Qt.PointingHandCursor))
         self.refresh_pch_btn.setMouseTracking(True)
-        self.refresh_pch_btn.setStyleSheet(u"QPushButton{\n"
-"border-top-right-radius: 10px 5px;\n"
-"padding: 2px 5px 2px 5px;\n"
-"border: 1px solid black;\n"
-"}")
+        self.refresh_pch_btn.setStyleSheet(u"")
 
         self.horizontalLayout_5.addWidget(self.refresh_pch_btn)
 
@@ -331,11 +327,7 @@ class Ui_MainWindow(object):
         self.back_btn_local.setObjectName(u"back_btn_local")
         self.back_btn_local.setCursor(QCursor(Qt.PointingHandCursor))
         self.back_btn_local.setMouseTracking(True)
-        self.back_btn_local.setStyleSheet(u"QPushButton{\n"
-"border-top-left-radius: 10px 5px;\n"
-"padding: 2px 25px 2px 25px;\n"
-"border: 1px solid black;\n"
-"}")
+        self.back_btn_local.setStyleSheet(u"")
 
         self.horizontalLayout_10.addWidget(self.back_btn_local)
 
@@ -355,11 +347,7 @@ class Ui_MainWindow(object):
         self.check_for_updates_btn.setObjectName(u"check_for_updates_btn")
         self.check_for_updates_btn.setCursor(QCursor(Qt.PointingHandCursor))
         self.check_for_updates_btn.setMouseTracking(True)
-        self.check_for_updates_btn.setStyleSheet(u"QPushButton{\n"
-"border-top-right-radius: 10px 5px;\n"
-"padding: 2px 5px 2px 5px;\n"
-"border: 1px solid black;\n"
-"}")
+        self.check_for_updates_btn.setStyleSheet(u"")
 
         self.horizontalLayout_10.addWidget(self.check_for_updates_btn)
 
@@ -412,12 +400,7 @@ class Ui_MainWindow(object):
         self.update_patch_notes.setObjectName(u"update_patch_notes")
         self.update_patch_notes.setCursor(QCursor(Qt.PointingHandCursor))
         self.update_patch_notes.setMouseTracking(True)
-        self.update_patch_notes.setStyleSheet(u"QPushButton{\n"
-"border-top-right-radius: 10px 5px;\n"
-"border-top-left-radius: 10px 5px;\n"
-"padding: 2px 2px 2px 2px;\n"
-"border: 1px solid black;\n"
-"}")
+        self.update_patch_notes.setStyleSheet(u"")
 
         self.verticalLayout_12.addWidget(self.update_patch_notes)
 
@@ -477,11 +460,7 @@ class Ui_MainWindow(object):
         self.delete_folder_sd_btn.setObjectName(u"delete_folder_sd_btn")
         self.delete_folder_sd_btn.setCursor(QCursor(Qt.PointingHandCursor))
         self.delete_folder_sd_btn.setMouseTracking(True)
-        self.delete_folder_sd_btn.setStyleSheet(u"QPushButton{\n"
-"border-radius: 5px;\n"
-"padding: 2px 2px 2px 2px;\n"
-"border: 1px solid black;\n"
-"}")
+        self.delete_folder_sd_btn.setStyleSheet(u"")
 
         self.verticalLayout_11.addWidget(self.delete_folder_sd_btn)
 
@@ -489,22 +468,14 @@ class Ui_MainWindow(object):
         self.import_all_btn.setObjectName(u"import_all_btn")
         self.import_all_btn.setCursor(QCursor(Qt.PointingHandCursor))
         self.import_all_btn.setMouseTracking(True)
-        self.import_all_btn.setStyleSheet(u"QPushButton{\n"
-"border-radius: 5px;\n"
-"padding: 2px 2px 2px 2px;\n"
-"border: 1px solid black;\n"
-"}")
+        self.import_all_btn.setStyleSheet(u"")
 
         self.verticalLayout_11.addWidget(self.import_all_btn)
 
         self.import_all_ver_btn = QPushButton(self.layoutWidget_3)
         self.import_all_ver_btn.setObjectName(u"import_all_ver_btn")
         self.import_all_ver_btn.setCursor(QCursor(Qt.PointingHandCursor))
-        self.import_all_ver_btn.setStyleSheet(u"QPushButton{\n"
-"border-radius: 5px;\n"
-"padding: 2px 2px 2px 2px;\n"
-"border: 1px solid black;\n"
-"}")
+        self.import_all_ver_btn.setStyleSheet(u"")
 
         self.verticalLayout_11.addWidget(self.import_all_ver_btn)
 
@@ -724,11 +695,7 @@ class Ui_MainWindow(object):
         self.btn_save_bank.setObjectName(u"btn_save_bank")
         self.btn_save_bank.setCursor(QCursor(Qt.PointingHandCursor))
         self.btn_save_bank.setMouseTracking(True)
-        self.btn_save_bank.setStyleSheet(u"QPushButton{\n"
-"border-top-left-radius: 10px 5px;\n"
-"padding: 2px 25px 2px 25px;\n"
-"border: 1px solid gray;\n"
-"}")
+        self.btn_save_bank.setStyleSheet(u"")
 
         self.horizontalLayout_3.addWidget(self.btn_save_bank)
 
@@ -736,10 +703,7 @@ class Ui_MainWindow(object):
         self.btn_load_bank.setObjectName(u"btn_load_bank")
         self.btn_load_bank.setCursor(QCursor(Qt.PointingHandCursor))
         self.btn_load_bank.setMouseTracking(True)
-        self.btn_load_bank.setStyleSheet(u"QPushButton{\n"
-"padding: 2px 25px 2px 25px;\n"
-"border: 1px solid gray;\n"
-"}")
+        self.btn_load_bank.setStyleSheet(u"")
 
         self.horizontalLayout_3.addWidget(self.btn_load_bank)
 
@@ -747,11 +711,7 @@ class Ui_MainWindow(object):
         self.btn_export_bank.setObjectName(u"btn_export_bank")
         self.btn_export_bank.setCursor(QCursor(Qt.PointingHandCursor))
         self.btn_export_bank.setMouseTracking(True)
-        self.btn_export_bank.setStyleSheet(u"QPushButton{\n"
-"border-top-right-radius: 10px 5px;\n"
-"padding: 2px 5px 2px 5px;\n"
-"border: 1px solid gray;\n"
-"}")
+        self.btn_export_bank.setStyleSheet(u"")
 
         self.horizontalLayout_3.addWidget(self.btn_export_bank)
 
@@ -957,11 +917,7 @@ class Ui_MainWindow(object):
         self.back_btn_bank.setObjectName(u"back_btn_bank")
         self.back_btn_bank.setCursor(QCursor(Qt.PointingHandCursor))
         self.back_btn_bank.setMouseTracking(True)
-        self.back_btn_bank.setStyleSheet(u"QPushButton{\n"
-"border-top-left-radius: 10px 5px;\n"
-"padding: 2px 25px 2px 25px;\n"
-"border: 1px solid gray;\n"
-"}")
+        self.back_btn_bank.setStyleSheet(u"")
 
         self.horizontalLayout_11.addWidget(self.back_btn_bank)
 
