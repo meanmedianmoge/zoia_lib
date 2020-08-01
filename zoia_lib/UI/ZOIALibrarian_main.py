@@ -153,7 +153,7 @@ class ZOIALibrarianMain(QMainWindow):
             # SD Card previously specified.
             with open(os.path.join(self.backend_path, "pref.json"), "r") as f:
                 data = json.loads(f.read())
-            if data[0]["sd_root"] is not "" \
+            if data[0]["sd_root"] != "" \
                     and os.path.exists(data[0]["sd_root"]):
                 self.sd.set_sd_root(data[0]["sd_root"])
                 self.ui.tab_sd.setEnabled(True)
@@ -812,7 +812,7 @@ class ZOIALibrarianMain(QMainWindow):
                 elif self.ui.tabs.currentIndex() == 3:
                     temp = self.ui.text_browser_bank
                 self.local_selected = name
-                if ver is not "":
+                if ver != "":
                     self.local_selected += "_" + ver
                 try:
                     with open(os.path.join(self.backend_path, name,
@@ -1175,7 +1175,7 @@ class ZOIALibrarianMain(QMainWindow):
                                                          'Select a directory',
                                                          expanduser("~"))
 
-            if input_dir is "" or not os.path.isdir(input_dir):
+            if input_dir == "" or not os.path.isdir(input_dir):
                 self.msg.setWindowTitle("Invalid Selection")
                 self.msg.setIcon(QMessageBox.Information)
                 self.msg.setText("Please select a directory.")
@@ -1224,7 +1224,7 @@ class ZOIALibrarianMain(QMainWindow):
             input_dir = QFileDialog.getExistingDirectory(None,
                                                          'Select a directory',
                                                          expanduser("~"))
-            if input_dir is "" or not os.path.isdir(input_dir):
+            if input_dir == "" or not os.path.isdir(input_dir):
                 self.msg.setWindowTitle("Invalid Selection")
                 self.msg.setIcon(QMessageBox.Information)
                 self.msg.setText("Please select a directory.")

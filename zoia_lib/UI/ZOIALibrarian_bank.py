@@ -102,7 +102,7 @@ class ZOIALibrarianBank(QMainWindow):
 
         bnk_file = QFileDialog.getOpenFileName(
             None, "Select A Patch Bank:", os.path.join(self.path, "Banks"))[0]
-        if bnk_file is not "":
+        if bnk_file != "":
             if "/" in bnk_file and platform.system().lower() == "windows":
                 bnk_file = bnk_file.split("/")[-1]
             elif "\\" in bnk_file:
