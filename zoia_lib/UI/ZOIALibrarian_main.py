@@ -1271,7 +1271,6 @@ class ZOIALibrarianMain(QMainWindow):
         if o.objectName() == "table_sd_left" or o.objectName() == \
                 "table_sd_right":
             self.sd.events(o, e)
-            self.sd.events(o, e)
         elif o.objectName() == "table_bank_local" or o.objectName() == \
                 "table_bank_left" or o.objectName() == "table_bank_right":
             self.bank.events(o, e)
