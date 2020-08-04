@@ -41,7 +41,7 @@ class ZOIALibrarianSD(QMainWindow):
             input_dir = QFileDialog.getExistingDirectory(None,
                                                          'Select an SD Card:',
                                                          expanduser("~"))
-            if input_dir is not "" and os.path.isdir(input_dir):
+            if input_dir != "" and os.path.isdir(input_dir):
                 if "/" in input_dir and platform.system().lower() == "windows":
                     # THIS IS NEEDED FOR WINDOWS.
                     # This comes from a bug with QFileDialog returning the
