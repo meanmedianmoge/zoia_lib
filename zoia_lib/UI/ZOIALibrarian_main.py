@@ -154,6 +154,7 @@ class ZOIALibrarianMain(QMainWindow):
             with open(os.path.join(self.backend_path, "pref.json"), "r") as f:
                 data = json.loads(f.read())
             if data[0]["sd_root"] is not "" \
+                    and data[0]["sd_root"] is not "/Volumes/Untitled" \
                     and os.path.exists(data[0]["sd_root"]):
                 self.sd.set_sd_root(data[0]["sd_root"])
                 self.ui.tab_sd.setEnabled(True)
@@ -495,10 +496,11 @@ class ZOIALibrarianMain(QMainWindow):
             # header items.
             elif table_index == 1:
                 if "[Multiple Versions]" in btn_title.text():
-                    expt = QPushButton("See Version\nHistory to\nexport!")
+                    expt = QPushButton("See Version\nHistory to\nexport!",
+                                       self)
                     expt.setEnabled(False)
                 else:
-                    expt = QPushButton("Click me\nto export!")
+                    expt = QPushButton("Click me\nto export!", self)
                 if self.ui.back_btn_local.isEnabled():
                     expt.setObjectName(str(data[i]["id"]) + "_v"
                                        + str(data[i]["revision"]))
@@ -508,7 +510,7 @@ class ZOIALibrarianMain(QMainWindow):
                 expt.clicked.connect(self.initiate_export)
                 curr_table.setCellWidget(i, 4, expt)
 
-                delete = QPushButton("X")
+                delete = QPushButton("X", self)
                 if self.ui.back_btn_local.isEnabled():
                     delete.setObjectName(str(data[i]["id"]) + "_v"
                                          + str(data[i]["revision"]))
@@ -661,8 +663,8 @@ class ZOIALibrarianMain(QMainWindow):
                                                   timeout=5000)
                     # Got a slot and the user hit "OK"
                     try:
-                        export.export_patch_bin(self.sender().objectName(),
-                                                os.path.join(
+                        export.export_patch_bin(
+                            self.sender().objectName(), os.path.join(
                                                     self.sd.get_sd_root(),
                                                     "to_zoia"), slot)
                         self.ui.statusbar.showMessage("Export complete!",
@@ -727,7 +729,6 @@ class ZOIALibrarianMain(QMainWindow):
                 delete.delete_patch(self.sender().objectName())
             self.get_local_patches()
             self.sort_and_set()
-            self.set_data()
         else:
             delete.delete_patch(os.path.join(self.curr_ver,
                                              self.sender().objectName()))
@@ -1301,7 +1302,6 @@ class ZOIALibrarianMain(QMainWindow):
                     self.set_data(version=True)
                 return True
         elif o.objectName() == "table_local":
-            print(e.type())
             if e.type() == QEvent.FocusIn:
                 if self.prev_tag_cat is None:
                     return False

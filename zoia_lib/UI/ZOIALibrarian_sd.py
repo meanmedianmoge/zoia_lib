@@ -8,7 +8,7 @@ from PySide2.QtWidgets import QTableWidgetItem, QPushButton, QFileDialog, \
 
 
 class ZOIALibrarianSD(QMainWindow):
-    """ The ZoiaLibrarianSD class is responsible for all
+    """ The ZOIALibrarianSD class is responsible for all
     activities contained within the SD Card View tab of the application.
     """
 
@@ -27,6 +27,8 @@ class ZOIALibrarianSD(QMainWindow):
         self.can_export_bank = False
         self.f2 = f2
         self.msg = msg
+        self.rows_left = []
+        self.rows_right = []
 
     def sd_path(self, startup, width):
         """ Allows the user to specify the path to their SD card via
@@ -245,7 +247,9 @@ class ZOIALibrarianSD(QMainWindow):
                 return
 
         # We are doing a move.
-
+        if src_pch is None:
+            self.set_data_sd()
+            return
         os.rename(os.path.join(self.sd_path_full, src_pch),
                   os.path.join(self.sd_path_full, dest + src_pch[3:]))
 
@@ -276,6 +280,16 @@ class ZOIALibrarianSD(QMainWindow):
             else:
                 self.ui.table_sd_right.clearSelection()
         if e.type() == QEvent.ChildAdded:
+            # Figure out which rows are selected.
+
+            indexes = self.ui.table_sd_left.selectionModel().selectedRows()
+            for index in sorted(indexes):
+                self.rows_left.append(index)
+
+            indexes = self.ui.table_sd_right.selectionModel().selectedRows()
+            for index in sorted(indexes):
+                self.rows_right.append(index)
+
             self.ui.table_sd_left.hideColumn(1)
             self.ui.table_sd_left.hideColumn(2)
             self.ui.table_sd_right.hideColumn(1)
@@ -290,8 +304,6 @@ class ZOIALibrarianSD(QMainWindow):
             self.ui.table_sd_right.showColumn(1)
             self.ui.table_sd_right.showColumn(2)
 
-            print(self.ui.table_sd_left.selectedItems())
-
             if self.sd_path_full is None:
                 return
 
@@ -302,54 +314,165 @@ class ZOIALibrarianSD(QMainWindow):
             else:
                 src_index = self.ui.table_sd_right.currentRow() + 32
 
-            if (self.ui.table_sd_left.item(src_index, 0) is not None and
-                self.ui.table_sd_left.item(src_index, 0).text() == "") \
-                    or (self.ui.table_sd_right.item(src_index - 32, 0)
-                        is not None and self.ui.table_sd_right.item(
-                        src_index - 32, 0).text() == ""):
-                # Then it is actually the destination
-                dst_index = src_index
-                # Find the item that just got "deleted"
-                for i in range(64):
-                    if i < 32:
-                        temp = self.ui.table_sd_left.item(i, 0)
-                    else:
-                        temp = self.ui.table_sd_right.item(i - 32, 0)
-                    if temp.text() == "":
-                        if i < 10:
-                            temp_index = "00{}".format(i)
+            if (len(self.rows_left) <= 1 and len(self.rows_right) == 0) \
+                    or (len(self.rows_right) <= 1 and len(self.rows_left)
+                        == 0):
+                # Single selection.
+                self.rows_left = []
+                self.rows_right = []
+                if (self.ui.table_sd_left.item(src_index, 0) is not None and
+                    self.ui.table_sd_left.item(src_index, 0).text() == "") \
+                        or (self.ui.table_sd_right.item(src_index - 32, 0)
+                            is not None and self.ui.table_sd_right.item(
+                            src_index - 32, 0).text() == ""):
+                    # Then it is actually the destination
+                    dst_index = src_index
+                    # Find the item that just got "deleted"
+                    for i in range(64):
+                        if i < 32:
+                            temp = self.ui.table_sd_left.item(i, 0)
                         else:
-                            temp_index = "0{}".format(i)
-                        for pch in os.listdir(self.sd_path_full):
-                            if "{}_zoia_".format(temp_index) in pch:
-                                if i != dst_index:
-                                    self.move_patch_sd(i, dst_index)
-                                    return True
-                                else:
-                                    return False
+                            temp = self.ui.table_sd_right.item(i - 32, 0)
+                        if temp.text() == "":
+                            if i < 10:
+                                temp_index = "00{}".format(i)
+                            else:
+                                temp_index = "0{}".format(i)
+                            for pch in os.listdir(self.sd_path_full):
+                                if "{}_zoia_".format(temp_index) in pch:
+                                    if i != dst_index:
+                                        self.move_patch_sd(i, dst_index)
+                                        return
+                                    else:
+                                        return
+                else:
+                    for i in range(64):
+                        if i < 32:
+                            temp = self.ui.table_sd_left.item(i, 0)
+                        else:
+                            temp = self.ui.table_sd_right.item(i - 32, 0)
+                        if temp is not None and temp.text() != "":
+                            if temp.text()[1] == "0":
+                                # one digit
+                                temp = int(temp.text()[2])
+                            else:
+                                # two digits
+                                temp = int(temp.text()[1:3])
+                            if temp != i:
+                                dst_index = i
+                    if dst_index is None:
+                        # We need to delete the row that just got created.
+
+                        self.ui.table_sd_left.removeRow(32)
+                        self.ui.table_sd_right.removeRow(32)
+                        return
+                    if src_index != dst_index:
+                        self.move_patch_sd(src_index, dst_index)
+                    return
             else:
-                for i in range(64):
-                    if i < 32:
+                # Multiple selections
+                first_item = None
+                first_item_index = -1
+                if len(self.rows_left) > 1 and len(self.rows_right) == 0:
+                    first_index = self.rows_left[0].row()
+                    first_index = int('%d' % first_index)
+                    for i in sorted(self.rows_left):
+                        i = i.row()
+                        i = int('%d' % i)
                         temp = self.ui.table_sd_left.item(i, 0)
-                    else:
-                        temp = self.ui.table_sd_right.item(i - 32, 0)
-                    if temp is not None and temp.text() != "":
-                        if temp.text()[1] == "0":
-                            # one digit
-                            temp = int(temp.text()[2])
+                        if temp is not None and temp.text() != "":
+                            first_item = temp
+                            first_item_index = i
+                            break
+                    first_item_text = first_item.text()
+                    for i in range(64):
+                        if i < 32:
+                            temp_left = self.ui.table_sd_left.item(i, 0)
+                            temp_right = None
                         else:
-                            # two digits
-                            temp = int(temp.text()[1:3])
-                        if temp != i:
-                            dst_index = i
-                if dst_index is None:
-                    # We need to delete the row that just got created.
-                    self.ui.table_sd_left.removeRow(32)
-                    self.ui.table_sd_right.removeRow(32)
-                    return False
-                if src_index != dst_index:
-                    self.move_patch_sd(src_index, dst_index)
-                return True
+                            temp_right = self.ui.table_sd_right.item(i - 32, 0)
+                            temp_left = None
+                        if (temp_left is not None and i != first_index
+                            and temp_left.text() == first_item_text) or (
+                                temp_right is not None and temp_right.text()
+                                == first_item_text):
+                            # We found the first item!
+                            row = sorted(self.rows_left)[-1].row()
+                            row = int('%d' % row)
+                            for j in range(first_item_index, row + 1):
+                                if j == first_item_index:
+                                    i = i + (j - first_item_index)
+                                else:
+                                    i += 1
+                                if i > 31:
+                                    temp1 = self.ui.table_sd_left.item(j, 0)
+                                    temp2 = self.ui.table_sd_right.item(i - 32,
+                                                                        0)
+                                else:
+                                    temp1 = self.ui.table_sd_left.item(j, 0)
+                                    temp2 = self.ui.table_sd_left.item(i, 0)
+                                print(j)
+                                print(i)
+                                if temp1 is None and temp2 is None:
+                                    continue
+                                elif temp1 is None and temp2 is not None:
+                                    self.move_patch_sd(i, j)
+                                elif temp1 is not None and temp2 is None or \
+                                        temp1 is not None and temp2 is not None:
+                                    self.move_patch_sd(j, i)
+                                elif temp1 is None and temp2 is not None:
+                                    self.move_patch_sd(i, j)
+
+                else:
+                    first_index = self.rows_right[0].row()
+                    first_index = int('%d' % first_index) + 32
+                    for i in sorted(self.rows_right):
+                        i = i.row()
+                        i = int('%d' % i)
+                        temp = self.ui.table_sd_right.item(i, 0)
+                        if temp is not None and temp.text() != "":
+                            first_item = temp
+                            first_item_index = i + 32
+                            break
+                    first_item_text = first_item.text()
+                    for i in range(64):
+                        if i < 32:
+                            temp_left = self.ui.table_sd_left.item(i, 0)
+                            temp_right = None
+                        else:
+                            temp_right = self.ui.table_sd_right.item(i - 32, 0)
+                            temp_left = None
+                        if (temp_right is not None and i != first_index
+                            and temp_right.text() == first_item_text) or (
+                                temp_left is not None and temp_left.text()
+                                == first_item_text):
+                            # We found the first item!
+                            row = sorted(self.rows_right)[-1].row()
+                            row = int('%d' % row) + 31
+                            print(row)
+                            for j in range(first_item_index, row + 1):
+                                if j == first_item_index:
+                                    i = i + (j - first_item_index)
+                                else:
+                                    i += 1
+                                if i > 31:
+                                    temp1 = self.ui.table_sd_right.item(j, 0)
+                                    temp2 = self.ui.table_sd_left.item(
+                                        i - 32, 0)
+                                else:
+                                    temp1 = self.ui.table_sd_right.item(j, 0)
+                                    temp2 = self.ui.table_sd_right.item(i, 0)
+                                if temp1 is None and temp2 is None:
+                                    continue
+                                elif temp1 is None and temp2 is not None:
+                                    self.move_patch_sd(i, j)
+                                elif temp1 is not None and temp2 is None or \
+                                        temp1 is not None and temp2 is not None:
+                                    self.move_patch_sd(j, i)
+                                elif temp1 is None and temp2 is not None:
+                                    self.move_patch_sd(i, j)
+                self.rows_left = []
+                self.rows_right = []
 
     def remove_sd(self):
         """ Removes a patch that is stored on a user's SD card.
