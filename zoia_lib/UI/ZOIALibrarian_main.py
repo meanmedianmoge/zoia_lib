@@ -5,8 +5,7 @@ from os.path import expanduser
 from PySide2.QtCore import QEvent, Qt
 from PySide2.QtGui import QIcon, QFont
 from PySide2.QtWidgets import QMainWindow, QMessageBox, QInputDialog, \
-    QFileDialog, QPushButton, QTableWidgetItem, QRadioButton, QDesktopWidget, \
-    QApplication
+    QFileDialog, QPushButton, QTableWidgetItem, QRadioButton, QDesktopWidget
 
 import zoia_lib.UI.ZOIALibrarian as ui_main
 import zoia_lib.backend.utilities as util
@@ -58,7 +57,6 @@ class ZOIALibrarianMain(QMainWindow):
         # Setup the UI using ZOIALibrarian.py
         self.ui = ui_main.Ui_MainWindow()
         self.ui.setupUi(self)
-
         self.backend_path = save.get_backend_path()
 
         # Message box init
@@ -98,7 +96,6 @@ class ZOIALibrarianMain(QMainWindow):
         self.sd_sizes = None
         self.bank_sizes = None
         self.font = None
-        self.dark = False
 
         # Check for metadata in the user's backend.
         if "data.json" not in os.listdir(self.backend_path):
@@ -201,7 +198,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.ui.table_bank_local.setColumnWidth(2,
                                                     self.bank_sizes["col_4"])
 
-            self.dark = data[5]["enabled"]
+            self.util.set_dark(data[5]["enabled"])
 
         else:
             self.ui.table_sd_left.setColumnWidth(0, self.width() * 0.4)
@@ -276,7 +273,8 @@ class ZOIALibrarianMain(QMainWindow):
             lambda: self.bank.export_bank(self.sd, export))
         self.ui.delete_folder_sd_btn.clicked.connect(
             lambda: self.sd.delete_sd_item(delete))
-        self.ui.actionToggle_Dark_Mode_2.triggered.connect(self.toggle_dark)
+        self.ui.actionToggle_Dark_Mode_2.triggered.connect(
+            self.util.toggle_dark)
 
         # Font consistency.
         self.util.change_font(QFont("Verdana", 10) if self.font is None else
@@ -327,7 +325,7 @@ class ZOIALibrarianMain(QMainWindow):
         center = QDesktopWidget().availableGeometry().center()
         frame.moveCenter(center)
         self.move(frame.topLeft())
-        self.toggle_dark()
+        self.util.toggle_dark()
 
     def tab_switch(self):
         """ Actions performed whenever a tab is switched to within the
@@ -501,58 +499,48 @@ class ZOIALibrarianMain(QMainWindow):
                     expt.setEnabled(False)
                 else:
                     expt = QPushButton("Click me\nto export!", self)
+
+                del_btn = QPushButton("X", self)
+
                 if self.ui.back_btn_local.isEnabled():
                     expt.setObjectName(str(data[i]["id"]) + "_v"
                                        + str(data[i]["revision"]))
+                    del_btn.setObjectName(str(data[i]["id"]) + "_v"
+                                          + str(data[i]["revision"]))
                 else:
                     expt.setObjectName(str(data[i]["id"]))
+                    del_btn.setObjectName(str(data[i]["id"]))
+
                 expt.setFont(self.ui.table_PS.horizontalHeader().font())
                 expt.clicked.connect(self.initiate_export)
                 curr_table.setCellWidget(i, 4, expt)
 
-                delete = QPushButton("X", self)
-                if self.ui.back_btn_local.isEnabled():
-                    delete.setObjectName(str(data[i]["id"]) + "_v"
-                                         + str(data[i]["revision"]))
-                else:
-                    delete.setObjectName(str(data[i]["id"]))
-                delete.setFont(self.ui.table_PS.horizontalHeader().font())
-                delete.clicked.connect(self.initiate_delete)
-                curr_table.setCellWidget(i, 5, delete)
+                del_btn.setFont(self.ui.table_PS.horizontalHeader().font())
+                del_btn.clicked.connect(self.initiate_delete)
+                curr_table.setCellWidget(i, 5, del_btn)
 
         # Also set the title size and resize the columns.
-        if table_index == 0:
-            if self.ps_sizes is None:
-                curr_table.resizeColumnsToContents()
-                curr_table.setColumnWidth(1, self.width() * 0.1)
-                curr_table.setColumnWidth(2, self.width() * 0.1)
-                curr_table.setColumnWidth(3, self.width() * 0.1)
-                self.ui.splitter_PS.setSizes([self.width() * 0.6,
-                                              self.width() * 0.4])
-                curr_table.resizeRowsToContents()
-            else:
-                curr_table.resizeRowsToContents()
-            if self.local_sizes is None:
-                curr_table.resizeColumnsToContents()
-                curr_table.setColumnWidth(1, self.width() * 0.1)
-                curr_table.setColumnWidth(2, self.width() * 0.1)
-                curr_table.setColumnWidth(3, self.width() * 0.1)
-                curr_table.setColumnWidth(4, self.width() * 0.05)
-                curr_table.setColumnWidth(5, self.width() * 0.03)
-                self.ui.splitter_local.setSizes([self.width() * 0.6,
-                                                 self.width() * 0.4])
-                curr_table.resizeRowsToContents()
-            else:
-                curr_table.resizeRowsToContents()
-
-        else:
-            if self.bank_sizes is None:
-                curr_table.resizeColumnsToContents()
-                curr_table.setColumnWidth(1, self.width() * 0.14)
-                curr_table.setColumnWidth(2, self.width() * 0.14)
-                curr_table.resizeRowsToContents()
-            else:
-                curr_table.resizeRowsToContents()
+        if table_index == 0 and self.ps_sizes is None:
+            curr_table.resizeColumnsToContents()
+            curr_table.setColumnWidth(1, self.width() * 0.1)
+            curr_table.setColumnWidth(2, self.width() * 0.1)
+            curr_table.setColumnWidth(3, self.width() * 0.1)
+            self.ui.splitter_PS.setSizes([self.width() * 0.6,
+                                          self.width() * 0.4])
+        elif table_index == 1 and self.local_sizes is None:
+            curr_table.resizeColumnsToContents()
+            curr_table.setColumnWidth(1, self.width() * 0.1)
+            curr_table.setColumnWidth(2, self.width() * 0.1)
+            curr_table.setColumnWidth(3, self.width() * 0.1)
+            curr_table.setColumnWidth(4, self.width() * 0.05)
+            curr_table.setColumnWidth(5, self.width() * 0.03)
+            self.ui.splitter_local.setSizes([self.width() * 0.6,
+                                             self.width() * 0.4])
+        elif table_index == 3 and self.bank_sizes is None:
+            curr_table.resizeColumnsToContents()
+            curr_table.setColumnWidth(1, self.width() * 0.14)
+            curr_table.setColumnWidth(2, self.width() * 0.14)
+        curr_table.resizeRowsToContents()
 
     def get_version_patches(self, context):
         """ Retrieves the versions of a patch that is locally stored to
@@ -665,8 +653,8 @@ class ZOIALibrarianMain(QMainWindow):
                     try:
                         export.export_patch_bin(
                             self.sender().objectName(), os.path.join(
-                                                    self.sd.get_sd_root(),
-                                                    "to_zoia"), slot)
+                                self.sd.get_sd_root(),
+                                "to_zoia"), slot)
                         self.ui.statusbar.showMessage("Export complete!",
                                                       timeout=5000)
                         break
@@ -736,6 +724,15 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Reset the text browser.
         self.ui.text_browser_local.setText("")
+
+        # Special case, we only have one patch in a version history after
+        # a deletion.
+        if self.ui.back_btn_local.isEnabled() \
+                and self.ui.table_local.rowCount() == 1:
+            self.get_local_patches()
+            self.ui.back_btn_local.setEnabled(False)
+            self.ui.searchbar_local.setText("")
+            self.sort_and_set()
 
     def get_local_patches(self):
         """ Retrieves the metadata for patches that a user has previously
@@ -1142,15 +1139,14 @@ class ZOIALibrarianMain(QMainWindow):
             if self.ui.tabs.currentIndex() == 1:
                 self.get_local_patches()
                 self.sort_and_set()
-                self.set_data(self.ui.searchbar_local.text() != "")
             self.ui.statusbar.showMessage("Import complete!")
             self.msg.setWindowTitle("Import Complete")
             self.msg.setText("The patch has been successfully imported!")
             self.msg.exec_()
             if (self.ui.tabs.currentIndex() == 1 and not
-                self.ui.back_btn_local.isEnabled()) or \
+            self.ui.back_btn_local.isEnabled()) or \
                     (self.ui.tabs.currentIndex() == 3 and not
-                     self.ui.back_btn_bank.isEnabled()):
+                    self.ui.back_btn_bank.isEnabled()):
                 self.get_local_patches()
                 self.sort_and_set()
 
@@ -1241,21 +1237,20 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-            return
         else:
             self.msg.setWindowTitle("Warning")
-            self.msg.setText("Certain patches in the specified Version History"
-                             "already existed in the Librarian. Please delete"
-                             "them before attempting to import a version "
-                             "history if you would like them to appear.")
+            self.msg.setText("Certain patches in the specified Version "
+                             "History already existed in the Librarian."
+                             "\nPlease delete them before attempting to "
+                             "import a version history if you would like "
+                             "them to appear.")
             self.msg.setIcon(QMessageBox.Warning)
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-            return
         if (self.ui.tabs.currentIndex() == 1 and not
-            self.ui.back_btn_local.isEnabled()) or \
+        self.ui.back_btn_local.isEnabled()) or \
                 (self.ui.tabs.currentIndex() == 3 and not
-                 self.ui.back_btn_bank.isEnabled()):
+                self.ui.back_btn_bank.isEnabled()):
             self.get_local_patches()
             self.sort_and_set()
 
@@ -1348,7 +1343,6 @@ class ZOIALibrarianMain(QMainWindow):
             if not self.ui.back_btn_local.isEnabled():
                 self.get_local_patches()
                 self.sort_and_set()
-                self.set_data(self.ui.searchbar_local != "")
             else:
                 self.get_version_patches(True)
         # Case 2 - Leftover text from when there are no tags/categories
@@ -1401,27 +1395,13 @@ class ZOIALibrarianMain(QMainWindow):
         self.get_local_patches()
         self.sort_and_set()
 
-    def toggle_dark(self):
-        app = QApplication.instance()
-        if self.dark:
-            with open(os.path.join("zoia_lib", "UI", "resources",
-                                   "light.css"), "r") as f:
-                data = f.read()
-            self.dark = False
-        else:
-            with open(os.path.join("zoia_lib", "UI", "resources",
-                                   "dark.css"), "r") as f:
-                data = f.read()
-            self.dark = True
-        app.setStyleSheet(data)
-
     def closeEvent(self, event):
         """ Override the default close operation so certain application
         settings can be saved.
         """
 
         self.util.save_pref(self.width(), self.height(), self.sd.get_sd_root(),
-                            self.backend_path, not self.dark)
+                            self.backend_path)
 
     def try_quit(self):
         """ Forces the application to close.

@@ -207,6 +207,8 @@ class ZOIALibrarianSD(QMainWindow):
             src = str("0{}".format(src))
         src_pch = None
         dest_pch = None
+        print(src)
+        print(dest)
         for pch in os.listdir(self.sd_path_full):
             if pch[:3] == src:
                 src_pch = pch
@@ -281,7 +283,6 @@ class ZOIALibrarianSD(QMainWindow):
                 self.ui.table_sd_right.clearSelection()
         if e.type() == QEvent.ChildAdded:
             # Figure out which rows are selected.
-
             indexes = self.ui.table_sd_left.selectionModel().selectedRows()
             for index in sorted(indexes):
                 self.rows_left.append(index)
@@ -362,7 +363,6 @@ class ZOIALibrarianSD(QMainWindow):
                                 dst_index = i
                     if dst_index is None:
                         # We need to delete the row that just got created.
-
                         self.ui.table_sd_left.removeRow(32)
                         self.ui.table_sd_right.removeRow(32)
                         return
@@ -374,8 +374,6 @@ class ZOIALibrarianSD(QMainWindow):
                 first_item = None
                 first_item_index = -1
                 if len(self.rows_left) > 1 and len(self.rows_right) == 0:
-                    first_index = self.rows_left[0].row()
-                    first_index = int('%d' % first_index)
                     for i in sorted(self.rows_left):
                         i = i.row()
                         i = int('%d' % i)
@@ -392,7 +390,7 @@ class ZOIALibrarianSD(QMainWindow):
                         else:
                             temp_right = self.ui.table_sd_right.item(i - 32, 0)
                             temp_left = None
-                        if (temp_left is not None and i != first_index
+                        if (temp_left is not None and i != first_item_index
                             and temp_left.text() == first_item_text) or (
                                 temp_right is not None and temp_right.text()
                                 == first_item_text):
@@ -411,8 +409,6 @@ class ZOIALibrarianSD(QMainWindow):
                                 else:
                                     temp1 = self.ui.table_sd_left.item(j, 0)
                                     temp2 = self.ui.table_sd_left.item(i, 0)
-                                print(j)
-                                print(i)
                                 if temp1 is None and temp2 is None:
                                     continue
                                 elif temp1 is None and temp2 is not None:
@@ -424,8 +420,6 @@ class ZOIALibrarianSD(QMainWindow):
                                     self.move_patch_sd(i, j)
 
                 else:
-                    first_index = self.rows_right[0].row()
-                    first_index = int('%d' % first_index) + 32
                     for i in sorted(self.rows_right):
                         i = i.row()
                         i = int('%d' % i)
@@ -442,14 +436,13 @@ class ZOIALibrarianSD(QMainWindow):
                         else:
                             temp_right = self.ui.table_sd_right.item(i - 32, 0)
                             temp_left = None
-                        if (temp_right is not None and i != first_index
+                        if (temp_right is not None and i != first_item_index
                             and temp_right.text() == first_item_text) or (
                                 temp_left is not None and temp_left.text()
                                 == first_item_text):
                             # We found the first item!
                             row = sorted(self.rows_right)[-1].row()
-                            row = int('%d' % row) + 31
-                            print(row)
+                            row = int('%d' % row) + 32
                             for j in range(first_item_index, row + 1):
                                 if j == first_item_index:
                                     i = i + (j - first_item_index)
@@ -457,20 +450,21 @@ class ZOIALibrarianSD(QMainWindow):
                                     i += 1
                                 if i > 31:
                                     temp1 = self.ui.table_sd_right.item(j, 0)
-                                    temp2 = self.ui.table_sd_left.item(
-                                        i - 32, 0)
+                                    temp2 = self.ui.table_sd_left.item(i - 32,
+                                                                       0)
                                 else:
                                     temp1 = self.ui.table_sd_right.item(j, 0)
                                     temp2 = self.ui.table_sd_right.item(i, 0)
                                 if temp1 is None and temp2 is None:
                                     continue
                                 elif temp1 is None and temp2 is not None:
-                                    self.move_patch_sd(i, j)
-                                elif temp1 is not None and temp2 is None or \
-                                        temp1 is not None and temp2 is not None:
                                     self.move_patch_sd(j, i)
-                                elif temp1 is None and temp2 is not None:
+                                elif temp1 is not None and temp2 is None or \
+                                        temp1 is not None and temp2 is not \
+                                        None:
                                     self.move_patch_sd(i, j)
+                                elif temp1 is None and temp2 is not None:
+                                    self.move_patch_sd(j, i)
                 self.rows_left = []
                 self.rows_right = []
 

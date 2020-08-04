@@ -28,6 +28,8 @@ class ZOIALibrarianBank(QMainWindow):
         self.path = path
         self.msg = msg
         self.data_banks = []
+        self.rows_left = []
+        self.rows_right = []
 
     def set_data_bank(self):
         """ Populates the bank export tables with data.
@@ -464,9 +466,21 @@ class ZOIALibrarianBank(QMainWindow):
                     self.ui.table_bank_left.clearSelection()
                 else:
                     self.ui.table_bank_right.clearSelection()
-            if e.type() == QEvent.ChildAdded:
+            elif e.type() == QEvent.ChildAdded:
+                # Figure out which rows are selected.
+                indexes = \
+                    self.ui.table_bank_left.selectionModel().selectedRows()
+                for index in sorted(indexes):
+                    self.rows_left.append(index)
+
+                indexes = \
+                    self.ui.table_bank_right.selectionModel().selectedRows()
+                for index in sorted(indexes):
+                    self.rows_right.append(index)
+
                 self.ui.table_bank_left.hideColumn(1)
                 self.ui.table_bank_right.hideColumn(1)
+
             elif e.type() == QEvent.ChildRemoved:
                 # We have dropped an item, so now we need to rename it
                 # or swap it with the item that was previously in that
@@ -481,46 +495,165 @@ class ZOIALibrarianBank(QMainWindow):
                 else:
                     src_index = self.ui.table_bank_right.currentRow() + 32
 
-                if (src_index < 32 and self.ui.table_bank_left.item(
-                        src_index, 0)) is None \
-                        or (src_index > 31 and self.ui.table_bank_right.item(
-                    src_index - 32, 0) is None):
-                    # Then it is actually the destination
-                    dst_index = src_index
-                    # Find the item that just got "deleted"
-                    for i in range(64):
-                        if i < 32:
-                            temp = self.ui.table_bank_left.item(i, 0)
-                            temp2 = self.ui.table_bank_left.cellWidget(i, 1)
-                        else:
-                            temp = self.ui.table_bank_right.item(i - 32, 0)
-                            temp2 = self.ui.table_bank_right.cellWidget(i - 32
-                                                                        , 1)
-                        if temp is None and temp2 is not None:
-                            self.move_patch_bank(i, dst_index)
-                else:
-                    for i in range(64):
-                        if i < 32:
-                            temp = self.ui.table_bank_left.item(i, 0)
-                        else:
-                            temp = self.ui.table_bank_right.item(i - 32, 0)
-                        if temp is not None and temp.text() != "":
-                            if temp.text()[1] == "0":
-                                # one digit
-                                temp = int(temp.text()[2])
+                if (len(self.rows_left) <= 1 and len(self.rows_right) == 0) \
+                        or (len(self.rows_right) <= 1 and len(self.rows_left)
+                            == 0):
+                    # Single selection.
+                    self.rows_left = []
+                    self.rows_right = []
+                    if (src_index < 32 and self.ui.table_bank_left.item(
+                            src_index, 0)) is None \
+                            or (
+                            src_index > 31 and self.ui.table_bank_right.item(
+                        src_index - 32, 0) is None):
+                        # Then it is actually the destination
+                        dst_index = src_index
+                        # Find the item that just got "deleted"
+                        for i in range(64):
+                            if i < 32:
+                                temp = self.ui.table_bank_left.item(i, 0)
+                                temp2 = self.ui.table_bank_left.cellWidget(i,
+                                                                           1)
                             else:
-                                # two digits
-                                temp = int(temp.text()[1:3])
-                            if temp != i:
-                                dst_index = i
-                    if dst_index is None:
-                        # We need to delete the row that just got created.
-                        self.ui.table_bank_left.removeRow(32)
-                        self.ui.table_bank_right.removeRow(32)
-                        return False
-                    if src_index != dst_index:
-                        self.move_patch_bank(src_index, dst_index)
-                    return True
+                                temp = self.ui.table_bank_right.item(i - 32, 0)
+                                temp2 = self.ui.table_bank_right.cellWidget(
+                                    i - 32, 1)
+                            if temp is None and temp2 is not None:
+                                self.move_patch_bank(i, dst_index)
+                    else:
+                        for i in range(64):
+                            if i < 32:
+                                temp = self.ui.table_bank_left.item(i, 0)
+                            else:
+                                temp = self.ui.table_bank_right.item(i - 32, 0)
+                            if temp is not None and temp.text() != "":
+                                if temp.text()[1] == "0":
+                                    # one digit
+                                    temp = int(temp.text()[2])
+                                else:
+                                    # two digits
+                                    temp = int(temp.text()[1:3])
+                                if temp != i:
+                                    dst_index = i
+                        if dst_index is None:
+                            # We need to delete the row that just got created.
+                            self.ui.table_bank_left.removeRow(32)
+                            self.ui.table_bank_right.removeRow(32)
+                            return False
+                        if src_index != dst_index:
+                            self.move_patch_bank(src_index, dst_index)
+                        return True
+                else:
+                    # Multiple selections
+                    first_item = None
+                    first_item_index = -1
+                    if len(self.rows_left) > 1 and len(self.rows_right) == 0:
+                        for i in sorted(self.rows_left):
+                            i = i.row()
+                            i = int('%d' % i)
+                            temp = self.ui.table_bank_left.item(i, 0)
+                            if temp is not None and temp.text() != "":
+                                first_item = temp
+                                first_item_index = i
+                                break
+                        first_item_text = first_item.text()
+                        for i in range(64):
+                            if i < 32:
+                                temp_left = self.ui.table_bank_left.item(i, 0)
+                                temp_right = None
+                            else:
+                                temp_right = self.ui.table_bank_right.item(
+                                    i - 32, 0)
+                                temp_left = None
+                            if (temp_left is not None and i != first_item_index
+                                and temp_left.text() == first_item_text) or (
+                                    temp_right is not None and temp_right.text()
+                                    == first_item_text):
+                                # We found the first item!
+                                row = sorted(self.rows_left)[-1].row()
+                                row = int('%d' % row)
+                                for j in range(first_item_index, row + 1):
+                                    if j == first_item_index:
+                                        i = i + (j - first_item_index)
+                                    else:
+                                        i += 1
+                                    if i > 31:
+                                        temp1 = self.ui.table_bank_left.item(j,
+                                                                             0)
+                                        temp2 = self.ui.table_bank_right.item(
+                                            i - 32,
+                                            0)
+                                    else:
+                                        temp1 = self.ui.table_bank_left.item(j,
+                                                                             0)
+                                        temp2 = self.ui.table_bank_left.item(i,
+                                                                             0)
+                                    if temp1 is None and temp2 is None:
+                                        continue
+                                    elif temp1 is None and temp2 is not None:
+                                        self.move_patch_bank(i, j)
+                                    elif temp1 is not None and temp2 is None or \
+                                            temp1 is not None and temp2 is not\
+                                            None:
+                                        self.move_patch_bank(j, i)
+                                    elif temp1 is None and temp2 is not None:
+                                        self.move_patch_bank(i, j)
+                    else:
+                        for i in sorted(self.rows_right):
+                            i = i.row()
+                            i = int('%d' % i)
+                            temp = self.ui.table_bank_right.item(i, 0)
+                            if temp is not None and temp.text() != "":
+                                first_item = temp
+                                first_item_index = i + 32
+                                break
+                        first_item_text = first_item.text()
+                        for i in range(64):
+                            if i < 32:
+                                temp_left = self.ui.table_bank_left.item(i, 0)
+                                temp_right = None
+                            else:
+                                temp_right = self.ui.table_bank_right.item(
+                                    i - 32, 0)
+                                temp_left = None
+                            if (temp_right is not None
+                                and i != first_item_index and temp_right.text()
+                                == first_item_text) or \
+                                    (temp_left is not None and temp_left.text()
+                                        == first_item_text):
+                                # We found the first item!
+                                row = sorted(self.rows_right)[-1].row()
+                                row = int('%d' % row) + 32
+                                for j in range(first_item_index, row + 1):
+                                    if j == first_item_index:
+                                        i = i + (j - first_item_index)
+                                    else:
+                                        i += 1
+                                    if i > 31:
+                                        temp1 = self.ui.table_bank_right.item(
+                                            j,
+                                            0)
+                                        temp2 = self.ui.table_bank_left.item(
+                                            i - 32,
+                                            0)
+                                    else:
+                                        temp1 = self.ui.table_bank_right.item(
+                                            j,
+                                            0)
+                                        temp2 = self.ui.table_bank_right.item(
+                                            i,
+                                            0)
+                                    if temp1 is None and temp2 is None:
+                                        continue
+                                    elif temp1 is None and temp2 is not None:
+                                        self.move_patch_bank(j, i)
+                                    elif temp1 is not None and temp2 is None or \
+                                            temp1 is not None and temp2 is not None:
+                                        self.move_patch_bank(i, j)
+                                    elif temp1 is None and temp2 is not None:
+                                        self.move_patch_bank(j, i)
+                    self.rows_left = []
+                    self.rows_right = []
 
     def remove_bank_item(self):
         """ Removes an item from one of the bank tables.

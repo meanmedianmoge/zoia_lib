@@ -1,5 +1,5 @@
 from PySide2.QtGui import QFont
-from PySide2.QtWidgets import QFontDialog
+from PySide2.QtWidgets import QFontDialog, QApplication
 import os
 import json
 
@@ -10,6 +10,7 @@ class ZOIALibrarianUtil:
 
         # Get the ui reference
         self.ui = ui
+        self.dark = True
 
     def change_font(self, name):
         """ Changes the font used throughout the application.
@@ -76,36 +77,52 @@ class ZOIALibrarianUtil:
                         self.ui.table_local.cellWidget(i, 4).setFont(new_font)
                         self.ui.table_local.cellWidget(i, 5).setFont(new_font)
                 for i in range(32):
-                    if self.ui.table_sd_left.cellWidget(i, 1) is not None:
+                    try:
                         self.ui.table_sd_left.cellWidget(i, 1).setFont(
                             new_font)
-                    if self.ui.table_sd_left.cellWidget(i, 2) is not None:
+                    except AttributeError:
+                        pass
+                    try:
                         self.ui.table_sd_left.cellWidget(i, 2).setFont(
                             new_font)
-                    if self.ui.table_sd_right.cellWidget(i, 1) is not None:
+                    except AttributeError:
+                        pass
+                    try:
                         self.ui.table_sd_right.cellWidget(i, 1).setFont(
                             new_font)
-                    if self.ui.table_sd_right.cellWidget(i, 2) is not None:
+                    except AttributeError:
+                        pass
+                    try:
                         self.ui.table_sd_right.cellWidget(i, 2).setFont(
                             new_font)
-                    if self.ui.table_bank_left.cellWidget(i, 1) is not None:
+                    except AttributeError:
+                        pass
+                    try:
                         self.ui.table_bank_left.cellWidget(i, 1).setFont(
                             new_font)
-                    if self.ui.table_bank_left.cellWidget(i, 2) is not None:
+                    except AttributeError:
+                        pass
+                    try:
                         self.ui.table_bank_left.cellWidget(i, 2).setFont(
                             new_font)
-                    if self.ui.table_bank_right.cellWidget(i, 1) is not None:
+                    except AttributeError:
+                        pass
+                    try:
                         self.ui.table_bank_right.cellWidget(i, 1).setFont(
                             new_font)
-                    if self.ui.table_bank_right.cellWidget(i, 2) is not None:
+                    except AttributeError:
+                        pass
+                    try:
                         self.ui.table_bank_right.cellWidget(i, 2).setFont(
                             new_font)
+                    except AttributeError:
+                        pass
                 if self.ui.table_bank_local.cellWidget(0, 0) is not None:
                     for i in range(self.ui.table_bank_local.rowCount()):
                         self.ui.table_bank_local.cellWidget(i, 0).setFont(
                             new_font)
 
-    def save_pref(self, w, h, sd, path, dark):
+    def save_pref(self, w, h, sd, path):
         """ Saves and writes the state of a UI window to pref.json
         """
 
@@ -160,12 +177,26 @@ class ZOIALibrarianUtil:
             "split_bank_right": self.ui.splitter_bank_tables.sizes()[1]
         }
         dark_mode = {
-            "enabled": dark
+            "enabled": not self.dark
         }
 
         with open(os.path.join(path, "pref.json"), "w") as f:
             f.write(json.dumps([window, ps_sizes, local_sizes,
                                 sd_sizes, bank_sizes, dark_mode]))
+
+    def toggle_dark(self):
+        app = QApplication.instance()
+        if self.dark:
+            with open(os.path.join("zoia_lib", "UI", "resources",
+                                   "light.css"), "r") as f:
+                data = f.read()
+            self.dark = False
+        else:
+            with open(os.path.join("zoia_lib", "UI", "resources",
+                                   "dark.css"), "r") as f:
+                data = f.read()
+            self.dark = True
+        app.setStyleSheet(data)
 
     def row_invert(self):
         """ Either enables of disables alternating row colours for
@@ -187,3 +218,9 @@ class ZOIALibrarianUtil:
             not self.ui.table_bank_left.alternatingRowColors())
         self.ui.table_bank_right.setAlternatingRowColors(
             not self.ui.table_bank_right.alternatingRowColors())
+
+    def set_dark(self, value):
+        """ Setter method to specify the state of the application with
+        regards to dark mode being enabled.
+        """
+        self.dark = value

@@ -378,6 +378,8 @@ class PatchSave(Patch):
                     datetime.datetime.fromtimestamp(
                         os.path.getmtime(temp_path)).strftime(
                         '%Y-%m-%dT%H:%M:%S+00:00')
+                js_data["files"][0]["filename"] = os.listdir(path)[i]
+
             # Try to save the patch.
             if not version:
                 self.save_to_backend((temp_data, js_data))
