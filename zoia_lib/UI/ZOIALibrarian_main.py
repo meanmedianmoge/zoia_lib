@@ -13,13 +13,14 @@ import zoia_lib.common.errors as errors
 from zoia_lib.UI.ZOIALibrarian_bank import ZOIALibrarianBank
 from zoia_lib.UI.ZOIALibrarian_util import ZOIALibrarianUtil
 from zoia_lib.UI.ZOIALibrarian_sd import ZOIALibrarianSD
+from zoia_lib.UI.ZOIALibrarian_ps import ZOIALibrarianPS
 from zoia_lib.backend.api import PatchStorage
 from zoia_lib.backend.patch_delete import PatchDelete
 from zoia_lib.backend.patch_export import PatchExport
 from zoia_lib.backend.patch_save import PatchSave
 from zoia_lib.backend.patch_update import PatchUpdate
 
-ps = PatchStorage()
+api = PatchStorage()
 update = PatchUpdate()
 save = PatchSave()
 export = PatchExport()
@@ -37,9 +38,9 @@ class ZOIALibrarianMain(QMainWindow):
         pyside2-uic.exe ZOIALibrarian.ui -o ZOIALibrarian.py
 
     Known issues:
-     - Sorting order is not maintained when exiting out of the
-       version history table of a patch.
-     - The code is a mess and should be refactored into separate modules
+     - Sorting order is not consistently maintained after various
+       operations.
+     - The code is a mess and should be refactored into separate classes
        where possible.
     """
 
@@ -70,8 +71,8 @@ class ZOIALibrarianMain(QMainWindow):
                                   delete)
         self.bank = ZOIALibrarianBank(self.ui, self.backend_path, self.msg)
         self.util = ZOIALibrarianUtil(self.ui)
+        self.ps = ZOIALibrarianPS(self.ui, api, self.backend_path)
 
-        self.data_PS = None
         self.patch_cache = []
         self.search_data_PS = None
         self.search_data_local = None
@@ -97,37 +98,8 @@ class ZOIALibrarianMain(QMainWindow):
         self.bank_sizes = None
         self.font = None
 
-        # Check for metadata in the user's backend.
-        if "data.json" not in os.listdir(self.backend_path):
-            ps_data = ps.get_all_patch_data_init()
-            with open(os.path.join(self.backend_path, "data.json"),
-                      "w") as f:
-                f.write(json.dumps(ps_data))
-                self.data_PS = ps_data
-        else:
-            # Got previous metadata, need to ensure that there are no
-            # new patches.
-            with open(os.path.join(self.backend_path, "data.json"),
-                      "r") as f:
-                data = json.loads(f.read())
-            if len(data) == ps.patch_count:
-                # Assume no new patches; allow the user to refresh manually.
-                self.data_PS = data
-            elif len(data) > ps.patch_count:
-                # Uh oh, some patches got deleted on PatchStorage.
-                ps_data = ps.get_all_patch_data_init()
-                with open(os.path.join(self.backend_path, "data.json"),
-                          "w") as f:
-                    f.write(json.dumps(ps_data))
-                    self.data_PS = ps_data
-            else:
-                # Get the new patch metadata that we don't have.
-                new_patches = ps.get_newest_patches(len(data))
-                data = new_patches + data
-                with open(os.path.join(self.backend_path, "data.json"),
-                          "w") as f:
-                    f.write(json.dumps(data))
-                    self.data_PS = data
+        # Get the data necessary for the PS tab.
+        self.ps.metadata_init()
 
         # Set the window icon
         self.setWindowIcon(QIcon(self.icon))
@@ -392,7 +364,7 @@ class ZOIALibrarianMain(QMainWindow):
         # Figure out the data we are using.
         data = {
             (0, True, False): self.search_data_PS,
-            (0, False, False): self.data_PS,
+            (0, False, False): self.ps.get_data_ps(),
             (1, True, True): self.search_data_local_version,
             (1, False, True): self.data_local_version,
             (1, True, False): self.search_data_local,
@@ -593,7 +565,7 @@ class ZOIALibrarianMain(QMainWindow):
 
         # TODO Replace with FCFS thread scheduling
         try:
-            save.save_to_backend(ps.download(str(
+            save.save_to_backend(api.download(str(
                 self.sender().objectName())))
             self.sender().setEnabled(False)
             self.sender().setText("Downloaded!")
@@ -791,7 +763,7 @@ class ZOIALibrarianMain(QMainWindow):
                 temp = self.ui.text_browser_PS
                 self.selected = name
                 if len(self.patch_cache) == 0:
-                    content = ps.get_patch_meta(name)
+                    content = api.get_patch_meta(name)
                     self.patch_cache.append(content)
                 else:
                     content = None
@@ -801,7 +773,7 @@ class ZOIALibrarianMain(QMainWindow):
                             skip = True
                             break
                     if content is None:
-                        content = ps.get_patch_meta(name)
+                        content = api.get_patch_meta(name)
                         self.patch_cache.append(content)
             else:
                 if self.ui.tabs.currentIndex() == 1:
@@ -882,9 +854,8 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Get the new patch metadata that we don't have (if any).
         self.ui.refresh_pch_btn.setEnabled(False)
-        self.data_PS = ps.get_all_patch_data_init()
         with open(os.path.join(self.backend_path, "data.json"), "w") as f:
-            f.write(json.dumps(self.data_PS))
+            f.write(json.dumps(self.api.get_all_patch_data_init()))
         self.ui.searchbar_PS.setText("")
         self.sort_and_set()
         self.ui.refresh_pch_btn.setEnabled(True)
@@ -906,7 +877,7 @@ class ZOIALibrarianMain(QMainWindow):
         if self.ui.tabs.currentIndex() == 0 \
                 and self.ui.searchbar_PS.text() != "":
             self.search_data_PS = \
-                util.search_patches(self.data_PS,
+                util.search_patches(self.ps.get_data_ps(),
                                     self.ui.searchbar_PS.text())
             self.set_data(True)
         # Case 2: Local tab
@@ -975,18 +946,20 @@ class ZOIALibrarianMain(QMainWindow):
         # Case 1: A user forces a reload of the PS patch list.
         if self.sender() is not None and self.sender().objectName() == \
                 "refresh_pch_btn":
-            util.sort_metadata(curr_sort[0], self.data_PS, curr_sort[1])
+            util.sort_metadata(curr_sort[0], self.ps.get_data_ps(),
+                               curr_sort[1])
             self.set_data(self.ui.searchbar_PS.text() != "")
         # Case 2: Sorting on the PatchStorage tab.
         # ->Case 2.1: Sorting on the PS tab with the search bar empty.
         elif table_index == 0 and self.ui.searchbar_PS.text() == "":
-            util.sort_metadata(curr_sort[0], self.data_PS, curr_sort[1])
+            util.sort_metadata(curr_sort[0], self.ps.get_data_ps(),
+                               curr_sort[1])
             self.set_data()
         # ->Case 2.2: Sorting on the PS tab with the search bar containing
         #             text.
         elif table_index == 0 and self.ui.searchbar_PS.text() != "":
             if self.search_data_PS is None:
-                self.search_data_PS = self.data_PS
+                self.search_data_PS = self.ps.get_data_ps()
             util.sort_metadata(curr_sort[0], self.search_data_PS,
                                curr_sort[1])
             self.set_data(True)

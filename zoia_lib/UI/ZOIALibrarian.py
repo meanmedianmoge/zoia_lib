@@ -331,11 +331,7 @@ class Ui_MainWindow(object):
         self.back_btn_local.setObjectName(u"back_btn_local")
         self.back_btn_local.setCursor(QCursor(Qt.PointingHandCursor))
         self.back_btn_local.setMouseTracking(True)
-        self.back_btn_local.setStyleSheet(u"QPushButton{\n"
-"border-top-left-radius: 10px 5px;\n"
-"padding: 2px 25px 2px 25px;\n"
-"border: 1px solid black;\n"
-"}")
+        self.back_btn_local.setStyleSheet(u"")
 
         self.horizontalLayout_10.addWidget(self.back_btn_local)
 
@@ -355,11 +351,7 @@ class Ui_MainWindow(object):
         self.check_for_updates_btn.setObjectName(u"check_for_updates_btn")
         self.check_for_updates_btn.setCursor(QCursor(Qt.PointingHandCursor))
         self.check_for_updates_btn.setMouseTracking(True)
-        self.check_for_updates_btn.setStyleSheet(u"QPushButton{\n"
-"border-top-right-radius: 10px 5px;\n"
-"padding: 2px 5px 2px 5px;\n"
-"border: 1px solid black;\n"
-"}")
+        self.check_for_updates_btn.setStyleSheet(u"")
 
         self.horizontalLayout_10.addWidget(self.check_for_updates_btn)
 
@@ -412,12 +404,7 @@ class Ui_MainWindow(object):
         self.update_patch_notes.setObjectName(u"update_patch_notes")
         self.update_patch_notes.setCursor(QCursor(Qt.PointingHandCursor))
         self.update_patch_notes.setMouseTracking(True)
-        self.update_patch_notes.setStyleSheet(u"QPushButton{\n"
-"border-top-right-radius: 10px 5px;\n"
-"border-top-left-radius: 10px 5px;\n"
-"padding: 2px 2px 2px 2px;\n"
-"border: 1px solid black;\n"
-"}")
+        self.update_patch_notes.setStyleSheet(u"")
 
         self.verticalLayout_12.addWidget(self.update_patch_notes)
 
@@ -1215,7 +1202,7 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(accessibility)
         self.refresh_pch_btn.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"This button will refresh the data in the PatchStorage patch table with the latest patches on PatchStorage should the list ever become out of sync.", None))
 #endif // QT_CONFIG(accessibility)
-        self.refresh_pch_btn.setText(QCoreApplication.translate("MainWindow", u"Refresh patches", None))
+        self.refresh_pch_btn.setText(QCoreApplication.translate("MainWindow", u"Refresh Patches", None))
         ___qtablewidgetitem = self.table_PS.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"Title", None));
         ___qtablewidgetitem1 = self.table_PS.horizontalHeaderItem(1)

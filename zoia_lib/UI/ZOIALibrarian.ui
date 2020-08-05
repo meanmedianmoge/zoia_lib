@@ -245,7 +245,7 @@ border: 1px solid black;
 }</string>
                            </property>
                            <property name="text">
-                            <string>Refresh patches</string>
+                            <string>Refresh Patches</string>
                            </property>
                           </widget>
                          </item>
@@ -304,11 +304,11 @@ border: 1px solid black;
                          <attribute name="horizontalHeaderCascadingSectionResizes">
                           <bool>true</bool>
                          </attribute>
-                         <attribute name="horizontalHeaderDefaultSectionSize">
-                          <number>100</number>
-                         </attribute>
                          <attribute name="horizontalHeaderMinimumSectionSize">
                           <number>0</number>
+                         </attribute>
+                         <attribute name="horizontalHeaderDefaultSectionSize">
+                          <number>100</number>
                          </attribute>
                          <attribute name="horizontalHeaderStretchLastSection">
                           <bool>true</bool>
@@ -468,11 +468,7 @@ border: 1px solid black;
                       <string>When clicked, exits out of the Version History for a patch and returns to the full list of patches currently stored in the ZOIA Librarian</string>
                      </property>
                      <property name="styleSheet">
-                      <string notr="true">QPushButton{
-border-top-left-radius: 10px 5px;
-padding: 2px 25px 2px 25px;
-border: 1px solid black;
-}</string>
+                      <string notr="true"/>
                      </property>
                      <property name="text">
                       <string>Back</string>
@@ -531,11 +527,7 @@ border: 1px solid black;
                       <string>Automatically checks for updates to any patches listed in the Local Storage View table when clicked. Should any be found, a popup will let you know how many patches were updated.</string>
                      </property>
                      <property name="styleSheet">
-                      <string notr="true">QPushButton{
-border-top-right-radius: 10px 5px;
-padding: 2px 5px 2px 5px;
-border: 1px solid black;
-}</string>
+                      <string notr="true"/>
                      </property>
                      <property name="text">
                       <string>Check for updates</string>
@@ -579,11 +571,11 @@ border: 1px solid black;
                    <attribute name="horizontalHeaderCascadingSectionResizes">
                     <bool>true</bool>
                    </attribute>
-                   <attribute name="horizontalHeaderDefaultSectionSize">
-                    <number>100</number>
-                   </attribute>
                    <attribute name="horizontalHeaderMinimumSectionSize">
                     <number>10</number>
+                   </attribute>
+                   <attribute name="horizontalHeaderDefaultSectionSize">
+                    <number>100</number>
                    </attribute>
                    <attribute name="horizontalHeaderStretchLastSection">
                     <bool>true</bool>
@@ -591,10 +583,10 @@ border: 1px solid black;
                    <attribute name="verticalHeaderVisible">
                     <bool>false</bool>
                    </attribute>
-                   <attribute name="verticalHeaderDefaultSectionSize">
+                   <attribute name="verticalHeaderMinimumSectionSize">
                     <number>0</number>
                    </attribute>
-                   <attribute name="verticalHeaderMinimumSectionSize">
+                   <attribute name="verticalHeaderDefaultSectionSize">
                     <number>0</number>
                    </attribute>
                    <row/>
@@ -655,12 +647,7 @@ border: 1px solid black;
                     <string>When clicked, updates the patch notes for the currently selected patch. Patch notes can be add directly below in the Additional Patch Notes Display. </string>
                    </property>
                    <property name="styleSheet">
-                    <string notr="true">QPushButton{
-border-top-right-radius: 10px 5px;
-border-top-left-radius: 10px 5px;
-padding: 2px 2px 2px 2px;
-border: 1px solid black;
-}</string>
+                    <string notr="true"/>
                    </property>
                    <property name="text">
                     <string>Update Patch Notes</string>

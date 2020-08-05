@@ -1,3 +1,6 @@
+import json
+import os
+
 from zoia_lib.common import errors
 
 
@@ -123,3 +126,31 @@ def search_patches(data, query):
             continue
 
     return hits
+
+
+def add_test_patch(name, idx, path):
+    """Note: This method is for testing purposes
+    and will be deleted once a release candidate
+    is prepared.
+    Adds a test patch that can be used for unit
+    testing purposes.
+    name: The name of the patch, to be used for the title attribute
+          in the JSON metadata.
+    idx: The id number to be used for the patch.
+    """
+
+    if os.path.sep in name:
+        dr, name = name.split(os.path.sep)
+        pch = os.path.join(path, "{}".format(dr))
+    else:
+        pch = os.path.join(path, "{}".format(name))
+
+    if not os.path.isdir(pch):
+        os.mkdir(pch)
+
+    name_bin = os.path.join(pch, "{}.bin".format(name))
+    with open(name_bin, "wb") as f:
+        f.write(b"Test")
+    name_json = os.path.join(pch, "{}.json".format(name))
+    with open(name_json, "w") as jf:
+        json.dump({"id": idx, "title": "Test", "created_at": "test"}, jf)

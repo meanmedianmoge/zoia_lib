@@ -241,12 +241,11 @@ class ZOIALibrarianBank(QMainWindow):
                                      "they have all been deleted from the "
                                      "ZOIA Librarian.")
                 else:
-                    self.msg.setText(
-                        "Successful exports: {}\nFailed exports: {}\n"
-                        "Failures occur when the Bank contains a patch that "
-                        "has been deleted from the ZOIA Librarian."
-                        "".format(len(self.data_banks)) - len(fails),
-                        len(fails))
+                    self.msg.setText("Successful exports: {}\nFailed exports: "
+                                     "{}\nFailures occur when the Bank "
+                                     "contains a patch that has been deleted "
+                                     "from the ZOIA Librarian".format(
+                        len(self.data_banks)) - len(fails), len(fails))
                     temp = "Here is a list of patches that failed to export:\n"
                     for slot in fails:
                         if slot < 32:
@@ -291,6 +290,9 @@ class ZOIALibrarianBank(QMainWindow):
 
         swap = False
 
+        if dest > 63:
+            dest -= 64
+
         # Setup the new item.
         if src < 32:
             idx = self.ui.table_bank_left.cellWidget(src, 1).objectName()
@@ -329,7 +331,6 @@ class ZOIALibrarianBank(QMainWindow):
             })
         else:
             # We are doing a move.
-
             self.data_banks.append({
                 "slot": dest,
                 "id": idx
@@ -593,7 +594,7 @@ class ZOIALibrarianBank(QMainWindow):
                                     elif temp1 is None and temp2 is not None:
                                         self.move_patch_bank(i, j)
                                     elif temp1 is not None and temp2 is None or \
-                                            temp1 is not None and temp2 is not\
+                                            temp1 is not None and temp2 is not \
                                             None:
                                         self.move_patch_bank(j, i)
                                     elif temp1 is None and temp2 is not None:
@@ -620,7 +621,7 @@ class ZOIALibrarianBank(QMainWindow):
                                 and i != first_item_index and temp_right.text()
                                 == first_item_text) or \
                                     (temp_left is not None and temp_left.text()
-                                        == first_item_text):
+                                     == first_item_text):
                                 # We found the first item!
                                 row = sorted(self.rows_right)[-1].row()
                                 row = int('%d' % row) + 32
@@ -631,14 +632,14 @@ class ZOIALibrarianBank(QMainWindow):
                                         i += 1
                                     if i > 31:
                                         temp1 = self.ui.table_bank_right.item(
-                                            j,
+                                            j - 32,
                                             0)
                                         temp2 = self.ui.table_bank_left.item(
                                             i - 32,
                                             0)
                                     else:
                                         temp1 = self.ui.table_bank_right.item(
-                                            j,
+                                            j - 32,
                                             0)
                                         temp2 = self.ui.table_bank_right.item(
                                             i,
@@ -646,14 +647,18 @@ class ZOIALibrarianBank(QMainWindow):
                                     if temp1 is None and temp2 is None:
                                         continue
                                     elif temp1 is None and temp2 is not None:
-                                        self.move_patch_bank(j, i)
+                                        self.move_patch_bank(i, j)
                                     elif temp1 is not None and temp2 is None or \
                                             temp1 is not None and temp2 is not None:
-                                        self.move_patch_bank(i, j)
-                                    elif temp1 is None and temp2 is not None:
                                         self.move_patch_bank(j, i)
+                                    elif temp1 is None and temp2 is not None:
+                                        self.move_patch_bank(i, j)
                     self.rows_left = []
                     self.rows_right = []
+                    while self.ui.table_bank_left.rowCount() > 32:
+                        self.ui.table_bank_left.removeRow(32)
+                    while self.ui.table_bank_right.rowCount() > 32:
+                        self.ui.table_bank_right.removeRow(32)
 
     def remove_bank_item(self):
         """ Removes an item from one of the bank tables.

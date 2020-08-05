@@ -311,8 +311,7 @@ class PatchSave(Patch):
         title = title.replace("_", " ")
         title = title.strip()
 
-        if version:
-            patch_id = self.generate_patch_id(path)
+        patch_id = self.generate_patch_id(path)
 
         count = 1 if not os.path.isdir(path) else len(os.listdir(path))
         for i in range(count):

@@ -196,6 +196,9 @@ class ZOIALibrarianSD(QMainWindow):
         self.ui.table_sd_left.clearSelection()
         self.ui.table_sd_right.clearSelection()
 
+        if dest > 63:
+            dest -= 64
+
         # We need to find out if we are just doing a simple move or a swap.
         if dest < 10:
             dest = str("00{}".format(dest))
@@ -207,8 +210,6 @@ class ZOIALibrarianSD(QMainWindow):
             src = str("0{}".format(src))
         src_pch = None
         dest_pch = None
-        print(src)
-        print(dest)
         for pch in os.listdir(self.sd_path_full):
             if pch[:3] == src:
                 src_pch = pch
@@ -448,25 +449,32 @@ class ZOIALibrarianSD(QMainWindow):
                                     i = i + (j - first_item_index)
                                 else:
                                     i += 1
+                                print(j)
                                 if i > 31:
-                                    temp1 = self.ui.table_sd_right.item(j, 0)
+                                    temp1 = self.ui.table_sd_right.item(j - 32,
+                                                                        0)
                                     temp2 = self.ui.table_sd_left.item(i - 32,
                                                                        0)
                                 else:
-                                    temp1 = self.ui.table_sd_right.item(j, 0)
+                                    temp1 = self.ui.table_sd_right.item(j - 32,
+                                                                        0)
                                     temp2 = self.ui.table_sd_right.item(i, 0)
                                 if temp1 is None and temp2 is None:
                                     continue
                                 elif temp1 is None and temp2 is not None:
-                                    self.move_patch_sd(j, i)
+                                    self.move_patch_sd(i, j)
                                 elif temp1 is not None and temp2 is None or \
                                         temp1 is not None and temp2 is not \
                                         None:
-                                    self.move_patch_sd(i, j)
-                                elif temp1 is None and temp2 is not None:
                                     self.move_patch_sd(j, i)
+                                elif temp1 is None and temp2 is not None:
+                                    self.move_patch_sd(i, j)
                 self.rows_left = []
                 self.rows_right = []
+                while self.ui.table_sd_left.rowCount() > 32:
+                    self.ui.table_sd_left.removeRow(32)
+                while self.ui.table_sd_right.rowCount() > 32:
+                    self.ui.table_sd_right.removeRow(32)
 
     def remove_sd(self):
         """ Removes a patch that is stored on a user's SD card.
