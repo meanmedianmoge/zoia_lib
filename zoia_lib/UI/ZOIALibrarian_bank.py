@@ -707,12 +707,10 @@ class ZOIALibrarianBank(QMainWindow):
         # Check to see if we should disable export and save buttons.
         item = False
         for i in range(64):
-            if i < 32:
-                if self.ui.table_bank_left.cellWidget(i, 1) is not None:
-                    item = True
-                    break
-            else:
-                if self.ui.table_bank_right.cellWidget(i - 32, 1) is not None:
-                    item = True
-                    break
+            if i < 32 and self.ui.table_bank_left.cellWidget(i, 1) is not None:
+                item = True
+                break
+            elif self.ui.table_bank_right.cellWidget(i - 32, 1) is not None:
+                item = True
+                break
         return item

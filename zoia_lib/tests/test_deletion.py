@@ -10,6 +10,7 @@ test_path = os.path.join(os.getcwd(), "zoia_lib", "tests")
 
 delete_pch = PatchDelete()
 
+
 class TestDeletion(unittest.TestCase):
     """ This class is responsible for testing the various deletion
     methods that are to be used on data stored in the backend
@@ -21,7 +22,6 @@ class TestDeletion(unittest.TestCase):
     """
 
     def setUp(self):
-        backend_path = test_path
         # Create a test patch to delete.
         add_test_patch("22222", 22222, delete_pch.back_path)
 
@@ -31,7 +31,7 @@ class TestDeletion(unittest.TestCase):
         # Create a version directory with 3 versions
         for i in range(1, 4):
             add_test_patch(os.path.join("22224", "22224_v{}".format(i)),
-                                22224, delete_pch.back_path)
+                           22224, delete_pch.back_path)
 
     def tearDown(self):
         # Clean up everything (in case it wasn't deleted properly).
@@ -190,10 +190,12 @@ class TestDeletion(unittest.TestCase):
         self.assertRaises(exc, delete_pch.delete_full_patch_directory,
                           "IamNotAPatch")
         self.assertRaises(exc, delete_pch.delete_full_patch_directory, None)
-        self.assertRaises(exc, delete_pch.delete_full_patch_directory, "22222.bin")
+        self.assertRaises(exc, delete_pch.delete_full_patch_directory,
+                          "22222.bin")
         self.assertRaises(exc, delete_pch.delete_full_patch_directory,
                           "22224_v1.bin")
-        self.assertRaises(exc, delete_pch.delete_full_patch_directory, "22224_v1")
+        self.assertRaises(exc, delete_pch.delete_full_patch_directory,
+                          "22224_v1")
 
         # Try to delete a patch directory.
         delete_pch.delete_full_patch_directory("22222")
@@ -245,7 +247,8 @@ class TestDeletion(unittest.TestCase):
         self.assertRaises(exc, delete_pch.delete_patch_sd,
                           "IamNotAPatch")
 
-        delete_pch.delete_patch_sd(os.path.join(test_path, "22222", "22222.bin"))
+        delete_pch.delete_patch_sd(22222, os.path.join(test_path, "22222",
+                                                       "22222.bin"))
         # Ensure it got deleted correctly.
         self.assertTrue("22222.bin" not in
                         os.listdir(os.path.join(test_path, "22222")))

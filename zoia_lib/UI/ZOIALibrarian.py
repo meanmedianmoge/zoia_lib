@@ -273,7 +273,7 @@ class Ui_MainWindow(object):
         self.table_PS.setColumnCount(5)
         self.table_PS.horizontalHeader().setCascadingSectionResizes(True)
         self.table_PS.horizontalHeader().setMinimumSectionSize(0)
-        self.table_PS.horizontalHeader().setDefaultSectionSize(100)
+        self.table_PS.horizontalHeader().setDefaultSectionSize(0)
         self.table_PS.horizontalHeader().setStretchLastSection(True)
         self.table_PS.verticalHeader().setVisible(False)
 
@@ -331,7 +331,11 @@ class Ui_MainWindow(object):
         self.back_btn_local.setObjectName(u"back_btn_local")
         self.back_btn_local.setCursor(QCursor(Qt.PointingHandCursor))
         self.back_btn_local.setMouseTracking(True)
-        self.back_btn_local.setStyleSheet(u"")
+        self.back_btn_local.setStyleSheet(u"QPushButton{\n"
+"border-top-left-radius: 10px 5px;\n"
+"padding: 2px 25px 2px 25px;\n"
+"border: 1px solid black;\n"
+"}")
 
         self.horizontalLayout_10.addWidget(self.back_btn_local)
 
@@ -351,7 +355,11 @@ class Ui_MainWindow(object):
         self.check_for_updates_btn.setObjectName(u"check_for_updates_btn")
         self.check_for_updates_btn.setCursor(QCursor(Qt.PointingHandCursor))
         self.check_for_updates_btn.setMouseTracking(True)
-        self.check_for_updates_btn.setStyleSheet(u"")
+        self.check_for_updates_btn.setStyleSheet(u"QPushButton{\n"
+"border-top-right-radius: 10px 5px;\n"
+"padding: 2px 5px 2px 5px;\n"
+"border: 1px solid black;\n"
+"}")
 
         self.horizontalLayout_10.addWidget(self.check_for_updates_btn)
 
@@ -385,8 +393,8 @@ class Ui_MainWindow(object):
         self.table_local.setRowCount(1)
         self.table_local.setColumnCount(6)
         self.table_local.horizontalHeader().setCascadingSectionResizes(True)
-        self.table_local.horizontalHeader().setMinimumSectionSize(10)
-        self.table_local.horizontalHeader().setDefaultSectionSize(100)
+        self.table_local.horizontalHeader().setMinimumSectionSize(0)
+        self.table_local.horizontalHeader().setDefaultSectionSize(0)
         self.table_local.horizontalHeader().setStretchLastSection(True)
         self.table_local.verticalHeader().setVisible(False)
         self.table_local.verticalHeader().setMinimumSectionSize(0)
@@ -404,7 +412,12 @@ class Ui_MainWindow(object):
         self.update_patch_notes.setObjectName(u"update_patch_notes")
         self.update_patch_notes.setCursor(QCursor(Qt.PointingHandCursor))
         self.update_patch_notes.setMouseTracking(True)
-        self.update_patch_notes.setStyleSheet(u"")
+        self.update_patch_notes.setStyleSheet(u"QPushButton{\n"
+"border-top-right-radius: 10px 5px;\n"
+"border-top-left-radius: 10px 5px;\n"
+"padding: 2px 2px 2px 2px;\n"
+"border: 1px solid black;\n"
+"}")
 
         self.verticalLayout_12.addWidget(self.update_patch_notes)
 
@@ -988,6 +1001,7 @@ class Ui_MainWindow(object):
         self.table_bank_local.setColumnCount(4)
         self.table_bank_local.horizontalHeader().setCascadingSectionResizes(True)
         self.table_bank_local.horizontalHeader().setMinimumSectionSize(0)
+        self.table_bank_local.horizontalHeader().setDefaultSectionSize(0)
         self.table_bank_local.horizontalHeader().setStretchLastSection(True)
         self.table_bank_local.verticalHeader().setVisible(False)
         self.table_bank_local.verticalHeader().setMinimumSectionSize(0)

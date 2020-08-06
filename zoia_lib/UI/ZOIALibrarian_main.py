@@ -32,11 +32,9 @@ class ZOIALibrarianMain(QMainWindow):
     application. It allows users to interact with the various backend
     functions available. These include searching, downloading, sorting,
     and exporting patches; among other functions.
-
     Any changes made to the .ui file will not be reflected unless the
     following command is run from the UI directory:
         pyside2-uic.exe ZOIALibrarian.ui -o ZOIALibrarian.py
-
     Known issues:
      - Sorting order is not consistently maintained after various
        operations.
@@ -71,7 +69,8 @@ class ZOIALibrarianMain(QMainWindow):
                                   delete)
         self.bank = ZOIALibrarianBank(self.ui, self.backend_path, self.msg)
         self.util = ZOIALibrarianUtil(self.ui)
-        self.ps = ZOIALibrarianPS(self.ui, api, self.backend_path)
+        self.ps = ZOIALibrarianPS(self.ui, api, self.backend_path, self.msg,
+                                  save)
 
         self.patch_cache = []
         self.search_data_PS = None
@@ -218,7 +217,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.update_local_patches)
         self.ui.actionImport_Version_History_directory.triggered.connect(
             self.version_import)
-        self.ui.refresh_pch_btn.clicked.connect(self.reload_ps)
+        self.ui.refresh_pch_btn.clicked.connect(self.ps.reload_ps)
         self.ui.update_patch_notes.clicked.connect(self.update_patch_notes)
         self.ui.actionImport_A_Patch.triggered.connect(self.import_patch)
         self.ui.table_local.installEventFilter(self)
@@ -338,10 +337,8 @@ class ZOIALibrarianMain(QMainWindow):
         when the app begins, whenever a tab is returned to, whenever a
         search is initiated within a tab, or whenever a version history
         is expanded.
-
         This is for use with table_PS, table_local, and table_bank. For
         other tables, please see set_data_sd().
-
         search: True if we need are setting the data after a search has
                 initiated, False otherwise. Defaults to False.
         version: True if we are using patch version data,
@@ -455,7 +452,7 @@ class ZOIALibrarianMain(QMainWindow):
                 dwn = QPushButton("Click me\nto download!", self)
                 dwn.setObjectName(str(data[i]["id"]))
                 dwn.setFont(self.ui.table_PS.horizontalHeader().font())
-                dwn.clicked.connect(self.initiate_download)
+                dwn.clicked.connect(self.ps.initiate_download)
                 # Only enable it if we haven't already downloaded the patch.
                 if (str(data[i]["id"])) in os.listdir(self.backend_path):
                     dwn.setEnabled(False)
@@ -517,7 +514,6 @@ class ZOIALibrarianMain(QMainWindow):
     def get_version_patches(self, context):
         """ Retrieves the versions of a patch that is locally stored to
         a user's backend local storage.
-
         context: True for the Local Storage View tab, False for the
                  Banks tab.
         """
@@ -550,42 +546,11 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.text_browser_bank.setText("")
         self.sort_and_set()
 
-    def initiate_download(self):
-        """ Attempts to download a patch from the PS API. Once the
-        download completes, it will be saved to the backend application
-        directory.
-
-        Currently, only patches uploaded as .bin or .zip files will
-        successfully download. Support for additional file formats will
-        be implemented in subsequent releases.
-        """
-
-        self.ui.statusbar.showMessage("Starting download...",
-                                      timeout=5000)
-
-        # TODO Replace with FCFS thread scheduling
-        try:
-            save.save_to_backend(api.download(str(
-                self.sender().objectName())))
-            self.sender().setEnabled(False)
-            self.sender().setText("Downloaded!")
-            self.ui.statusbar.showMessage("Download complete!", timeout=5000)
-        except errors.SavingError:
-            self.msg.setWindowTitle("Invalid File Type")
-            self.msg.setIcon(QMessageBox.Information)
-            self.msg.setText("Unfortunately, that patch is not in a "
-                             "supported format.")
-            self.msg.setInformativeText("Supported formats are .bin and .zip")
-            self.msg.setStandardButtons(QMessageBox.Ok)
-            self.msg.exec_()
-            self.msg.setInformativeText(None)
-
     def initiate_export(self):
         """ Attempts to export a patch saved in the backend to an SD
         card. This requires that the user has previously set their SD
         card path using sd_path(). Should the patch be missing, a
         message prompt will inform the user that it must be specified.
-
         The application will ask for a slot number, and this is forced
         to be between 0 and 63 inclusive. Should the user specify a slot
         and the application detects that the slot is occupied by another
@@ -734,10 +699,8 @@ class ZOIALibrarianMain(QMainWindow):
         """ Queries the PS API for additional patch information whenever
         a patch is selected in the PS table or local table. Information
         is displayed via HTML.
-
         Should the patch contain multiple versions, a call to
         display_patch_versions is ran instead.
-
         Currently triggered via a radio button selection.
         """
 
@@ -827,7 +790,6 @@ class ZOIALibrarianMain(QMainWindow):
     def display_patch_versions(self, context):
         """ Displays the contents of a patch that has multiple versions.
         Currently triggered via a button press.
-
         context: True for the Local Storage View tab, False for the
                  Banks tab.
         """
@@ -846,25 +808,6 @@ class ZOIALibrarianMain(QMainWindow):
             self.ui.back_btn_bank.setEnabled(True)
             # Prepare the table.
             self.get_version_patches(False)
-
-    def reload_ps(self):
-        """ Reloads the PS table view to accurately reflect new uploads.
-        Currently triggered via a menu action.
-        """
-
-        # Get the new patch metadata that we don't have (if any).
-        self.ui.refresh_pch_btn.setEnabled(False)
-        with open(os.path.join(self.backend_path, "data.json"), "w") as f:
-            f.write(json.dumps(self.api.get_all_patch_data_init()))
-        self.ui.searchbar_PS.setText("")
-        self.sort_and_set()
-        self.ui.refresh_pch_btn.setEnabled(True)
-        self.ui.statusbar.showMessage("Patch list refreshed!", timeout=5000)
-        self.msg.setWindowTitle("Patches Refreshed")
-        self.msg.setText("The PatchStorage patch list has been refreshed.")
-        self.msg.setIcon(QMessageBox.Information)
-        self.msg.setStandardButtons(QMessageBox.Ok)
-        self.msg.exec_()
 
     def search(self):
         """ Initiates a data search for the metadata that is retrieved
@@ -1026,7 +969,6 @@ class ZOIALibrarianMain(QMainWindow):
     def update_local_patches(self):
         """ Attempts to update any patch that is stored in the user's
         backend directory.
-
         TODO List which patches were updated.
         """
 
@@ -1230,7 +1172,6 @@ class ZOIALibrarianMain(QMainWindow):
     def eventFilter(self, o, e):
         """ Deals with events that originate from various widgets
         present in the GUI.
-
         o: The source object that triggered the event.
         e: The event that was triggered.
         """
@@ -1302,7 +1243,6 @@ class ZOIALibrarianMain(QMainWindow):
     def update_tags_cats(self, text, mode, idx):
         """ Updates the tags or categories for a locally downloaded
         patch.
-
         text: The text used to discern tags and categories from.
         mode: True for tags update, False for categories update.
         """
