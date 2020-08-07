@@ -3,6 +3,7 @@ import os
 import platform
 
 from PySide2.QtCore import QEvent
+from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QTableWidgetItem, QPushButton, QFileDialog, \
     QMessageBox, QInputDialog, QTableWidgetSelectionRange, QMainWindow
 
@@ -159,14 +160,14 @@ class ZOIALibrarianBank(QMainWindow):
         self.ui.btn_export_bank.setEnabled(True)
         self.ui.btn_save_bank.setEnabled(True)
 
-    def save_bank(self):
+    def save_bank(self, window):
         """ Saves a Bank to the backend application directory.
         Currently triggered via a button press.
         """
 
         # Ask for a name
         name, ok = QInputDialog().getText(
-            self, "Save Bank", "Please enter a name for the Bank:")
+            window, "Save Bank", "Please enter a name for the Bank:")
         if ok:
             self.get_bank_data()
             if "{}.json".format(name) in \
@@ -187,7 +188,7 @@ class ZOIALibrarianBank(QMainWindow):
                 f.write(json.dumps(self.data_banks))
             self.ui.btn_load_bank.setEnabled(True)
 
-    def export_bank(self, sd, export):
+    def export_bank(self, sd, export, window):
         """ Saves a Bank to the backend application directory.
         Currently triggered via a button press.
 
@@ -204,35 +205,32 @@ class ZOIALibrarianBank(QMainWindow):
         else:
             fails = []
             # Ask for a name
-            while True:
-                name, ok = QInputDialog().getText(
-                    self, "Export Bank", "Please enter a name for the Bank:")
-                if ok and name not in os.listdir(sd.get_sd_root()):
+            name, ok = QInputDialog.getText(
+                window, "Export Bank", "Please enter a name for the Bank:")
+            if ok and name not in os.listdir(sd.get_sd_root()):
+                self.ui.statusbar.showMessage("Patches be movin'",
+                                              timeout=1000)
+                self.get_bank_data()
+                fails = export.export_bank(self.data_banks,
+                                           sd.get_sd_root(), name)
+            elif ok and name in os.listdir(sd.get_sd_root()):
+                self.msg.setWindowTitle("Directory exists")
+                self.msg.setIcon(QMessageBox.Warning)
+                self.msg.setText(
+                    "A directory with that name already exists.")
+                self.msg.setInformativeText(
+                    "Would you like to overwrite it?")
+                self.msg.setStandardButtons(
+                    QMessageBox.Yes | QMessageBox.No)
+                value = self.msg.exec_()
+                if value == QMessageBox.Yes:
                     self.ui.statusbar.showMessage("Patches be movin'",
                                                   timeout=1000)
                     self.get_bank_data()
-                    fails = export.export_bank(self.data_banks,
-                                               sd.get_sd_root(), name)
-                    break
-                elif ok and name in os.listdir(sd.get_sd_root()):
-                    self.msg.setWindowTitle("Directory exists")
-                    self.msg.setIcon(QMessageBox.Warning)
-                    self.msg.setText(
-                        "A directory with that name already exists.")
-                    self.msg.setInformativeText(
-                        "Would you like to overwrite it?")
-                    self.msg.setStandardButtons(
-                        QMessageBox.Yes | QMessageBox.No)
-                    value = self.msg.exec_()
-                    if value == QMessageBox.Yes:
-                        self.ui.statusbar.showMessage("Patches be movin'",
-                                                      timeout=1000)
-                        self.get_bank_data()
-                        fails = export.export_bank(
-                            self.data_banks, sd.get_sd_root(), name, True)
-                        break
-                else:
-                    break
+                    fails = export.export_bank(
+                        self.data_banks, sd.get_sd_root(), name, True)
+            else:
+                return
             self.msg.setInformativeText("")
             if len(fails) == 0:
                 self.msg.setWindowTitle("Success!")
@@ -253,7 +251,7 @@ class ZOIALibrarianBank(QMainWindow):
                                      "{}\nFailures occur when the Bank "
                                      "contains a patch that has been deleted "
                                      "from the ZOIA Librarian".format(
-                        len(self.data_banks)) - len(fails), len(fails))
+                        len(self.data_banks) - len(fails), len(fails)))
                     temp = "Here is a list of patches that failed to export:\n"
                     for slot in fails:
                         if slot < 32:
@@ -678,7 +676,8 @@ class ZOIALibrarianBank(QMainWindow):
                 item = self.ui.table_bank_left.cellWidget(i, 1)
                 if item is None:
                     continue
-                elif item.objectName() == self.sender().objectName():
+                elif item.objectName() == self.sender().objectName() and \
+                        i == self.ui.table_bank_left.currentRow():
                     self.ui.table_bank_left.setItem(i, 0, QTableWidgetItem(
                         None))
                     self.ui.table_bank_left.setCellWidget(i, 1, None)
@@ -688,7 +687,8 @@ class ZOIALibrarianBank(QMainWindow):
                 item = self.ui.table_bank_right.cellWidget(i - 32, 1)
                 if item is None:
                     continue
-                elif item.objectName() == self.sender().objectName():
+                elif item.objectName() == self.sender().objectName() and \
+                        i - 32 == self.ui.table_bank_right.currentRow():
                     self.ui.table_bank_right.setItem(i - 32, 0,
                                                      QTableWidgetItem(None))
                     self.ui.table_bank_right.setCellWidget(i - 32, 1, None)

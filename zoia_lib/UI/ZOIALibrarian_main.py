@@ -239,9 +239,10 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.back_btn_local.clicked.connect(self.go_back)
         self.ui.back_btn_bank.clicked.connect(self.go_back)
         self.ui.btn_load_bank.clicked.connect(self.bank.load_bank)
-        self.ui.btn_save_bank.clicked.connect(self.bank.save_bank)
+        self.ui.btn_save_bank.clicked.connect(
+            lambda: self.bank.save_bank(self))
         self.ui.btn_export_bank.clicked.connect(
-            lambda: self.bank.export_bank(self.sd, export))
+            lambda: self.bank.export_bank(self.sd, export, self))
         self.ui.delete_folder_sd_btn.clicked.connect(
             lambda: self.sd.delete_sd_item(delete))
         self.ui.actionToggle_Dark_Mode_2.triggered.connect(
