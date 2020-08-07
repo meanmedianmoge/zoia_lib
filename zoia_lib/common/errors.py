@@ -30,6 +30,7 @@ class DeletionError(ZoiaLibError):
      - 401: Encountered a file extension when none was expected.
      - 402: Encountered a version extension when none was expected.
      - 403: Failed to encounter a file extension when one was expected.
+     - 404: Incorrect index provided for deletion purposes.
     """
 
     def __init__(self, patch, error_code=0):
@@ -44,6 +45,8 @@ class DeletionError(ZoiaLibError):
         elif error_code == 403:
             print(f'Patch {patch} does not contain a file extension, which is '
                   f'required when an SD card patch is being deleted.')
+        elif error_code == 404:
+            print(f'Expected an index of length 3, but got {patch} instead.')
         else:
             # Default case. We do not want to get here.
             print(f'Could not delete the file {patch} from the backend '
@@ -62,6 +65,8 @@ class SavingError(ZoiaLibError):
      - 503: Saving of a patch was attempted, but since that patch was
             already saved in the backend, no saving occurred.
      - 504: A file extension was expected but none was encountered.
+     - 505: A directory was requested to be created, yet it already
+            existed.
     """
 
     def __init__(self, patch, error_code=0):
@@ -79,6 +84,9 @@ class SavingError(ZoiaLibError):
         elif error_code == 504:
             print(f'Could not save the file {patch} because it lacked '
                   f'a file extension.')
+        elif error_code == 505:
+            print(f'Could not create a directory with id {patch} because it '
+                  f'already existed.')
         else:
             # Default case. We do not want to get here.
             print(f'Could not save the file {patch} from the backend '

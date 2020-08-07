@@ -6,15 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1616</width>
-    <height>1123</height>
+    <width>1567</width>
+    <height>1203</height>
    </rect>
   </property>
   <property name="focusPolicy">
    <enum>Qt::StrongFocus</enum>
   </property>
   <property name="windowTitle">
-   <string>ZOIA Librarian -  Beta 1</string>
+   <string>ZOIA Librarian -  Beta 2</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
   </property>
   <property name="tabShape">
    <enum>QTabWidget::Rounded</enum>
@@ -23,6 +26,9 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout_5">
     <property name="sizeConstraint">
      <enum>QLayout::SetNoConstraint</enum>
@@ -52,6 +58,27 @@
       </property>
       <item>
        <widget class="QTabWidget" name="tabs">
+        <property name="cursor">
+         <cursorShape>ArrowCursor</cursorShape>
+        </property>
+        <property name="mouseTracking">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="accessibleName">
+         <string>Tab List</string>
+        </property>
+        <property name="accessibleDescription">
+         <string>This list contains four tabs, PatchStorage View, Local Storage View, SD Card View, and Banks. It allows you to switch between tabs to access different features contained with the ZOIA Librarian.</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
         <property name="tabShape">
          <enum>QTabWidget::Rounded</enum>
         </property>
@@ -59,9 +86,18 @@
          <number>0</number>
         </property>
         <property name="movable">
-         <bool>true</bool>
+         <bool>false</bool>
+        </property>
+        <property name="tabBarAutoHide">
+         <bool>false</bool>
         </property>
         <widget class="QWidget" name="tab_ps">
+         <property name="toolTip">
+          <string/>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
          <attribute name="title">
           <string>PatchStorage View</string>
          </attribute>
@@ -83,6 +119,9 @@
           </property>
           <item>
            <widget class="QWidget" name="widget_5" native="true">
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
             <layout class="QHBoxLayout" name="horizontalLayout_6">
              <property name="spacing">
               <number>0</number>
@@ -155,6 +194,21 @@
                          </property>
                          <item>
                           <widget class="QLineEdit" name="searchbar_PS">
+                           <property name="toolTip">
+                            <string>Type and hit enter/return to search!</string>
+                           </property>
+                           <property name="statusTip">
+                            <string>Type and hit enter/return to search!</string>
+                           </property>
+                           <property name="accessibleName">
+                            <string>PatchStorage View search bar</string>
+                           </property>
+                           <property name="accessibleDescription">
+                            <string>Searches through the ZOIA patches currently hosted on PatchStorage for any that match what is written in the search query. Hit enter or return to initiate the search.</string>
+                           </property>
+                           <property name="styleSheet">
+                            <string notr="true"/>
+                           </property>
                            <property name="inputMask">
                             <string/>
                            </property>
@@ -165,8 +219,29 @@
                          </item>
                          <item>
                           <widget class="QPushButton" name="refresh_pch_btn">
+                           <property name="cursor">
+                            <cursorShape>PointingHandCursor</cursorShape>
+                           </property>
+                           <property name="mouseTracking">
+                            <bool>true</bool>
+                           </property>
+                           <property name="toolTip">
+                            <string>Click here to refresh the PatchStorage patch list.</string>
+                           </property>
+                           <property name="statusTip">
+                            <string>Click here to refresh the PatchStorage patch list.</string>
+                           </property>
+                           <property name="accessibleName">
+                            <string>Refresh PatchStorage patch list button</string>
+                           </property>
+                           <property name="accessibleDescription">
+                            <string>This button will refresh the data in the PatchStorage patch table with the latest patches on PatchStorage should the list ever become out of sync.</string>
+                           </property>
+                           <property name="styleSheet">
+                            <string notr="true"/>
+                           </property>
                            <property name="text">
-                            <string>Refresh patches</string>
+                            <string>Refresh Patches</string>
                            </property>
                           </widget>
                          </item>
@@ -174,6 +249,24 @@
                        </item>
                        <item>
                         <widget class="QTableWidget" name="table_PS">
+                         <property name="cursor" stdset="0">
+                          <cursorShape>ArrowCursor</cursorShape>
+                         </property>
+                         <property name="mouseTracking">
+                          <bool>false</bool>
+                         </property>
+                         <property name="accessibleName">
+                          <string>PatchStorage Table</string>
+                         </property>
+                         <property name="accessibleDescription">
+                          <string>Displays all of the ZOIA patches that are currently hosted on PatchStorage.</string>
+                         </property>
+                         <property name="styleSheet">
+                          <string notr="true"/>
+                         </property>
+                         <property name="frameShape">
+                          <enum>QFrame::StyledPanel</enum>
+                         </property>
                          <property name="frameShadow">
                           <enum>QFrame::Plain</enum>
                          </property>
@@ -195,6 +288,9 @@
                          <property name="horizontalScrollMode">
                           <enum>QAbstractItemView::ScrollPerPixel</enum>
                          </property>
+                         <property name="gridStyle">
+                          <enum>Qt::SolidLine</enum>
+                         </property>
                          <property name="rowCount">
                           <number>1</number>
                          </property>
@@ -204,6 +300,12 @@
                          <attribute name="horizontalHeaderCascadingSectionResizes">
                           <bool>true</bool>
                          </attribute>
+                         <attribute name="horizontalHeaderMinimumSectionSize">
+                          <number>0</number>
+                         </attribute>
+                         <attribute name="horizontalHeaderDefaultSectionSize">
+                          <number>0</number>
+                         </attribute>
                          <attribute name="horizontalHeaderStretchLastSection">
                           <bool>true</bool>
                          </attribute>
@@ -211,16 +313,48 @@
                           <bool>false</bool>
                          </attribute>
                          <row/>
-                         <column/>
-                         <column/>
-                         <column/>
-                         <column/>
-                         <column/>
+                         <column>
+                          <property name="text">
+                           <string>Title</string>
+                          </property>
+                         </column>
+                         <column>
+                          <property name="text">
+                           <string>Tags</string>
+                          </property>
+                         </column>
+                         <column>
+                          <property name="text">
+                           <string>Categories</string>
+                          </property>
+                         </column>
+                         <column>
+                          <property name="text">
+                           <string>Date Modified</string>
+                          </property>
+                         </column>
+                         <column>
+                          <property name="text">
+                           <string>Download</string>
+                          </property>
+                         </column>
                         </widget>
                        </item>
                       </layout>
                      </widget>
                      <widget class="QTextBrowser" name="text_browser_PS">
+                      <property name="statusTip">
+                       <string/>
+                      </property>
+                      <property name="accessibleName">
+                       <string>Additional Patch Notes Display</string>
+                      </property>
+                      <property name="accessibleDescription">
+                       <string>Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)</string>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true"/>
+                      </property>
                       <property name="frameShadow">
                        <enum>QFrame::Plain</enum>
                       </property>
@@ -248,6 +382,9 @@
          </layout>
         </widget>
         <widget class="QWidget" name="tab_ls">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
          <attribute name="title">
           <string>Local Storage View</string>
          </attribute>
@@ -308,6 +445,27 @@
                   <layout class="QHBoxLayout" name="horizontalLayout_10">
                    <item>
                     <widget class="QPushButton" name="back_btn_local">
+                     <property name="cursor">
+                      <cursorShape>PointingHandCursor</cursorShape>
+                     </property>
+                     <property name="mouseTracking">
+                      <bool>true</bool>
+                     </property>
+                     <property name="toolTip">
+                      <string>Click here to back to the full patch list.</string>
+                     </property>
+                     <property name="statusTip">
+                      <string>Click here to back to the full patch list.</string>
+                     </property>
+                     <property name="accessibleName">
+                      <string>Back button Local Storage View</string>
+                     </property>
+                     <property name="accessibleDescription">
+                      <string>When clicked, exits out of the Version History for a patch and returns to the full list of patches currently stored in the ZOIA Librarian</string>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true"/>
+                     </property>
                      <property name="text">
                       <string>Back</string>
                      </property>
@@ -315,6 +473,30 @@
                    </item>
                    <item>
                     <widget class="QLineEdit" name="searchbar_local">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="acceptDrops">
+                      <bool>false</bool>
+                     </property>
+                     <property name="toolTip">
+                      <string>Type and hit enter/return to search!</string>
+                     </property>
+                     <property name="statusTip">
+                      <string>Type and hit enter/return to search!</string>
+                     </property>
+                     <property name="accessibleName">
+                      <string>LocalStorage View search bar</string>
+                     </property>
+                     <property name="accessibleDescription">
+                      <string>Searches through the ZOIA patches currently saved in the ZOIA Librarian for any that match what is written in the search query. Hit enter or return to initiate the search.</string>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true"/>
+                     </property>
                      <property name="inputMask">
                       <string/>
                      </property>
@@ -322,6 +504,27 @@
                    </item>
                    <item>
                     <widget class="QPushButton" name="check_for_updates_btn">
+                     <property name="cursor">
+                      <cursorShape>PointingHandCursor</cursorShape>
+                     </property>
+                     <property name="mouseTracking">
+                      <bool>true</bool>
+                     </property>
+                     <property name="toolTip">
+                      <string>Click here to check for updates for all patches listed below.</string>
+                     </property>
+                     <property name="statusTip">
+                      <string>Click here to check for updates for all patches listed below.</string>
+                     </property>
+                     <property name="accessibleName">
+                      <string>Check for updates button</string>
+                     </property>
+                     <property name="accessibleDescription">
+                      <string>Automatically checks for updates to any patches listed in the Local Storage View table when clicked. Should any be found, a popup will let you know how many patches were updated.</string>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true"/>
+                     </property>
                      <property name="text">
                       <string>Check for updates</string>
                      </property>
@@ -331,6 +534,18 @@
                  </item>
                  <item>
                   <widget class="QTableWidget" name="table_local">
+                   <property name="mouseTracking">
+                    <bool>false</bool>
+                   </property>
+                   <property name="accessibleName">
+                    <string>Local Storage View table</string>
+                   </property>
+                   <property name="accessibleDescription">
+                    <string>Displays all of the patches that have been saved to the ZOIA Librarian</string>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true"/>
+                   </property>
                    <property name="sizeAdjustPolicy">
                     <enum>QAbstractScrollArea::AdjustToContents</enum>
                    </property>
@@ -349,19 +564,58 @@
                    <property name="columnCount">
                     <number>6</number>
                    </property>
+                   <attribute name="horizontalHeaderCascadingSectionResizes">
+                    <bool>true</bool>
+                   </attribute>
+                   <attribute name="horizontalHeaderMinimumSectionSize">
+                    <number>0</number>
+                   </attribute>
+                   <attribute name="horizontalHeaderDefaultSectionSize">
+                    <number>0</number>
+                   </attribute>
                    <attribute name="horizontalHeaderStretchLastSection">
                     <bool>true</bool>
                    </attribute>
                    <attribute name="verticalHeaderVisible">
                     <bool>false</bool>
                    </attribute>
+                   <attribute name="verticalHeaderMinimumSectionSize">
+                    <number>0</number>
+                   </attribute>
+                   <attribute name="verticalHeaderDefaultSectionSize">
+                    <number>0</number>
+                   </attribute>
                    <row/>
-                   <column/>
-                   <column/>
-                   <column/>
-                   <column/>
-                   <column/>
-                   <column/>
+                   <column>
+                    <property name="text">
+                     <string>Title</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Tags</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Categories</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Date Modified</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Export</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Delete</string>
+                    </property>
+                   </column>
                   </widget>
                  </item>
                 </layout>
@@ -370,6 +624,27 @@
                 <layout class="QVBoxLayout" name="verticalLayout_12">
                  <item>
                   <widget class="QPushButton" name="update_patch_notes">
+                   <property name="cursor">
+                    <cursorShape>PointingHandCursor</cursorShape>
+                   </property>
+                   <property name="mouseTracking">
+                    <bool>true</bool>
+                   </property>
+                   <property name="toolTip">
+                    <string>Click here to update the patch notes for the currently selected patch.</string>
+                   </property>
+                   <property name="statusTip">
+                    <string>Click here to update the patch notes for the currently selected patch.</string>
+                   </property>
+                   <property name="accessibleName">
+                    <string>Update Patch Notes button</string>
+                   </property>
+                   <property name="accessibleDescription">
+                    <string>When clicked, updates the patch notes for the currently selected patch. Patch notes can be add directly below in the Additional Patch Notes Display. </string>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true"/>
+                   </property>
                    <property name="text">
                     <string>Update Patch Notes</string>
                    </property>
@@ -377,6 +652,15 @@
                  </item>
                  <item>
                   <widget class="QTextBrowser" name="text_browser_local">
+                   <property name="accessibleName">
+                    <string>Additional Patch Notes Display</string>
+                   </property>
+                   <property name="accessibleDescription">
+                    <string>Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)</string>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true"/>
+                   </property>
                    <property name="textInteractionFlags">
                     <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextEditable|Qt::TextSelectableByMouse</set>
                    </property>
@@ -398,8 +682,14 @@
          </layout>
         </widget>
         <widget class="QWidget" name="tab_sd">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
          <attribute name="title">
           <string>SD Card View</string>
+         </attribute>
+         <attribute name="toolTip">
+          <string>Switch to view your SD card within the ZOIA Librarian</string>
          </attribute>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
@@ -410,6 +700,9 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
             <property name="orientation">
              <enum>Qt::Vertical</enum>
             </property>
@@ -417,6 +710,15 @@
              <number>10</number>
             </property>
             <widget class="QTreeView" name="sd_tree">
+             <property name="accessibleName">
+              <string>SD Card Viewer</string>
+             </property>
+             <property name="accessibleDescription">
+              <string>Dispalys the contents of the previously specified SD Card (which is specified via the menu bar at File-&gt;Specify SD Card path, or by using Alt+S and then specifying that way).</string>
+             </property>
+             <property name="styleSheet">
+              <string notr="true"/>
+             </property>
              <property name="lineWidth">
               <number>10000</number>
              </property>
@@ -451,7 +753,7 @@
               <bool>true</bool>
              </property>
              <property name="wordWrap">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
              <property name="headerHidden">
               <bool>true</bool>
@@ -463,14 +765,79 @@
             <widget class="QWidget" name="layoutWidget_3">
              <layout class="QVBoxLayout" name="verticalLayout_11">
               <item>
-               <widget class="QPushButton" name="import_all_btn">
+               <widget class="QPushButton" name="delete_folder_sd_btn">
+                <property name="cursor">
+                 <cursorShape>PointingHandCursor</cursorShape>
+                </property>
+                <property name="mouseTracking">
+                 <bool>true</bool>
+                </property>
+                <property name="toolTip">
+                 <string>Click here to delete the currently selected item above from your SD card.</string>
+                </property>
+                <property name="statusTip">
+                 <string>Click here to delete the currently selected item above from your SD card.</string>
+                </property>
+                <property name="accessibleName">
+                 <string>Delete Selected Item from SD Card Tree View Button</string>
+                </property>
+                <property name="accessibleDescription">
+                 <string>Will attempt to delete the currently selected item in the SD tree view above from your SD card. Will create a popup if the currently selected item is a folder, at which point a warning will indicate that deletion will delete everything contained within. The options are yes to continue with the deletion and no to abort. </string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
                 <property name="text">
-                 <string>Import All Patches</string>
+                 <string>Delete Selected Item Above</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="import_all_btn">
+                <property name="cursor">
+                 <cursorShape>PointingHandCursor</cursorShape>
+                </property>
+                <property name="mouseTracking">
+                 <bool>true</bool>
+                </property>
+                <property name="toolTip">
+                 <string>Click here to import all patches currently listed below.</string>
+                </property>
+                <property name="statusTip">
+                 <string>Click here to import all patches currently listed below.</string>
+                </property>
+                <property name="accessibleName">
+                 <string>Import All Patches button</string>
+                </property>
+                <property name="accessibleDescription">
+                 <string>Attempts to import all of the patches listed in the tables below (SD card table left and SD card table right) into the ZOIA Librarian. This requires that a folder is selected from the SD Card Viewer above that contains patches.</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="text">
+                 <string>Import All Listed Patches Below</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="import_all_ver_btn">
+                <property name="cursor">
+                 <cursorShape>PointingHandCursor</cursorShape>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="text">
+                 <string>Import All Listed Patches Below As A Version History</string>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QSplitter" name="splitter_sd_hori">
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
                 </property>
@@ -478,8 +845,20 @@
                  <number>10</number>
                 </property>
                 <widget class="QTableWidget" name="table_sd_left">
+                 <property name="mouseTracking">
+                  <bool>false</bool>
+                 </property>
                  <property name="acceptDrops">
                   <bool>true</bool>
+                 </property>
+                 <property name="accessibleName">
+                  <string>SD Card Table left</string>
+                 </property>
+                 <property name="accessibleDescription">
+                  <string>Displays patches that would occupy slots 0-31 on a ZOIA</string>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true"/>
                  </property>
                  <property name="editTriggers">
                   <set>QAbstractItemView::NoEditTriggers</set>
@@ -497,7 +876,7 @@
                   <enum>Qt::IgnoreAction</enum>
                  </property>
                  <property name="selectionMode">
-                  <enum>QAbstractItemView::SingleSelection</enum>
+                  <enum>QAbstractItemView::ContiguousSelection</enum>
                  </property>
                  <property name="selectionBehavior">
                   <enum>QAbstractItemView::SelectRows</enum>
@@ -508,8 +887,14 @@
                  <property name="columnCount">
                   <number>3</number>
                  </property>
+                 <attribute name="horizontalHeaderMinimumSectionSize">
+                  <number>10</number>
+                 </attribute>
                  <attribute name="horizontalHeaderStretchLastSection">
                   <bool>true</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderMinimumSectionSize">
+                  <number>0</number>
                  </attribute>
                  <row>
                   <property name="text">
@@ -671,13 +1056,37 @@
                    <string>31</string>
                   </property>
                  </row>
-                 <column/>
-                 <column/>
-                 <column/>
+                 <column>
+                  <property name="text">
+                   <string>Patch</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Remove</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Import</string>
+                  </property>
+                 </column>
                 </widget>
                 <widget class="QTableWidget" name="table_sd_right">
+                 <property name="mouseTracking">
+                  <bool>false</bool>
+                 </property>
                  <property name="acceptDrops">
                   <bool>true</bool>
+                 </property>
+                 <property name="accessibleName">
+                  <string>SD Card Table right</string>
+                 </property>
+                 <property name="accessibleDescription">
+                  <string>Displays patches that would occupy slots 32-63 on a ZOIA</string>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true"/>
                  </property>
                  <property name="editTriggers">
                   <set>QAbstractItemView::NoEditTriggers</set>
@@ -686,7 +1095,7 @@
                   <enum>QAbstractItemView::DragDrop</enum>
                  </property>
                  <property name="selectionMode">
-                  <enum>QAbstractItemView::SingleSelection</enum>
+                  <enum>QAbstractItemView::ContiguousSelection</enum>
                  </property>
                  <property name="selectionBehavior">
                   <enum>QAbstractItemView::SelectRows</enum>
@@ -697,8 +1106,14 @@
                  <property name="columnCount">
                   <number>3</number>
                  </property>
+                 <attribute name="horizontalHeaderMinimumSectionSize">
+                  <number>10</number>
+                 </attribute>
                  <attribute name="horizontalHeaderStretchLastSection">
                   <bool>true</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderMinimumSectionSize">
+                  <number>0</number>
                  </attribute>
                  <row>
                   <property name="text">
@@ -860,9 +1275,21 @@
                    <string>63</string>
                   </property>
                  </row>
-                 <column/>
-                 <column/>
-                 <column/>
+                 <column>
+                  <property name="text">
+                   <string>Patch</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Remove</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Import</string>
+                  </property>
+                 </column>
                 </widget>
                </widget>
               </item>
@@ -879,8 +1306,14 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
          <attribute name="title">
           <string>Banks</string>
+         </attribute>
+         <attribute name="toolTip">
+          <string>Switch to view the Bank creator</string>
          </attribute>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
@@ -891,6 +1324,563 @@
             <property name="handleWidth">
              <number>10</number>
             </property>
+            <widget class="QWidget" name="layoutWidget_6">
+             <layout class="QVBoxLayout" name="verticalLayout">
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <item>
+                 <widget class="QPushButton" name="btn_save_bank">
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="mouseTracking">
+                   <bool>true</bool>
+                  </property>
+                  <property name="toolTip">
+                   <string>Click here to save your Bank.</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Click here to save your Bank.</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Save Bank button</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>When clicked, will open a popup asking for a Bank name, which will then be saved such that it can be loaded at a later time.</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
+                  <property name="text">
+                   <string>Save Bank</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="btn_load_bank">
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="mouseTracking">
+                   <bool>true</bool>
+                  </property>
+                  <property name="toolTip">
+                   <string>Click here to load a Bank.</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Click here to load a Bank.</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Load Bank button</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>When clicked, you will be prompted to select a Bank to load that has been created in a previous session using the ZOIA Librarian.</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
+                  <property name="text">
+                   <string>Load Bank</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="btn_export_bank">
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="mouseTracking">
+                   <bool>true</bool>
+                  </property>
+                  <property name="toolTip">
+                   <string>Click here to export a Bank as a folder to your SD card.</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Click here to export a Bank as a folder to your SD card.</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Export Bank button</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>When clicked, will open a popup asking for a Bank name, which will then be saved such that it can be exported to an SD card, should it have been specified previously.</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
+                  <property name="text">
+                   <string>Export Bank</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QSplitter" name="splitter_bank_tables">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="handleWidth">
+                 <number>10</number>
+                </property>
+                <widget class="QTableWidget" name="table_bank_left">
+                 <property name="mouseTracking">
+                  <bool>false</bool>
+                 </property>
+                 <property name="toolTip">
+                  <string/>
+                 </property>
+                 <property name="statusTip">
+                  <string>Drag and drop a patch here!</string>
+                 </property>
+                 <property name="accessibleName">
+                  <string>Bank Table left</string>
+                 </property>
+                 <property name="accessibleDescription">
+                  <string>Displays patches that would occupy slots 0-31 on a ZOIA</string>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true"/>
+                 </property>
+                 <property name="editTriggers">
+                  <set>QAbstractItemView::NoEditTriggers</set>
+                 </property>
+                 <property name="dragDropOverwriteMode">
+                  <bool>true</bool>
+                 </property>
+                 <property name="dragDropMode">
+                  <enum>QAbstractItemView::DragDrop</enum>
+                 </property>
+                 <property name="defaultDropAction">
+                  <enum>Qt::IgnoreAction</enum>
+                 </property>
+                 <property name="selectionMode">
+                  <enum>QAbstractItemView::ContiguousSelection</enum>
+                 </property>
+                 <property name="selectionBehavior">
+                  <enum>QAbstractItemView::SelectRows</enum>
+                 </property>
+                 <property name="rowCount">
+                  <number>32</number>
+                 </property>
+                 <property name="columnCount">
+                  <number>2</number>
+                 </property>
+                 <attribute name="horizontalHeaderMinimumSectionSize">
+                  <number>10</number>
+                 </attribute>
+                 <attribute name="horizontalHeaderStretchLastSection">
+                  <bool>true</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderMinimumSectionSize">
+                  <number>0</number>
+                 </attribute>
+                 <row>
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>1</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>2</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>3</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>4</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>5</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>6</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>7</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>8</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>9</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>10</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>11</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>12</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>13</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>14</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>15</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>16</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>17</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>18</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>19</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>20</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>21</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>22</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>23</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>24</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>25</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>26</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>27</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>28</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>29</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>30</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>31</string>
+                  </property>
+                 </row>
+                 <column>
+                  <property name="text">
+                   <string>Patch</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Remove</string>
+                  </property>
+                 </column>
+                </widget>
+                <widget class="QTableWidget" name="table_bank_right">
+                 <property name="mouseTracking">
+                  <bool>false</bool>
+                 </property>
+                 <property name="toolTip">
+                  <string/>
+                 </property>
+                 <property name="statusTip">
+                  <string>Drag and drop a patch here!</string>
+                 </property>
+                 <property name="accessibleName">
+                  <string>Bank table right</string>
+                 </property>
+                 <property name="accessibleDescription">
+                  <string>Displays patches that would occupy slots 32-63 on a ZOIA</string>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true"/>
+                 </property>
+                 <property name="editTriggers">
+                  <set>QAbstractItemView::NoEditTriggers</set>
+                 </property>
+                 <property name="dragDropOverwriteMode">
+                  <bool>true</bool>
+                 </property>
+                 <property name="dragDropMode">
+                  <enum>QAbstractItemView::DragDrop</enum>
+                 </property>
+                 <property name="defaultDropAction">
+                  <enum>Qt::IgnoreAction</enum>
+                 </property>
+                 <property name="selectionMode">
+                  <enum>QAbstractItemView::ContiguousSelection</enum>
+                 </property>
+                 <property name="selectionBehavior">
+                  <enum>QAbstractItemView::SelectRows</enum>
+                 </property>
+                 <property name="rowCount">
+                  <number>32</number>
+                 </property>
+                 <property name="columnCount">
+                  <number>2</number>
+                 </property>
+                 <attribute name="horizontalHeaderMinimumSectionSize">
+                  <number>10</number>
+                 </attribute>
+                 <attribute name="horizontalHeaderStretchLastSection">
+                  <bool>true</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderMinimumSectionSize">
+                  <number>0</number>
+                 </attribute>
+                 <row>
+                  <property name="text">
+                   <string>32</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>33</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>34</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>35</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>36</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>37</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>38</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>39</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>40</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>41</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>42</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>43</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>44</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>45</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>46</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>47</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>48</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>49</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>50</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>51</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>52</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>53</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>54</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>55</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>56</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>57</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>58</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>59</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>60</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>61</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>62</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>63</string>
+                  </property>
+                 </row>
+                 <column>
+                  <property name="text">
+                   <string>Patch</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Remove</string>
+                  </property>
+                 </column>
+                </widget>
+               </widget>
+              </item>
+             </layout>
+            </widget>
             <widget class="QWidget" name="layoutWidget_5">
              <layout class="QVBoxLayout" name="verticalLayout_9">
               <property name="spacing">
@@ -900,6 +1890,27 @@
                <layout class="QHBoxLayout" name="horizontalLayout_11">
                 <item>
                  <widget class="QPushButton" name="back_btn_bank">
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="mouseTracking">
+                   <bool>true</bool>
+                  </property>
+                  <property name="toolTip">
+                   <string>Click here to back to the full patch list.</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Click here to back to the full patch list.</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Back button Bank</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>When clicked, exits out of the Version History for a patch and returns to the full list of patches currently stored in the ZOIA Librarian</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
                   <property name="text">
                    <string>Back</string>
                   </property>
@@ -907,6 +1918,24 @@
                 </item>
                 <item>
                  <widget class="QLineEdit" name="searchbar_bank">
+                  <property name="toolTip">
+                   <string>Type and hit enter/return to search!</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Type and hit enter/return to search!</string>
+                  </property>
+                  <property name="whatsThis">
+                   <string/>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Banks search bar</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>Searches through the ZOIA patches currently saved in the ZOIA Librarian for any that match what is written in the search query. Hit enter or return to initiate the search.</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
                   <property name="inputMask">
                    <string/>
                   </property>
@@ -916,6 +1945,21 @@
               </item>
               <item>
                <widget class="QTableWidget" name="table_bank_local">
+                <property name="toolTip">
+                 <string/>
+                </property>
+                <property name="statusTip">
+                 <string>Drag a patch to one of the tables on the left!</string>
+                </property>
+                <property name="accessibleName">
+                 <string>Banks table</string>
+                </property>
+                <property name="accessibleDescription">
+                 <string>Displays all of the patches that have been saved to the ZOIA Librarian</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
                 <property name="sizeAdjustPolicy">
                  <enum>QAbstractScrollArea::AdjustToContents</enum>
                 </property>
@@ -946,22 +1990,59 @@
                 <property name="columnCount">
                  <number>4</number>
                 </property>
+                <attribute name="horizontalHeaderCascadingSectionResizes">
+                 <bool>true</bool>
+                </attribute>
+                <attribute name="horizontalHeaderMinimumSectionSize">
+                 <number>0</number>
+                </attribute>
+                <attribute name="horizontalHeaderDefaultSectionSize">
+                 <number>0</number>
+                </attribute>
                 <attribute name="horizontalHeaderStretchLastSection">
                  <bool>true</bool>
                 </attribute>
                 <attribute name="verticalHeaderVisible">
                  <bool>false</bool>
                 </attribute>
+                <attribute name="verticalHeaderMinimumSectionSize">
+                 <number>0</number>
+                </attribute>
                 <row/>
-                <column/>
-                <column/>
-                <column/>
-                <column/>
+                <column>
+                 <property name="text">
+                  <string>Title</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Tags</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Categories</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Date Modified</string>
+                 </property>
+                </column>
                </widget>
               </item>
              </layout>
             </widget>
             <widget class="QTextBrowser" name="text_browser_bank">
+             <property name="accessibleName">
+              <string>Additional Patch Notes Display</string>
+             </property>
+             <property name="accessibleDescription">
+              <string>Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)</string>
+             </property>
+             <property name="styleSheet">
+              <string notr="true"/>
+             </property>
              <property name="textInteractionFlags">
               <set>Qt::TextBrowserInteraction</set>
              </property>
@@ -971,433 +2052,6 @@
              <property name="openLinks">
               <bool>true</bool>
              </property>
-            </widget>
-            <widget class="QWidget" name="layoutWidget_6">
-             <layout class="QVBoxLayout" name="verticalLayout">
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_3">
-                <item>
-                 <widget class="QPushButton" name="btn_save_bank">
-                  <property name="text">
-                   <string>Save Bank</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="btn_load_bank">
-                  <property name="text">
-                   <string>Load Bank</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="btn_export_bank">
-                  <property name="text">
-                   <string>Export Bank</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <widget class="QSplitter" name="splitter_bank_tables">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="handleWidth">
-                 <number>10</number>
-                </property>
-                <widget class="QTableWidget" name="table_bank_left">
-                 <property name="editTriggers">
-                  <set>QAbstractItemView::NoEditTriggers</set>
-                 </property>
-                 <property name="dragDropOverwriteMode">
-                  <bool>true</bool>
-                 </property>
-                 <property name="dragDropMode">
-                  <enum>QAbstractItemView::DragDrop</enum>
-                 </property>
-                 <property name="defaultDropAction">
-                  <enum>Qt::IgnoreAction</enum>
-                 </property>
-                 <property name="selectionMode">
-                  <enum>QAbstractItemView::SingleSelection</enum>
-                 </property>
-                 <property name="selectionBehavior">
-                  <enum>QAbstractItemView::SelectRows</enum>
-                 </property>
-                 <property name="rowCount">
-                  <number>32</number>
-                 </property>
-                 <property name="columnCount">
-                  <number>2</number>
-                 </property>
-                 <attribute name="horizontalHeaderStretchLastSection">
-                  <bool>true</bool>
-                 </attribute>
-                 <row>
-                  <property name="text">
-                   <string>0</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>1</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>2</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>3</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>4</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>5</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>6</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>7</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>8</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>9</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>10</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>11</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>12</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>13</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>14</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>15</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>16</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>17</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>18</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>19</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>20</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>21</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>22</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>23</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>24</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>25</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>26</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>27</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>28</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>29</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>30</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>31</string>
-                  </property>
-                 </row>
-                 <column/>
-                 <column/>
-                </widget>
-                <widget class="QTableWidget" name="table_bank_right">
-                 <property name="editTriggers">
-                  <set>QAbstractItemView::NoEditTriggers</set>
-                 </property>
-                 <property name="dragDropOverwriteMode">
-                  <bool>true</bool>
-                 </property>
-                 <property name="dragDropMode">
-                  <enum>QAbstractItemView::DragDrop</enum>
-                 </property>
-                 <property name="defaultDropAction">
-                  <enum>Qt::IgnoreAction</enum>
-                 </property>
-                 <property name="selectionMode">
-                  <enum>QAbstractItemView::SingleSelection</enum>
-                 </property>
-                 <property name="selectionBehavior">
-                  <enum>QAbstractItemView::SelectRows</enum>
-                 </property>
-                 <property name="rowCount">
-                  <number>32</number>
-                 </property>
-                 <property name="columnCount">
-                  <number>2</number>
-                 </property>
-                 <attribute name="horizontalHeaderStretchLastSection">
-                  <bool>true</bool>
-                 </attribute>
-                 <row>
-                  <property name="text">
-                   <string>32</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>33</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>34</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>35</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>36</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>37</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>38</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>39</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>40</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>41</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>42</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>43</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>44</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>45</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>46</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>47</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>48</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>49</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>50</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>51</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>52</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>53</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>54</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>55</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>56</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>57</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>58</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>59</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>60</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>61</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>62</string>
-                  </property>
-                 </row>
-                 <row>
-                  <property name="text">
-                   <string>63</string>
-                  </property>
-                 </row>
-                 <column/>
-                 <column/>
-                </widget>
-               </widget>
-              </item>
-             </layout>
             </widget>
            </widget>
           </item>
@@ -1414,9 +2068,18 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1616</width>
+     <width>1567</width>
      <height>27</height>
     </rect>
+   </property>
+   <property name="contextMenuPolicy">
+    <enum>Qt::ActionsContextMenu</enum>
+   </property>
+   <property name="acceptDrops">
+    <bool>false</bool>
+   </property>
+   <property name="nativeMenuBar">
+    <bool>true</bool>
    </property>
    <widget class="QMenu" name="menuFiel">
     <property name="title">
@@ -1425,6 +2088,7 @@
     <addaction name="actionSpecify_SD_Card_Location"/>
     <addaction name="actionImport_A_Patch"/>
     <addaction name="actionImport_Multiple_Patches"/>
+    <addaction name="actionImport_Version_History_directory"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -1448,6 +2112,10 @@
      <string>Options</string>
     </property>
     <addaction name="actionAlternating_Row_Colours"/>
+    <addaction name="actionFont"/>
+    <addaction name="actionIncrease_Font_Size"/>
+    <addaction name="actionDecrease_Font_Size"/>
+    <addaction name="actionToggle_Dark_Mode_2"/>
    </widget>
    <addaction name="menuFiel"/>
    <addaction name="menuSort"/>
@@ -1458,60 +2126,135 @@
    <property name="text">
     <string>Specify SD Card Location</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+S</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="actionQuit">
    <property name="text">
     <string>Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionSort_by_title_A_Z">
    <property name="text">
     <string>Sort by title (A-Z)</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+1</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="actionSort_by_title_Z_A">
    <property name="text">
     <string>Sort by title (Z-A)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+2</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionSort_by_date_new_old">
    <property name="text">
     <string>Sort by date (new-old)</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+3</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="actionSort_by_date_old_new">
    <property name="text">
     <string>Sort by date (old-new)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+4</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionSort_by_likes_high_low">
    <property name="text">
     <string>Sort by likes (high-low)</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+5</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="actionSort_by_likes_low_high">
    <property name="text">
     <string>Sort by likes (low-high)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+6</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionSort_by_views_high_low">
    <property name="text">
     <string>Sort by views (high-low)</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+7</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="actionSort_by_views_low_high">
    <property name="text">
     <string>Sort by views (low-high)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+8</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionSort_by_downloads_high_low">
    <property name="text">
     <string>Sort by downloads (high-low)</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+9</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="actionSort_by_downloads_low_high">
    <property name="text">
     <string>Sort by downloads (low-high)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+0</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionZOIA_Librarian_Help">
@@ -1523,10 +2266,22 @@
    <property name="text">
     <string>Alternating Row Colours</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="actionImport_A_Patch">
    <property name="text">
     <string>Import A Patch (.bin)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionToggle_Dark_Mode">
@@ -1537,6 +2292,206 @@
   <action name="actionImport_Multiple_Patches">
    <property name="text">
     <string>Import Multiple Patches (directory)</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+I</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionArial">
+   <property name="text">
+    <string>Arial</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionArial_Black">
+   <property name="text">
+    <string>Arial Black</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial Black</family>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="actionComic_Sans_MS">
+   <property name="text">
+    <string>Comic Sans</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Comic Sans MS</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionCourier_New">
+   <property name="text">
+    <string>Courier New</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Courier New</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionGeorgia">
+   <property name="text">
+    <string>Georgia</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Georgia</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionLucida_Console">
+   <property name="text">
+    <string>Lucida Console</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Lucida Console</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionLucida_Sans_Unicode">
+   <property name="text">
+    <string>Lucida Sans Unicode</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Lucida Sans Unicode</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionPalatino_Linotype">
+   <property name="text">
+    <string>Palatino Linotype</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Palatino Linotype</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionTahoma">
+   <property name="text">
+    <string>Tahoma</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionTimes_New_Roman">
+   <property name="text">
+    <string>Times New Roman</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Times New Roman</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionTrebuchet_MS">
+   <property name="text">
+    <string>Trebuchet MS</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Trebuchet MS</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionVerdana">
+   <property name="text">
+    <string>Verdana (Default)</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Verdana</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionPapyrus">
+   <property name="text">
+    <string>Papyrus</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Papyrus</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionWingdings">
+   <property name="text">
+    <string>Wingdings (Oh no)</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Verdana</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionIncrease_Font_Size">
+   <property name="text">
+    <string>Increase Font Size</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+=</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionDecrease_Font_Size">
+   <property name="text">
+    <string>Decrease Font Size</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+-</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionFont">
+   <property name="text">
+    <string>Change Font</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+F</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionImport_Version_History_directory">
+   <property name="text">
+    <string>Import Version History (directory)</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+V</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionToggle_Dark_Mode_2">
+   <property name="text">
+    <string>Toggle Dark Mode</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
    </property>
   </action>
  </widget>
