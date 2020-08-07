@@ -34,8 +34,9 @@ This software is intended to be free and will be supported by the development te
 - Version control and change-detection
 
 ## Authors
-- John Breton
-- Mike Moger
-- Matthew Allen
+- John Breton (primary dev, does everything)
+- Mike Moger (initial Python implementation, Mac testing, app owner)
+- djigneo (C# binary decoder and testing)
+- Matthew Allen (initial UI frames and app planning)
 - Special thanks to Steve Bragg and the entire Empress Effects team for supporting this work
 - Additional thanks to our beta testers and those who submitted user stories
