@@ -19,6 +19,42 @@ QHeaderView {
     color: #000;
 }
 
+QPushButton#btn_load_bank {
+    padding: 2px 25px 2px 25px;
+    border: 1px solid black;
+}
+
+QPushButton#delete_folder_sd_btn,
+QPushButton#import_all_btn,
+QPushButton#import_all_ver_btn {
+border-radius: 5px;
+padding: 2px 2px 2px 2px;
+border: 1px solid black;
+}
+
+QPushButton#back_btn_local,
+QPushButton#btn_save_bank,
+QPushButton#back_btn_bank {
+    border-top-left-radius: 10px 5px;
+    padding: 2px 25px 2px 25px;
+    border: 1px solid black;
+}
+
+QPushButton#update_patch_notes {
+    border-top-right-radius: 10px 5px;
+    border-top-left-radius: 10px 5px;
+    padding: 2px 2px 2px 2px;
+    border: 1px solid black;
+}
+
+QPushButton#refresh_pch_btn,
+QPushButton#check_for_updates_btn,
+QPushButton#btn_export_bank {
+    border-top-right-radius: 10px 5px;
+    padding: 2px 5px 2px 5px;
+    border: 1px solid black;
+}
+
 QHeaderView::section:selected {
     background-color: #ddd;
     color: #000;

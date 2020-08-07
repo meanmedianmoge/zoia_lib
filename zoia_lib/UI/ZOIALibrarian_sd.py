@@ -99,17 +99,16 @@ class ZOIALibrarianSD(QMainWindow):
         # If any patches populate the tables, enable the import all button.
         # TODO Find out if this can be determined without iterating through the
         #  entire table.
+        count = 0
         for i in range(64):
             if i < 32:
                 if self.ui.table_sd_left.item(i, 0).text() != "":
-                    self.ui.import_all_btn.setEnabled(True)
-                    self.ui.import_all_ver_btn.setEnabled(True)
-                    break
+                    count += 1
             else:
                 if self.ui.table_sd_right.item(i - 32, 0).text() != "":
-                    self.ui.import_all_btn.setEnabled(True)
-                    self.ui.import_all_ver_btn.setEnabled(True)
-                    break
+                    count += 1
+        self.ui.import_all_btn.setEnabled(count > 0)
+        self.ui.import_all_ver_btn.setEnabled(count > 1)
         self.ui.delete_folder_sd_btn.setEnabled(True)
 
     def set_data_sd(self):
@@ -449,7 +448,6 @@ class ZOIALibrarianSD(QMainWindow):
                                     i = i + (j - first_item_index)
                                 else:
                                     i += 1
-                                print(j)
                                 if i > 31:
                                     temp1 = self.ui.table_sd_right.item(j - 32,
                                                                         0)
@@ -484,6 +482,16 @@ class ZOIALibrarianSD(QMainWindow):
         row = self.sender().objectName()
         index = "00{}".format(row) if len(row) < 2 else "0{}".format(row)
         self.delete.delete_patch_sd(index, self.sd_path_full)
+        count = 0
+        for i in range(64):
+            if i < 32:
+                if self.ui.table_sd_left.item(i, 0).text() != "":
+                    count += 1
+            else:
+                if self.ui.table_sd_right.item(i - 32, 0).text() != "":
+                    count += 1
+        self.ui.import_all_btn.setEnabled(count > 0)
+        self.ui.import_all_ver_btn.setEnabled(count > 1)
         self.set_data_sd()
 
     def get_sd_path(self):

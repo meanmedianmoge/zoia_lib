@@ -230,11 +230,7 @@ class Ui_MainWindow(object):
         self.refresh_pch_btn.setObjectName(u"refresh_pch_btn")
         self.refresh_pch_btn.setCursor(QCursor(Qt.PointingHandCursor))
         self.refresh_pch_btn.setMouseTracking(True)
-        self.refresh_pch_btn.setStyleSheet(u"QPushButton{\n"
-"border-top-right-radius: 10px 5px;\n"
-"padding: 2px 5px 2px 5px;\n"
-"border: 1px solid black;\n"
-"}")
+        self.refresh_pch_btn.setStyleSheet(u"")
 
         self.horizontalLayout_5.addWidget(self.refresh_pch_btn)
 

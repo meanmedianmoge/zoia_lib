@@ -1,3 +1,5 @@
+import platform
+
 from PySide2.QtGui import QFont
 from PySide2.QtWidgets import QFontDialog, QApplication
 import os
@@ -187,14 +189,24 @@ class ZOIALibrarianUtil:
     def toggle_dark(self):
         app = QApplication.instance()
         if self.dark:
-            with open(os.path.join("zoia_lib", "UI", "resources",
-                                   "light.css"), "r") as f:
-                data = f.read()
+            if platform.system().lower() == "darwin":
+                with open(os.path.join("zoia_lib", "UI", "resources",
+                                       "osx-light.css"), "r") as f:
+                    data = f.read()
+            else:
+                with open(os.path.join("zoia_lib", "UI", "resources",
+                                       "light.css"), "r") as f:
+                    data = f.read()
             self.dark = False
         else:
-            with open(os.path.join("zoia_lib", "UI", "resources",
-                                   "dark.css"), "r") as f:
-                data = f.read()
+            if platform.system().lower() == "darwin":
+                with open(os.path.join("zoia_lib", "UI", "resources",
+                                       "osx-dark.css"), "r") as f:
+                    data = f.read()
+            else:
+                with open(os.path.join("zoia_lib", "UI", "resources",
+                                       "dark.css"), "r") as f:
+                    data = f.read()
             self.dark = True
         app.setStyleSheet(data)
 

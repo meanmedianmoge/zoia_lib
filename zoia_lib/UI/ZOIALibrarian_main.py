@@ -217,7 +217,8 @@ class ZOIALibrarianMain(QMainWindow):
             self.update_local_patches)
         self.ui.actionImport_Version_History_directory.triggered.connect(
             self.version_import)
-        self.ui.refresh_pch_btn.clicked.connect(self.ps.reload_ps)
+        self.ui.refresh_pch_btn.clicked.connect(
+            lambda: self.ps.reload_ps(self.sort_and_set))
         self.ui.update_patch_notes.clicked.connect(self.update_patch_notes)
         self.ui.actionImport_A_Patch.triggered.connect(self.import_patch)
         self.ui.table_local.installEventFilter(self)

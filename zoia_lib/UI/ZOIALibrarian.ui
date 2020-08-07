@@ -238,11 +238,7 @@
                             <string>This button will refresh the data in the PatchStorage patch table with the latest patches on PatchStorage should the list ever become out of sync.</string>
                            </property>
                            <property name="styleSheet">
-                            <string notr="true">QPushButton{
-border-top-right-radius: 10px 5px;
-padding: 2px 5px 2px 5px;
-border: 1px solid black;
-}</string>
+                            <string notr="true"/>
                            </property>
                            <property name="text">
                             <string>Refresh Patches</string>
