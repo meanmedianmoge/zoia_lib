@@ -7,4 +7,3 @@ numpy>=1.19.0
 requests~=2.24.0
 beautifulsoup4~=4.9.1
 jsonschema~=3.2.0
-PyQt5~=5.15.0

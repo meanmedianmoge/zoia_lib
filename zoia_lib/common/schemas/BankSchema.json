@@ -10,7 +10,7 @@
             "bank": [
                 {
                     "slot": 1,
-                    "filepath": "122661.bin"
+                    "id": "122661"
                 }
             ]
         }
@@ -30,7 +30,7 @@
                 [
                     {
                         "slot": 1,
-                        "filepath": "122661.bin"
+                        "id": "122661"
                     }
                 ]
             ],
@@ -41,17 +41,17 @@
                         "$id": "#/properties/bank/items/anyOf/0",
                         "type": "object",
                         "title": "The Bank object schema",
-                        "description": "Describes the file that should be associated with each slot on an SD card for use with a ZOIA",
+                        "description": "Describes the patch that should be associated with each slot on an SD card for use with a ZOIA",
                         "default": {},
                         "examples": [
                             {
                                 "slot": 1,
-                                "filepath": "122661.bin"
+                                "id": "122661"
                             }
                         ],
                         "required": [
                             "slot",
-                            "filepath"
+                            "id"
                         ],
                         "additionalProperties": true,
                         "properties": {
@@ -69,10 +69,10 @@
                                 "$id": "#/properties/bank/items/anyOf/0/properties/file",
                                 "type": "string",
                                 "title": "The file schema",
-                                "description": "A string used to specify the file path to the file that will be added to an SD card",
+                                "description": "A string to specify which patch should be retrieved (via its id number)",
                                 "default": "",
                                 "examples": [
-                                    "122661.bin"
+                                    "122661"
                                 ]
                             }
                         }

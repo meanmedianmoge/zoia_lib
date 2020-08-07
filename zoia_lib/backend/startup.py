@@ -5,34 +5,35 @@ you can run the application using the following command from the
 root zoia_lib directory:
     python -m zoia_lib.backend.startup
 
-Please note, this app is still in active development. Please stay updated
-by visiting https://github.com/meanmedianmoge/zoia_lib/
+Please note, this app is still in active development. Please stay
+updated by visiting https://github.com/meanmedianmoge/zoia_lib/
 """
 import os
 import sys
 
-from PySide2.QtCore import Qt
-from PySide2.QtGui import QPixmap
+from PySide2.QtGui import QPixmap, Qt
 from PySide2.QtWidgets import QApplication, QSplashScreen
 
-from zoia_lib.UI.early_ui_main import EarlyUIMain
-from zoia_lib.backend import utilities as util
+from zoia_lib.UI.ZOIALibrarian_main import ZOIALibrarianMain
 
 # Entry point for the application.
+from zoia_lib.backend.patch import Patch
+
 if __name__ == "__main__":
-    # Launch the GUI.
     app = QApplication(sys.argv)
 
     # Create and display the splash screen
-    splash_pix = QPixmap(os.path.join(os.getcwd(), "zoia_lib", "backend",
-                                      "splash.png"))
-    splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
+    img = QPixmap(os.path.join(os.getcwd(), "zoia_lib", "backend",
+                               "splash.png"))
+    splash = QSplashScreen(img, Qt.WindowStaysOnTopHint)
     splash.show()
 
-    # Try to make the backend directories if need be.
-    util.create_backend_directories()
+    # Create the backend directories (if need be).
+    patch = Patch()
+    patch.create_backend_directories()
 
-    window = EarlyUIMain()
+    # Show the window after it finishes setting up and close the splash.
+    window = ZOIALibrarianMain()
     window.show()
     splash.finish(window)
 

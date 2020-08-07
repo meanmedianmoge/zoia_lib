@@ -3,7 +3,11 @@ import shutil
 import unittest
 
 import zoia_lib.backend.utilities as util
+from zoia_lib.backend.patch_save import PatchSave
 from zoia_lib.common import errors
+from zoia_lib.backend.utilities import add_test_patch
+
+save = PatchSave()
 
 backend_path = util.determine_backend_path()
 
@@ -20,10 +24,10 @@ class TestDirectoryCreation(unittest.TestCase):
     def setUp(self):
         # Create a backend directory and another
         # directory for additional tests.
-        util.create_backend_directories()
-        util.backend_path = os.path.join(os.getcwd(), "zoia_lib",
-                                         "tests", ".ZoiaLibraryApp")
-        util.create_backend_directories()
+        save.create_backend_directories()
+        save.back_path = os.path.join(os.getcwd(), "zoia_lib",
+                                      "tests", ".ZoiaLibraryApp")
+        save.create_backend_directories()
 
     def tearDown(self):
         # Remove the testing ZoiaLibraryApp directory.
@@ -75,10 +79,10 @@ class TestDirectoryCreation(unittest.TestCase):
 
         # Try to break the method with a NoneType
         exc = (FileNotFoundError, errors.SavingError)
-        self.assertRaises(exc, util.save_to_backend, None)
-        self.assertRaises(exc, util.save_to_backend, ("ERROR", "ERROR"))
-        self.assertRaises(exc, util.save_to_backend, (None, "ERROR"))
-        self.assertRaises(exc, util.save_to_backend, ("ERROR", None))
+        self.assertRaises(exc, save.save_to_backend, None)
+        self.assertRaises(exc, save.save_to_backend, ("ERROR", "ERROR"))
+        self.assertRaises(exc, save.save_to_backend, (None, "ERROR"))
+        self.assertRaises(exc, save.save_to_backend, ("ERROR", None))
 
         # Make sure there is no directory
         path = os.path.join(os.getcwd(), "zoia_lib", "tests",
@@ -89,10 +93,12 @@ class TestDirectoryCreation(unittest.TestCase):
 
         # Now add the directory and some patches
         # Create a dummy patch with dummy metadata.
-        util.add_test_patch(os.path.join("55555", "55555_v1"), 55555)
+        add_test_patch(os.path.join("55555", "55555_v1"), 55555,
+                       save.back_path)
         # Try to save the same patch again without making any changes to the
         # binary contents of the patch.
-        util.add_test_patch(os.path.join("55555", "55555_v2"), 55555)
+        add_test_patch(os.path.join("55555", "55555_v2"), 55555,
+                       save.back_path)
         # Try to save the same patch again after making a change to the
         # binary contents of the patch.
         with open(os.path.join(path, "55555", "55555_v1.bin"), "rb") as fb:
