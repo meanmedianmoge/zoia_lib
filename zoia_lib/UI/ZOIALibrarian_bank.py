@@ -670,8 +670,7 @@ class ZOIALibrarianBank(QMainWindow):
                 item = self.ui.table_bank_left.cellWidget(i, 1)
                 if item is None:
                     continue
-                elif item.objectName() == self.sender().objectName() and \
-                        i == self.ui.table_bank_left.currentRow():
+                elif item.objectName() == self.sender().objectName():
                     self.ui.table_bank_left.setItem(i, 0, QTableWidgetItem(
                         None))
                     self.ui.table_bank_left.setCellWidget(i, 1, None)
@@ -681,8 +680,7 @@ class ZOIALibrarianBank(QMainWindow):
                 item = self.ui.table_bank_right.cellWidget(i - 32, 1)
                 if item is None:
                     continue
-                elif item.objectName() == self.sender().objectName() and \
-                        i - 32 == self.ui.table_bank_right.currentRow():
+                elif item.objectName() == self.sender().objectName():
                     self.ui.table_bank_right.setItem(i - 32, 0,
                                                      QTableWidgetItem(None))
                     self.ui.table_bank_right.setCellWidget(i - 32, 1, None)

@@ -65,8 +65,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.msg.setWindowIcon(self.icon)
 
         # Helper classes init
-        self.sd = ZOIALibrarianSD(self.ui, self.import_patch, self.msg,
-                                  delete)
+        self.sd = ZOIALibrarianSD(self.ui, self.import_patch, self.msg, delete)
         self.bank = ZOIALibrarianBank(self.ui, self.backend_path, self.msg)
         self.util = ZOIALibrarianUtil(self.ui)
         self.ps = ZOIALibrarianPS(self.ui, api, self.backend_path, self.msg,
@@ -248,6 +247,8 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.actionToggle_Dark_Mode_2.triggered.connect(
             self.util.toggle_dark)
 
+        self.util.toggle_dark()
+
         # Font consistency.
         self.util.change_font(QFont("Verdana", 10) if self.font is None else
                               data[0]["font"] + "%" + str(
@@ -297,7 +298,6 @@ class ZOIALibrarianMain(QMainWindow):
         center = QDesktopWidget().availableGeometry().center()
         frame.moveCenter(center)
         self.move(frame.topLeft())
-        self.util.toggle_dark()
 
     def tab_switch(self):
         """ Actions performed whenever a tab is switched to within the
