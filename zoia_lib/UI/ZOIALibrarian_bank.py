@@ -123,7 +123,15 @@ class ZOIALibrarianBank(QMainWindow):
 
         fails = []
         for pch in self.data_banks:
-            if pch["id"] not in os.listdir(self.path):
+            if "_" in pch["id"] and \
+                    os.path.exists(os.path.join(self.path,
+                                                pch["id"].split("_")[0])):
+                if (pch["id"] + ".bin") not in \
+                        os.listdir(os.path.join(self.path,
+                                                pch["id"].split("_")[0])):
+                    fails.append(pch)
+                    self.data_banks.remove(pch)
+            elif pch["id"] not in os.listdir(self.path):
                 fails.append(pch)
                 self.data_banks.remove(pch)
 
