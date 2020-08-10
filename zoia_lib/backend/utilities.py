@@ -40,7 +40,7 @@ def sort_metadata(mode, data, rev):
     elif mode == 2:
         # Sort by author
         data.sort(key=lambda x: x["author"]["name"].upper()
-        if "author" in x else "", reverse=rev)
+                  if "author" in x else "", reverse=rev)
     elif mode == 3:
         # Sort by like count.
         data.sort(key=lambda x: x["like_count"] if "like_count" in x else 0,
@@ -48,7 +48,7 @@ def sort_metadata(mode, data, rev):
     elif mode == 4:
         # Sort by download count.
         data.sort(key=lambda x: x["download_count"]
-        if "download_count" in x else 0, reverse=rev)
+                  if "download_count" in x else 0, reverse=rev)
     elif mode == 5:
         # Sort by view count.
         data.sort(key=lambda x: x["view_count"] if "view_count" in x else 0,
@@ -99,41 +99,31 @@ def search_patches(data, query):
 
     for curr in data:
         # Check the patch title.
-        if query in curr["title"].lower():
-            if curr not in hits:
-                hits.append(curr)
+        if query in curr["title"].lower() and curr not in hits:
+            hits.append(curr)
             continue
-        if "author" in curr:
-            # Check the author name.
-            if query in curr["author"]["name"].lower():
-                if curr not in hits:
-                    hits.append(curr)
-                continue
+        if "author" in curr and query in curr["author"]["name"].lower() \
+                and curr not in hits:
+            hits.append(curr)
+            continue
         if "tags" in curr:
             # Check every tag.
             for tag in curr["tags"]:
-                if query in tag["name"].lower():
-                    if curr not in hits:
-                        hits.append(curr)
+                if query in tag["name"].lower() and curr not in hits:
+                    hits.append(curr)
                     continue
-        if query in curr["updated_at"].lower():
-            if curr not in hits:
-                hits.append(curr)
+        if query in curr["updated_at"].lower() and curr not in hits:
+            hits.append(curr)
             continue
-        if query in curr["created_at"].lower():
-            if curr not in hits:
-                hits.append(curr)
-            continue
+        if query in curr["created_at"].lower() and curr not in hits:
+            hits.append(curr)
 
     return hits
 
 
 def add_test_patch(name, idx, path):
-    """Note: This method is for testing purposes
-    and will be deleted once a release candidate
-    is prepared.
-    Adds a test patch that can be used for unit
-    testing purposes.
+    """ Note: This method is for testing purposes only.
+    Adds a test patch that can be used for unit testing purposes.
     name: The name of the patch, to be used for the title attribute
           in the JSON metadata.
     idx: The id number to be used for the patch.

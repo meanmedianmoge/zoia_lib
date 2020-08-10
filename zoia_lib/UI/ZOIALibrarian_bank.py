@@ -3,7 +3,6 @@ import os
 import platform
 
 from PySide2.QtCore import QEvent
-from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QTableWidgetItem, QPushButton, QFileDialog, \
     QMessageBox, QInputDialog, QTableWidgetSelectionRange, QMainWindow
 
@@ -39,10 +38,8 @@ class ZOIALibrarianBank(QMainWindow):
         # Cleanup the tables
         for i in range(32):
             self.ui.table_bank_left.setItem(i, 0, QTableWidgetItem(None))
-            self.ui.table_bank_left.setItem(i, 1, QTableWidgetItem(None))
             self.ui.table_bank_left.setCellWidget(i, 1, None)
             self.ui.table_bank_right.setItem(i, 0, QTableWidgetItem(None))
-            self.ui.table_bank_right.setItem(i, 1, QTableWidgetItem(None))
             self.ui.table_bank_right.setCellWidget(i, 1, None)
 
         # PyQt tables make zero sense.
@@ -122,6 +119,18 @@ class ZOIALibrarianBank(QMainWindow):
         with open(os.path.join(self.path, "Banks", bnk_file), "r") as f:
             self.data_banks = json.loads(f.read())
 
+        if self.has_item():
+            self.msg.setWindowTitle("Warning")
+            self.msg.setIcon(QMessageBox.Warning)
+            self.msg.setText("This will overwrite the current data in the "
+                             "table.\nIs that okay?")
+            self.msg.setInformativeText(
+                "If you haven't saved your changes they will be lost.")
+            self.msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+            value = self.msg.exec_()
+            if value != QMessageBox.Yes:
+                return
+
         fails = []
         for pch in self.data_banks:
             if "_" in pch["id"] and \
@@ -145,17 +154,6 @@ class ZOIALibrarianBank(QMainWindow):
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
 
-        if self.has_item():
-            self.msg.setWindowTitle("Warning")
-            self.msg.setIcon(QMessageBox.Warning)
-            self.msg.setText("This will overwrite the current data in the "
-                             "table.\nIs that okay?")
-            self.msg.setInformativeText(
-                "If you haven't saved your changes they will be lost.")
-            self.msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-            value = self.msg.exec_()
-            if value != QMessageBox.Yes:
-                return
         self.set_data_bank()
         self.ui.btn_export_bank.setEnabled(True)
         self.ui.btn_save_bank.setEnabled(True)
@@ -172,20 +170,16 @@ class ZOIALibrarianBank(QMainWindow):
             self.get_bank_data()
             if "{}.json".format(name) in \
                     os.listdir(os.path.join(self.path, "Banks")):
-                self.msg.setWindowTitle("Bank exists")
+                self.msg.setWindowTitle("Bank Exists")
                 self.msg.setIcon(QMessageBox.Warning)
-                self.msg.setText(
-                    "A Bank with that name already exists.")
-                self.msg.setInformativeText(
-                    "Would you like to overwrite it?")
-                self.msg.setStandardButtons(
-                    QMessageBox.Yes | QMessageBox.No)
+                self.msg.setText("A Bank with that name already exists.")
+                self.msg.setInformativeText("Would you like to overwrite it?")
+                self.msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
                 value = self.msg.exec_()
-                if value == QMessageBox.No:
-                    return
-            with open(os.path.join(self.path, "Banks", "{}.json".format(name)),
-                      "w") as f:
-                f.write(json.dumps(self.data_banks))
+                if value != QMessageBox.No:
+                    with open(os.path.join(self.path, "Banks",
+                                           "{}.json".format(name)), "w") as f:
+                        f.write(json.dumps(self.data_banks))
             self.ui.btn_load_bank.setEnabled(True)
 
     def export_bank(self, sd, export, window):
@@ -199,9 +193,9 @@ class ZOIALibrarianBank(QMainWindow):
             self.msg.setWindowTitle("No SD Path")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText("Please specify your SD card path!")
-            self.msg.setInformativeText("File -> Specify SD Card Location")
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
+            self.sd.sd_path(False, self.ui.table_sd_left.width() * 2)
         else:
             fails = []
             # Ask for a name
@@ -272,15 +266,18 @@ class ZOIALibrarianBank(QMainWindow):
         """
 
         self.data_banks = []
-        for i in range(64):
-            if i < 32:
-                temp = self.ui.table_bank_left.cellWidget(i, 1)
-            else:
-                temp = self.ui.table_bank_right.cellWidget(i - 32, 1)
-            if temp is not None:
+        for i in range(32):
+            temp_left = self.ui.table_bank_left.cellWidget(i, 1)
+            temp_right = self.ui.table_bank_right.cellWidget(i, 1)
+            if temp_left is not None:
                 self.data_banks.append({
                     "slot": i,
-                    "id": temp.objectName()
+                    "id": temp_left.objectName()
+                })
+            if temp_right is not None:
+                self.data_banks.append({
+                    "slot": i + 32,
+                    "id": temp_right.objectName()
                 })
 
     def move_patch_bank(self, src, dest):
@@ -298,6 +295,8 @@ class ZOIALibrarianBank(QMainWindow):
 
         if dest > 63:
             dest -= 64
+
+        print(src, dest)
 
         # Setup the new item.
         if src < 32:
@@ -420,8 +419,6 @@ class ZOIALibrarianBank(QMainWindow):
                             "slot": drop_index,
                             "id": idx
                         })
-
-                        self.set_data_bank()
                     else:
                         # An entire version directory was dragged over.
                         pch_num = int((len(os.listdir(os.path.join(
@@ -456,8 +453,7 @@ class ZOIALibrarianBank(QMainWindow):
                                     "slot": drop_index + i - 1,
                                     "id": "{}_v{}".format(idx, i)
                                 })
-
-                            self.set_data_bank()
+                    self.set_data_bank()
                 else:
                     # Check for phantom rows to delete.
                     while self.ui.table_bank_left.rowCount() > 32 or \
@@ -474,6 +470,9 @@ class ZOIALibrarianBank(QMainWindow):
                 else:
                     self.ui.table_bank_right.clearSelection()
             elif e.type() == QEvent.ChildAdded:
+                self.ui.table_bank_left.hideColumn(1)
+                self.ui.table_bank_right.hideColumn(1)
+
                 # Figure out which rows are selected.
                 indexes = \
                     self.ui.table_bank_left.selectionModel().selectedRows()
@@ -484,10 +483,6 @@ class ZOIALibrarianBank(QMainWindow):
                     self.ui.table_bank_right.selectionModel().selectedRows()
                 for index in sorted(indexes):
                     self.rows_right.append(index)
-
-                self.ui.table_bank_left.hideColumn(1)
-                self.ui.table_bank_right.hideColumn(1)
-
             elif e.type() == QEvent.ChildRemoved:
                 # We have dropped an item, so now we need to rename it
                 # or swap it with the item that was previously in that
@@ -509,10 +504,9 @@ class ZOIALibrarianBank(QMainWindow):
                     self.rows_left = []
                     self.rows_right = []
                     if (src_index < 32 and self.ui.table_bank_left.item(
-                            src_index, 0)) is None \
-                            or (
+                            src_index, 0)) is None or (
                             src_index > 31 and self.ui.table_bank_right.item(
-                        src_index - 32, 0) is None):
+                            src_index - 32, 0) is None):
                         # Then it is actually the destination
                         dst_index = src_index
                         # Find the item that just got "deleted"
@@ -638,18 +632,14 @@ class ZOIALibrarianBank(QMainWindow):
                                         i += 1
                                     if i > 31:
                                         temp1 = self.ui.table_bank_right.item(
-                                            j - 32,
-                                            0)
+                                            j - 32, 0)
                                         temp2 = self.ui.table_bank_left.item(
-                                            i - 32,
-                                            0)
+                                            i - 32, 0)
                                     else:
                                         temp1 = self.ui.table_bank_right.item(
-                                            j - 32,
-                                            0)
+                                            j - 32, 0)
                                         temp2 = self.ui.table_bank_right.item(
-                                            i,
-                                            0)
+                                            i, 0)
                                     if temp1 is None and temp2 is None:
                                         continue
                                     elif temp1 is None and temp2 is not None:
@@ -659,6 +649,7 @@ class ZOIALibrarianBank(QMainWindow):
                                         self.move_patch_bank(j, i)
                                     elif temp1 is None and temp2 is not None:
                                         self.move_patch_bank(i, j)
+                                break
                     self.rows_left = []
                     self.rows_right = []
                     while self.ui.table_bank_left.rowCount() > 32:
@@ -671,37 +662,26 @@ class ZOIALibrarianBank(QMainWindow):
         Currently triggered via a button press.
         """
 
-        for i in range(64):
-            if i < 32:
-                item = self.ui.table_bank_left.cellWidget(i, 1)
-                if item is None:
-                    continue
-                elif item.objectName() == self.sender().objectName() and \
-                        i == self.ui.table_bank_left.currentRow():
-                    self.ui.table_bank_left.setItem(i, 0, QTableWidgetItem(
-                        None))
-                    self.ui.table_bank_left.setCellWidget(i, 1, None)
-                    self.ui.table_bank_right.clearSelection()
-                    break
-            else:
-                item = self.ui.table_bank_right.cellWidget(i - 32, 1)
-                if item is None:
-                    continue
-                elif item.objectName() == self.sender().objectName() and \
-                        i - 32 == self.ui.table_bank_right.currentRow():
-                    self.ui.table_bank_right.setItem(i - 32, 0,
-                                                     QTableWidgetItem(None))
-                    self.ui.table_bank_right.setCellWidget(i - 32, 1, None)
-                    self.ui.table_bank_right.clearSelection()
-                    break
-
-        for pch in self.data_banks:
-            if pch["slot"] == i:
-                self.data_banks.remove(pch)
+        for i in range(32):
+            item_left = self.ui.table_bank_left.cellWidget(i, 1)
+            item_right = self.ui.table_bank_right.cellWidget(i, 1)
+            if item_left is not None and \
+                    item_left.objectName() == self.sender().objectName():
+                self.ui.table_bank_left.setItem(i, 0, QTableWidgetItem(None))
+                self.ui.table_bank_left.setCellWidget(i, 1, None)
+                self.ui.table_bank_left.clearSelection()
+                break
+            elif item_right is not None and \
+                    item_right.objectName() == self.sender().objectName():
+                self.ui.table_bank_right.setItem(i, 0, QTableWidgetItem(None))
+                self.ui.table_bank_right.setCellWidget(i, 1, None)
+                self.ui.table_bank_right.clearSelection()
+                break
 
         item = self.has_item()
         self.ui.btn_export_bank.setEnabled(item)
         self.ui.btn_save_bank.setEnabled(item)
+        self.get_bank_data()
 
     def has_item(self):
         """ Determines whether the Bank tables contain an entry.
@@ -711,12 +691,8 @@ class ZOIALibrarianBank(QMainWindow):
         """
 
         # Check to see if we should disable export and save buttons.
-        item = False
-        for i in range(64):
-            if i < 32 and self.ui.table_bank_left.cellWidget(i, 1) is not None:
-                item = True
-                break
-            elif self.ui.table_bank_right.cellWidget(i - 32, 1) is not None:
-                item = True
-                break
-        return item
+        for i in range(32):
+            if self.ui.table_bank_left.cellWidget(i, 1) is not None \
+                    or self.ui.table_bank_right.cellWidget(i, 1) is not None:
+                return True
+        return False

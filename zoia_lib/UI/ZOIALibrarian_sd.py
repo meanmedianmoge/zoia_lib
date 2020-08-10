@@ -6,13 +6,15 @@ from PySide2.QtCore import QEvent
 from PySide2.QtWidgets import QTableWidgetItem, QPushButton, QFileDialog, \
     QFileSystemModel, QMessageBox, QTableWidgetSelectionRange, QMainWindow
 
+from zoia_lib.common import errors
+
 
 class ZOIALibrarianSD(QMainWindow):
     """ The ZOIALibrarianSD class is responsible for all
     activities contained within the SD Card View tab of the application.
     """
 
-    def __init__(self, ui, f2, msg, delete):
+    def __init__(self, ui, save, msg, delete):
         """ Initializes the class with the required parameters.
         """
 
@@ -24,8 +26,7 @@ class ZOIALibrarianSD(QMainWindow):
         self.delete = delete
         self.sd_path_full = None
         self.sd_root = None
-        self.can_export_bank = False
-        self.f2 = f2
+        self.save = save
         self.msg = msg
         self.rows_left = []
         self.rows_right = []
@@ -47,24 +48,15 @@ class ZOIALibrarianSD(QMainWindow):
                     # This comes from a bug with QFileDialog returning the
                     # wrong path separator on Windows for some odd reason.
                     input_dir = input_dir.split("/")[0]
-                elif "/" in input_dir and platform.system().lower() != \
-                        "windows":
+                elif "/" in input_dir:
                     # OSX case.
                     pass
-                elif "\\" in input_dir:
-                    input_dir = input_dir.split("\\")[0]
-                elif "//" in input_dir:
-                    input_dir = input_dir.split("//")[0]
-                elif "\\\\" in input_dir:
-                    input_dir = input_dir.split("\\\\")[0]
                 else:
                     input_dir = input_dir.split(os.path.sep)[0]
                 self.sd_root = str(input_dir)
                 self.ui.tab_sd.setEnabled(True)
-                self.can_export_bank = True
             else:
                 self.ui.tab_sd.setEnabled(False)
-                self.can_export_bank = False
                 self.ui.tabs.setCurrentIndex(1)
 
         # Setup the SD card tree view for the SD Card tab.
@@ -87,8 +79,7 @@ class ZOIALibrarianSD(QMainWindow):
         temp = self.ui.sd_tree.currentIndex()
         while True:
             temp = temp.parent()
-            if temp.data() is not None and self.sd_root \
-                    not in temp.data():
+            if temp.data() is not None and self.sd_root not in temp.data():
                 path = os.path.join(temp.data(), path)
                 continue
             break
@@ -96,17 +87,24 @@ class ZOIALibrarianSD(QMainWindow):
         self.sd_path_full = os.path.join(self.sd_root, path)
 
         self.set_data_sd()
-        # If any patches populate the tables, enable the import all button.
-        # TODO Find out if this can be determined without iterating through the
-        #  entire table.
+        self.has_item()
+
+    def has_item(self):
+        """ Determines whether the SD tables contain an entry.
+
+        Return: True if the SD tables contain an entry, False
+                otherwise.
+        """
+
+        # Determine which buttons should be enabled.
         count = 0
-        for i in range(64):
-            if i < 32:
-                if self.ui.table_sd_left.item(i, 0).text() != "":
-                    count += 1
-            else:
-                if self.ui.table_sd_right.item(i - 32, 0).text() != "":
-                    count += 1
+        for i in range(32):
+            if self.ui.table_sd_left.item(i, 0).text() != "":
+                count += 1
+            if self.ui.table_sd_right.item(i, 0).text() != "":
+                count += 1
+            if count > 1:
+                break
         self.ui.import_all_btn.setEnabled(count > 0)
         self.ui.import_all_ver_btn.setEnabled(count > 1)
         self.ui.delete_folder_sd_btn.setEnabled(True)
@@ -142,7 +140,7 @@ class ZOIALibrarianSD(QMainWindow):
                 import_btn = QPushButton("Click me to import!", self)
                 import_btn.setObjectName(str(index))
                 import_btn.setFont(self.ui.table_PS.horizontalHeader().font())
-                import_btn.clicked.connect(self.f2)
+                import_btn.clicked.connect(self.import_patch_sd)
 
                 if index < 32:
                     # Left sd table.
@@ -158,6 +156,41 @@ class ZOIALibrarianSD(QMainWindow):
                                                          rmv_btn)
                     self.ui.table_sd_right.setCellWidget(index - 32, 2,
                                                          import_btn)
+
+    def import_patch_sd(self):
+        """ Imports a single patch from an SD card into the Librarian.
+        Will alert the user if the patch exists in the Librarian.
+        Currently triggered via a button press.
+        """
+
+        if self.sd_path_full is not None:
+            for sd_pch in os.listdir(self.sd_path_full):
+                index = int(self.sender().objectName())
+                if index < 10:
+                    index = "00{}".format(index)
+                else:
+                    index = "0{}".format(index)
+                if index == sd_pch[:3]:
+                    try:
+                        self.save.import_to_backend(
+                            os.path.join(self.sd_path_full, sd_pch))
+                        self.ui.statusbar.showMessage("Import complete!")
+                        self.msg.setIcon(QMessageBox.Information)
+                        self.msg.setWindowTitle("Import Complete")
+                        self.msg.setText(
+                            "The patch has been successfully imported!")
+                        self.msg.exec_()
+                        return
+                    except errors.SavingError:
+                        self.msg.setWindowTitle("Patch Already In Library")
+                        self.msg.setIcon(QMessageBox.Information)
+                        self.msg.setText(
+                            "That patch exists within your locally "
+                            "saved patches.\nNo importing has occurred.")
+                        self.msg.setStandardButtons(QMessageBox.Ok)
+                        self.msg.exec_()
+                        self.msg.setInformativeText(None)
+                        return
 
     def delete_sd_item(self, delete):
         """ Deletes the currently selected directory from the SD card.
@@ -176,11 +209,11 @@ class ZOIALibrarianSD(QMainWindow):
             val = self.msg.exec_()
             if val == QMessageBox.Yes:
                 delete.delete_full_patch_directory(self.sd_path_full)
-                self.prepare_sd_view()
         else:
             delete.delete_file(self.get_sd_path())
-            self.prepare_sd_view()
 
+        self.set_data_sd()
+        self.has_item()
         self.ui.sd_tree.clearSelection()
         self.ui.delete_folder_sd_btn.setEnabled(False)
 
@@ -482,17 +515,10 @@ class ZOIALibrarianSD(QMainWindow):
         row = self.sender().objectName()
         index = "00{}".format(row) if len(row) < 2 else "0{}".format(row)
         self.delete.delete_patch_sd(index, self.sd_path_full)
-        count = 0
-        for i in range(64):
-            if i < 32:
-                if self.ui.table_sd_left.item(i, 0).text() != "":
-                    count += 1
-            else:
-                if self.ui.table_sd_right.item(i - 32, 0).text() != "":
-                    count += 1
-        self.ui.import_all_btn.setEnabled(count > 0)
-        self.ui.import_all_ver_btn.setEnabled(count > 1)
         self.set_data_sd()
+        self.ui.table_sd_right.clearSelection()
+        self.ui.table_sd_left.clearSelection()
+        self.has_item()
 
     def get_sd_path(self):
         """ Gets the current SD card path.
@@ -508,21 +534,8 @@ class ZOIALibrarianSD(QMainWindow):
 
         return self.sd_root
 
-    def get_can_export(self):
-        """ Gets whether the application can export.
-        Will be None if it has not been determined.
-        """
-
-        return self.can_export_bank
-
     def set_sd_root(self, path):
         """ Sets the current SD card root.
         """
 
         self.sd_root = path
-
-    def set_export(self, val):
-        """ Sets whether the application can export.
-        """
-
-        self.can_export_bank = val

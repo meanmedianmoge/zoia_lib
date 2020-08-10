@@ -63,7 +63,7 @@ class PatchSave(Patch):
                         and direc != ".DS_Store":
                     for files in os.listdir(
                             os.path.join(self.back_path, direc)):
-                        if files.split(".")[1] == "bin":
+                        if files.split(".")[-1] == "bin":
                             with open(os.path.join(
                                     self.back_path, direc, files), "rb") as f:
                                 data = f.read()
@@ -76,10 +76,10 @@ class PatchSave(Patch):
         if not os.path.isdir(pch):
             os.mkdir(pch)
             if "files" in patch[1] \
-                    and patch[1]["files"][0]["filename"].split(".")[
-                1] != "bin":
+                    and patch[1]["files"][0]["filename"].split(".")[-1] \
+                    != "bin":
                 # If it isn't a straight bin additional work must be done.
-                if patch[1]["files"][0]["filename"].split(".")[1] == "py":
+                if patch[1]["files"][0]["filename"].split(".")[-1] == "py":
                     # We are not responsible for .py files.
                     shutil.rmtree(os.path.join(self.back_path, pch))
                     raise errors.SavingError(patch[1], 501)
@@ -101,13 +101,13 @@ class PatchSave(Patch):
             """
             # Case 1: Check if this is a compressed patch download.
             if "files" in patch[1] \
-                    and patch[1]["files"][0]["filename"].split(".")[1] \
+                    and patch[1]["files"][0]["filename"].split(".")[-1] \
                     != "bin":
                 # We need to check the individual binary files to see which,
                 # if any, differ from the ones currently stored.
 
                 # Figure out which file compression is being used.
-                if patch[1]["files"][0]["filename"].split(".")[1] == "zip":
+                if patch[1]["files"][0]["filename"].split(".")[-1] == "zip":
                     # Create a temporary directory to store
                     # the extracted files.
                     os.mkdir(os.path.join(self.back_path, "temp"))
@@ -128,7 +128,7 @@ class PatchSave(Patch):
                             os.path.join(self.back_path, "temp")):
                         try:
                             # We only care about .bin files.
-                            if file.split(".")[1] == "bin":
+                            if file.split(".")[-1] == "bin":
                                 with open(file, "rb") as bin_file:
                                     raw_bin = bin_file.read()
                                 self.save_to_backend((raw_bin, patch[1]))
@@ -148,7 +148,7 @@ class PatchSave(Patch):
             # If we get here, we are working with a .bin, so we
             # need to to see if the binary is already saved.
             for file in os.listdir(os.path.join(pch)):
-                if file.split(".")[1] == "bin":
+                if file.split(".")[-1] == "bin":
                     with open(os.path.join(pch, file), "rb") as f:
                         if f.read() == patch[0]:
                             # This exact binary is already saved onto the
@@ -187,7 +187,7 @@ class PatchSave(Patch):
                     for file in reversed(
                             sorted(os.listdir(os.path.join(pch)))):
                         ver = int(file.split("v")[1].split(".")[0]) + 1
-                        extension = file.split(".")[1]
+                        extension = file.split(".")[-1]
                         os.rename(os.path.join(pch,
                                                "{}_v{}.{}".format(pch_id,
                                                                   str(ver - 1),
@@ -441,7 +441,7 @@ class PatchSave(Patch):
 
             i = 0
             for file in os.listdir(pch):
-                if file.split(".")[1] == "bin":
+                if file.split(".")[-1] == "bin":
                     i += 1
                     try:
                         name = file
@@ -473,5 +473,4 @@ class PatchSave(Patch):
         else:
             # Unexpected file extension encountered.
             # TODO Handle this case gracefully.
-            print(patch)
             raise errors.SavingError(patch[1]["title"], 501)

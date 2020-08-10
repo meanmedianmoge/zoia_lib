@@ -188,31 +188,25 @@ class ZOIALibrarianUtil:
 
     def toggle_dark(self):
         app = QApplication.instance()
-        if self.dark:
-            if platform.system().lower() == "darwin":
-                with open(os.path.join("zoia_lib", "UI", "resources",
-                                       "osx-light.css"), "r") as f:
-                    data = f.read()
-            else:
-                with open(os.path.join("zoia_lib", "UI", "resources",
-                                       "light.css"), "r") as f:
-                    data = f.read()
-            self.dark = False
-        else:
-            if platform.system().lower() == "darwin":
-                with open(os.path.join("zoia_lib", "UI", "resources",
-                                       "osx-dark.css"), "r") as f:
-                    data = f.read()
-            else:
-                with open(os.path.join("zoia_lib", "UI", "resources",
-                                       "dark.css"), "r") as f:
-                    data = f.read()
-            self.dark = True
+        sheet = {
+            ("darwin", True): "osx-light.css",
+            ("windows", True): "light.css",
+            ("linux", True): "light.css",
+            ("darwin", False): "osx-dark.css",
+            ("windows", False): "dark.css",
+            ("linux", True): "dark.css"
+        }[(platform.system().lower(), self.dark)]
+
+        with open(os.path.join("zoia_lib", "UI", "resources",
+                               sheet), "r") as f:
+            data = f.read()
+
+        self.dark = not self.dark
         app.setStyleSheet(data)
 
     def row_invert(self):
         """ Either enables of disables alternating row colours for
-        tables; depending on the previous state of the tables.
+        tables depending on the previous state of the tables.
         Currently triggered via a menu action.
         """
 

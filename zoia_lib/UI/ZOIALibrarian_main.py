@@ -56,7 +56,7 @@ class ZOIALibrarianMain(QMainWindow):
         # Setup the UI using ZOIALibrarian.py
         self.ui = ui_main.Ui_MainWindow()
         self.ui.setupUi(self)
-        self.backend_path = save.get_backend_path()
+        self.path = save.get_backend_path()
 
         # Message box init
         self.icon = QIcon(os.path.join(os.getcwd(), "zoia_lib", "UI",
@@ -65,10 +65,10 @@ class ZOIALibrarianMain(QMainWindow):
         self.msg.setWindowIcon(self.icon)
 
         # Helper classes init
-        self.sd = ZOIALibrarianSD(self.ui, self.import_patch, self.msg, delete)
-        self.bank = ZOIALibrarianBank(self.ui, self.backend_path, self.msg)
+        self.sd = ZOIALibrarianSD(self.ui, save, self.msg, delete)
+        self.bank = ZOIALibrarianBank(self.ui, self.path, self.msg)
         self.util = ZOIALibrarianUtil(self.ui)
-        self.ps = ZOIALibrarianPS(self.ui, api, self.backend_path, self.msg,
+        self.ps = ZOIALibrarianPS(self.ui, api, self.path, self.msg,
                                   save)
 
         self.patch_cache = []
@@ -89,7 +89,6 @@ class ZOIALibrarianMain(QMainWindow):
         self.table_bank_local_title_size = None
         self.prev_sort = None
         self.curr_ver = None
-        self.can_export_bank = False
         self.ps_sizes = None
         self.local_sizes = None
         self.sd_sizes = None
@@ -112,20 +111,19 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.btn_save_bank.setEnabled(False)
         self.ui.btn_export_bank.setEnabled(False)
         self.ui.delete_folder_sd_btn.setEnabled(False)
-        if len(os.listdir(os.path.join(self.backend_path, "Banks"))) == 0:
+        if len(os.listdir(os.path.join(self.path, "Banks"))) == 0:
             self.ui.btn_load_bank.setEnabled(False)
 
         # Load preferences from previous sessions (if they exist)
-        if os.path.exists(os.path.join(self.backend_path, "pref.json")):
+        if os.path.exists(os.path.join(self.path, "pref.json")):
             # SD Card previously specified.
-            with open(os.path.join(self.backend_path, "pref.json"), "r") as f:
+            with open(os.path.join(self.path, "pref.json"), "r") as f:
                 data = json.loads(f.read())
             if data[0]["sd_root"] != "" \
                     and data[0]["sd_root"] != "/Volumes/Untitled" \
                     and os.path.exists(data[0]["sd_root"]):
                 self.sd.set_sd_root(data[0]["sd_root"])
                 self.ui.tab_sd.setEnabled(True)
-                self.sd.set_export(True)
                 self.sd.sd_path(True, self.width())
 
             self.resize(data[0]["width"], data[0]["height"])
@@ -232,8 +230,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.searchbar_PS.installEventFilter(self)
         self.ui.searchbar_local.installEventFilter(self)
         self.ui.searchbar_bank.installEventFilter(self)
-        self.ui.sd_tree.clicked.connect(
-            lambda: self.sd.prepare_sd_view())
+        self.ui.sd_tree.clicked.connect(lambda: self.sd.prepare_sd_view())
         self.ui.import_all_btn.clicked.connect(self.mass_import)
         self.ui.import_all_ver_btn.clicked.connect(self.version_import)
         self.ui.back_btn_local.clicked.connect(self.go_back)
@@ -330,9 +327,6 @@ class ZOIALibrarianMain(QMainWindow):
                 self.msg.setInformativeText(None)
                 self.sd.sd_path(False, self.width())
                 self.ui.tabs.setCurrentIndex(1)
-        elif self.ui.tabs.currentIndex() == 0:
-            pass
-            # self.sort_and_set()
 
     def set_data(self, search=False, version=False):
         """ Sets the data for the various patch tables. This is done
@@ -406,7 +400,7 @@ class ZOIALibrarianMain(QMainWindow):
                   not self.ui.back_btn_local.isEnabled()) \
                     or (table_index == 3 and
                         not self.ui.back_btn_bank.isEnabled()):
-                if len(os.listdir(os.path.join(self.backend_path,
+                if len(os.listdir(os.path.join(self.path,
                                                str(data[i]["id"])))) > 2:
                     btn_title.setText(title.rstrip() + "\n[Multiple Versions]")
                 btn_title.setObjectName(str(data[i]["id"]))
@@ -438,7 +432,7 @@ class ZOIALibrarianMain(QMainWindow):
                 text_item.setTextAlignment(Qt.AlignCenter)
                 if table_index == 1 and not \
                         self.ui.back_btn_local.isEnabled() and len(os.listdir(
-                    os.path.join(self.backend_path, str(data[i]["id"])))) > 2:
+                    os.path.join(self.path, str(data[i]["id"])))) > 2:
                     text_item.setFlags(
                         Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 curr_table.setItem(i, j + 1, text_item)
@@ -456,7 +450,7 @@ class ZOIALibrarianMain(QMainWindow):
                 dwn.setFont(self.ui.table_PS.horizontalHeader().font())
                 dwn.clicked.connect(self.ps.initiate_download)
                 # Only enable it if we haven't already downloaded the patch.
-                if (str(data[i]["id"])) in os.listdir(self.backend_path):
+                if (str(data[i]["id"])) in os.listdir(self.path):
                     dwn.setEnabled(False)
                     dwn.setText("Downloaded!")
                 curr_table.setCellWidget(i, 4, dwn)
@@ -523,9 +517,7 @@ class ZOIALibrarianMain(QMainWindow):
             idx = self.curr_ver
         else:
             idx = self.sender().objectName()
-            if "_" in idx:
-                idx = idx.split("_")[0]
-            self.curr_ver = idx
+            self.curr_ver = idx.split("_")[0]
         self.prev_tag_cat = None
         if context:
             self.data_local_version = []
@@ -535,17 +527,14 @@ class ZOIALibrarianMain(QMainWindow):
             curr_data = self.data_bank_version
 
         # Get all of the patch versions into one place.
-        for pch in os.listdir(os.path.join(self.backend_path, idx)):
-            if pch.split(".")[1] == "json":
+        for pch in os.listdir(os.path.join(self.path, idx)):
+            if pch.split(".")[-1] == "json":
                 # Got the metadata
-                with open(os.path.join(self.backend_path, idx, pch)) as f:
+                with open(os.path.join(self.path, idx, pch)) as f:
                     temp = json.loads(f.read())
                 curr_data.append(temp)
 
-        if context:
-            self.ui.update_patch_notes.setEnabled(False)
-
-        self.ui.text_browser_bank.setText("")
+        self.ui.update_patch_notes.setEnabled(not context)
         self.sort_and_set()
 
     def initiate_export(self):
@@ -581,19 +570,18 @@ class ZOIALibrarianMain(QMainWindow):
                 os.mkdir(os.path.join(self.sd.get_sd_root(), "to_zoia"))
             while True:
                 # Ask for a slot
-                slot, ok = QInputDialog().getInt(self, "Patch Export",
-                                                 "Slot number:", minValue=0,
-                                                 maxValue=63)
+                slot, ok = QInputDialog().getInt(
+                    self, "Patch Export", "Slot number:", minValue=0,
+                    maxValue=63)
 
-                if slot >= 0 and ok:
+                if ok:
                     self.ui.statusbar.showMessage("Patch be movin",
                                                   timeout=5000)
                     # Got a slot and the user hit "OK"
                     try:
                         export.export_patch_bin(
                             self.sender().objectName(), os.path.join(
-                                self.sd.get_sd_root(),
-                                "to_zoia"), slot)
+                                self.sd.get_sd_root(), "to_zoia"), slot)
                         self.ui.statusbar.showMessage("Export complete!",
                                                       timeout=5000)
                         break
@@ -609,34 +597,13 @@ class ZOIALibrarianMain(QMainWindow):
                         value = self.msg.exec_()
                         if value == QMessageBox.Yes:
                             # Overwrite the other patch.
-                            try:
-                                export.export_patch_bin(
-                                    self.sender().objectName(),
-                                    os.path.join(self.sd.get_sd_root(),
-                                                 "to_zoia"),
-                                    slot, True)
-                                self.ui.statusbar.showMessage(
-                                    "Export complete!", timeout=5000)
-                            except FileNotFoundError:
-                                idx = str(self.sender().objectName()) + "_v1"
-                                export.export_patch_bin(idx, os.path.join(
-                                    self.sd.get_sd_root(), "to_zoia"), slot,
-                                                        True)
-                                self.ui.statusbar.showMessage(
-                                    "Export complete!", timeout=5000)
+                            export.export_patch_bin(
+                                self.sender().objectName(),
+                                os.path.join(self.sd.get_sd_root(),
+                                             "to_zoia"), slot, True)
+                            self.ui.statusbar.showMessage(
+                                "Export complete!", timeout=5000)
                             break
-                        else:
-                            continue
-                    except FileNotFoundError:
-                        idx = str(self.sender().objectName()) + "_v1"
-                        export.export_patch_bin(idx,
-                                                os.path.join(
-                                                    self.sd.get_sd_root(),
-                                                    "to_zoia"), slot,
-                                                True)
-                        self.ui.statusbar.showMessage(
-                            "Export complete!", timeout=5000)
-                        break
                 else:
                     # Operation was aborted.
                     break
@@ -647,10 +614,9 @@ class ZOIALibrarianMain(QMainWindow):
         """
 
         if "_" not in self.sender().objectName():
-            if len(os.listdir(
-                    os.path.join(self.backend_path,
-                                 self.sender().objectName()))) > 2 \
-                    and not self.ui.back_btn_local.isEnabled():
+            if not self.ui.back_btn_local.isEnabled() and \
+                    len(os.listdir(os.path.join(
+                        self.path, self.sender().objectName()))) > 2:
                 delete.delete_full_patch_directory(self.sender().objectName())
             else:
                 delete.delete_patch(self.sender().objectName())
@@ -683,15 +649,15 @@ class ZOIALibrarianMain(QMainWindow):
         else:
             self.data_bank = []
             curr_data = self.data_bank
-        for patches in os.listdir(self.backend_path):
+        for patches in os.listdir(self.path):
             # Look for patch directories in the backend.
             if patches != "Banks" and patches != "data.json" and \
                     patches != '.DS_Store' and patches != "pref.json":
-                for pch in os.listdir(os.path.join(self.backend_path,
+                for pch in os.listdir(os.path.join(self.path,
                                                    patches)):
                     # Read the metadata so that we can set up the tables.
-                    if pch.split(".")[1] == "json":
-                        with open(os.path.join(self.backend_path,
+                    if pch.split(".")[-1] == "json":
+                        with open(os.path.join(self.path,
                                                patches, pch)) as f:
                             temp = json.loads(f.read())
                         curr_data.append(temp)
@@ -713,11 +679,10 @@ class ZOIALibrarianMain(QMainWindow):
                 or self.ui.tabs.currentIndex() == 3) and \
                     "_" not in self.sender().objectName() and \
                     len(os.listdir(
-                        os.path.join(self.backend_path,
+                        os.path.join(self.path,
                                      self.sender().objectName()))) > 2:
                 # We are pointing to a version directory.
-                self.display_patch_versions(
-                    self.ui.tabs.currentIndex() == 1)
+                self.display_patch_versions(self.ui.tabs.currentIndex() == 1)
                 return
             name = str(self.sender().objectName())
             ver = ""
@@ -750,14 +715,13 @@ class ZOIALibrarianMain(QMainWindow):
                 if ver != "":
                     self.local_selected += "_" + ver
                 try:
-                    with open(os.path.join(self.backend_path, name,
+                    with open(os.path.join(self.path, name,
                                            name + ".json")) \
                             as f:
                         content = json.loads(f.read())
                 except FileNotFoundError:
-                    with open(os.path.join(self.backend_path,
-                                           name,
-                                           name + "_{}.json".format(ver))) \
+                    with open(os.path.join(
+                            self.path, name, name + "_{}.json".format(ver))) \
                             as f:
                         content = json.loads(f.read())
             if not skip:
@@ -774,7 +738,10 @@ class ZOIALibrarianMain(QMainWindow):
                 legal = content["license"]["name"]
             content["content"] = content["content"].replace("\n", "<br/>")
 
-            # TODO Add artwork to HTML view (test case when offline).
+            # TODO Add artwork to HTML view.
+            # Artwork needs to be downloaded ahead of time and then
+            # pointed to, as QTextViews don't support downloading from
+            # external sources. Maybe create a cache of images?
 
             temp.setHtml("<html><h3>"
                          + content["title"] + "</h3><u>Author:</u> "
@@ -971,6 +938,7 @@ class ZOIALibrarianMain(QMainWindow):
     def update_local_patches(self):
         """ Attempts to update any patch that is stored in the user's
         backend directory.
+        Currently triggered via a button press.
         TODO List which patches were updated.
         """
 
@@ -1022,40 +990,11 @@ class ZOIALibrarianMain(QMainWindow):
                          "saved patches.\nNo importing has occurred.")
         self.msg.setStandardButtons(QMessageBox.Ok)
 
-        if self.sd.get_sd_path() is not None and \
-                self.ui.tabs.currentIndex() == 2:
-            for sd_pch in os.listdir(self.sd.get_sd_path()):
-                try:
-                    index = int(self.sender().objectName())
-                except ValueError:
-                    break
-                if index < 10:
-                    index = "00{}".format(index)
-                else:
-                    index = "0{}".format(index)
-                if index == sd_pch[:3]:
-                    try:
-                        save.import_to_backend(
-                            os.path.join(self.sd.get_sd_path(), sd_pch))
-                        self.ui.statusbar.showMessage("Import complete!")
-                        self.msg.setWindowTitle("Import Complete")
-                        self.msg.setText(
-                            "The patch has been successfully imported!")
-                        self.msg.exec_()
-                        return
-                    except errors.SavingError:
-                        self.msg.exec_()
-                        self.msg.setInformativeText(None)
-                        return
-
         pch = QFileDialog.getOpenFileName()[0]
         if pch == "":
             return
         try:
             save.import_to_backend(pch)
-            if self.ui.tabs.currentIndex() == 1:
-                self.get_local_patches()
-                self.sort_and_set()
             self.ui.statusbar.showMessage("Import complete!")
             self.msg.setWindowTitle("Import Complete")
             self.msg.setText("The patch has been successfully imported!")
@@ -1079,15 +1018,14 @@ class ZOIALibrarianMain(QMainWindow):
         directory. Unlike import_patch, failing to import a patch will
         not create a message box. A message box will be displayed at the
         end indicating how many patches were and were not imported.
-        Currently triggered via a button press.
+        Currently triggered via a button press or a menu action.
         """
         imp_cnt = 0
         fail_cnt = 0
         if self.sender() is not None and self.sender().objectName() == \
                 "actionImport_Multiple_Patches":
-            input_dir = QFileDialog.getExistingDirectory(None,
-                                                         'Select a directory',
-                                                         expanduser("~"))
+            input_dir = QFileDialog.getExistingDirectory(
+                None, 'Select a directory' ,expanduser("~"))
 
             if input_dir == "" or not os.path.isdir(input_dir):
                 self.msg.setWindowTitle("Invalid Selection")
@@ -1107,7 +1045,6 @@ class ZOIALibrarianMain(QMainWindow):
                     imp_cnt += 1
                 except errors.SavingError:
                     fail_cnt += 1
-                    continue
 
         self.msg.setWindowTitle("Import Complete")
         self.msg.setIcon(QMessageBox.Information)
@@ -1117,16 +1054,10 @@ class ZOIALibrarianMain(QMainWindow):
         else:
             self.msg.setText("Did not import any patches.")
         if fail_cnt > 0:
-            if fail_cnt == 1:
-                self.msg.setInformativeText(
-                    "{} was already saved in the library "
-                    "and was not "
-                    "imported.".format(fail_cnt))
-            else:
-                self.msg.setInformativeText(
-                    "{} were already saved in the library "
-                    "and were not "
-                    "imported.".format(fail_cnt))
+            word = "was" if fail_cnt == 1 else "were"
+            self.msg.setInformativeText(
+                "{} {} already saved in the library "
+                "and {} not imported.".format(fail_cnt, word, word))
         self.msg.setStandardButtons(QMessageBox.Ok)
         self.msg.exec_()
         self.msg.setInformativeText(None)
@@ -1134,10 +1065,14 @@ class ZOIALibrarianMain(QMainWindow):
         self.sort_and_set()
 
     def version_import(self):
+        """ Attempts to import a directory of patches as a version
+        history within the application. Should any non-bin files be
+        encountered, they will simply be ignored.
+        Currently triggered via a button press or a menu action.
+        """
         if self.sender().objectName() != "import_all_ver_btn":
-            input_dir = QFileDialog.getExistingDirectory(None,
-                                                         'Select a directory',
-                                                         expanduser("~"))
+            input_dir = QFileDialog.getExistingDirectory(
+                None, 'Select a directory', expanduser("~"))
             if input_dir == "" or not os.path.isdir(input_dir):
                 self.msg.setWindowTitle("Invalid Selection")
                 self.msg.setIcon(QMessageBox.Information)
@@ -1165,9 +1100,9 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
         if (self.ui.tabs.currentIndex() == 1 and not
-        self.ui.back_btn_local.isEnabled()) or \
+            self.ui.back_btn_local.isEnabled()) or \
                 (self.ui.tabs.currentIndex() == 3 and not
-                self.ui.back_btn_bank.isEnabled()):
+                 self.ui.back_btn_bank.isEnabled()):
             self.get_local_patches()
             self.sort_and_set()
 
@@ -1316,7 +1251,7 @@ class ZOIALibrarianMain(QMainWindow):
         """
 
         self.util.save_pref(self.width(), self.height(), self.sd.get_sd_root(),
-                            self.backend_path)
+                            self.path)
 
     def try_quit(self):
         """ Forces the application to close.

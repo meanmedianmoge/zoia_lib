@@ -27,9 +27,9 @@ QPushButton#btn_load_bank {
 QPushButton#delete_folder_sd_btn,
 QPushButton#import_all_btn,
 QPushButton#import_all_ver_btn {
-border-radius: 5px;
-padding: 2px 2px 2px 2px;
-border: 1px solid black;
+    border-radius: 5px;
+    padding: 2px 2px 2px 2px;
+    border: 1px solid black;
 }
 
 QPushButton#back_btn_local,
