@@ -244,8 +244,10 @@ class ZOIALibrarianBank(QMainWindow):
                     self.msg.setText("Successful exports: {}\nFailed exports: "
                                      "{}\nFailures occur when the Bank "
                                      "contains a patch that has been deleted "
-                                     "from the ZOIA Librarian".format(
-                        len(self.data_banks) - len(fails), len(fails)))
+                                     "from the ZOIA "
+                                     "Librarian".format(len(self.data_banks)
+                                                        - len(fails),
+                                                        len(fails)))
                     temp = "Here is a list of patches that failed to export:\n"
                     for slot in fails:
                         if slot < 32:
@@ -444,7 +446,7 @@ class ZOIALibrarianBank(QMainWindow):
                             else:
                                 for pch in self.data_banks:
                                     for i in range(drop_index, drop_index
-                                                               + pch_num):
+                                                   + pch_num):
                                         if pch["slot"] == i:
                                             self.data_banks.remove(pch)
                             # Add all of the version patches
@@ -506,7 +508,7 @@ class ZOIALibrarianBank(QMainWindow):
                     if (src_index < 32 and self.ui.table_bank_left.item(
                             src_index, 0)) is None or (
                             src_index > 31 and self.ui.table_bank_right.item(
-                            src_index - 32, 0) is None):
+                        src_index - 32, 0) is None):
                         # Then it is actually the destination
                         dst_index = src_index
                         # Find the item that just got "deleted"
@@ -568,8 +570,8 @@ class ZOIALibrarianBank(QMainWindow):
                                 temp_left = None
                             if (temp_left is not None and i != first_item_index
                                 and temp_left.text() == first_item_text) or (
-                                    temp_right is not None and temp_right.text()
-                                    == first_item_text):
+                                    temp_right is not None and
+                                    temp_right.text() == first_item_text):
                                 # We found the first item!
                                 row = sorted(self.rows_left)[-1].row()
                                 row = int('%d' % row)
@@ -644,8 +646,9 @@ class ZOIALibrarianBank(QMainWindow):
                                         continue
                                     elif temp1 is None and temp2 is not None:
                                         self.move_patch_bank(i, j)
-                                    elif temp1 is not None and temp2 is None or \
-                                            temp1 is not None and temp2 is not None:
+                                    elif temp1 is not None and temp2 is \
+                                            None or temp1 is not None and \
+                                            temp2 is not None:
                                         self.move_patch_bank(j, i)
                                     elif temp1 is None and temp2 is not None:
                                         self.move_patch_bank(i, j)

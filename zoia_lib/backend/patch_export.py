@@ -57,18 +57,13 @@ class PatchExport(Patch):
                 if pch[:3] == "00{}".format(slot) or pch[:3] == "0{}".format(
                         slot):
                     os.remove(os.path.join(dest, pch))
+                    break
 
         # Prepare the name of the patch. We need to access the metadata.
         # Extract the patch id from the supplied patch parameter.
-        idx = patch
-        if "." in patch:
-            patch = patch.split(".")[0]
-
-        if "." in idx:
-            idx = patch.split(".")[0]
-
-        if "_" in idx:
-            idx = idx.split("_")[0]
+        patch = patch.split(".")[0]
+        idx = patch.split(".")[0]
+        idx = idx.split("_")[0]
 
         # Get the metadata for this patch.
         try:
@@ -82,14 +77,12 @@ class PatchExport(Patch):
         name = metadata["files"][0]["filename"]
         # Check to see if the patch author included a ZOIA prefix.
         # (and drop it from the name).
-        if "_" in name:
-            prefix = name.split("_")[0]
-            if len(prefix) == 3:
-                try:
-                    float(prefix)
-                    name = name[4:]
-                except ValueError:
-                    pass
+        if "_" in name and len(name.split("_")[0]) == 3:
+            try:
+                float(name.split("_")[0])
+                name = name[4:]
+            except ValueError:
+                pass
         try:
             if -1 < slot < 10:
                 # one digit
@@ -131,12 +124,11 @@ class PatchExport(Patch):
 
         fail_list = []
 
-        # Prepare a destination directory.
+        # Prepare a destination directory (remove the previous if
+        # overwrite is true).
         if overwrite and name in os.listdir(dest):
             shutil.rmtree(os.path.join(dest, name))
-            os.mkdir(os.path.join(dest, name))
-        else:
-            os.mkdir(os.path.join(dest, name))
+        os.mkdir(os.path.join(dest, name))
 
         # Process the bank and add each to the bank directory.
         for pch in bank:

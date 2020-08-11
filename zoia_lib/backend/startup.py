@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
     # Create the backend directories (if need be).
     patch = Patch()
-    patch.create_backend_directories()
+    patch._create_backend_directories()
 
     # Show the window after it finishes setting up and close the splash.
     window = ZOIALibrarianMain()

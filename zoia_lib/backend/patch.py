@@ -15,23 +15,15 @@ class Patch:
         based on the OS a user is running.
         """
 
-        self.back_path = None
-        curr_os = platform.system().lower()
-        if curr_os == "windows":
-            self.back_path = os.path.join(os.getenv('APPDATA'),
-                                          ".ZoiaLibraryApp")
-        elif curr_os == "darwin":
-            self.back_path = os.path.join(str(Path.home()), "Library",
-                                          "Application Support",
-                                          ".ZoiaLibraryApp")
-        elif curr_os == "linux":
-            self.back_path = os.path.join(str(Path.home()), ".local", "share",
-                                          ".ZoiaLibraryApp")
-        else:
-            # Solaris/Chrome OS/Java OS?
-            self.back_path = None
+        self.back_path = {
+            "windows": os.path.join(os.getenv('APPDATA'), ".ZoiaLibraryApp"),
+            "darwin": os.path.join(str(Path.home()), "Library",
+                                   "Application Support", ".ZoiaLibraryApp"),
+            "linux": os.path.join(str(Path.home()), ".local", "share",
+                                  ".ZoiaLibraryApp")
+        }[platform.system().lower()]
 
-    def create_backend_directories(self):
+    def _create_backend_directories(self):
         """ Creates the necessary directories that will
         store patch files, bank files, and metadata files.
         """

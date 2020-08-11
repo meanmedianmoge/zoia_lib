@@ -135,7 +135,8 @@ class ZOIALibrarianUtil:
             "font":
                 self.ui.table_PS.horizontalHeader().font().toString().split(
                     ",")[0],
-            "font_size": self.ui.table_PS.horizontalHeader().font().pointSize(),
+            "font_size":
+                self.ui.table_PS.horizontalHeader().font().pointSize(),
             "sd_root": "" if sd is None else sd
         }
         ps_sizes = {

@@ -431,8 +431,9 @@ class ZOIALibrarianMain(QMainWindow):
                 text_item = QTableWidgetItem(text)
                 text_item.setTextAlignment(Qt.AlignCenter)
                 if table_index == 1 and not \
-                        self.ui.back_btn_local.isEnabled() and len(os.listdir(
-                    os.path.join(self.path, str(data[i]["id"])))) > 2:
+                        self.ui.back_btn_local.isEnabled() and \
+                        len(os.listdir(os.path.join(
+                            self.path, str(data[i]["id"])))) > 2:
                     text_item.setFlags(
                         Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 curr_table.setItem(i, j + 1, text_item)
@@ -1000,9 +1001,9 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setText("The patch has been successfully imported!")
             self.msg.exec_()
             if (self.ui.tabs.currentIndex() == 1 and not
-            self.ui.back_btn_local.isEnabled()) or \
+                self.ui.back_btn_local.isEnabled()) or \
                     (self.ui.tabs.currentIndex() == 3 and not
-                    self.ui.back_btn_bank.isEnabled()):
+                     self.ui.back_btn_bank.isEnabled()):
                 self.get_local_patches()
                 self.sort_and_set()
 
@@ -1025,7 +1026,7 @@ class ZOIALibrarianMain(QMainWindow):
         if self.sender() is not None and self.sender().objectName() == \
                 "actionImport_Multiple_Patches":
             input_dir = QFileDialog.getExistingDirectory(
-                None, 'Select a directory' ,expanduser("~"))
+                None, 'Select a directory', expanduser("~"))
 
             if input_dir == "" or not os.path.isdir(input_dir):
                 self.msg.setWindowTitle("Invalid Selection")
@@ -1100,9 +1101,9 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
         if (self.ui.tabs.currentIndex() == 1 and not
-            self.ui.back_btn_local.isEnabled()) or \
+        self.ui.back_btn_local.isEnabled()) or \
                 (self.ui.tabs.currentIndex() == 3 and not
-                 self.ui.back_btn_bank.isEnabled()):
+                self.ui.back_btn_bank.isEnabled()):
             self.get_local_patches()
             self.sort_and_set()
 

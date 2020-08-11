@@ -43,11 +43,10 @@ class PatchDelete(Patch):
             if new_path is not None and len(os.listdir(new_path)) == 2:
                 for left_files in os.listdir(new_path):
                     try:
-                        front = left_files.split("_")[0]
-                        end = left_files.split(".")[1]
                         os.rename(os.path.join(new_path, left_files),
-                                  os.path.join(new_path,
-                                               "{}.{}".format(front, end)))
+                                  os.path.join(new_path, "{}.{}".format(
+                                      left_files.split("_")[0],
+                                      left_files.split(".")[-1])))
                     except FileNotFoundError or FileExistsError:
                         raise errors.RenamingError(left_files, 601)
             elif new_path is not None and len(os.listdir(new_path)) == 0:

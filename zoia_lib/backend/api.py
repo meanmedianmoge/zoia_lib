@@ -105,32 +105,6 @@ class PatchStorage:
             'platforms': self.platform
         }
 
-        # check type of optional args
-        for key in list(more_params.keys()):
-            # date
-            if key in ['before', 'after']:
-                more_params[key] = self._validate_date(more_params[key])
-            # str
-            if key in ['search', 'exclude', 'include', 'order',
-                       'orderby', 'slug', 'author', 'author_exclude'] and \
-                    type(more_params[key]) != list:
-                more_params[key] = str(more_params[key])
-            # int
-            if key in ['offset', 'categories', 'categories_exclude',
-                       'tags', 'tags_exclude', 'page', 'platforms',
-                       'platforms_exclude', 'states', 'states_exclude'] and \
-                    type(more_params[key]) != list:
-                more_params[key] = int(more_params[key])
-            # str list
-            if key in ['slug'] and type(more_params[key]) == list:
-                more_params[key] = self._validate_strlist(more_params[key])
-            # int list
-            if key in ['categories', 'categories_exclude', 'tags',
-                       'tags_exclude', 'platforms', 'platforms_exclude',
-                       'states', 'states_exclude'] and \
-                    type(more_params[key]) == list:
-                more_params[key] = self._validate_intlist(more_params[key])
-
         params = {**default_params, **more_params}
 
         # make request
@@ -201,7 +175,7 @@ class PatchStorage:
         all_patches = []
         for page in range(1, math.ceil(self.patch_count / per_page) + 1):
             # Get all the patches on the current page.
-            all_patches += self.search({**search, **{'page': page}})
+            all_patches.extend(self.search({**search, **{'page': page}}))
 
         return all_patches
 
@@ -212,9 +186,8 @@ class PatchStorage:
 
         return: An integer representing the total of ZOIA patches.
         """
-        soup_patch = BeautifulSoup(urlopen(Request("https://patchstorage.com/",
-                                                   headers={"User-Agent":
-                                                                "Mozilla/5.0"})
+        soup_patch = BeautifulSoup(urlopen(Request(
+            "https://patchstorage.com/", headers={"User-Agent": "Mozilla/5.0"})
                                            ).read(), "html.parser")
         found_pedals = soup_patch.find_all(class_="d-flex flex-column "
                                                   "justify-content-center")
@@ -255,7 +228,8 @@ class PatchStorage:
             curr_meta = self.get_patch_meta(idx)
             try:
                 if curr_meta["updated_at"] > entry["updated_at"]:
-                    new_bin.append((self.download(str(entry["id"])), curr_meta))
+                    new_bin.append((self.download(str(entry["id"])),
+                                    curr_meta))
             except KeyError:
                 continue
 
@@ -284,5 +258,5 @@ class PatchStorage:
             return self.search({**search, **{'page': 1}})
         else:
             for i in range(1, pages):
-                new_patches += self.search({**search, **{'page': 1}})
+                new_patches.extend(self.search({**search, **{'page': 1}}))
             return new_patches

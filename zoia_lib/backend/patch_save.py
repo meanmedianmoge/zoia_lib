@@ -56,16 +56,15 @@ class PatchSave(Patch):
         if len(pch_id) == 5:
             # This is an imported patch. Unfortunately, we need to make sure
             # that its a unique binary by checking every patch currently
-            # stored. TODO Use binary analysis to improve this process.
-            for direc in os.listdir(self.back_path):
-                if os.path.isdir(os.path.join(self.back_path, direc)) \
-                        and direc != "Banks" and direc != "sample_files" \
-                        and direc != ".DS_Store":
-                    for files in os.listdir(
-                            os.path.join(self.back_path, direc)):
+            # stored.
+            for fld in os.listdir(self.back_path):
+                if os.path.isdir(os.path.join(self.back_path, fld)) \
+                        and fld != "Banks" and fld != "sample_files" \
+                        and fld != ".DS_Store":
+                    for files in os.listdir(os.path.join(self.back_path, fld)):
                         if files.split(".")[-1] == "bin":
                             with open(os.path.join(
-                                    self.back_path, direc, files), "rb") as f:
+                                    self.back_path, fld, files), "rb") as f:
                                 data = f.read()
                             if patch[0] == data:
                                 raise errors.SavingError(patch[1]["title"],
@@ -105,7 +104,6 @@ class PatchSave(Patch):
                     != "bin":
                 # We need to check the individual binary files to see which,
                 # if any, differ from the ones currently stored.
-
                 # Figure out which file compression is being used.
                 if patch[1]["files"][0]["filename"].split(".")[-1] == "zip":
                     # Create a temporary directory to store
@@ -142,7 +140,7 @@ class PatchSave(Patch):
                         raise errors.SavingError(patch[1]["title"], 503)
                     return
                 else:
-                    # TODO Cover the other compression cases.
+                    # TODO Cover the other compression cases such as 7z
                     raise errors.SavingError(patch[1]["title"])
 
             # If we get here, we are working with a .bin, so we
@@ -184,30 +182,25 @@ class PatchSave(Patch):
             elif len(os.listdir(os.path.join(self.back_path, pch))) > 2:
                 # Increment the version number for each file in the directory.
                 try:
-                    for file in reversed(
-                            sorted(os.listdir(os.path.join(pch)))):
+                    for file in reversed(sorted(os.listdir(pch), key=len)):
                         ver = int(file.split("v")[1].split(".")[0]) + 1
                         extension = file.split(".")[-1]
-                        os.rename(os.path.join(pch,
-                                               "{}_v{}.{}".format(pch_id,
-                                                                  str(ver - 1),
-                                                                  extension)),
-                                  os.path.join(pch,
-                                               "{}_v{}.{}".format(pch_id,
-                                                                  str(ver),
-                                                                  extension)))
+                        os.rename(os.path.join(
+                            pch, "{}_v{}.{}".format(pch_id, str(ver - 1),
+                                                    extension)),
+                                  os.path.join(
+                                      pch, "{}_v{}.{}".format(pch_id, str(ver),
+                                                              extension)))
                         # Update the revision number in each metadata file
-                        with open(os.path.join(pch,
-                                               "{}_v{}.json".format(pch_id,
-                                                                    str(ver))),
+                        with open(os.path.join(
+                                pch, "{}_v{}.json".format(pch_id, str(ver))),
                                   "r") as f:
                             jf = json.loads(f.read())
 
                         jf["revision"] = ver
 
-                        with open(os.path.join(pch,
-                                               "{}_v{}.json".format(pch_id,
-                                                                    str(ver))),
+                        with open(os.path.join(
+                                pch, "{}_v{}.json".format(pch_id, str(ver))),
                                   "w") as f:
                             json.dump(jf, f)
 
@@ -287,7 +280,7 @@ class PatchSave(Patch):
                 patch_name = patch_name.split(":")[-1]
             ext = "bin"
         patch_name = patch_name.split(os.path.sep)[-1]
-        # PyQt5 bug where the path separator is incorrect on Windows
+        # PySide2 bug where the path separator is incorrect on Windows :')
         patch_name = patch_name.split("/")[-1]
 
         title = patch_name
@@ -311,13 +304,13 @@ class PatchSave(Patch):
         title = title.replace("_", " ")
         title = title.strip()
 
-        patch_id = self.generate_patch_id(path)
+        patch_id = self._generate_patch_id(path)
 
         count = 1 if not os.path.isdir(path) else len(os.listdir(path))
         for i in range(count):
             # Generate a random patch ID to use (must be 5 digits).
             if not version:
-                patch_id = self.generate_patch_id(path)
+                patch_id = self._generate_patch_id(path)
             # Binary file, easiest case.
             # Get the bytes.
             if not version:
@@ -331,6 +324,7 @@ class PatchSave(Patch):
                     continue
                 with open(temp_path, "rb") as f:
                     temp_data = f.read()
+
             # Prepare the JSON.
             js_data = {
                 "id": patch_id,
@@ -389,20 +383,6 @@ class PatchSave(Patch):
                     fails += 1
                     continue
         return fails
-
-    @staticmethod
-    def generate_patch_id(path):
-        """ Generates a 5-digit patch ID for a supplied path.
-        """
-
-        patch_id = str(abs(hash(path)))
-        if len(patch_id) > 5:
-            patch_id = patch_id[:5]
-        else:
-            while len(patch_id) < 5:
-                patch_id += "0"
-        patch_id = int(patch_id)
-        return patch_id
 
     def patch_decompress(self, patch):
         """ Method stub for decompressing files retrieved from the PS API.
@@ -472,5 +452,19 @@ class PatchSave(Patch):
 
         else:
             # Unexpected file extension encountered.
-            # TODO Handle this case gracefully.
             raise errors.SavingError(patch[1]["title"], 501)
+
+    @staticmethod
+    def _generate_patch_id(path):
+        """ Generates a 5-digit patch ID for a supplied path.
+        The same string will hash to the same 5-digit identifier.
+        """
+
+        patch_id = str(abs(hash(path)))
+        if len(patch_id) > 5:
+            patch_id = patch_id[:5]
+        else:
+            while len(patch_id) < 5:
+                patch_id += "0"
+        patch_id = int(patch_id)
+        return patch_id

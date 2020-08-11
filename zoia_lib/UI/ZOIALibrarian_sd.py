@@ -447,7 +447,8 @@ class ZOIALibrarianSD(QMainWindow):
                                 elif temp1 is None and temp2 is not None:
                                     self.move_patch_sd(i, j)
                                 elif temp1 is not None and temp2 is None or \
-                                        temp1 is not None and temp2 is not None:
+                                        temp1 is not None and temp2 is not \
+                                        None:
                                     self.move_patch_sd(j, i)
                                 elif temp1 is None and temp2 is not None:
                                     self.move_patch_sd(i, j)
