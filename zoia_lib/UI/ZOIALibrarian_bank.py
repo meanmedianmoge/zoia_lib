@@ -298,8 +298,6 @@ class ZOIALibrarianBank(QMainWindow):
         if dest > 63:
             dest -= 64
 
-        print(src, dest)
-
         # Setup the new item.
         if src < 32:
             idx = self.ui.table_bank_left.cellWidget(src, 1).objectName()

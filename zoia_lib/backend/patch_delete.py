@@ -21,11 +21,13 @@ class PatchDelete(Patch):
         """Attempts to delete a patch and its metadata from
         the backend ZoiaLibraryApp directory.
 
-        patch: A string representing the patch to be deleted.
+        patch: A string representing the path to the patch to be
+               deleted.
         Raises RenamingError if the file could not be renamed
                correctly.
         Raises BadPathError if patch was not a valid path.
         """
+
         if patch is None:
             raise errors.DeletionError(None)
 

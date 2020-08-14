@@ -13,6 +13,7 @@ class ZOIALibrarianUtil:
         # Get the ui reference
         self.ui = ui
         self.dark = True
+        self.font = None
 
     def change_font(self, name):
         """ Changes the font used throughout the application.
@@ -204,6 +205,7 @@ class ZOIALibrarianUtil:
 
         self.dark = not self.dark
         app.setStyleSheet(data)
+        self.change_font(self.font)
 
     def row_invert(self):
         """ Either enables of disables alternating row colours for
@@ -227,7 +229,11 @@ class ZOIALibrarianUtil:
             not self.ui.table_bank_right.alternatingRowColors())
 
     def set_dark(self, value):
-        """ Setter method to specify the state of the application with
-        regards to dark mode being enabled.
+        """ Setter method to specify whether dark mode is enabled.
         """
         self.dark = value
+
+    def set_font(self, f):
+        """ Setter method to specify the font to be used for the app.
+        """
+        self.font = f

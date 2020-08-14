@@ -2,7 +2,7 @@ import io
 import unittest
 import zipfile
 
-from zoia_lib.backend import api, binary
+from zoia_lib.backend import api, patch_binary
 
 ps = api.PatchStorage()
 
@@ -15,7 +15,7 @@ class FormatTest(unittest.TestCase):
         self.assertTrue(isinstance(f[0], bytes), "Returned tuple did not contain binary data in the first element.")
         self.assertTrue(isinstance(f[1], dict), "Returned tuple did not contain json data in the second element.")
 
-        size, name, n_mod = binary.formatter(f[0])
+        size, name, n_mod = patch_binary.formatter(f[0])
         self.assertTrue(size == 908, "Binary size not returning as expected")
         self.assertTrue(name == 'Am I Conscious', "Binary name not returning as expected")
         self.assertTrue(n_mod == 31, "Binary n_mod not returning as expected")
@@ -33,7 +33,7 @@ class FormatTest(unittest.TestCase):
                 continue
             byt = zf.read(info)
             # print(zf.read(fileinfo).decode('latin-1'))
-            size, name, n_mod = binary.formatter(byt)
+            size, name, n_mod = patch_binary.formatter(byt)
 
             self.assertTrue(size == 2123, "Binary size not returning as expected")
             self.assertTrue(name == 'Juniper', "Binary name not returning as expected")

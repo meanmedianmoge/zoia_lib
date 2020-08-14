@@ -19,7 +19,7 @@ QHeaderView {
     color: #000;
 }
 
-QPushButton#btn_load_bank {
+QPushButton#btn_load_bank, QPushButton#btn_dwn_all {
     padding: 2px 25px 2px 25px;
     border: 1px solid black;
 }
@@ -87,7 +87,7 @@ QPushButton#back_btn_bank:hover, QPushButton#import_all_ver_btn:hover,
 QPushButton#import_all_btn:hover, QPushButton#update_patch_notes:hover,
 QPushButton#btn_save_bank:hover, QPushButton#btn_load_bank:hover,
 QPushButton#btn_export_bank:hover, QPushButton#check_for_updates_btn:hover,
-QPushButton#delete_folder_sd_btn:hover {
+QPushButton#delete_folder_sd_btn:hover, QPushButton#btn_dwn_all:hover {
     background-color: #d9ebf9;
 }
 
@@ -172,7 +172,8 @@ QPushButton#back_btn_local, QPushButton#back_btn_bank,
 QPushButton#import_all_ver_btn, QPushButton#import_all_btn,
 QPushButton#update_patch_notes, QPushButton#btn_save_bank,
 QPushButton#btn_load_bank, QPushButton#btn_export_bank,
-QPushButton#check_for_updates_btn, QPushButton#delete_folder_sd_btn {
+QPushButton#check_for_updates_btn, QPushButton#delete_folder_sd_btn,
+QPushButton#btn_dwn_all {
     background-color: #eaeaea;
     color: #000;
 }

@@ -20,7 +20,7 @@ QPushButton {
     color: #FFF;
 }
 
-QPushButton#btn_load_bank {
+QPushButton#btn_load_bank, QPushButton#btn_dwn_all {
     padding: 2px 25px 2px 25px;
     border: 1px solid black;
 }

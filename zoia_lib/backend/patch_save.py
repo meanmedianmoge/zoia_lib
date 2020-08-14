@@ -419,26 +419,36 @@ class PatchSave(Patch):
                     to_delete = (os.path.join(pch, file))
                     pch = os.path.join(pch, file)
 
-            i = 0
-            for file in os.listdir(pch):
-                if file.split(".")[-1] == "bin":
-                    i += 1
-                    try:
-                        name = file
-                        # Rename the file to follow the conventional format
-                        os.rename(os.path.join(pch, file),
-                                  os.path.join(pch, "{}_v{}.bin".format(
-                                      patch[1]["id"], i)))
-                        patch[1]["files"][0]["filename"] = name
-                        self.save_metadata_json(patch[1], i)
-                    except FileNotFoundError or FileExistsError:
-                        raise errors.RenamingError(patch, 601)
-                else:
-                    # Remove any additional files.
-                    # TODO make this better. Shouldn't just delete
-                    #  additional files. Especially .txt, would want to
-                    #  add that to the content attribute in the JSON.
-                    os.remove(os.path.join(pch, file))
+            if len(os.listdir(pch)) == 1:
+                for file in os.listdir(pch):
+                    name = file
+                    os.rename(os.path.join(pch, file),
+                              os.path.join(pch, "{}.bin".format(patch[1]["id"]
+                                                                )))
+                    patch[1]["files"][0]["filename"] = name
+                    self.save_metadata_json(patch[1])
+
+            else:
+                i = 0
+                for file in os.listdir(pch):
+                    if file.split(".")[-1] == "bin":
+                        i += 1
+                        try:
+                            name = file
+                            # Rename the file to follow the conventional format
+                            os.rename(os.path.join(pch, file),
+                                      os.path.join(pch, "{}_v{}.bin".format(
+                                          patch[1]["id"], i)))
+                            patch[1]["files"][0]["filename"] = name
+                            self.save_metadata_json(patch[1], i)
+                        except FileNotFoundError or FileExistsError:
+                            raise errors.RenamingError(patch, 601)
+                    else:
+                        # Remove any additional files.
+                        # TODO make this better. Shouldn't just delete
+                        #  additional files. Especially .txt, would want to
+                        #  add that to the content attribute in the JSON.
+                        os.remove(os.path.join(pch, file))
             if to_delete is not None:
                 for file in os.listdir(to_delete):
                     correct_pch = os.path.join(self.back_path,
@@ -452,6 +462,7 @@ class PatchSave(Patch):
 
         else:
             # Unexpected file extension encountered.
+            os.rmdir(pch)
             raise errors.SavingError(patch[1]["title"], 501)
 
     @staticmethod

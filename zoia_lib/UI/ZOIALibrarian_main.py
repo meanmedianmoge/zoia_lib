@@ -1,8 +1,9 @@
 import json
 import os
+import threading
 from os.path import expanduser
 
-from PySide2.QtCore import QEvent, Qt
+from PySide2.QtCore import QEvent, Qt, QThread
 from PySide2.QtGui import QIcon, QFont
 from PySide2.QtWidgets import QMainWindow, QMessageBox, QInputDialog, \
     QFileDialog, QPushButton, QTableWidgetItem, QRadioButton, QDesktopWidget
@@ -15,6 +16,7 @@ from zoia_lib.UI.ZOIALibrarian_util import ZOIALibrarianUtil
 from zoia_lib.UI.ZOIALibrarian_sd import ZOIALibrarianSD
 from zoia_lib.UI.ZOIALibrarian_ps import ZOIALibrarianPS
 from zoia_lib.backend.api import PatchStorage
+from zoia_lib.backend.patch_binary import PatchBinary
 from zoia_lib.backend.patch_delete import PatchDelete
 from zoia_lib.backend.patch_export import PatchExport
 from zoia_lib.backend.patch_save import PatchSave
@@ -25,6 +27,7 @@ update = PatchUpdate()
 save = PatchSave()
 export = PatchExport()
 delete = PatchDelete()
+binary = PatchBinary()
 
 
 class ZOIALibrarianMain(QMainWindow):
@@ -94,6 +97,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.sd_sizes = None
         self.bank_sizes = None
         self.font = None
+        self.prev_search = ""
 
         # Get the data necessary for the PS tab.
         self.ps.metadata_init()
@@ -130,6 +134,7 @@ class ZOIALibrarianMain(QMainWindow):
 
             # Font
             self.font = QFont(data[0]["font"], data[0]["font_size"])
+            self.util.set_font(self.font)
 
             self.ps_sizes = data[1]
             self.local_sizes = data[2]
@@ -244,6 +249,7 @@ class ZOIALibrarianMain(QMainWindow):
             lambda: self.sd.delete_sd_item(delete))
         self.ui.actionToggle_Dark_Mode_2.triggered.connect(
             self.util.toggle_dark)
+        self.ui.btn_dwn_all.clicked.connect(self.ps.download_all_thread)
 
         self.util.toggle_dark()
 
@@ -394,8 +400,7 @@ class ZOIALibrarianMain(QMainWindow):
                     (table_index == 3 and self.ui.back_btn_bank.isEnabled()):
                 btn_title.setObjectName(str(data[i]["id"]) + "_v"
                                         + str(data[i]["revision"]))
-                btn_title.setText(data[i]["title"] + "\n"
-                                  + data[i]["files"][0]["filename"])
+                btn_title.setText(data[i]["files"][0]["filename"])
             elif (table_index == 1 and
                   not self.ui.back_btn_local.isEnabled()) \
                     or (table_index == 3 and
@@ -674,6 +679,7 @@ class ZOIALibrarianMain(QMainWindow):
         """
 
         skip = False
+        viz = None
 
         if self.sender().isChecked():
             if (self.ui.tabs.currentIndex() == 1
@@ -707,8 +713,10 @@ class ZOIALibrarianMain(QMainWindow):
                         content = api.get_patch_meta(name)
                         self.patch_cache.append(content)
             else:
+                temp2 = None
                 if self.ui.tabs.currentIndex() == 1:
                     temp = self.ui.text_browser_local
+                    temp2 = self.ui.text_browser_viz
                     self.ui.update_patch_notes.setEnabled(True)
                 elif self.ui.tabs.currentIndex() == 3:
                     temp = self.ui.text_browser_bank
@@ -717,14 +725,23 @@ class ZOIALibrarianMain(QMainWindow):
                     self.local_selected += "_" + ver
                 try:
                     with open(os.path.join(self.path, name,
-                                           name + ".json")) \
-                            as f:
+                                           name + ".json")) as f:
                         content = json.loads(f.read())
                 except FileNotFoundError:
                     with open(os.path.join(
                             self.path, name, name + "_{}.json".format(ver))) \
                             as f:
                         content = json.loads(f.read())
+                if temp2 is not None:
+                    try:
+                        with open(os.path.join(self.path, name,
+                                               name + ".bin"), "rb") as f:
+                            viz = binary.parse_data(f.read())
+                    except FileNotFoundError:
+                        with open(os.path.join(
+                                self.path, name,
+                                name + "_{}.bin".format(ver)), "rb") as f:
+                            viz = binary.parse_data(f.read())
             if not skip:
                 if content["preview_url"] == "":
                     content["preview_url"] = "None provided"
@@ -757,6 +774,9 @@ class ZOIALibrarianMain(QMainWindow):
                          + "<br/><br/><u>Patch Notes:</u><br/>"
                          + content["content"] + "</html>")
 
+            if viz is not None:
+                temp2.setText(viz)
+
     def display_patch_versions(self, context):
         """ Displays the contents of a patch that has multiple versions.
         Currently triggered via a button press.
@@ -765,7 +785,9 @@ class ZOIALibrarianMain(QMainWindow):
         """
         if context:
             # Clean up the tab.
+            self.prev_search = self.ui.searchbar_local.text()
             self.ui.text_browser_local.setText("")
+            self.ui.text_browser_viz.setText("")
             self.ui.searchbar_local.setText("")
             self.ui.update_patch_notes.setEnabled(False)
             self.ui.back_btn_local.setEnabled(True)
@@ -773,6 +795,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.get_version_patches(True)
         else:
             # Clean up the tab.
+            self.prev_search = self.ui.searchbar_bank.text()
             self.ui.text_browser_bank.setText("")
             self.ui.searchbar_bank.setText("")
             self.ui.back_btn_bank.setEnabled(True)
@@ -1234,12 +1257,13 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Do the necessary cleanup depending on the context.
         if self.sender().objectName() == "back_btn_local":
-            self.ui.searchbar_local.setText("")
+            self.ui.searchbar_local.setText(self.prev_search)
             self.ui.text_browser_local.setText("")
+            self.ui.text_browser_viz.setText("")
             self.ui.back_btn_local.setEnabled(False)
             self.ui.update_patch_notes.setEnabled(False)
         elif self.sender().objectName() == "back_btn_bank":
-            self.ui.searchbar_bank.setText("")
+            self.ui.searchbar_bank.setText(self.prev_search)
             self.ui.text_browser_bank.setText("")
             self.ui.back_btn_bank.setEnabled(False)
         # Sort and display the data.

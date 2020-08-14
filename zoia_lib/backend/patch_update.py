@@ -95,12 +95,10 @@ class PatchUpdate(Patch):
         pch_list = ps.get_potential_updates(meta)
 
         # Try to save the new binaries to the backend.
-        updates = 0
         save = PatchSave()
         for patch in pch_list:
             try:
                 save.save_to_backend(patch[0])
-                updates += 1
             except errors.SavingError:
                 # TODO If we fail to save, at least update the metadata.
                 try:
@@ -116,6 +114,5 @@ class PatchUpdate(Patch):
                                                str(patch[1]["id"]))),
                               "r") as f:
                         f.write(json.dumps(patch[1]))
-                updates += 1
 
-        return updates
+        return len(pch_list)

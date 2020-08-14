@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1567</width>
-    <height>1203</height>
+    <height>1185</height>
    </rect>
   </property>
   <property name="focusPolicy">
@@ -83,7 +83,7 @@
          <enum>QTabWidget::Rounded</enum>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <property name="movable">
          <bool>false</bool>
@@ -248,6 +248,25 @@
                         </layout>
                        </item>
                        <item>
+                        <widget class="QPushButton" name="btn_dwn_all">
+                         <property name="toolTip">
+                          <string>Click here to download all patches currently stored on PatchStorage.</string>
+                         </property>
+                         <property name="statusTip">
+                          <string>Click here to download all patches currently stored on PatchStorage.</string>
+                         </property>
+                         <property name="accessibleName">
+                          <string>Download All Button</string>
+                         </property>
+                         <property name="accessibleDescription">
+                          <string>Forcibly downloads and saves all patches currently hosted on the PatchStorage.com website to your local computer. All of these patches will then be available for viewing in the Local Storage View tab.</string>
+                         </property>
+                         <property name="text">
+                          <string>Download All Patches</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
                         <widget class="QTableWidget" name="table_PS">
                          <property name="cursor" stdset="0">
                           <cursorShape>ArrowCursor</cursorShape>
@@ -406,43 +425,19 @@
           </property>
           <item>
            <widget class="QWidget" name="widget_9" native="true">
-            <layout class="QHBoxLayout" name="horizontalLayout_8">
-             <property name="spacing">
-              <number>9</number>
-             </property>
-             <property name="leftMargin">
-              <number>9</number>
-             </property>
-             <property name="topMargin">
-              <number>9</number>
-             </property>
-             <property name="rightMargin">
-              <number>9</number>
-             </property>
-             <property name="bottomMargin">
-              <number>9</number>
-             </property>
+            <layout class="QVBoxLayout" name="verticalLayout_13">
              <item>
               <widget class="QSplitter" name="splitter_local">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
                <property name="handleWidth">
                 <number>10</number>
                </property>
-               <widget class="QWidget" name="layoutWidget">
-                <layout class="QVBoxLayout" name="verticalLayout_2">
-                 <property name="spacing">
-                  <number>5</number>
-                 </property>
+               <widget class="QWidget" name="layoutWidget_7">
+                <layout class="QVBoxLayout" name="verticalLayout_7">
                  <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_10">
+                  <layout class="QHBoxLayout" name="horizontalLayout_12">
                    <item>
                     <widget class="QPushButton" name="back_btn_local">
                      <property name="cursor">
@@ -620,7 +615,7 @@
                  </item>
                 </layout>
                </widget>
-               <widget class="QWidget" name="layoutWidget_2">
+               <widget class="QWidget" name="layoutWidget_8">
                 <layout class="QVBoxLayout" name="verticalLayout_12">
                  <item>
                   <widget class="QPushButton" name="update_patch_notes">
@@ -651,25 +646,53 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QTextBrowser" name="text_browser_local">
-                   <property name="accessibleName">
-                    <string>Additional Patch Notes Display</string>
+                  <widget class="QSplitter" name="splitter_viz_2">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
                    </property>
-                   <property name="accessibleDescription">
-                    <string>Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)</string>
+                   <property name="handleWidth">
+                    <number>10</number>
                    </property>
-                   <property name="styleSheet">
-                    <string notr="true"/>
-                   </property>
-                   <property name="textInteractionFlags">
-                    <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextEditable|Qt::TextSelectableByMouse</set>
-                   </property>
-                   <property name="openExternalLinks">
-                    <bool>true</bool>
-                   </property>
-                   <property name="openLinks">
-                    <bool>true</bool>
-                   </property>
+                   <widget class="QTextBrowser" name="text_browser_local">
+                    <property name="accessibleName">
+                     <string>Additional Patch Notes Display</string>
+                    </property>
+                    <property name="accessibleDescription">
+                     <string>Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)</string>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true"/>
+                    </property>
+                    <property name="textInteractionFlags">
+                     <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextEditable|Qt::TextSelectableByMouse</set>
+                    </property>
+                    <property name="openExternalLinks">
+                     <bool>true</bool>
+                    </property>
+                    <property name="openLinks">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                   <widget class="QTextBrowser" name="text_browser_viz">
+                    <property name="accessibleName">
+                     <string>Additional Patch Notes Display</string>
+                    </property>
+                    <property name="accessibleDescription">
+                     <string>Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)</string>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true"/>
+                    </property>
+                    <property name="textInteractionFlags">
+                     <set>Qt::TextBrowserInteraction</set>
+                    </property>
+                    <property name="openExternalLinks">
+                     <bool>true</bool>
+                    </property>
+                    <property name="openLinks">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
                   </widget>
                  </item>
                 </layout>
