@@ -19,14 +19,15 @@ QHeaderView {
     color: #000;
 }
 
-QPushButton#btn_load_bank, QPushButton#btn_dwn_all {
+QPushButton#btn_load_bank {
     padding: 2px 25px 2px 25px;
     border: 1px solid black;
 }
 
 QPushButton#delete_folder_sd_btn,
 QPushButton#import_all_btn,
-QPushButton#import_all_ver_btn {
+QPushButton#import_all_ver_btn,
+QPushButton#btn_dwn_all {
     border-radius: 5px;
     padding: 2px 2px 2px 2px;
     border: 1px solid black;

@@ -13,7 +13,7 @@ class ZOIALibrarianUtil:
         # Get the ui reference
         self.ui = ui
         self.dark = True
-        self.font = None
+        self.font = QFont("Verdana", 10)
 
     def change_font(self, name):
         """ Changes the font used throughout the application.
