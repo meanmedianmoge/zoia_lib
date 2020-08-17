@@ -15,6 +15,7 @@ class Patch:
         based on the OS a user is running.
         """
 
+        # Can't use a dict here because it will fail on macOS.
         self.back_path = None
         curr_os = platform.system().lower()
         if curr_os == "windows":

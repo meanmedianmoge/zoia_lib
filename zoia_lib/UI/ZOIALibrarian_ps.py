@@ -1,13 +1,10 @@
 import json
 import os
-import sys
-import threading
-import time
-import traceback
 
-from PySide2.QtCore import QRunnable, Slot, QThreadPool, QObject, Signal
-from PySide2.QtWidgets import QMainWindow, QMessageBox
+from PySide2.QtCore import QThreadPool
+from PySide2.QtWidgets import QMainWindow, QMessageBox, QPushButton
 
+from zoia_lib.backend.worker import Worker
 from zoia_lib.common import errors
 
 
@@ -66,10 +63,6 @@ class ZOIALibrarianPS(QMainWindow):
         # Check for metadata in the user's backend.
         if "data.json" not in os.listdir(self.path):
             ps_data = self.api.get_all_patch_data_init()
-            with open(os.path.join(self.path, "data.json"),
-                      "w") as f:
-                f.write(json.dumps(ps_data))
-                self.data_PS = ps_data
         else:
             # Got previous metadata, need to ensure that there are no
             # new patches.
@@ -79,24 +72,25 @@ class ZOIALibrarianPS(QMainWindow):
             if len(data) == self.api.patch_count:
                 # Assume no new patches; allow the user to refresh manually.
                 self.data_PS = data
+                return
             elif len(data) > self.api.patch_count:
                 # Uh oh, some patches got deleted on PatchStorage.
                 ps_data = self.api.get_all_patch_data_init()
-                with open(os.path.join(self.path, "data.json"),
-                          "w") as f:
-                    f.write(json.dumps(ps_data))
-                    self.data_PS = ps_data
             else:
                 # Get the new patch metadata that we don't have.
                 new_patches = self.api.get_newest_patches(len(data))
-                data = new_patches + data
-                with open(os.path.join(self.path, "data.json"),
-                          "w") as f:
-                    f.write(json.dumps(data))
-                    self.data_PS = data
+                ps_data = new_patches + data
+
+        # Create/update the data file with the new data.
+        with open(os.path.join(self.path, "data.json"),
+                  "w") as f:
+            f.write(json.dumps(ps_data))
+            self.data_PS = ps_data
 
     def download_all_thread(self):
-        """
+        """ Initializes a Worker thread to manage the downloading of
+        all ZOIA patches currently hosted on PatchStorage.
+        Currently triggered via a button press.
         """
 
         # Pass the function to execute
@@ -108,7 +102,10 @@ class ZOIALibrarianPS(QMainWindow):
         self.thread_pool.start(worker)
 
     def download_all_progress(self, i):
-        """
+        """ Progress update provided by the worker to display how
+        many patches have been downloaded.
+
+        i: The current patch that is being downloaded.
         """
 
         self.ui.statusbar.showMessage(
@@ -116,7 +113,9 @@ class ZOIALibrarianPS(QMainWindow):
                 i + 1, self.ui.table_PS.rowCount()))
 
     def download_all_done(self):
-        """
+        """ Notifies the user once all PatchStorage patches have been
+        downloaded. Will also notify the user with the number of
+        patches that failed to download and explain why they failed.
         """
 
         self.msg.setWindowTitle("Download Complete")
@@ -136,8 +135,9 @@ class ZOIALibrarianPS(QMainWindow):
         self.ui.check_for_updates_btn.setEnabled(True)
 
     def download_all(self, progress_callback):
-        """
-
+        """ Attempts to download all patches currently stored on
+        PatchStorage. This method will ignore failures and continue
+        on to the next patch until it has exhausted the list.
         """
 
         self.ui.btn_dwn_all.setEnabled(False)
@@ -191,46 +191,26 @@ class ZOIALibrarianPS(QMainWindow):
             self.msg.exec_()
             self.msg.setInformativeText(None)
 
+    def create_dwn_btn(self, i, idx):
+        """ Creates a download button for patches on the PatchStorage
+        tab.
+
+        i: The row for which the button will be inserted into.
+        """
+
+        # Prepare the button.
+        dwn = QPushButton("Click me\nto download!", self)
+        dwn.setObjectName(idx)
+        dwn.setFont(self.ui.table_PS.horizontalHeader().font())
+        dwn.clicked.connect(self.initiate_download)
+        # Only enable it if we haven't already downloaded the patch.
+        if idx in os.listdir(self.path):
+            dwn.setEnabled(False)
+            dwn.setText("Downloaded!")
+        self.ui.table_PS.setCellWidget(i, 4, dwn)
+
     def get_data_ps(self):
         """ Getter method to get PS table data.
         """
 
         return self.data_PS
-
-
-class Worker(QRunnable):
-    """
-    """
-
-    def __init__(self, fn, *args, **kwargs):
-        super(Worker, self).__init__()
-
-        # Store constructor arguments (re-used for processing)
-        self.fn = fn
-        self.args = args
-        self.kwargs = kwargs
-        self.signals = WorkerSignals()
-
-        self.kwargs['progress_callback'] = self.signals.progress
-
-    def run(self):
-        """
-        """
-
-        try:
-            result = self.fn(*self.args, **self.kwargs)
-        except:
-            traceback.print_exc()
-            exctype, value = sys.exc_info()[:2]
-            self.signals.error.emit((exctype, value, traceback.format_exc()))
-        else:
-            self.signals.result.emit(result)
-        finally:
-            self.signals.finished.emit()
-
-
-class WorkerSignals(QObject):
-    finished = Signal()
-    error = Signal(tuple)
-    result = Signal(object)
-    progress = Signal(int)
