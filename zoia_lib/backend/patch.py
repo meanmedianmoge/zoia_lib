@@ -19,18 +19,21 @@ class Patch:
         self.back_path = None
         curr_os = platform.system().lower()
         if curr_os == "windows":
-            self.back_path = os.path.join(os.getenv('APPDATA'),
-                                          ".ZoiaLibraryApp")
+            self.back_path = os.path.join(
+                os.getenv('APPDATA'), ".ZoiaLibraryApp")
         elif curr_os == "darwin":
-            self.back_path = os.path.join(str(Path.home()), "Library",
-                                          "Application Support",
-                                          ".ZoiaLibraryApp")
+            self.back_path = os.path.join(
+                str(Path.home()), "Library", "Application Support",
+                ".ZoiaLibraryApp")
         elif curr_os == "linux":
-            self.back_path = os.path.join(str(Path.home()), ".local", "share",
-                                          ".ZoiaLibraryApp")
+            self.back_path = os.path.join(
+                str(Path.home()), ".local", "share", ".ZoiaLibraryApp")
         else:
             # Solaris/Chrome OS/Java OS?
             self.back_path = None
+
+        # Create the backend directories if needed.
+        self._create_backend_directories()
 
     def _create_backend_directories(self):
         """ Creates the necessary directories that will

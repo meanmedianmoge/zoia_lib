@@ -8,7 +8,7 @@ from PySide2.QtWidgets import QTableWidgetItem, QPushButton, QFileDialog, \
 
 
 class ZOIALibrarianBank(QMainWindow):
-    """ The ZOIALibrarianBank class is responsible for all
+    """ The ZOIALibrarianBank class is responsible for most
     activities contained within the Banks tab of the application.
     """
 
@@ -668,17 +668,16 @@ class ZOIALibrarianBank(QMainWindow):
             item_right = self.ui.table_bank_right.cellWidget(i, 1)
             if item_left is not None and \
                     item_left.objectName() == self.sender().objectName():
-                self.ui.table_bank_left.setItem(i, 0, QTableWidgetItem(None))
-                self.ui.table_bank_left.setCellWidget(i, 1, None)
-                self.ui.table_bank_left.clearSelection()
+                curr_table = self.ui.table_bank_left
                 break
             elif item_right is not None and \
                     item_right.objectName() == self.sender().objectName():
-                self.ui.table_bank_right.setItem(i, 0, QTableWidgetItem(None))
-                self.ui.table_bank_right.setCellWidget(i, 1, None)
-                self.ui.table_bank_right.clearSelection()
+                curr_table = self.ui.table_bank_left
                 break
-
+        # Clear the item and determine if buttons need to be disabled.
+        curr_table.setItem(i, 0, QTableWidgetItem(None))
+        curr_table.setCellWidget(i, 1, None)
+        curr_table.clearSelection()
         item = self.has_item()
         self.ui.btn_export_bank.setEnabled(item)
         self.ui.btn_save_bank.setEnabled(item)

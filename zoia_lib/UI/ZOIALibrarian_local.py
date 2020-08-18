@@ -1,6 +1,7 @@
 import json
 import os
 
+from PySide2.QtCore import QEvent
 from PySide2.QtWidgets import QMainWindow, QMessageBox, QInputDialog, \
     QPushButton
 
@@ -8,10 +9,16 @@ from zoia_lib.common import errors
 
 
 class ZOIALibrarianLocal(QMainWindow):
-    """
+    """ The ZOIALibrarianLocal class is responsible for all
+    activities contained within the Local Storage View tab of the
+    application, along with some activities contained within the Banks
+    tab. This added responsibility is due to the fact that the Banks
+    tab displays local patches that users can then use to create banks.
+    In order to minimize code duplication, the code was merged into
+    this class.
     """
 
-    def __init__(self, ui, path, export, delete, window, sd, msg):
+    def __init__(self, ui, path, export, delete, update, window, sd, msg, f1):
         """
         """
 
@@ -21,9 +28,19 @@ class ZOIALibrarianLocal(QMainWindow):
         self.path = path
         self.export = export
         self.delete = delete
+        self.update = update
         self.window = window
         self.sd = sd
         self.msg = msg
+        self.f1 = f1
+        self.data_local = []
+        self.data_local_version = []
+        self.data_bank = []
+        self.data_bank_version = []
+        self.curr_ver = None
+        self.prev_tag_cat = None
+        self.prev_search = ""
+        self.local_selected = None
 
     def initiate_export(self):
         """ Attempts to export a patch saved in the backend to an SD
@@ -95,7 +112,7 @@ class ZOIALibrarianLocal(QMainWindow):
                     # Operation was aborted.
                     break
 
-    def create_expt_and_del_btns(self, btn, i, idx, ver, f1):
+    def create_expt_and_del_btns(self, btn, i, idx, ver):
         """
 
         btn:
@@ -125,7 +142,7 @@ class ZOIALibrarianLocal(QMainWindow):
         self.ui.table_local.setCellWidget(i, 4, expt)
 
         del_btn.setFont(self.ui.table_PS.horizontalHeader().font())
-        del_btn.clicked.connect(f1)
+        del_btn.clicked.connect(self.initiate_delete)
         self.ui.table_local.setCellWidget(i, 5, del_btn)
 
     def get_local_patches(self):
@@ -133,7 +150,12 @@ class ZOIALibrarianLocal(QMainWindow):
         downloaded and saved to their machine's backend.
         """
 
-        curr_data = []
+        if self.ui.tabs.currentIndex() == 1:
+            self.data_local = []
+            curr_data = self.data_local
+        else:
+            self.data_bank = []
+            curr_data = self.data_bank
         for patches in os.listdir(self.path):
             # Look for patch directories in the backend.
             if patches != "Banks" and patches != "data.json" and \
@@ -145,5 +167,251 @@ class ZOIALibrarianLocal(QMainWindow):
                             temp = json.loads(f.read())
                         curr_data.append(temp)
                         break
-        return curr_data
 
+    def initiate_delete(self):
+        """ Attempts to delete a patch that is stored on a user's local
+        filesystem.
+        """
+
+        if "_" not in self.sender().objectName():
+            if not self.ui.back_btn_local.isEnabled() and \
+                    len(os.listdir(os.path.join(
+                        self.path, self.sender().objectName()))) > 2:
+                self.delete.delete_full_patch_directory(
+                    self.sender().objectName())
+            else:
+                self.delete.delete_patch(self.sender().objectName())
+            self.get_local_patches()
+            self.f1()
+        else:
+            self.delete.delete_patch(
+                os.path.join(self.curr_ver, self.sender().objectName()))
+            self.get_version_patches(self.ui.tabs.currentIndex() == 1)
+
+        # Reset the text browser.
+        self.ui.text_browser_local.setText("")
+
+        # Special case, we only have one patch in a version history after
+        # a deletion.
+        if self.ui.back_btn_local.isEnabled() \
+                and self.ui.table_local.rowCount() == 1:
+            self.get_local_patches()
+            self.ui.back_btn_local.setEnabled(False)
+            self.ui.searchbar_local.setText("")
+            self.f1()
+
+    def get_version_patches(self, context, idx=None):
+        """ Retrieves the versions of a patch that is locally stored to
+        a user's backend local storage.
+        context: True for the Local Storage View tab, False for the
+                 Banks tab.
+        """
+
+        if idx is None:
+            idx = self.curr_ver
+        else:
+            self.curr_ver = idx.split("_")[0]
+        self.prev_tag_cat = None
+        if context:
+            self.data_local_version = []
+            curr_data = self.data_local_version
+        else:
+            self.data_bank_version = []
+            curr_data = self.data_bank_version
+
+        # Get all of the patch versions into one place.
+        for pch in os.listdir(os.path.join(self.path, idx)):
+            if pch.split(".")[-1] == "json":
+                # Got the metadata
+                with open(os.path.join(self.path, idx, pch)) as f:
+                    temp = json.loads(f.read())
+                curr_data.append(temp)
+
+        self.ui.update_patch_notes.setEnabled(not context)
+        self.f1()
+
+    def update_local_patches(self):
+        """ Attempts to update any patch that is stored in the user's
+        backend directory.
+        Currently triggered via a button press.
+        TODO List which patches were updated.
+        """
+
+        self.ui.statusbar.showMessage("Checking for updates...",
+                                      timeout=5000)
+        count = self.update.check_for_updates()
+        if count == 0:
+            self.msg.setWindowTitle("No Updates")
+            self.msg.setIcon(QMessageBox.Information)
+            self.msg.setText("All of the patches you have downloaded are "
+                             "the latest version!")
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+        else:
+            self.msg.setWindowTitle("Updates")
+            self.msg.setIcon(QMessageBox.Information)
+            if count == 1:
+                self.msg.setText("Successfully updated 1 patch.")
+            else:
+                self.msg.setText(
+                    "Successfully updated " + str(count) + " patches.")
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+
+    def go_back(self):
+        """ Returns to the default local patch screen.
+        Currently triggered via a button press.
+        """
+
+        # Do the necessary cleanup depending on the context.
+        if self.sender().objectName() == "back_btn_local":
+            self.ui.searchbar_local.setText(self.prev_search)
+            self.ui.text_browser_local.setText("")
+            self.ui.text_browser_viz.setText("")
+            self.ui.back_btn_local.setEnabled(False)
+            self.ui.update_patch_notes.setEnabled(False)
+        elif self.sender().objectName() == "back_btn_bank":
+            self.ui.searchbar_bank.setText(self.prev_search)
+            self.ui.text_browser_bank.setText("")
+            self.ui.back_btn_bank.setEnabled(False)
+        # Sort and display the data.
+        self.f1()
+
+    def update_patch_notes(self):
+        """ Updates the patch notes for a patch that has been previously
+        locally saved to a user's machine.
+        Currently triggered via a button click.
+        """
+
+        text = self.ui.text_browser_local.toPlainText()
+        try:
+            text = text.split("Patch Notes:")[1]
+            self.update.update_data(self.local_selected, text.strip("\n"), 3)
+        except IndexError:
+            self.update.update_data(self.local_selected, "", 3)
+        self.ui.statusbar.showMessage("Successfully updated patch notes.",
+                                      timeout=5000)
+
+    def update_tags_cats(self, text, mode, idx):
+        """ Updates the tags or categories for a locally downloaded
+        patch.
+        text: The text used to discern tags and categories from.
+        mode: True for tags update, False for categories update.
+        """
+
+        # Case 1 - The text is empty (i.e., delete everything)
+        if text == "":
+            if mode:
+                self.update.update_data(idx, [], 1)
+            else:
+                self.update.update_data(idx, [], 2)
+            if not self.ui.back_btn_local.isEnabled():
+                self.get_local_patches()
+                self.f1()
+            else:
+                self.get_version_patches(True)
+        # Case 2 - Leftover text from when there are no tags/categories
+        elif text == "No tags" or text == "No categories":
+            pass
+        # Case 3 - The text isn't empty and contains tags/categories
+        else:
+            # Tags/categories are separated by commas
+            items = text.split(",")
+            done = []
+            for curr in items:
+                curr = curr.strip()
+                if " and " in curr and curr[0] != " ":
+                    # They listed tags as "This and that"
+                    done.append({
+                        "name": curr.split(" and ")[0]
+                    })
+                    curr = curr.split(" and ")[1]
+                elif "and " in curr and curr[0:3] == "and":
+                    curr = curr.split("and ")[1]
+                done.append({
+                    "name": curr
+                })
+            if mode:
+                self.update.update_data(idx, done, 1)
+            else:
+                self.update.update_data(idx, done, 2)
+            if not self.ui.back_btn_local.isEnabled():
+                self.get_local_patches()
+                self.f1()
+            else:
+                self.get_version_patches(True)
+
+    def events(self, e):
+        if e.type() == QEvent.FocusIn:
+            if self.prev_tag_cat is None:
+                return False
+            else:
+                new_text = self.ui.table_local.item(
+                    self.prev_tag_cat[0], self.prev_tag_cat[1]).text()
+                if new_text == self.prev_tag_cat[2] \
+                        or self.ui.table_local.currentColumn() == 3:
+                    return False
+                else:
+                    self.update_tags_cats(new_text, self.prev_tag_cat[1] == 1,
+                                          self.ui.table_local.cellWidget(
+                                              self.ui.table_local.currentRow(),
+                                              4).objectName())
+                    return True
+        elif e.type() == QEvent.FocusOut:
+            try:
+                if self.ui.table_local.currentColumn() != 3:
+                    self.prev_tag_cat = \
+                        (self.ui.table_local.currentRow(),
+                         self.ui.table_local.currentColumn(),
+                         self.ui.table_local.selectedItems()[0].text())
+                return True
+            except IndexError:
+                return False
+
+    def get_data_local(self):
+        """
+        """
+
+        return self.data_local
+
+    def get_data_local_version(self):
+        """
+        """
+
+        return self.data_local_version
+
+    def get_data_bank(self):
+        """
+        """
+
+        return self.data_bank
+
+    def get_data_bank_version(self):
+        """
+        """
+
+        return self.data_bank_version
+
+    def get_prev_tag_cat(self):
+        """
+        """
+
+        return self.prev_tag_cat
+
+    def set_prev_tag_cat(self, data):
+        """
+        """
+
+        self.prev_tag_cat = data
+
+    def set_local_selected(self, data):
+        """
+        """
+
+        self.local_selected = data
+
+    def set_prev_search(self, data):
+        """
+        """
+
+        self.prev_search = data

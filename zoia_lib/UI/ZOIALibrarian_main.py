@@ -72,33 +72,26 @@ class ZOIALibrarianMain(QMainWindow):
         self.bank = ZOIALibrarianBank(self.ui, self.path, self.msg)
         self.util = ZOIALibrarianUtil(self.ui)
         self.ps = ZOIALibrarianPS(self.ui, api, self.path, self.msg, save)
-        self.local = ZOIALibrarianLocal(self.ui, self.path, export, delete,
-                                        self, self.sd, self.msg)
+        self.local = ZOIALibrarianLocal(
+            self.ui, self.path, export, delete, update, self, self.sd,
+            self.msg, self.sort_and_set)
 
         self.patch_cache = []
+        self.selected = None
+        self.prev_sort = None
         self.search_data_PS = None
         self.search_data_local = None
         self.search_data_bank = None
-        self.data_local = None
         self.search_data_local_version = None
         self.search_data_bank_version = None
-        self.data_local_version = None
-        self.data_bank = None
-        self.data_bank_version = None
-        self.local_selected = None
-        self.selected = None
-        self.prev_tag_cat = None
         self.table_title_size = None
         self.table_local_title_size = None
         self.table_bank_local_title_size = None
-        self.prev_sort = None
-        self.curr_ver = None
         self.ps_sizes = None
         self.local_sizes = None
         self.sd_sizes = None
         self.bank_sizes = None
         self.font = None
-        self.prev_search = ""
 
         # Get the data necessary for the PS tab.
         self.ps.metadata_init()
@@ -116,8 +109,8 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.btn_save_bank.setEnabled(False)
         self.ui.btn_export_bank.setEnabled(False)
         self.ui.delete_folder_sd_btn.setEnabled(False)
-        if len(os.listdir(os.path.join(self.path, "Banks"))) == 0:
-            self.ui.btn_load_bank.setEnabled(False)
+        self.ui.btn_load_bank.setEnabled(
+            not len(os.listdir(os.path.join(self.path, "Banks"))) == 0)
 
         # Load preferences from previous sessions (if they exist)
         if os.path.exists(os.path.join(self.path, "pref.json")):
@@ -217,12 +210,13 @@ class ZOIALibrarianMain(QMainWindow):
             lambda: self.util.change_font("-"))
         self.ui.actionQuit.triggered.connect(self.try_quit)
         self.ui.check_for_updates_btn.clicked.connect(
-            self.update_local_patches)
+            self.local.update_local_patches)
         self.ui.actionImport_Version_History_directory.triggered.connect(
             self.version_import)
         self.ui.refresh_pch_btn.clicked.connect(
             lambda: self.ps.reload_ps(self.sort_and_set))
-        self.ui.update_patch_notes.clicked.connect(self.update_patch_notes)
+        self.ui.update_patch_notes.clicked.connect(
+            self.local.update_patch_notes)
         self.ui.actionImport_A_Patch.triggered.connect(self.import_patch)
         self.ui.table_local.installEventFilter(self)
         self.ui.table_sd_left.installEventFilter(self)
@@ -239,8 +233,8 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.sd_tree.clicked.connect(lambda: self.sd.prepare_sd_view())
         self.ui.import_all_btn.clicked.connect(self.mass_import)
         self.ui.import_all_ver_btn.clicked.connect(self.version_import)
-        self.ui.back_btn_local.clicked.connect(self.go_back)
-        self.ui.back_btn_bank.clicked.connect(self.go_back)
+        self.ui.back_btn_local.clicked.connect(self.local.go_back)
+        self.ui.back_btn_bank.clicked.connect(self.local.go_back)
         self.ui.btn_load_bank.clicked.connect(self.bank.load_bank)
         self.ui.btn_save_bank.clicked.connect(
             lambda: self.bank.save_bank(self))
@@ -310,13 +304,12 @@ class ZOIALibrarianMain(QMainWindow):
         """
 
         # Reset the previous tag/cat (if it existed).
-        self.prev_tag_cat = None
+        self.local.set_prev_tag_cat(None)
 
         # Figure out what tab we switched to.
         if self.ui.tabs.currentIndex() == 1 \
                 or self.ui.tabs.currentIndex() == 3:
-            self.data_local = self.local.get_local_patches()
-            self.data_bank = self.data_local
+            self.local.get_local_patches()
             # Context cleanup
             # TODO Compare number of previous local patches to see if a
             #  reload is needed.
@@ -369,13 +362,13 @@ class ZOIALibrarianMain(QMainWindow):
             (0, True, False): self.search_data_PS,
             (0, False, False): self.ps.get_data_ps(),
             (1, True, True): self.search_data_local_version,
-            (1, False, True): self.data_local_version,
+            (1, False, True): self.local.get_data_local_version(),
             (1, True, False): self.search_data_local,
-            (1, False, False): self.data_local,
+            (1, False, False): self.local.get_data_local(),
             (3, True, True): self.search_data_bank_version,
-            (3, False, True): self.data_bank_version,
+            (3, False, True): self.local.get_data_bank_version(),
             (3, True, False): self.search_data_bank,
-            (3, False, False): self.data_bank
+            (3, False, False): self.local.get_data_bank()
         }[(table_index, search, version)]
 
         data_length = len(data)
@@ -461,8 +454,7 @@ class ZOIALibrarianMain(QMainWindow):
             # header items.
             elif table_index == 1:
                 self.local.create_expt_and_del_btns(
-                    btn_title, i, str(data[i]["id"]), str(data[i]["revision"]),
-                    self.initiate_delete)
+                    btn_title, i, str(data[i]["id"]), str(data[i]["revision"]))
 
         # Also set the title size and resize the columns.
         if table_index == 0 and self.ps_sizes is None:
@@ -518,67 +510,6 @@ class ZOIALibrarianMain(QMainWindow):
             }
         curr_table.resizeRowsToContents()
 
-    def get_version_patches(self, context):
-        """ Retrieves the versions of a patch that is locally stored to
-        a user's backend local storage.
-        context: True for the Local Storage View tab, False for the
-                 Banks tab.
-        """
-        if self.sender() is None:
-            idx = self.curr_ver
-        else:
-            idx = self.sender().objectName()
-            self.curr_ver = idx.split("_")[0]
-        self.prev_tag_cat = None
-        if context:
-            self.data_local_version = []
-            curr_data = self.data_local_version
-        else:
-            self.data_bank_version = []
-            curr_data = self.data_bank_version
-
-        # Get all of the patch versions into one place.
-        for pch in os.listdir(os.path.join(self.path, idx)):
-            if pch.split(".")[-1] == "json":
-                # Got the metadata
-                with open(os.path.join(self.path, idx, pch)) as f:
-                    temp = json.loads(f.read())
-                curr_data.append(temp)
-
-        self.ui.update_patch_notes.setEnabled(not context)
-        self.sort_and_set()
-
-    def initiate_delete(self):
-        """ Attempts to delete a patch that is stored on a user's local
-        filesystem.
-        """
-
-        if "_" not in self.sender().objectName():
-            if not self.ui.back_btn_local.isEnabled() and \
-                    len(os.listdir(os.path.join(
-                        self.path, self.sender().objectName()))) > 2:
-                delete.delete_full_patch_directory(self.sender().objectName())
-            else:
-                delete.delete_patch(self.sender().objectName())
-            self.data_local = self.local.get_local_patches()
-            self.sort_and_set()
-        else:
-            delete.delete_patch(os.path.join(self.curr_ver,
-                                             self.sender().objectName()))
-            self.get_version_patches(self.ui.tabs.currentIndex() == 1)
-
-        # Reset the text browser.
-        self.ui.text_browser_local.setText("")
-
-        # Special case, we only have one patch in a version history after
-        # a deletion.
-        if self.ui.back_btn_local.isEnabled() \
-                and self.ui.table_local.rowCount() == 1:
-            self.data_local = self.local.get_local_patches()
-            self.ui.back_btn_local.setEnabled(False)
-            self.ui.searchbar_local.setText("")
-            self.sort_and_set()
-
     def display_patch_info(self):
         """ Queries the PS API for additional patch information whenever
         a patch is selected in the PS table or local table. Information
@@ -630,9 +561,9 @@ class ZOIALibrarianMain(QMainWindow):
                     self.ui.update_patch_notes.setEnabled(True)
                 elif self.ui.tabs.currentIndex() == 3:
                     temp = self.ui.text_browser_bank
-                self.local_selected = name
+                self.local.set_local_selected(name)
                 if ver != "":
-                    self.local_selected += "_" + ver
+                    self.local.set_local_selected("{}_{}".format(name, ver))
                 try:
                     with open(os.path.join(self.path, name,
                                            name + ".json")) as f:
@@ -695,22 +626,22 @@ class ZOIALibrarianMain(QMainWindow):
         """
         if context:
             # Clean up the tab.
-            self.prev_search = self.ui.searchbar_local.text()
+            self.local.set_prev_search(self.ui.searchbar_local.text())
             self.ui.text_browser_local.setText("")
             self.ui.text_browser_viz.setText("")
             self.ui.searchbar_local.setText("")
             self.ui.update_patch_notes.setEnabled(False)
             self.ui.back_btn_local.setEnabled(True)
             # Prepare the table.
-            self.get_version_patches(True)
+            self.local.get_version_patches(True, self.sender().objectName())
         else:
             # Clean up the tab.
-            self.prev_search = self.ui.searchbar_bank.text()
+            self.local.set_prev_search(self.ui.searchbar_bank.text())
             self.ui.text_browser_bank.setText("")
             self.ui.searchbar_bank.setText("")
             self.ui.back_btn_bank.setEnabled(True)
             # Prepare the table.
-            self.get_version_patches(False)
+            self.local.get_version_patches(False, self.sender().objectName())
 
     def search(self):
         """ Initiates a data search for the metadata that is retrieved
@@ -732,13 +663,13 @@ class ZOIALibrarianMain(QMainWindow):
             # Case 2.1: No version
             if not self.ui.back_btn_local.isEnabled():
                 self.search_data_local = \
-                    util.search_patches(self.data_local,
+                    util.search_patches(self.local.get_data_local(),
                                         self.ui.searchbar_local.text())
                 self.set_data(True)
             # Case 2.2: Version
             else:
                 self.search_data_local_version = \
-                    util.search_patches(self.data_local_version,
+                    util.search_patches(self.local.get_data_local_version(),
                                         self.ui.searchbar_local.text())
                 self.set_data(True, True)
         # Case 3: Bank tab
@@ -747,13 +678,13 @@ class ZOIALibrarianMain(QMainWindow):
             # Case 3.1: No version
             if not self.ui.back_btn_bank.isEnabled():
                 self.search_data_bank = \
-                    util.search_patches(self.data_bank,
+                    util.search_patches(self.local.get_data_bank(),
                                         self.ui.searchbar_bank.text())
                 self.set_data(True)
             # Case 3.2: Version
             else:
                 self.search_data_bank_version = \
-                    util.search_patches(self.data_bank_version,
+                    util.search_patches(self.local.get_data_bank_version(),
                                         self.ui.searchbar_bank.text())
                 self.set_data(True, True)
 
@@ -814,20 +745,21 @@ class ZOIALibrarianMain(QMainWindow):
         #             search bar
         elif table_index == 1 and self.ui.searchbar_local.text() == "" \
                 and not self.ui.back_btn_local.isEnabled():
-            util.sort_metadata(curr_sort[0], self.data_local, curr_sort[1])
+            util.sort_metadata(curr_sort[0], self.local.get_data_local(),
+                               curr_sort[1])
             self.set_data()
         # ->Case 3.2: Local tab, no version, text in the search bar.
         elif table_index == 1 and self.ui.searchbar_local.text() != "" \
                 and not self.ui.back_btn_local.isEnabled():
             if self.search_data_local is None:
-                self.search_data_local = self.data_local
+                self.search_data_local = self.local.get_data_local()
             util.sort_metadata(curr_sort[0], self.search_data_local,
                                curr_sort[1])
             self.set_data(True)
         # ->Case 3.3: Local tab, it is a version, no text in the search bar.
         elif table_index == 1 and self.ui.searchbar_local.text() == "" \
                 and self.ui.back_btn_local.isEnabled():
-            util.sort_metadata(7, self.data_local_version,
+            util.sort_metadata(7, self.local.get_data_local_version(),
                                False)
             self.set_data(version=True)
         # ->Case 3.4: Local tab, it is a version, and text is in the search
@@ -835,7 +767,8 @@ class ZOIALibrarianMain(QMainWindow):
         elif table_index == 1 and self.ui.searchbar_local.text() != "" \
                 and self.ui.back_btn_local.isEnabled():
             if self.search_data_local_version is None:
-                self.search_data_local_version = self.data_local_version
+                self.search_data_local_version = \
+                    self.local.get_data_local_version()
             util.sort_metadata(7, self.search_data_local_version,
                                False)
             self.set_data(True, True)
@@ -844,73 +777,31 @@ class ZOIALibrarianMain(QMainWindow):
         #             bar.
         elif table_index == 3 and self.ui.searchbar_bank.text() == "" \
                 and not self.ui.back_btn_bank.isEnabled():
-            util.sort_metadata(curr_sort[0], self.data_bank, curr_sort[1])
+            util.sort_metadata(curr_sort[0], self.local.get_data_bank(),
+                               curr_sort[1])
             self.set_data()
         # ->Case 4.2: Bank tab, no version, text in the search bar.
         elif table_index == 3 and self.ui.searchbar_bank.text() != "" \
                 and not self.ui.back_btn_bank.isEnabled():
             if self.search_data_bank is None:
-                self.search_data_bank = self.data_bank
+                self.search_data_bank = self.local.get_data_bank()
             util.sort_metadata(curr_sort[0], self.search_data_bank,
                                curr_sort[1])
             self.set_data(True)
         # ->Case 4.3: Bank tab, it is a version, no text in the search bar.
         elif table_index == 3 and self.ui.searchbar_bank.text() == "" \
                 and self.ui.back_btn_bank.isEnabled():
-            util.sort_metadata(7, self.data_bank_version,
+            util.sort_metadata(7, self.local.get_data_bank_version(),
                                False)
             self.set_data(version=True)
         # ->Case 4.4: Bank tab, it is a version, and text is in the search bar.
         elif table_index == 3 and self.ui.searchbar_bank.text() != "" \
                 and self.ui.back_btn_bank.isEnabled():
             if self.search_data_bank_version is None:
-                self.search_data_bank_version = self.data_bank_version
+                self.search_data_bank_version = self.local.get_data_bank_version()
             util.sort_metadata(7, self.search_data_bank_version,
                                False)
             self.set_data(True, True)
-
-    def update_local_patches(self):
-        """ Attempts to update any patch that is stored in the user's
-        backend directory.
-        Currently triggered via a button press.
-        TODO List which patches were updated.
-        """
-
-        self.ui.statusbar.showMessage("Checking for updates...",
-                                      timeout=5000)
-        count = update.check_for_updates()
-        if count == 0:
-            self.msg.setWindowTitle("No Updates")
-            self.msg.setIcon(QMessageBox.Information)
-            self.msg.setText("All of the patches you have downloaded are "
-                             "the latest version!")
-            self.msg.setStandardButtons(QMessageBox.Ok)
-            self.msg.exec_()
-        else:
-            self.msg.setWindowTitle("Updates")
-            self.msg.setIcon(QMessageBox.Information)
-            if count == 1:
-                self.msg.setText("Successfully updated 1 patch.")
-            else:
-                self.msg.setText(
-                    "Successfully updated " + str(count) + " patches.")
-            self.msg.setStandardButtons(QMessageBox.Ok)
-            self.msg.exec_()
-
-    def update_patch_notes(self):
-        """ Updates the patch notes for a patch that has been previously
-        locally saved to a user's machine.
-        Currently triggered via a button click.
-        """
-
-        text = self.ui.text_browser_local.toPlainText()
-        try:
-            text = text.split("Patch Notes:")[1]
-            update.update_data(self.local_selected, text.strip("\n"), 3)
-        except IndexError:
-            update.update_data(self.local_selected, "", 3)
-        self.ui.statusbar.showMessage("Successfully updated patch notes.",
-                                      timeout=5000)
 
     def import_patch(self):
         """ Attempts to import a patch into the librarian.
@@ -937,10 +828,7 @@ class ZOIALibrarianMain(QMainWindow):
                 self.ui.back_btn_local.isEnabled()) or \
                     (self.ui.tabs.currentIndex() == 3 and not
                      self.ui.back_btn_bank.isEnabled()):
-                if self.ui.tabs.currentIndex() == 1:
-                    self.data_local = self.local.get_local_patches()
-                else:
-                    self.data_bank = self.local.get_local_patches()
+                self.local.get_local_patches()
                 self.sort_and_set()
 
         except errors.BadPathError:
@@ -998,8 +886,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.msg.setStandardButtons(QMessageBox.Ok)
         self.msg.exec_()
         self.msg.setInformativeText(None)
-        self.data_local = self.local.get_local_patches()
-        self.data_bank = self.data_local
+        self.local.get_local_patches()
         self.sort_and_set()
 
     def version_import(self):
@@ -1041,8 +928,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.back_btn_local.isEnabled()) or \
                 (self.ui.tabs.currentIndex() == 3 and not
                 self.ui.back_btn_bank.isEnabled()):
-            self.data_local = self.local.get_local_patches()
-            self.data_bank = self.data_local
+            self.local.get_local_patches()
             self.sort_and_set()
 
     def eventFilter(self, o, e):
@@ -1066,128 +952,30 @@ class ZOIALibrarianMain(QMainWindow):
                 if self.ui.searchbar_local.text() == "" \
                         and self.ui.tabs.currentIndex() == 1 \
                         and not self.ui.back_btn_local.isEnabled():
-                    self.data_bank = self.local.get_local_patches()
-                    self.data_local = self.data_bank
-                    self.set_data()
+                    self.local.get_local_patches()
+                    self.sort_and_set()
                 elif self.ui.searchbar_PS.text() == "" \
                         and self.ui.tabs.currentIndex() == 0:
-                    self.set_data()
+                    self.sort_and_set()
                 elif self.ui.searchbar_local.text() == "" \
                         and self.ui.tabs.currentIndex() == 1 \
                         and self.ui.back_btn_local.isEnabled():
-                    self.get_version_patches(True)
-                    self.set_data(version=True)
+                    self.local.get_version_patches(True)
+                    self.sort_and_set()
                 elif self.ui.searchbar_bank.text() == "" \
                         and self.ui.tabs.currentIndex() == 3 \
                         and not self.ui.back_btn_bank.isEnabled():
-                    self.data_bank = self.local.get_local_patches()
-                    self.data_local = self.data_bank
-                    self.set_data()
+                    self.local.get_local_patches()
+                    self.sort_and_set()
                 elif self.ui.searchbar_bank.text() == "" \
                         and self.ui.tabs.currentIndex() == 3 \
                         and self.ui.back_btn_bank.isEnabled():
-                    self.get_version_patches(False)
-                    self.set_data(version=True)
+                    self.local.get_version_patches(False)
+                    self.sort_and_set()
                 return True
         elif o.objectName() == "table_local":
-            if e.type() == QEvent.FocusIn:
-                if self.prev_tag_cat is None:
-                    return False
-                else:
-                    new_text = self.ui.table_local.item(self.prev_tag_cat[0],
-                                                        self.prev_tag_cat[1]
-                                                        ).text()
-                    if new_text == self.prev_tag_cat[2] \
-                            or self.ui.table_local.currentColumn() == 3:
-                        return False
-                    else:
-                        self.update_tags_cats(
-                            new_text, self.prev_tag_cat[1] == 1,
-                            self.ui.table_local.cellWidget(
-                                self.ui.table_local.currentRow(),
-                                4).objectName())
-                        return True
-            elif e.type() == QEvent.FocusOut:
-                try:
-                    if self.ui.table_local.currentColumn() != 3:
-                        self.prev_tag_cat = (
-                            self.ui.table_local.currentRow(),
-                            self.ui.table_local.currentColumn(),
-                            self.ui.table_local.selectedItems()[0].text())
-                    return True
-                except IndexError:
-                    return False
+            self.local.events(e)
         return False
-
-    def update_tags_cats(self, text, mode, idx):
-        """ Updates the tags or categories for a locally downloaded
-        patch.
-        text: The text used to discern tags and categories from.
-        mode: True for tags update, False for categories update.
-        """
-
-        # Case 1 - The text is empty (i.e., delete everything)
-        if text == "":
-            if mode:
-                update.update_data(idx, [], 1)
-            else:
-                update.update_data(idx, [], 2)
-            if not self.ui.back_btn_local.isEnabled():
-                self.data_bank = self.local.get_local_patches()
-                self.data_local = self.data_bank
-                self.sort_and_set()
-            else:
-                self.get_version_patches(True)
-        # Case 2 - Leftover text from when there are no tags/categories
-        elif text == "No tags" or text == "No categories":
-            pass
-        # Case 3 - The text isn't empty and contains tags/categories
-        else:
-            # Tags/categories are separated by commas
-            items = text.split(",")
-            done = []
-            for curr in items:
-                curr = curr.strip()
-                if " and " in curr and curr[0] != " ":
-                    # They listed tags as "This and that"
-                    done.append({
-                        "name": curr.split(" and ")[0]
-                    })
-                    curr = curr.split(" and ")[1]
-                elif "and " in curr and curr[0:3] == "and":
-                    curr = curr.split("and ")[1]
-                done.append({
-                    "name": curr
-                })
-            if mode:
-                update.update_data(idx, done, 1)
-            else:
-                update.update_data(idx, done, 2)
-            if not self.ui.back_btn_local.isEnabled():
-                self.data_bank = self.local.get_local_patches()
-                self.data_local = self.data_bank
-                self.sort_and_set()
-            else:
-                self.get_version_patches(True)
-
-    def go_back(self):
-        """ Returns to the default local patch screen.
-        Currently triggered via a button press.
-        """
-
-        # Do the necessary cleanup depending on the context.
-        if self.sender().objectName() == "back_btn_local":
-            self.ui.searchbar_local.setText(self.prev_search)
-            self.ui.text_browser_local.setText("")
-            self.ui.text_browser_viz.setText("")
-            self.ui.back_btn_local.setEnabled(False)
-            self.ui.update_patch_notes.setEnabled(False)
-        elif self.sender().objectName() == "back_btn_bank":
-            self.ui.searchbar_bank.setText(self.prev_search)
-            self.ui.text_browser_bank.setText("")
-            self.ui.back_btn_bank.setEnabled(False)
-        # Sort and display the data.
-        self.sort_and_set()
 
     def closeEvent(self, event):
         """ Override the default close operation so certain application
