@@ -33,6 +33,7 @@ class ZOIALibrarianPS(QMainWindow):
         self.path = path
         self.msg = msg
         self.save = save
+
         self.thread_pool = QThreadPool()
         self.cnt = 0
         self.fails = 0
@@ -133,6 +134,7 @@ class ZOIALibrarianPS(QMainWindow):
         self.ui.btn_dwn_all.setEnabled(True)
         self.ui.refresh_pch_btn.setEnabled(True)
         self.ui.check_for_updates_btn.setEnabled(True)
+        self.ui.searchbar_PS.setEnabled(True)
 
     def download_all(self, progress_callback):
         """ Attempts to download all patches currently stored on
@@ -143,6 +145,7 @@ class ZOIALibrarianPS(QMainWindow):
         self.ui.btn_dwn_all.setEnabled(False)
         self.ui.refresh_pch_btn.setEnabled(False)
         self.ui.check_for_updates_btn.setEnabled(False)
+        self.ui.searchbar_PS.setEnabled(False)
 
         self.fails = 0
         self.cnt = 0

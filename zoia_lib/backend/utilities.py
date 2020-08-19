@@ -27,8 +27,7 @@ def sort_metadata(mode, data, rev):
     """
     # Input checking.
     if mode is None or data is None or rev is None:
-        # TODO replace with an error.
-        return None
+        raise errors.SortingError(mode, 903)
     if mode < 1 or mode > 7:
         raise errors.SortingError(mode, 901)
     if not isinstance(data, list):
@@ -68,7 +67,11 @@ def search_patches(data, query):
 
     data: An array of metadata that is to be searched through.
     query: The search term for the current search.
-    Returns an array of metadata containing the data that matches the
+
+    raise: SearchingError if the parameters are None or data is
+           not of type list.
+
+    return: an array of metadata containing the data that matches the
     search query.
     """
 
@@ -76,8 +79,7 @@ def search_patches(data, query):
 
     # Input checking.
     if query is None or data is None:
-        # TODO replace with an error.
-        return None
+        raise errors.SearchingError(query, 1002)
     if not isinstance(data, list):
         raise errors.SearchingError(query, 1001)
 
@@ -124,6 +126,7 @@ def search_patches(data, query):
 def add_test_patch(name, idx, path):
     """ Note: This method is for testing purposes only.
     Adds a test patch that can be used for unit testing purposes.
+
     name: The name of the patch, to be used for the title attribute
           in the JSON metadata.
     idx: The id number to be used for the patch.

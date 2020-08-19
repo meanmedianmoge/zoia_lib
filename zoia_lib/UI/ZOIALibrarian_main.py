@@ -20,10 +20,8 @@ from zoia_lib.backend.patch_binary import PatchBinary
 from zoia_lib.backend.patch_delete import PatchDelete
 from zoia_lib.backend.patch_export import PatchExport
 from zoia_lib.backend.patch_save import PatchSave
-from zoia_lib.backend.patch_update import PatchUpdate
 
 api = PatchStorage()
-update = PatchUpdate()
 save = PatchSave()
 export = PatchExport()
 delete = PatchDelete()
@@ -39,10 +37,8 @@ class ZOIALibrarianMain(QMainWindow):
     following command is run from the UI directory:
         pyside2-uic.exe ZOIALibrarian.ui -o ZOIALibrarian.py
     Known issues:
-     - Sorting order is not consistently maintained after various
-       operations.
-     - The code is a mess and should be refactored into separate classes
-       where possible.
+     - The code very all over the place.
+     - Certain UI elements do not like font changes (headers, tabs, etc).
     """
 
     def __init__(self):
@@ -72,9 +68,8 @@ class ZOIALibrarianMain(QMainWindow):
         self.bank = ZOIALibrarianBank(self.ui, self.path, self.msg)
         self.util = ZOIALibrarianUtil(self.ui)
         self.ps = ZOIALibrarianPS(self.ui, api, self.path, self.msg, save)
-        self.local = ZOIALibrarianLocal(
-            self.ui, self.path, export, delete, update, self, self.sd,
-            self.msg, self.sort_and_set)
+        self.local = ZOIALibrarianLocal(self.ui, self.path, self.sd, self.msg,
+                                        self.sort_and_set)
 
         self.patch_cache = []
         self.selected = None
@@ -92,6 +87,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.sd_sizes = None
         self.bank_sizes = None
         self.font = None
+        self.local_pch_count = -1
 
         # Get the data necessary for the PS tab.
         self.ps.metadata_init()
@@ -240,8 +236,7 @@ class ZOIALibrarianMain(QMainWindow):
             lambda: self.bank.save_bank(self))
         self.ui.btn_export_bank.clicked.connect(
             lambda: self.bank.export_bank(self.sd, export, self))
-        self.ui.delete_folder_sd_btn.clicked.connect(
-            lambda: self.sd.delete_sd_item(delete))
+        self.ui.delete_folder_sd_btn.clicked.connect(self.sd.delete_sd_item)
         self.ui.actionToggle_Dark_Mode_2.triggered.connect(
             self.util.toggle_dark)
         self.ui.btn_dwn_all.clicked.connect(self.ps.download_all_thread)
@@ -309,16 +304,20 @@ class ZOIALibrarianMain(QMainWindow):
         # Figure out what tab we switched to.
         if self.ui.tabs.currentIndex() == 1 \
                 or self.ui.tabs.currentIndex() == 3:
-            self.local.get_local_patches()
+            # Only reload the table data if we need to (new # of patches).
+            if self.local_pch_count == -1 \
+                    or self.local_pch_count != len(os.listdir(self.path))\
+                    or self.ui.table_local.rowCount() == 1\
+                    or self.ui.table_bank_local.rowCount() == 1:
+                self.local.get_local_patches()
+                self.local_pch_count = len(os.listdir(self.path))
             # Context cleanup
-            # TODO Compare number of previous local patches to see if a
-            #  reload is needed.
             if self.ui.tabs.currentIndex() == 3:
                 self.ui.text_browser_bank.setText("")
             else:
                 self.ui.text_browser_local.setText("")
+                self.ui.text_browser_viz.setText("")
                 self.ui.update_patch_notes.setEnabled(False)
-            self.sort_and_set()
         elif self.ui.tabs.currentIndex() == 2:
             # SD card tab, need to check if an SD card has been specified.
             if self.sd.get_sd_root() is None:
@@ -378,9 +377,10 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Iterate through the data so that we can set each row.
         for i in range(data_length):
-            # Button for the header "Title"
-            btn_title = QRadioButton(data[i]["title"], self)
+            idx = str(data[i]["id"])
             title = data[i]["title"]
+            # Button for the header "Title"
+            btn_title = QRadioButton(title, self)
             # Wrap the title if it exceeds 24 characters in length.
             if len(title) > 24:
                 temp = title.split(" ")
@@ -395,19 +395,17 @@ class ZOIALibrarianMain(QMainWindow):
                 btn_title.setText(title.rstrip())
             if (table_index == 1 and self.ui.back_btn_local.isEnabled()) or \
                     (table_index == 3 and self.ui.back_btn_bank.isEnabled()):
-                btn_title.setObjectName(str(data[i]["id"]) + "_v"
-                                        + str(data[i]["revision"]))
+                btn_title.setObjectName(idx + "_v" + str(data[i]["revision"]))
                 btn_title.setText(data[i]["files"][0]["filename"])
             elif (table_index == 1 and
                   not self.ui.back_btn_local.isEnabled()) \
                     or (table_index == 3 and
                         not self.ui.back_btn_bank.isEnabled()):
-                if len(os.listdir(os.path.join(self.path,
-                                               str(data[i]["id"])))) > 2:
+                if len(os.listdir(os.path.join(self.path, idx))) > 2:
                     btn_title.setText(title.rstrip() + "\n[Multiple Versions]")
-                btn_title.setObjectName(str(data[i]["id"]))
+                btn_title.setObjectName(idx)
             else:
-                btn_title.setObjectName(str(data[i]["id"]))
+                btn_title.setObjectName(idx)
             btn_title.toggled.connect(self.display_patch_info)
             btn_title.setFont(self.ui.table_PS.font())
             curr_table.setCellWidget(i, 0, btn_title)
@@ -416,12 +414,13 @@ class ZOIALibrarianMain(QMainWindow):
             for j in range(2):
                 index = "tags" if j == 0 else "categories"
                 text = ""
-                if len(data[i][index]) > 2:
-                    for k in range(0, len(data[i][index]) - 1):
+                length = len(data[i][index])
+                if length > 2:
+                    for k in range(0, length - 1):
                         text += data[i][index][k]["name"] + ", "
                     text += "and " \
-                            + data[i][index][len(data[i][index]) - 1]["name"]
-                elif len(data[i][index]) == 2:
+                            + data[i][index][length - 1]["name"]
+                elif length == 2:
                     text = data[i][index][0]["name"] + " and " \
                            + data[i][index][1]["name"]
                 else:
@@ -434,8 +433,7 @@ class ZOIALibrarianMain(QMainWindow):
                 text_item.setTextAlignment(Qt.AlignCenter)
                 if table_index == 1 and not \
                         self.ui.back_btn_local.isEnabled() and \
-                        len(os.listdir(os.path.join(
-                            self.path, str(data[i]["id"])))) > 2:
+                        len(os.listdir(os.path.join(self.path, idx))) > 2:
                     text_item.setFlags(
                         Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 curr_table.setItem(i, j + 1, text_item)
@@ -448,13 +446,14 @@ class ZOIALibrarianMain(QMainWindow):
 
             # If we are on tab index 0, we need a "Download" header item.
             if table_index == 0:
-                self.ps.create_dwn_btn(i, str(data[i]["id"]))
+                self.ps.create_dwn_btn(i, idx)
 
             # If we are on tab index 1, we need "Export" and "Delete"
             # header items.
             elif table_index == 1:
                 self.local.create_expt_and_del_btns(
-                    btn_title, i, str(data[i]["id"]), str(data[i]["revision"]))
+                    btn_title, i, idx, str(data[i]["revision"]), self,
+                    export, delete)
 
         # Also set the title size and resize the columns.
         if table_index == 0 and self.ps_sizes is None:
@@ -532,9 +531,9 @@ class ZOIALibrarianMain(QMainWindow):
                 # We are pointing to a version directory.
                 self.display_patch_versions(self.ui.tabs.currentIndex() == 1)
                 return
-            name = str(self.sender().objectName())
+            name = self.sender().objectName()
             ver = ""
-            if "_" in self.sender().objectName():
+            if "_" in name:
                 name, ver = name.split("_")
             temp = None
             if self.ui.tabs.currentIndex() == 0:
@@ -580,16 +579,15 @@ class ZOIALibrarianMain(QMainWindow):
                             viz = binary.parse_data(f.read())
                     except FileNotFoundError:
                         with open(os.path.join(
-                                self.path, name,
-                                name + "_{}.bin".format(ver)), "rb") as f:
+                                self.path, name, name + "_{}.bin".format(ver)),
+                                "rb") as f:
                             viz = binary.parse_data(f.read())
             if not skip:
                 if content["preview_url"] == "":
                     content["preview_url"] = "None provided"
                 else:
-                    content["preview_url"] = "<a href=" + \
-                                             content["preview_url"] \
-                                             + ">Click here</a>"
+                    content["preview_url"] = \
+                        "<a href=" + content["preview_url"] + ">Click here</a>"
             if "license" not in content or content["license"] is None or \
                     content["license"]["name"] == "":
                 legal = "None provided"
@@ -714,8 +712,11 @@ class ZOIALibrarianMain(QMainWindow):
         except KeyError:
             curr_sort = self.prev_sort
         except AttributeError:
-            curr_sort = (6, True)
-            self.prev_sort = curr_sort
+            if self.prev_sort is None:
+                curr_sort = (6, True)
+                self.prev_sort = curr_sort
+            else:
+                curr_sort = self.prev_sort
 
         table_index = self.ui.tabs.currentIndex()
 
@@ -829,7 +830,6 @@ class ZOIALibrarianMain(QMainWindow):
                     (self.ui.tabs.currentIndex() == 3 and not
                      self.ui.back_btn_bank.isEnabled()):
                 self.local.get_local_patches()
-                self.sort_and_set()
 
         except errors.BadPathError:
             self.msg.setWindowTitle("No Patch Found")
@@ -887,7 +887,6 @@ class ZOIALibrarianMain(QMainWindow):
         self.msg.exec_()
         self.msg.setInformativeText(None)
         self.local.get_local_patches()
-        self.sort_and_set()
 
     def version_import(self):
         """ Attempts to import a directory of patches as a version
@@ -929,7 +928,6 @@ class ZOIALibrarianMain(QMainWindow):
                 (self.ui.tabs.currentIndex() == 3 and not
                 self.ui.back_btn_bank.isEnabled()):
             self.local.get_local_patches()
-            self.sort_and_set()
 
     def eventFilter(self, o, e):
         """ Deals with events that originate from various widgets
@@ -953,7 +951,6 @@ class ZOIALibrarianMain(QMainWindow):
                         and self.ui.tabs.currentIndex() == 1 \
                         and not self.ui.back_btn_local.isEnabled():
                     self.local.get_local_patches()
-                    self.sort_and_set()
                 elif self.ui.searchbar_PS.text() == "" \
                         and self.ui.tabs.currentIndex() == 0:
                     self.sort_and_set()
@@ -961,17 +958,14 @@ class ZOIALibrarianMain(QMainWindow):
                         and self.ui.tabs.currentIndex() == 1 \
                         and self.ui.back_btn_local.isEnabled():
                     self.local.get_version_patches(True)
-                    self.sort_and_set()
                 elif self.ui.searchbar_bank.text() == "" \
                         and self.ui.tabs.currentIndex() == 3 \
                         and not self.ui.back_btn_bank.isEnabled():
                     self.local.get_local_patches()
-                    self.sort_and_set()
                 elif self.ui.searchbar_bank.text() == "" \
                         and self.ui.tabs.currentIndex() == 3 \
                         and self.ui.back_btn_bank.isEnabled():
                     self.local.get_version_patches(False)
-                    self.sort_and_set()
                 return True
         elif o.objectName() == "table_local":
             self.local.events(e)

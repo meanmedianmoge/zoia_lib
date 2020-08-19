@@ -7,8 +7,8 @@ from zoia_lib.common import errors
 
 
 class PatchExport(Patch):
-    """ The PatchExport class is a child of the Patch class. It is
-    responsible for patch exporting operations.
+    """ The PatchExport class is a child of the Patch class.
+    It is responsible for all patch exporting operations.
     """
 
     def __init__(self):
@@ -40,7 +40,9 @@ class PatchExport(Patch):
                    will conflict with a file that is already in the
                    dest, but the user has specified that it is okay to
                    overwrite said file.
-        Raises ExportingError if an invalid slot number is provided or
+
+        raise: BadPathError if path did not lead to a file.
+        raise: ExportingError if an invalid slot number is provided or
                shutil is unable to copy the file over to the dest.
         """
 
@@ -116,10 +118,13 @@ class PatchExport(Patch):
 
     def export_bank(self, bank, dest, name, overwrite=False):
         """ Exports an entire bank to be ready for use on a ZOIA.
-        Ideally,this is used to export a bank from a local user's
-        machine to a ZOIA SD card.
+        Ideally, this is used to export a bank from a local user's
+        machine to an SD card.
 
         bank: The bank data to be processed.
+
+        return: An array of slot numbers for patches that failed to
+                export.
         """
 
         fail_list = []

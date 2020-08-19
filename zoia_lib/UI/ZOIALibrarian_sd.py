@@ -23,11 +23,12 @@ class ZOIALibrarianSD(QMainWindow):
 
         # Variable init.
         self.ui = ui
-        self.delete = delete
-        self.sd_path_full = None
-        self.sd_root = None
         self.save = save
         self.msg = msg
+        self.delete = delete
+
+        self.sd_path_full = None
+        self.sd_root = None
         self.rows_left = []
         self.rows_right = []
 
@@ -192,7 +193,7 @@ class ZOIALibrarianSD(QMainWindow):
                         self.msg.setInformativeText(None)
                         return
 
-    def delete_sd_item(self, delete):
+    def delete_sd_item(self):
         """ Deletes the currently selected directory from the SD card.
         Currently triggered via a button press.
         """
@@ -208,9 +209,9 @@ class ZOIALibrarianSD(QMainWindow):
             self.msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
             val = self.msg.exec_()
             if val == QMessageBox.Yes:
-                delete.delete_full_patch_directory(self.sd_path_full)
+                self.delete.delete_full_patch_directory(self.sd_path_full)
         else:
-            delete.delete_file(self.get_sd_path())
+            self.delete.delete_file(self.get_sd_path())
 
         self.set_data_sd()
         self.has_item()

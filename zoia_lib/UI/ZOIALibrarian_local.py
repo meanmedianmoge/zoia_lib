@@ -5,7 +5,10 @@ from PySide2.QtCore import QEvent
 from PySide2.QtWidgets import QMainWindow, QMessageBox, QInputDialog, \
     QPushButton
 
+from zoia_lib.backend.patch_update import PatchUpdate
 from zoia_lib.common import errors
+
+update = PatchUpdate()
 
 
 class ZOIALibrarianLocal(QMainWindow):
@@ -18,7 +21,7 @@ class ZOIALibrarianLocal(QMainWindow):
     this class.
     """
 
-    def __init__(self, ui, path, export, delete, update, window, sd, msg, f1):
+    def __init__(self, ui, path, sd, msg, f1):
         """
         """
 
@@ -26,13 +29,9 @@ class ZOIALibrarianLocal(QMainWindow):
 
         self.ui = ui
         self.path = path
-        self.export = export
-        self.delete = delete
-        self.update = update
-        self.window = window
         self.sd = sd
         self.msg = msg
-        self.f1 = f1
+        self.sort_and_set = f1
         self.data_local = []
         self.data_local_version = []
         self.data_bank = []
@@ -42,7 +41,7 @@ class ZOIALibrarianLocal(QMainWindow):
         self.prev_search = ""
         self.local_selected = None
 
-    def initiate_export(self):
+    def initiate_export(self, window, export):
         """ Attempts to export a patch saved in the backend to an SD
         card. This requires that the user has previously set their SD
         card path using sd_path(). Should the patch be missing, a
@@ -68,7 +67,7 @@ class ZOIALibrarianLocal(QMainWindow):
             self.msg.setText("Please specify your SD card path!")
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-            self.sd.sd_path(False, self.window.width())
+            self.sd.sd_path(False, window.width())
             self.msg.setInformativeText(None)
         else:
             if "to_zoia" not in os.listdir(self.sd.get_sd_root()):
@@ -76,14 +75,14 @@ class ZOIALibrarianLocal(QMainWindow):
             while True:
                 # Ask for a slot
                 slot, ok = QInputDialog().getInt(
-                    self.window, "Patch Export", "Slot number:", minValue=0,
+                    window, "Patch Export", "Slot number:", minValue=0,
                     maxValue=63)
                 if ok:
                     self.ui.statusbar.showMessage("Patch be movin",
                                                   timeout=5000)
                     # Got a slot and the user hit "OK"
                     try:
-                        self.export.export_patch_bin(
+                        export.export_patch_bin(
                             self.sender().objectName(), os.path.join(
                                 self.sd.get_sd_root(), "to_zoia"), slot)
                         self.ui.statusbar.showMessage("Export complete!",
@@ -101,7 +100,7 @@ class ZOIALibrarianLocal(QMainWindow):
                         value = self.msg.exec_()
                         if value == QMessageBox.Yes:
                             # Overwrite the other patch.
-                            self.export.export_patch_bin(
+                            export.export_patch_bin(
                                 self.sender().objectName(),
                                 os.path.join(self.sd.get_sd_root(),
                                              "to_zoia"), slot, True)
@@ -112,14 +111,16 @@ class ZOIALibrarianLocal(QMainWindow):
                     # Operation was aborted.
                     break
 
-    def create_expt_and_del_btns(self, btn, i, idx, ver):
+    def create_expt_and_del_btns(self, btn, i, idx, ver, window, expt, delete):
         """
 
         btn:
         i:
         idx:
         ver:
-        f1:
+        window:
+        expt:
+        delete:
         """
 
         if "[Multiple Versions]" in btn.text():
@@ -131,18 +132,19 @@ class ZOIALibrarianLocal(QMainWindow):
         del_btn = QPushButton("X", self)
 
         if self.ui.back_btn_local.isEnabled():
-            expt.setObjectName(idx + "_v" + ver)
-            del_btn.setObjectName(idx + "_v" + ver)
+            name = "{}_v{}".format(idx, ver)
+            expt.setObjectName(name)
+            del_btn.setObjectName(name)
         else:
             expt.setObjectName(idx)
             del_btn.setObjectName(idx)
 
         expt.setFont(self.ui.table_PS.horizontalHeader().font())
-        expt.clicked.connect(self.initiate_export)
+        expt.clicked.connect(lambda: self.initiate_export(expt, window))
         self.ui.table_local.setCellWidget(i, 4, expt)
 
         del_btn.setFont(self.ui.table_PS.horizontalHeader().font())
-        del_btn.clicked.connect(self.initiate_delete)
+        del_btn.clicked.connect(lambda: self.initiate_delete(delete))
         self.ui.table_local.setCellWidget(i, 5, del_btn)
 
     def get_local_patches(self):
@@ -167,6 +169,7 @@ class ZOIALibrarianLocal(QMainWindow):
                             temp = json.loads(f.read())
                         curr_data.append(temp)
                         break
+        self.sort_and_set()
 
     def initiate_delete(self):
         """ Attempts to delete a patch that is stored on a user's local
@@ -182,7 +185,6 @@ class ZOIALibrarianLocal(QMainWindow):
             else:
                 self.delete.delete_patch(self.sender().objectName())
             self.get_local_patches()
-            self.f1()
         else:
             self.delete.delete_patch(
                 os.path.join(self.curr_ver, self.sender().objectName()))
@@ -198,7 +200,6 @@ class ZOIALibrarianLocal(QMainWindow):
             self.get_local_patches()
             self.ui.back_btn_local.setEnabled(False)
             self.ui.searchbar_local.setText("")
-            self.f1()
 
     def get_version_patches(self, context, idx=None):
         """ Retrieves the versions of a patch that is locally stored to
@@ -228,19 +229,18 @@ class ZOIALibrarianLocal(QMainWindow):
                 curr_data.append(temp)
 
         self.ui.update_patch_notes.setEnabled(not context)
-        self.f1()
+        self.sort_and_set()
 
     def update_local_patches(self):
         """ Attempts to update any patch that is stored in the user's
         backend directory.
         Currently triggered via a button press.
-        TODO List which patches were updated.
         """
 
         self.ui.statusbar.showMessage("Checking for updates...",
                                       timeout=5000)
-        count = self.update.check_for_updates()
-        if count == 0:
+        count = update.check_for_updates()
+        if count[0] == 0:
             self.msg.setWindowTitle("No Updates")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText("All of the patches you have downloaded are "
@@ -250,11 +250,15 @@ class ZOIALibrarianLocal(QMainWindow):
         else:
             self.msg.setWindowTitle("Updates")
             self.msg.setIcon(QMessageBox.Information)
-            if count == 1:
-                self.msg.setText("Successfully updated 1 patch.")
+            if count[0] == 1:
+                self.msg.setText("Successfully updated 1 patch:")
+                self.msg.setDetailedText("\t* {}".format(count[1][0]))
             else:
                 self.msg.setText(
-                    "Successfully updated " + str(count) + " patches.")
+                    "Successfully updated {} patches:".format(count))
+                text = ""
+                for i in range(count[0]):
+                    text += "\t* {}\n".format(count[1][i])
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
 
@@ -275,7 +279,7 @@ class ZOIALibrarianLocal(QMainWindow):
             self.ui.text_browser_bank.setText("")
             self.ui.back_btn_bank.setEnabled(False)
         # Sort and display the data.
-        self.f1()
+        self.sort_and_set()
 
     def update_patch_notes(self):
         """ Updates the patch notes for a patch that has been previously
@@ -286,9 +290,9 @@ class ZOIALibrarianLocal(QMainWindow):
         text = self.ui.text_browser_local.toPlainText()
         try:
             text = text.split("Patch Notes:")[1]
-            self.update.update_data(self.local_selected, text.strip("\n"), 3)
+            update.update_data(self.local_selected, text.strip("\n"), 3)
         except IndexError:
-            self.update.update_data(self.local_selected, "", 3)
+            update.update_data(self.local_selected, "", 3)
         self.ui.statusbar.showMessage("Successfully updated patch notes.",
                                       timeout=5000)
 
@@ -301,13 +305,9 @@ class ZOIALibrarianLocal(QMainWindow):
 
         # Case 1 - The text is empty (i.e., delete everything)
         if text == "":
-            if mode:
-                self.update.update_data(idx, [], 1)
-            else:
-                self.update.update_data(idx, [], 2)
+            update.update_data(idx, [], 1 if mode else 2)
             if not self.ui.back_btn_local.isEnabled():
                 self.get_local_patches()
-                self.f1()
             else:
                 self.get_version_patches(True)
         # Case 2 - Leftover text from when there are no tags/categories
@@ -332,16 +332,18 @@ class ZOIALibrarianLocal(QMainWindow):
                     "name": curr
                 })
             if mode:
-                self.update.update_data(idx, done, 1)
+                update.update_data(idx, done, 1)
             else:
-                self.update.update_data(idx, done, 2)
+                update.update_data(idx, done, 2)
             if not self.ui.back_btn_local.isEnabled():
                 self.get_local_patches()
-                self.f1()
             else:
                 self.get_version_patches(True)
 
     def events(self, e):
+        """
+        """
+
         if e.type() == QEvent.FocusIn:
             if self.prev_tag_cat is None:
                 return False

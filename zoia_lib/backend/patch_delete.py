@@ -23,9 +23,10 @@ class PatchDelete(Patch):
 
         patch: A string representing the path to the patch to be
                deleted.
-        Raises RenamingError if the file could not be renamed
+
+        raise: RenamingError if the file could not be renamed
                correctly.
-        Raises BadPathError if patch was not a valid path.
+        raise: BadPathError if patch was not a valid path.
         """
 
         if patch is None:
@@ -67,8 +68,9 @@ class PatchDelete(Patch):
         name of the patch directory that will be deleted.
 
         patch_dir: A string representing the patch directory to be deleted.
-        Raises DeletionError if patch_dir is malformed.
-        Raises BadPathError if patch_dir does not lead to a patch.
+
+        raise: DeletionError if patch_dir is malformed.
+        raise: BadPathError if patch_dir does not lead to a patch.
         """
 
         if patch_dir is None:
@@ -94,8 +96,9 @@ class PatchDelete(Patch):
                a patch be found that matches the passed index, it will
                be deleted.
         sd_path: A string representing the path to the inserted SD card.
-        Raises BadPatchError if path does not lead to a patch.
-        Raises DeletionError if patch_dir is malformed, cannot find a
+
+        raise: BadPatchError if path does not lead to a patch.
+        raise: DeletionError if patch_dir is malformed, cannot find a
                a patch to delete, or the SD card is removed during
                deletion.
         """
@@ -121,6 +124,8 @@ class PatchDelete(Patch):
         """ Deletes a file at the specified path.
 
         path: The path at which the file to be deleted is located.
+
+        raise: BadPathError if path did not lead to a file.
         """
 
         # Delete the patch.

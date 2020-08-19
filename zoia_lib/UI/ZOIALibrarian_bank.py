@@ -686,8 +686,8 @@ class ZOIALibrarianBank(QMainWindow):
     def has_item(self):
         """ Determines whether the Bank tables contain an entry.
 
-        Return: True if the Bank tables contain an entry, False
-                otherwise.
+        Returns: True if the Bank tables contain an entry, False
+                 otherwise.
         """
 
         # Check to see if we should disable export and save buttons.

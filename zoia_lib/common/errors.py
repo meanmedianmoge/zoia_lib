@@ -165,6 +165,7 @@ class SortingError(ZoiaLibError):
     Possible error codes:
      - 901: The mode was invalid.
      - 902: The data supplied was not a list.
+     - 903: One or more passed parameters contained None.
     """
     def __init__(self, info, error_code=0):
         if info is None:
@@ -175,6 +176,9 @@ class SortingError(ZoiaLibError):
         elif error_code == 902:
             print(f'The supplied metadata {info} is not a list. Sorting '
                   f'can only occur on valid lists.')
+        elif error_code == 903:
+            print(f'The parameter list was invalid. Ensure that no '
+                  f'parameters contain None as a value.')
         else:
             # Default case. We do not want to get here.
             print(f'Could not process {info} correctly '
@@ -186,8 +190,8 @@ class SearchingError(ZoiaLibError):
     successfully.
 
     Possible error codes:
-     - 1001: The mode was invalid.
-     - 1002: The query supplied was not a list.
+     - 1001:  The query supplied was not a list.
+     - 1002: One or more passed parameters contained None.
     """
     def __init__(self, info, error_code=0):
         if info is None:
@@ -195,6 +199,9 @@ class SearchingError(ZoiaLibError):
         elif error_code == 1001:
             print(f'The supplied metadata {info} is not a list. Searching '
                   f'can only occur on valid lists.')
+        elif error_code == 1002:
+            print(f'The parameter list was invalid. Ensure that no '
+                  f'parameters contain None as a value.')
         else:
             # Default case. We do not want to get here.
             print(f'Could not process {info} correctly '

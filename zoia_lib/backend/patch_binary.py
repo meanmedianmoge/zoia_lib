@@ -4,8 +4,8 @@ from zoia_lib.backend.patch import Patch
 
 
 class PatchBinary(Patch):
-    """T he PatchBinary class is a child of the Patch class. It is
-    responsible for patch binary analysis.
+    """The PatchBinary class is a child of the Patch class. It is
+    responsible for ZOIA patch binary analysis.
     """
 
     def __init__(self):
@@ -33,11 +33,12 @@ class PatchBinary(Patch):
             - Connection values and strength (as a %)
         - Number of pages
           - For each page:
-            - The page name (if it has one)
-        - The color of each module (not yet implemented).
+            - The page name (if it has one) (not yet implemented)
+        - The color of each module (not yet implemented)
 
         pch_data: The binary to be parsed and analyzed.
-        Returns a formatted string that can be shown in the frontend.
+
+        return: A formatted string that can be shown in the frontend.
         """
 
         # Massive credit to apparent1 for figuring this stuff out.
@@ -59,13 +60,13 @@ class PatchBinary(Patch):
         curr_step = 6
         for i in range(int(data[5])):
             size = data[curr_step]
-            pch_viz += "\n  Module #{}".format(i)
+            pch_viz += "\n     Module #{}".format(i)
             pch_viz += "\n\tModule size = {}".format(size)
             pch_viz += "\n\tModule type: {}".format(
-                self.get_module_type(data[curr_step + 1]))
+                self._get_module_type(data[curr_step + 1]))
             pch_viz += "\n\tPage number: {}".format(data[curr_step + 3])
             pch_viz += "\n\tOld color value: {}".format(
-                self.get_color_name(data[curr_step + 4]))
+                self._get_color_name(data[curr_step + 4]))
             pch_viz += "\n\tGrid position: {}".format(data[curr_step + 5])
             pch_viz += "\n\tNumber of parameters on grid: " \
                        "{}".format(data[curr_step + 6])
@@ -85,7 +86,15 @@ class PatchBinary(Patch):
 
         return pch_viz
 
-    def get_module_type(self, module_id):
+    @staticmethod
+    def _get_module_type(module_id):
+        """ Determines the longform name of a module id.
+
+        module_id: The id for the module.
+
+        return: The string that matches the passed module_id.
+        """
+
         module = {
             0: "SV Filter",
             1: "Audio Input",
@@ -175,10 +184,13 @@ class PatchBinary(Patch):
 
         return module
 
-    def get_color_name(self, color_id):
+    @staticmethod
+    def _get_color_name(color_id):
         """ Determines the longform name of a color id.
 
         color_id: The id for the color.
+
+        return: The string that matches the passed color_id.
         """
         color = {
             1: "Blue",
@@ -199,20 +211,3 @@ class PatchBinary(Patch):
         }[color_id]
 
         return color
-
-    def get_parameter_name(self, module_id):
-        """ Determines the longform name of a module id.
-
-        module_id: The id for the module.
-        """
-        module = {
-            0: "Module type",
-            2: "Page number",
-            3: "Old color value",
-            4: "Grid position",
-            5: "Number of parameters on grid",
-            7: "Module options 1",
-            8: "Module options 2"
-        }[module_id]
-
-        return module

@@ -38,8 +38,7 @@ class PatchUpdate(Patch):
         }[mode]
 
         pch = idx
-        if "_" in idx:
-            idx = idx.split("_")[0]
+        idx = idx.split("_")[0]
 
         with open(os.path.join(self.back_path, idx, "{}.json".format(pch)),
                   "r") as f:
@@ -54,12 +53,18 @@ class PatchUpdate(Patch):
         patches from PS, should any that have been previously downloaded
         are updated.
 
-        This method will check the updated_at attribute of each downloaded
-        patch, should this differ compared to what is returned by PS, a
-        new patch will attempt to be saved. If the binary file is determined
-        to be identical to the one stored within the backend, the saving is
-        aborted at there was no update to the patch itself. Otherwise, a new
-        version of the patch is added and saved within the patch directory.
+        This method will check the updated_at attribute of each
+        downloaded patch, should this differ compared to what is
+        returned by PS, a new patch will attempt to be saved. If the
+        binary file is determined to be identical to the one stored
+        within the backend, the saving is aborted at there was no update
+        to the patch itself. Otherwise, a new version of the patch is
+        added and saved within the patch directory.
+
+        return: A tuple containing the number of patches that updated as
+                an int as the first element, and the names of the
+                patches that updated in as strings in an array as the
+                second element.
         """
 
         meta = []
@@ -96,23 +101,23 @@ class PatchUpdate(Patch):
 
         # Try to save the new binaries to the backend.
         save = PatchSave()
+        pchs = []
         for patch in pch_list:
             try:
                 save.save_to_backend(patch[0])
             except errors.SavingError:
                 # TODO If we fail to save, at least update the metadata.
+                idx = str(patch[1]["id"])
                 try:
-                    with open(os.path.join(self.back_path, str(patch[1]["id"]),
-                                           "{}.bin".format(
-                                               str(patch[1]["id"]))),
-                              "w") as f:
+                    with open(os.path.join(self.back_path, idx,
+                                           "{}.bin".format(idx)), "w") as f:
                         f.write(json.dumps(patch[1]))
+                        pchs.append(patch[1]["title"])
                 except FileNotFoundError:
-                    with open(os.path.join(
-                            self.back_path, str(patch[1]["id"]),
-                                           "{}_v1.bin".format(
-                                               str(patch[1]["id"]))),
-                              "r") as f:
+                    with open(os.path.join(self.back_path, idx,
+                                           "{}_v1.bin".format(idx)), "r") as f:
                         f.write(json.dumps(patch[1]))
+                        pchs.append(patch[1]["title"])
+            pchs.append(patch)
 
-        return len(pch_list)
+        return len(pch_list), pchs

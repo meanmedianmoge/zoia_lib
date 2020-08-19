@@ -36,20 +36,23 @@ class Patch:
         self._create_backend_directories()
 
     def _create_backend_directories(self):
-        """ Creates the necessary directories that will
-        store patch files, bank files, and metadata files.
+        """ Creates the necessary directories that will store
+        patch files, bank files, and metadata files.
         """
 
         # Prevent an error on Windows by checking to see
         # if the directory already exists.
         if self.back_path is not None and not os.path.exists(self.back_path):
             os.mkdir(self.back_path)
-        if not os.path.exists(os.path.join(self.back_path, "Banks")):
+        if self.back_path is not None and not \
+                os.path.exists(os.path.join(self.back_path, "Banks")):
             os.mkdir(os.path.join(self.back_path, "Banks"))
 
     def get_backend_path(self):
         """ Getter method to retrieve the backend path as
         determined by __init__()
+
+        return: A string representing the OS specific backend path.
         """
 
         return self.back_path

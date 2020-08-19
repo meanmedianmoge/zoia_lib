@@ -35,8 +35,9 @@ class PatchSave(Patch):
         patch: A tuple containing the downloaded file
                data and the patch metadata, comes from ps.download(IDX).
                patch[0] is raw binary data, while patch[1] is json data.
-        Raises a SavingError should the patch fail to save.
-        Raises a RenamingError should the patch fail to be renamed.
+
+        raise: SavingError should the patch fail to save.
+        raise: RenamingError should the patch fail to be renamed.
         """
 
         # Don't try to save a file when we are missing necessary info.
@@ -94,10 +95,10 @@ class PatchSave(Patch):
                 # No files attribute,
                 raise errors.SavingError(patch[1], 502)
         else:
-            """ A directory already existed for this patch id, so 
-            we need to check if this is a unique patch version 
-            (otherwise there is no need to save it).
-            """
+            # A directory already existed for this patch id, so
+            # we need to check if this is a unique patch version
+            # (otherwise there is no need to save it).
+
             # Case 1: Check if this is a compressed patch download.
             if "files" in patch[1] \
                     and patch[1]["files"][0]["filename"].split(".")[-1] \
@@ -152,7 +153,6 @@ class PatchSave(Patch):
                             # This exact binary is already saved onto the
                             # system.
                             raise errors.SavingError(patch[1]["title"], 503)
-                    f.close()
 
             # If we get here, we have a unique patch, so we need to find
             # out what version # to give it.
@@ -259,7 +259,10 @@ class PatchSave(Patch):
               being imported.
         version: True if the directory being imported should be treated
                  as a version directory.
-        Raises a SavingError should the patch fail to save.
+
+        raise: SavingError should the patch fail to save.
+
+        return: The number of patches that failed to import as an int.
         """
 
         fails = 0
@@ -344,7 +347,7 @@ class PatchSave(Patch):
                 "files": [
                     {
                         "id": patch_id,
-                        "filename": patch_name + "." + ext
+                        "filename": "{}.{}".format(patch_name, ext)
                     }
                 ],
                 "categories": [],
@@ -385,28 +388,31 @@ class PatchSave(Patch):
         return fails
 
     def patch_decompress(self, patch):
-        """ Method stub for decompressing files retrieved from the PS API.
+        """ Method stub for decompressing files retrieved from the PS
+        API. Currently only supports .zip files.
+        TODO Add .tar decompression logic.
 
         patch: A tuple containing the downloaded file
-               data and the patch metadata, comes from ps.download(IDX).
+               data and the patch metadata, comes from ps.download().
                patch[0] is raw binary data, while patch[1] is json data.
-        Raises a SavingError should the contents fail to save.
-        Raises a RenamingError should the contents fail to be renamed.
+
+        raise: SavingError should the contents fail to save.
+        raise: RenamingError should the contents fail to be renamed.
         """
 
-        patch_name = str(patch[1]['id'])
+        patch_id = str(patch[1]['id'])
 
-        pch = os.path.join(self.back_path, "{}".format(str(patch_name)))
+        pch = os.path.join(self.back_path, "{}".format(patch_id))
         if not os.path.isdir(pch):
             os.mkdir(pch)
 
         if patch[1]["files"][0]["filename"].split(".")[-1] == "zip":
             # .zip files
-            name_zip = os.path.join(pch, "{}.zip".format(patch_name))
+            name_zip = os.path.join(pch, "{}.zip".format(patch_id))
             with open(name_zip, "wb") as f:
                 f.write(patch[0])
             with zipfile.ZipFile(
-                    os.path.join(pch, "{}.zip".format(patch_name)),
+                    os.path.join(pch, "{}.zip".format(patch_id)),
                     'r') as zipObj:
                 # Extract all the contents into the patch directory
                 zipObj.extractall(pch)
@@ -423,8 +429,7 @@ class PatchSave(Patch):
                 for file in os.listdir(pch):
                     name = file
                     os.rename(os.path.join(pch, file),
-                              os.path.join(pch, "{}.bin".format(patch[1]["id"]
-                                                                )))
+                              os.path.join(pch, "{}.bin".format(patch_id)))
                     patch[1]["files"][0]["filename"] = name
                     self.save_metadata_json(patch[1])
 
@@ -438,7 +443,7 @@ class PatchSave(Patch):
                             # Rename the file to follow the conventional format
                             os.rename(os.path.join(pch, file),
                                       os.path.join(pch, "{}_v{}.bin".format(
-                                          patch[1]["id"], i)))
+                                          patch_id, i)))
                             patch[1]["files"][0]["filename"] = name
                             self.save_metadata_json(patch[1], i)
                         except FileNotFoundError or FileExistsError:
@@ -452,7 +457,7 @@ class PatchSave(Patch):
             if to_delete is not None:
                 for file in os.listdir(to_delete):
                     correct_pch = os.path.join(self.back_path,
-                                               "{}".format(str(patch_name)))
+                                               "{}".format(str(patch_id)))
                     shutil.copy(os.path.join(to_delete, file),
                                 os.path.join(correct_pch))
                 try:
@@ -469,6 +474,8 @@ class PatchSave(Patch):
     def _generate_patch_id(path):
         """ Generates a 5-digit patch ID for a supplied path.
         The same string will hash to the same 5-digit identifier.
+
+        return: A 5-digit hash number based on the path, as an int.
         """
 
         patch_id = str(abs(hash(path)))
@@ -477,5 +484,4 @@ class PatchSave(Patch):
         else:
             while len(patch_id) < 5:
                 patch_id += "0"
-        patch_id = int(patch_id)
-        return patch_id
+        return int(patch_id)

@@ -13,18 +13,17 @@ class Worker(QRunnable):
     def __init__(self, fn, *args, **kwargs):
         """ Initializes the class with the required parameters.
 
-        fn: The function the Worker thread will target
+        fn: The function the Worker thread will target.
         args: The arguments passed that are required to execute fn.
-        kwargs: Any additional key word arguments needed to
-                communicate back with the UI.
+        kwargs: Any additional key word arguments the thread requires.
         """
 
-        super(Worker, self).__init__()
+        super().__init__()
+
         self.fn = fn
         self.args = args
         self.kwargs = kwargs
         self.signals = WorkerSignals()
-
         self.kwargs["progress_callback"] = self.signals.progress
 
     def run(self):
@@ -34,10 +33,10 @@ class Worker(QRunnable):
 
         try:
             result = self.fn(*self.args, **self.kwargs)
-        except:
+        except InterruptedError:
             traceback.print_exc()
-            exctype, value = sys.exc_info()[:2]
-            self.signals.error.emit((exctype, value, traceback.format_exc()))
+            exc_type, value = sys.exc_info()[:2]
+            self.signals.error.emit((exc_type, value, traceback.format_exc()))
         else:
             self.signals.result.emit(result)
         finally:
@@ -45,8 +44,8 @@ class Worker(QRunnable):
 
 
 class WorkerSignals(QObject):
-    """ The WorkerSignals enum is responsible for defining signals to
-    be used for communication with the UI by the Workers.
+    """ The WorkerSignals class (enum) is responsible for defining
+    signals to be used for communication with the UI by the Workers.
     """
 
     finished = Signal()
