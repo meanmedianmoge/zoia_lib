@@ -71,8 +71,8 @@ def search_patches(data, query):
     raise: SearchingError if the parameters are None or data is
            not of type list.
 
-    return: an array of metadata containing the data that matches the
-    search query.
+    return: An array of metadata containing the data that matches the
+            search query.
     """
 
     query = query.lower()

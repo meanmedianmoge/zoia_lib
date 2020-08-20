@@ -18,7 +18,7 @@ class Worker(QRunnable):
         kwargs: Any additional key word arguments the thread requires.
         """
 
-        super().__init__()
+        super(Worker, self).__init__()
 
         self.fn = fn
         self.args = args

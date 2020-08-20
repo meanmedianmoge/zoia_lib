@@ -4,6 +4,8 @@ import os
 import shutil
 import zipfile
 
+import rarfile
+
 from zoia_lib.backend.patch import Patch
 from zoia_lib.common import errors
 from zoia_lib.backend.api import PatchStorage
@@ -84,7 +86,7 @@ class PatchSave(Patch):
                     shutil.rmtree(os.path.join(self.back_path, pch))
                     raise errors.SavingError(patch[1], 501)
                 else:
-                    self.patch_decompress(patch)
+                    self._patch_decompress(patch)
             # Make sure the files attribute exists.
             elif "files" in patch[1] and isinstance(patch[0], bytes):
                 name_bin = os.path.join(pch, "{}.bin".format(pch_id))
@@ -188,20 +190,20 @@ class PatchSave(Patch):
                         os.rename(os.path.join(
                             pch, "{}_v{}.{}".format(pch_id, str(ver - 1),
                                                     extension)),
-                                  os.path.join(
-                                      pch, "{}_v{}.{}".format(pch_id, str(ver),
-                                                              extension)))
+                            os.path.join(
+                                pch, "{}_v{}.{}".format(pch_id, str(ver),
+                                                        extension)))
                         # Update the revision number in each metadata file
                         with open(os.path.join(
                                 pch, "{}_v{}.json".format(pch_id, str(ver))),
-                                  "r") as f:
+                                "r") as f:
                             jf = json.loads(f.read())
 
                         jf["revision"] = ver
 
                         with open(os.path.join(
                                 pch, "{}_v{}.json".format(pch_id, str(ver))),
-                                  "w") as f:
+                                "w") as f:
                             json.dump(jf, f)
 
                 except FileNotFoundError or FileExistsError:
@@ -366,7 +368,7 @@ class PatchSave(Patch):
                         js_data = temp
                         js_data["updated_at"] = \
                             datetime.datetime.fromtimestamp(
-                            os.path.getmtime(path)).strftime(
+                                os.path.getmtime(path)).strftime(
                                 '%Y-%m-%dT%H:%M:%S+00:00')
                         break
             if version:
@@ -387,7 +389,7 @@ class PatchSave(Patch):
                     continue
         return fails
 
-    def patch_decompress(self, patch):
+    def _patch_decompress(self, patch):
         """ Method stub for decompressing files retrieved from the PS
         API. Currently only supports .zip files.
         TODO Add .tar decompression logic.
@@ -400,7 +402,7 @@ class PatchSave(Patch):
         raise: RenamingError should the contents fail to be renamed.
         """
 
-        patch_id = str(patch[1]['id'])
+        patch_id = str(patch[1]["id"])
 
         pch = os.path.join(self.back_path, "{}".format(patch_id))
         if not os.path.isdir(pch):
@@ -411,64 +413,87 @@ class PatchSave(Patch):
             name_zip = os.path.join(pch, "{}.zip".format(patch_id))
             with open(name_zip, "wb") as f:
                 f.write(patch[0])
-            with zipfile.ZipFile(
-                    os.path.join(pch, "{}.zip".format(patch_id)),
-                    'r') as zipObj:
+            with zipfile.ZipFile(os.path.join(pch, "{}.zip".format(patch_id)),
+                                 "r") as zip_obj:
                 # Extract all the contents into the patch directory
-                zipObj.extractall(pch)
+                zip_obj.extractall(pch)
             # Ditch the zip
             os.remove(name_zip)
             to_delete = None
-
-            for file in os.listdir(pch):
-                if os.path.isdir(os.path.join(pch, file)):
-                    to_delete = (os.path.join(pch, file))
-                    pch = os.path.join(pch, file)
-
-            if len(os.listdir(pch)) == 1:
-                for file in os.listdir(pch):
-                    name = file
-                    os.rename(os.path.join(pch, file),
-                              os.path.join(pch, "{}.bin".format(patch_id)))
-                    patch[1]["files"][0]["filename"] = name
-                    self.save_metadata_json(patch[1])
-
-            else:
-                i = 0
-                for file in os.listdir(pch):
-                    if file.split(".")[-1] == "bin":
-                        i += 1
-                        try:
-                            name = file
-                            # Rename the file to follow the conventional format
-                            os.rename(os.path.join(pch, file),
-                                      os.path.join(pch, "{}_v{}.bin".format(
-                                          patch_id, i)))
-                            patch[1]["files"][0]["filename"] = name
-                            self.save_metadata_json(patch[1], i)
-                        except FileNotFoundError or FileExistsError:
-                            raise errors.RenamingError(patch, 601)
-                    else:
-                        # Remove any additional files.
-                        # TODO make this better. Shouldn't just delete
-                        #  additional files. Especially .txt, would want to
-                        #  add that to the content attribute in the JSON.
-                        os.remove(os.path.join(pch, file))
-            if to_delete is not None:
-                for file in os.listdir(to_delete):
-                    correct_pch = os.path.join(self.back_path,
-                                               "{}".format(str(patch_id)))
-                    shutil.copy(os.path.join(to_delete, file),
-                                os.path.join(correct_pch))
+        elif patch[1]["files"][0]["filename"].split(".")[-1] == "rar":
+            # .rar files
+            name_rar = os.path.join(pch, "{}.rar".format(patch_id))
+            with open(name_rar, "wb") as f:
+                f.write(patch[0])
+            try:
+                with rarfile.RarFile(os.path.join(pch, "{}.rar".format(patch_id)),
+                                     "r") as rar_obj:
+                    # Extract all the contents into the patch directory
+                    rar_obj.extractall(pch)
+                # Ditch the rar
+                os.remove(name_rar)
+                to_delete = None
+            except rarfile.RarCannotExec:
+                print("As .rar compression is a commercial product, you must "
+                      "download external software to download this patch "
+                      "(i.e. You need WinRAR installed for this to work).")
                 try:
-                    shutil.rmtree(to_delete)
+                    shutil.rmtree(pch)
                 except FileNotFoundError:
-                    raise errors.RenamingError(patch)
-
+                    pass
+                raise errors.SavingError(patch[1]["title"], 501)
         else:
             # Unexpected file extension encountered.
             os.rmdir(pch)
             raise errors.SavingError(patch[1]["title"], 501)
+
+        # Get to the uncompressed directory.
+        for file in os.listdir(pch):
+            if os.path.isdir(os.path.join(pch, file)):
+                to_delete = (os.path.join(pch, file))
+                pch = os.path.join(pch, file)
+
+        if len(os.listdir(pch)) == 1:
+            # The compressed file only contained 1 patch.
+            for file in os.listdir(pch):
+                name = file
+                os.rename(os.path.join(pch, file),
+                          os.path.join(pch, "{}.bin".format(patch_id)))
+                patch[1]["files"][0]["filename"] = name
+                self.save_metadata_json(patch[1])
+        else:
+            # The compressed file contained more than 1 patch.
+            i = 0
+            for file in os.listdir(pch):
+                if file.split(".")[-1] == "bin":
+                    i += 1
+                    try:
+                        name = file
+                        # Rename the file to follow the conventional format
+                        os.rename(os.path.join(pch, file),
+                                  os.path.join(pch, "{}_v{}.bin".format(
+                                      patch_id, i)))
+                        patch[1]["files"][0]["filename"] = name
+                        self.save_metadata_json(patch[1], i)
+                    except FileNotFoundError or FileExistsError:
+                        raise errors.RenamingError(patch, 601)
+                else:
+                    # Remove any additional files.
+                    # TODO make this better. Shouldn't just delete
+                    #  additional files. Especially .txt, would want to
+                    #  add that to the content attribute in the JSON.
+                    os.remove(os.path.join(pch, file))
+        if to_delete is not None:
+            # We need to cleanup.
+            for file in os.listdir(to_delete):
+                correct_pch = os.path.join(
+                    self.back_path, "{}".format(str(patch_id)))
+                shutil.copy(os.path.join(to_delete, file),
+                            os.path.join(correct_pch))
+            try:
+                shutil.rmtree(to_delete)
+            except FileNotFoundError:
+                raise errors.RenamingError(patch)
 
     @staticmethod
     def _generate_patch_id(path):

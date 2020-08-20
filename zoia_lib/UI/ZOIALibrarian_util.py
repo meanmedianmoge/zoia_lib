@@ -7,8 +7,14 @@ import json
 
 
 class ZOIALibrarianUtil:
+    """ The ZOIALibrarianUTIL class is responsible for all
+    auxiliary activities that may be required by other ZOIALibrarian
+    classes.
+    """
 
     def __init__(self, ui):
+        """ Initializes the class with the required parameters.
+        """
 
         # Get the ui reference
         self.ui = ui
@@ -18,6 +24,9 @@ class ZOIALibrarianUtil:
     def change_font(self, name):
         """ Changes the font used throughout the application.
         Currently triggered via a menu action.
+
+        name: Used to specify whether the font should be resized or
+              changed to a different font family.
         """
 
         # Get the context.
@@ -128,6 +137,11 @@ class ZOIALibrarianUtil:
 
     def save_pref(self, w, h, sd, path):
         """ Saves and writes the state of a UI window to pref.json
+
+        w: The width of the main window.
+        h: The height of the main window.
+        sd: The path to an the root of a specified SD card.
+        path: The path to the backend .ZoiaLibraryApp directory.
         """
 
         # Capture the necessary specs on exit.
@@ -190,7 +204,12 @@ class ZOIALibrarianUtil:
                                 sd_sizes, bank_sizes, dark_mode]))
 
     def toggle_dark(self):
+        """ Toggles the theme for the application.
+        Currently triggered via a menu action.
+        """
+
         app = QApplication.instance()
+        # Pick the right stylesheet based on the OS.
         sheet = {
             ("darwin", True): "osx-light.css",
             ("windows", True): "light.css",
@@ -238,3 +257,115 @@ class ZOIALibrarianUtil:
         """ Setter method to specify the font to be used for the app.
         """
         self.font = f
+
+    @staticmethod
+    def multi_drag_drop(rows_left, rows_right, table_1, table_2, f1):
+        """ Attempts to move multiple rows from one table at the same
+        time. This can be within the same table or to a companion table.
+
+        rows_left: An array containing the rows currently stored in the
+                   left table.
+        rows_right: And array containing the rows currently stored in
+                    the right table.
+        table_1: The left table associated with the multi drag/drop.
+        table_2: The right table associated with the multi drag/drop.
+        f1: A function to move the useful data associated with the rows.
+        TODO Refactor this mess.
+        """
+
+        first_item = None
+        first_item_index = -1
+        if len(rows_left) > 1 and len(rows_right) == 0:
+            for i in sorted(rows_left):
+                i = i.row()
+                i = int('%d' % i)
+                temp = table_1.item(i, 0)
+                if temp is not None and temp.text() != "":
+                    first_item = temp
+                    first_item_index = i
+                    break
+            first_item_text = first_item.text()
+            for i in range(64):
+                if i < 32:
+                    temp_left = table_1.item(i, 0)
+                    temp_right = None
+                else:
+                    temp_right = table_2.item(i - 32, 0)
+                    temp_left = None
+                if (temp_left is not None and i != first_item_index
+                    and temp_left.text() == first_item_text) or (
+                        temp_right is not None and temp_right.text()
+                        == first_item_text):
+                    # We found the first item!
+                    row = sorted(rows_left)[-1].row()
+                    row = int('%d' % row)
+                    for j in range(first_item_index, row + 1):
+                        if j == first_item_index:
+                            i = i + (j - first_item_index)
+                        else:
+                            i += 1
+                        if i > 31:
+                            temp1 = table_1.item(j, 0)
+                            temp2 = table_2.item(i - 32, 0)
+                        else:
+                            temp1 = table_1.item(j, 0)
+                            temp2 = table_1.item(i, 0)
+                        if temp1 is None and temp2 is None:
+                            continue
+                        elif temp1 is None and temp2 is not None:
+                            f1(i, j)
+                        elif temp1 is not None and temp2 is None or \
+                                temp1 is not None and temp2 is not \
+                                None:
+                            f1(j, i)
+                        elif temp1 is None and temp2 is not None:
+                            f1(i, j)
+
+        else:
+            for i in sorted(rows_right):
+                i = i.row()
+                i = int('%d' % i)
+                temp = table_2.item(i, 0)
+                if temp is not None and temp.text() != "":
+                    first_item = temp
+                    first_item_index = i + 32
+                    break
+            first_item_text = first_item.text()
+            for i in range(64):
+                if i < 32:
+                    temp_left = table_1.item(i, 0)
+                    temp_right = None
+                else:
+                    temp_right = table_2.item(i - 32, 0)
+                    temp_left = None
+                if (temp_right is not None and i != first_item_index
+                    and temp_right.text() == first_item_text) or (
+                        temp_left is not None and temp_left.text()
+                        == first_item_text):
+                    # We found the first item!
+                    row = sorted(rows_right)[-1].row()
+                    row = int('%d' % row) + 32
+                    for j in range(first_item_index, row + 1):
+                        if j == first_item_index:
+                            i = i + (j - first_item_index)
+                        else:
+                            i += 1
+                        if i > 31:
+                            temp1 = table_2.item(j - 32, 0)
+                            temp2 = table_1.item(i - 32, 0)
+                        else:
+                            temp1 = table_2.item(j - 32, 0)
+                            temp2 = table_2.item(i, 0)
+                        if temp1 is None and temp2 is None:
+                            continue
+                        elif temp1 is None and temp2 is not None:
+                            f1(i, j)
+                        elif temp1 is not None and temp2 is None or \
+                                temp1 is not None and temp2 is not \
+                                None:
+                            f1(j, i)
+                        elif temp1 is None and temp2 is not None:
+                            f1(i, j)
+        # Delete phantom rows.
+        table_1.setRowCount(32)
+        table_2.setRowCount(32)

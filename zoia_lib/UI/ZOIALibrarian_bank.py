@@ -12,13 +12,14 @@ class ZOIALibrarianBank(QMainWindow):
     activities contained within the Banks tab of the application.
     """
 
-    def __init__(self, ui, path, msg):
+    def __init__(self, ui, path, msg, util):
         """ Initializes the class with the required parameters.
 
         ui: The UI component of ZOIALibrarianMain
         path: A String representing the path to the backend application
               directory.
         msg: A template QMessageBox.
+        util: Helper class to access multi drag/drop.
         """
 
         # Needed to make use of self.sender()
@@ -27,6 +28,8 @@ class ZOIALibrarianBank(QMainWindow):
         self.ui = ui
         self.path = path
         self.msg = msg
+        self.util = util
+
         self.data_banks = []
         self.rows_left = []
         self.rows_right = []
@@ -161,6 +164,8 @@ class ZOIALibrarianBank(QMainWindow):
     def save_bank(self, window):
         """ Saves a Bank to the backend application directory.
         Currently triggered via a button press.
+
+        window: A reference to the main UI window for icon consistency.
         """
 
         # Ask for a name
@@ -187,6 +192,8 @@ class ZOIALibrarianBank(QMainWindow):
         Currently triggered via a button press.
 
         sd: A path to a user's SD card.
+        export: Helper class to access backend exporting methods.
+        window: A reference to the main UI window for icon consistency.
         """
 
         if sd.get_sd_root() is None:
@@ -299,11 +306,15 @@ class ZOIALibrarianBank(QMainWindow):
             dest -= 64
 
         # Setup the new item.
-        if src < 32:
-            idx = self.ui.table_bank_left.cellWidget(src, 1).objectName()
-        else:
-            idx = self.ui.table_bank_right.cellWidget(src - 32,
-                                                      1).objectName()
+        try:
+            if src < 32:
+                idx = self.ui.table_bank_left.cellWidget(src, 1).objectName()
+            else:
+                idx = self.ui.table_bank_right.cellWidget(src - 32,
+                                                          1).objectName()
+        except AttributeError:
+            # Got two empty rows, ignore them.
+            return
 
         for pch in self.data_banks:
             if dest == pch["slot"]:
@@ -506,7 +517,7 @@ class ZOIALibrarianBank(QMainWindow):
                     if (src_index < 32 and self.ui.table_bank_left.item(
                             src_index, 0)) is None or (
                             src_index > 31 and self.ui.table_bank_right.item(
-                        src_index - 32, 0) is None):
+                            src_index - 32, 0) is None):
                         # Then it is actually the destination
                         dst_index = src_index
                         # Find the item that just got "deleted"
@@ -540,123 +551,18 @@ class ZOIALibrarianBank(QMainWindow):
                             # We need to delete the row that just got created.
                             self.ui.table_bank_left.removeRow(32)
                             self.ui.table_bank_right.removeRow(32)
-                            return False
+                            return
                         if src_index != dst_index:
                             self.move_patch_bank(src_index, dst_index)
-                        return True
+                        return
                 else:
                     # Multiple selections
-                    first_item = None
-                    first_item_index = -1
-                    if len(self.rows_left) > 1 and len(self.rows_right) == 0:
-                        for i in sorted(self.rows_left):
-                            i = i.row()
-                            i = int('%d' % i)
-                            temp = self.ui.table_bank_left.item(i, 0)
-                            if temp is not None and temp.text() != "":
-                                first_item = temp
-                                first_item_index = i
-                                break
-                        first_item_text = first_item.text()
-                        for i in range(64):
-                            if i < 32:
-                                temp_left = self.ui.table_bank_left.item(i, 0)
-                                temp_right = None
-                            else:
-                                temp_right = self.ui.table_bank_right.item(
-                                    i - 32, 0)
-                                temp_left = None
-                            if (temp_left is not None and i != first_item_index
-                                and temp_left.text() == first_item_text) or (
-                                    temp_right is not None and
-                                    temp_right.text() == first_item_text):
-                                # We found the first item!
-                                row = sorted(self.rows_left)[-1].row()
-                                row = int('%d' % row)
-                                for j in range(first_item_index, row + 1):
-                                    if j == first_item_index:
-                                        i = i + (j - first_item_index)
-                                    else:
-                                        i += 1
-                                    if i > 31:
-                                        temp1 = self.ui.table_bank_left.item(j,
-                                                                             0)
-                                        temp2 = self.ui.table_bank_right.item(
-                                            i - 32,
-                                            0)
-                                    else:
-                                        temp1 = self.ui.table_bank_left.item(j,
-                                                                             0)
-                                        temp2 = self.ui.table_bank_left.item(i,
-                                                                             0)
-                                    if temp1 is None and temp2 is None:
-                                        continue
-                                    elif temp1 is None and temp2 is not None:
-                                        self.move_patch_bank(i, j)
-                                    elif temp1 is not None and temp2 is None or \
-                                            temp1 is not None and temp2 is not \
-                                            None:
-                                        self.move_patch_bank(j, i)
-                                    elif temp1 is None and temp2 is not None:
-                                        self.move_patch_bank(i, j)
-                    else:
-                        for i in sorted(self.rows_right):
-                            i = i.row()
-                            i = int('%d' % i)
-                            temp = self.ui.table_bank_right.item(i, 0)
-                            if temp is not None and temp.text() != "":
-                                first_item = temp
-                                first_item_index = i + 32
-                                break
-                        first_item_text = first_item.text()
-                        for i in range(64):
-                            if i < 32:
-                                temp_left = self.ui.table_bank_left.item(i, 0)
-                                temp_right = None
-                            else:
-                                temp_right = self.ui.table_bank_right.item(
-                                    i - 32, 0)
-                                temp_left = None
-                            if (temp_right is not None
-                                and i != first_item_index and temp_right.text()
-                                == first_item_text) or \
-                                    (temp_left is not None and temp_left.text()
-                                     == first_item_text):
-                                # We found the first item!
-                                row = sorted(self.rows_right)[-1].row()
-                                row = int('%d' % row) + 32
-                                for j in range(first_item_index, row + 1):
-                                    if j == first_item_index:
-                                        i = i + (j - first_item_index)
-                                    else:
-                                        i += 1
-                                    if i > 31:
-                                        temp1 = self.ui.table_bank_right.item(
-                                            j - 32, 0)
-                                        temp2 = self.ui.table_bank_left.item(
-                                            i - 32, 0)
-                                    else:
-                                        temp1 = self.ui.table_bank_right.item(
-                                            j - 32, 0)
-                                        temp2 = self.ui.table_bank_right.item(
-                                            i, 0)
-                                    if temp1 is None and temp2 is None:
-                                        continue
-                                    elif temp1 is None and temp2 is not None:
-                                        self.move_patch_bank(i, j)
-                                    elif temp1 is not None and temp2 is \
-                                            None or temp1 is not None and \
-                                            temp2 is not None:
-                                        self.move_patch_bank(j, i)
-                                    elif temp1 is None and temp2 is not None:
-                                        self.move_patch_bank(i, j)
-                                break
+                    self.util.multi_drag_drop(self.rows_left, self.rows_right,
+                                              self.ui.table_bank_left,
+                                              self.ui.table_bank_right,
+                                              self.move_patch_bank)
                     self.rows_left = []
                     self.rows_right = []
-                    while self.ui.table_bank_left.rowCount() > 32:
-                        self.ui.table_bank_left.removeRow(32)
-                    while self.ui.table_bank_right.rowCount() > 32:
-                        self.ui.table_bank_right.removeRow(32)
 
     def remove_bank_item(self):
         """ Removes an item from one of the bank tables.
@@ -686,8 +592,8 @@ class ZOIALibrarianBank(QMainWindow):
     def has_item(self):
         """ Determines whether the Bank tables contain an entry.
 
-        Returns: True if the Bank tables contain an entry, False
-                 otherwise.
+        return: True if the Bank tables contain an entry, False
+                otherwise.
         """
 
         # Check to see if we should disable export and save buttons.

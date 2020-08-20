@@ -14,7 +14,7 @@ class ZOIALibrarianSD(QMainWindow):
     activities contained within the SD Card View tab of the application.
     """
 
-    def __init__(self, ui, save, msg, delete):
+    def __init__(self, ui, save, msg, delete, util):
         """ Initializes the class with the required parameters.
         """
 
@@ -26,6 +26,7 @@ class ZOIALibrarianSD(QMainWindow):
         self.save = save
         self.msg = msg
         self.delete = delete
+        self.util = util
 
         self.sd_path_full = None
         self.sd_root = None
@@ -377,9 +378,7 @@ class ZOIALibrarianSD(QMainWindow):
                                 if "{}_zoia_".format(temp_index) in pch:
                                     if i != dst_index:
                                         self.move_patch_sd(i, dst_index)
-                                        return
-                                    else:
-                                        return
+                                    return
                 else:
                     for i in range(64):
                         if i < 32:
@@ -405,109 +404,13 @@ class ZOIALibrarianSD(QMainWindow):
                     return
             else:
                 # Multiple selections
-                first_item = None
-                first_item_index = -1
-                if len(self.rows_left) > 1 and len(self.rows_right) == 0:
-                    for i in sorted(self.rows_left):
-                        i = i.row()
-                        i = int('%d' % i)
-                        temp = self.ui.table_sd_left.item(i, 0)
-                        if temp is not None and temp.text() != "":
-                            first_item = temp
-                            first_item_index = i
-                            break
-                    first_item_text = first_item.text()
-                    for i in range(64):
-                        if i < 32:
-                            temp_left = self.ui.table_sd_left.item(i, 0)
-                            temp_right = None
-                        else:
-                            temp_right = self.ui.table_sd_right.item(i - 32, 0)
-                            temp_left = None
-                        if (temp_left is not None and i != first_item_index
-                            and temp_left.text() == first_item_text) or (
-                                temp_right is not None and temp_right.text()
-                                == first_item_text):
-                            # We found the first item!
-                            row = sorted(self.rows_left)[-1].row()
-                            row = int('%d' % row)
-                            for j in range(first_item_index, row + 1):
-                                if j == first_item_index:
-                                    i = i + (j - first_item_index)
-                                else:
-                                    i += 1
-                                if i > 31:
-                                    temp1 = self.ui.table_sd_left.item(j, 0)
-                                    temp2 = self.ui.table_sd_right.item(i - 32,
-                                                                        0)
-                                else:
-                                    temp1 = self.ui.table_sd_left.item(j, 0)
-                                    temp2 = self.ui.table_sd_left.item(i, 0)
-                                if temp1 is None and temp2 is None:
-                                    continue
-                                elif temp1 is None and temp2 is not None:
-                                    self.move_patch_sd(i, j)
-                                elif temp1 is not None and temp2 is None or \
-                                        temp1 is not None and temp2 is not \
-                                        None:
-                                    self.move_patch_sd(j, i)
-                                elif temp1 is None and temp2 is not None:
-                                    self.move_patch_sd(i, j)
-
-                else:
-                    for i in sorted(self.rows_right):
-                        i = i.row()
-                        i = int('%d' % i)
-                        temp = self.ui.table_sd_right.item(i, 0)
-                        if temp is not None and temp.text() != "":
-                            first_item = temp
-                            first_item_index = i + 32
-                            break
-                    first_item_text = first_item.text()
-                    for i in range(64):
-                        if i < 32:
-                            temp_left = self.ui.table_sd_left.item(i, 0)
-                            temp_right = None
-                        else:
-                            temp_right = self.ui.table_sd_right.item(i - 32, 0)
-                            temp_left = None
-                        if (temp_right is not None and i != first_item_index
-                            and temp_right.text() == first_item_text) or (
-                                temp_left is not None and temp_left.text()
-                                == first_item_text):
-                            # We found the first item!
-                            row = sorted(self.rows_right)[-1].row()
-                            row = int('%d' % row) + 32
-                            for j in range(first_item_index, row + 1):
-                                if j == first_item_index:
-                                    i = i + (j - first_item_index)
-                                else:
-                                    i += 1
-                                if i > 31:
-                                    temp1 = self.ui.table_sd_right.item(j - 32,
-                                                                        0)
-                                    temp2 = self.ui.table_sd_left.item(i - 32,
-                                                                       0)
-                                else:
-                                    temp1 = self.ui.table_sd_right.item(j - 32,
-                                                                        0)
-                                    temp2 = self.ui.table_sd_right.item(i, 0)
-                                if temp1 is None and temp2 is None:
-                                    continue
-                                elif temp1 is None and temp2 is not None:
-                                    self.move_patch_sd(i, j)
-                                elif temp1 is not None and temp2 is None or \
-                                        temp1 is not None and temp2 is not \
-                                        None:
-                                    self.move_patch_sd(j, i)
-                                elif temp1 is None and temp2 is not None:
-                                    self.move_patch_sd(i, j)
+                self.util.multi_drag_drop(self.rows_left, self.rows_right,
+                                          self.ui.table_sd_left,
+                                          self.ui.table_sd_right,
+                                          self.move_patch_sd)
                 self.rows_left = []
                 self.rows_right = []
-                while self.ui.table_sd_left.rowCount() > 32:
-                    self.ui.table_sd_left.removeRow(32)
-                while self.ui.table_sd_right.rowCount() > 32:
-                    self.ui.table_sd_right.removeRow(32)
+
 
     def remove_sd(self):
         """ Removes a patch that is stored on a user's SD card.
@@ -538,6 +441,8 @@ class ZOIALibrarianSD(QMainWindow):
 
     def set_sd_root(self, path):
         """ Sets the current SD card root.
+
+        path: The path that will be set.
         """
 
         self.sd_root = path

@@ -22,7 +22,14 @@ class ZOIALibrarianLocal(QMainWindow):
     """
 
     def __init__(self, ui, path, sd, msg, f1):
-        """
+        """ Initializes the class with the required parameters.
+
+        ui: The UI component of ZOIALibrarianMain
+        path: A String representing the path to the backend application
+              directory.
+        sd: Helper class to access UI-related SD methods.
+        msg: A template QMessageBox.
+        f1: Reference to ZOIALibrarianMain's sort_and_set function.
         """
 
         super().__init__()
@@ -32,6 +39,7 @@ class ZOIALibrarianLocal(QMainWindow):
         self.sd = sd
         self.msg = msg
         self.sort_and_set = f1
+
         self.data_local = []
         self.data_local_version = []
         self.data_bank = []
@@ -56,6 +64,9 @@ class ZOIALibrarianLocal(QMainWindow):
         number. At any point, the user can abort the operation by
         closing the message dialog or hitting the "Cancel" button.
         Currently triggered via a button press.
+
+        window: A reference to the main UI window for icon consistency.
+        export: Helper class to access backend exporting methods.
         """
 
         # Exporting this way will only export to a directory named "to_zoia"
@@ -112,15 +123,19 @@ class ZOIALibrarianLocal(QMainWindow):
                     break
 
     def create_expt_and_del_btns(self, btn, i, idx, ver, window, expt, delete):
-        """
+        """ Creates the export and delete buttons that are displayed on
+        the Local Storage View tab's QTableView. Each button is mapped
+        to a respective function. Namely, initiate_export() and
+        initiate_delete().
 
-        btn:
-        i:
-        idx:
-        ver:
-        window:
-        expt:
-        delete:
+        btn: A reference to the QRadioButton associated with the current
+             table row.
+        i: The current row the buttons are being created for.
+        idx: The id number associated with this row.
+        ver: The version associated with this row (if it exists).
+        window: A reference to the main UI window for icon consistency.
+        expt: Helper class to access backend exporting methods.
+        delete: Helper class to access backend deletion methods.
         """
 
         if "[Multiple Versions]" in btn.text():
@@ -204,8 +219,12 @@ class ZOIALibrarianLocal(QMainWindow):
     def get_version_patches(self, context, idx=None):
         """ Retrieves the versions of a patch that is locally stored to
         a user's backend local storage.
+
         context: True for the Local Storage View tab, False for the
                  Banks tab.
+        idx: Optional. Used to specify which patch directory to access,
+             Defaults to None. If it is None, the value stored in
+             self.curr_ver is used in its place.
         """
 
         if idx is None:
@@ -299,8 +318,10 @@ class ZOIALibrarianLocal(QMainWindow):
     def update_tags_cats(self, text, mode, idx):
         """ Updates the tags or categories for a locally downloaded
         patch.
+
         text: The text used to discern tags and categories from.
         mode: True for tags update, False for categories update.
+        idx: The id number associated with this row.
         """
 
         # Case 1 - The text is empty (i.e., delete everything)
@@ -339,26 +360,30 @@ class ZOIALibrarianLocal(QMainWindow):
                 self.get_local_patches()
             else:
                 self.get_version_patches(True)
+        self.prev_tag_cat = None
 
     def events(self, e):
-        """
+        """ Handles events that relate updating the tags/categories
+        for patches located in the Local Storage View tab's table.
+
+        e: The event that was initiated.
         """
 
         if e.type() == QEvent.FocusIn:
             if self.prev_tag_cat is None:
-                return False
+                return
             else:
                 new_text = self.ui.table_local.item(
                     self.prev_tag_cat[0], self.prev_tag_cat[1]).text()
                 if new_text == self.prev_tag_cat[2] \
                         or self.ui.table_local.currentColumn() == 3:
-                    return False
+                    return
                 else:
                     self.update_tags_cats(new_text, self.prev_tag_cat[1] == 1,
                                           self.ui.table_local.cellWidget(
                                               self.ui.table_local.currentRow(),
                                               4).objectName())
-                    return True
+                    return
         elif e.type() == QEvent.FocusOut:
             try:
                 if self.ui.table_local.currentColumn() != 3:
@@ -366,54 +391,63 @@ class ZOIALibrarianLocal(QMainWindow):
                         (self.ui.table_local.currentRow(),
                          self.ui.table_local.currentColumn(),
                          self.ui.table_local.selectedItems()[0].text())
-                return True
+                return
             except IndexError:
-                return False
+                return
 
     def get_data_local(self):
-        """
+        """ Gets the data for the patches in the Local Storage View tab
+        table.
         """
 
         return self.data_local
 
     def get_data_local_version(self):
-        """
+        """ Gets the version data for a patch in the Local Storage View
+        tab table.
         """
 
         return self.data_local_version
 
     def get_data_bank(self):
-        """
+        """ Gets the data for the patches in the Banks tab table.
         """
 
         return self.data_bank
 
     def get_data_bank_version(self):
-        """
+        """ Gets the version data for a patch in the Banks tab table.
         """
 
         return self.data_bank_version
 
     def get_prev_tag_cat(self):
-        """
+        """ Gets the previous tag/category text.
+        Can be None if it has not been set.
         """
 
         return self.prev_tag_cat
 
     def set_prev_tag_cat(self, data):
-        """
+        """ Sets the previous tag/category text.
+
+        data: The previous tag/category text to be set.
         """
 
         self.prev_tag_cat = data
 
     def set_local_selected(self, data):
-        """
+        """ Sets the previous locally selected item.
+
+        data: The previous locally selected item to be set.
         """
 
         self.local_selected = data
 
     def set_prev_search(self, data):
-        """
+        """ Sets the previous search term.
+
+        data: The previous search term that will be set.
         """
 
         self.prev_search = data

@@ -37,18 +37,22 @@ class ZOIALibrarianMain(QMainWindow):
     following command is run from the UI directory:
         pyside2-uic.exe ZOIALibrarian.ui -o ZOIALibrarian.py
     Known issues:
-     - The code very all over the place.
+     - The code is still a mess.
      - Certain UI elements do not like font changes (headers, tabs, etc).
     """
 
     def __init__(self):
         """ Initializes the UI for the application. Currently, upon
-        being launched for the first time, it queries the PS API for all
-        ZOIA patches and gets the metadata. Upon subsequent launches,
-        it will search for previously stored metadata, compare it to
-        the # of patches currently on PS, and either begin using the
-        cached data, or get the most recent patches and add them to the
-        cache; and subsequently start the application.
+        being launched for the first time, it uses ZOIALibrarianPS to query
+        the PS API for all ZOIA patches and gets the metadata.
+        Upon subsequent launches, it will search for previously stored
+        metadata, compare it to the # of patches currently on PS,
+        and either begin using the cached data, or get the most recent patches
+        and add them to the cache; and subsequently start the application.
+
+        Initialization consists of creating the helper UI classes, loading
+        previously saved preferences regarding the application, and finally
+        displaying the UI to the user beginning on the PatchStorage tab.
         """
 
         super().__init__()
@@ -64,15 +68,15 @@ class ZOIALibrarianMain(QMainWindow):
         self.msg.setWindowIcon(self.icon)
 
         # Helper classes init
-        self.sd = ZOIALibrarianSD(self.ui, save, self.msg, delete)
-        self.bank = ZOIALibrarianBank(self.ui, self.path, self.msg)
         self.util = ZOIALibrarianUtil(self.ui)
+        self.sd = ZOIALibrarianSD(self.ui, save, self.msg, delete, self.util)
+        self.bank = ZOIALibrarianBank(self.ui, self.path, self.msg, self.util)
         self.ps = ZOIALibrarianPS(self.ui, api, self.path, self.msg, save)
         self.local = ZOIALibrarianLocal(self.ui, self.path, self.sd, self.msg,
                                         self.sort_and_set)
 
+        # Instance variables.
         self.patch_cache = []
-        self.selected = None
         self.prev_sort = None
         self.search_data_PS = None
         self.search_data_local = None
@@ -177,7 +181,7 @@ class ZOIALibrarianMain(QMainWindow):
         # Connect buttons and items to methods.
         self.ui.tabs.currentChanged.connect(self.tab_switch)
         self.ui.actionAlternating_Row_Colours.triggered.connect(
-            lambda: self.util.row_invert())
+            self.util.row_invert)
         self.ui.actionSort_by_title_A_Z.triggered.connect(self.sort_and_set)
         self.ui.actionSort_by_title_Z_A.triggered.connect(self.sort_and_set)
         self.ui.actionSort_by_date_new_old.triggered.connect(self.sort_and_set)
@@ -226,7 +230,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.searchbar_PS.installEventFilter(self)
         self.ui.searchbar_local.installEventFilter(self)
         self.ui.searchbar_bank.installEventFilter(self)
-        self.ui.sd_tree.clicked.connect(lambda: self.sd.prepare_sd_view())
+        self.ui.sd_tree.clicked.connect(self.sd.prepare_sd_view)
         self.ui.import_all_btn.clicked.connect(self.mass_import)
         self.ui.import_all_ver_btn.clicked.connect(self.version_import)
         self.ui.back_btn_local.clicked.connect(self.local.go_back)
@@ -241,6 +245,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.util.toggle_dark)
         self.ui.btn_dwn_all.clicked.connect(self.ps.download_all_thread)
 
+        # Set the theme.
         self.util.toggle_dark()
 
         # Font consistency.
@@ -337,6 +342,7 @@ class ZOIALibrarianMain(QMainWindow):
         is expanded.
         This is for use with table_PS, table_local, and table_bank. For
         other tables, please see set_data_sd().
+
         search: True if we need are setting the data after a search has
                 initiated, False otherwise. Defaults to False.
         version: True if we are using patch version data,
@@ -395,7 +401,8 @@ class ZOIALibrarianMain(QMainWindow):
                 btn_title.setText(title.rstrip())
             if (table_index == 1 and self.ui.back_btn_local.isEnabled()) or \
                     (table_index == 3 and self.ui.back_btn_bank.isEnabled()):
-                btn_title.setObjectName(idx + "_v" + str(data[i]["revision"]))
+                btn_title.setObjectName("{}_v{}".format(
+                    idx, str(data[i]["revision"])))
                 btn_title.setText(data[i]["files"][0]["filename"])
             elif (table_index == 1 and
                   not self.ui.back_btn_local.isEnabled()) \
@@ -418,8 +425,7 @@ class ZOIALibrarianMain(QMainWindow):
                 if length > 2:
                     for k in range(0, length - 1):
                         text += data[i][index][k]["name"] + ", "
-                    text += "and " \
-                            + data[i][index][length - 1]["name"]
+                    text += "and " + data[i][index][length - 1]["name"]
                 elif length == 2:
                     text = data[i][index][0]["name"] + " and " \
                            + data[i][index][1]["name"]
@@ -452,8 +458,8 @@ class ZOIALibrarianMain(QMainWindow):
             # header items.
             elif table_index == 1:
                 self.local.create_expt_and_del_btns(
-                    btn_title, i, idx, str(data[i]["revision"]), self,
-                    export, delete)
+                    btn_title, i, idx, str(data[i]["revision"]),
+                    self, export, delete)
 
         # Also set the title size and resize the columns.
         if table_index == 0 and self.ps_sizes is None:
@@ -521,45 +527,48 @@ class ZOIALibrarianMain(QMainWindow):
         skip = False
         viz = None
 
+        # The "sender" here is every radio button, so we need to see
+        # which one is actually checked.
         if self.sender().isChecked():
             if (self.ui.tabs.currentIndex() == 1
                 or self.ui.tabs.currentIndex() == 3) and \
                     "_" not in self.sender().objectName() and \
-                    len(os.listdir(
-                        os.path.join(self.path,
-                                     self.sender().objectName()))) > 2:
+                    len(os.listdir(os.path.join(
+                        self.path, self.sender().objectName()))) > 2:
                 # We are pointing to a version directory.
                 self.display_patch_versions(self.ui.tabs.currentIndex() == 1)
                 return
+            # Get the name/version (if applicable).
             name = self.sender().objectName()
             ver = ""
             if "_" in name:
                 name, ver = name.split("_")
-            temp = None
+            curr_browser = None
+            # Special case, we are on the PS tab. We have a rolling patch cache
+            # to reference so a user can't log multiple views on a patch.
             if self.ui.tabs.currentIndex() == 0:
-                temp = self.ui.text_browser_PS
-                self.selected = name
-                if len(self.patch_cache) == 0:
+                curr_browser = self.ui.text_browser_PS
+                content = None
+                # Try to find the selected item in the patch cache.
+                for pch in self.patch_cache:
+                    if str(pch["id"]) == name:
+                        # Found it, no query needed.
+                        content = pch
+                        skip = True
+                        break
+                if content is None:
+                    # Didn't find it, need to query.
                     content = api.get_patch_meta(name)
+                    # Add it to the cache for next time.
                     self.patch_cache.append(content)
-                else:
-                    content = None
-                    for pch in self.patch_cache:
-                        if str(pch["id"]) == name:
-                            content = pch
-                            skip = True
-                            break
-                    if content is None:
-                        content = api.get_patch_meta(name)
-                        self.patch_cache.append(content)
             else:
-                temp2 = None
+                viz_browser = None
                 if self.ui.tabs.currentIndex() == 1:
-                    temp = self.ui.text_browser_local
-                    temp2 = self.ui.text_browser_viz
+                    curr_browser = self.ui.text_browser_local
+                    viz_browser = self.ui.text_browser_viz
                     self.ui.update_patch_notes.setEnabled(True)
                 elif self.ui.tabs.currentIndex() == 3:
-                    temp = self.ui.text_browser_bank
+                    curr_browser = self.ui.text_browser_bank
                 self.local.set_local_selected(name)
                 if ver != "":
                     self.local.set_local_selected("{}_{}".format(name, ver))
@@ -572,7 +581,7 @@ class ZOIALibrarianMain(QMainWindow):
                             self.path, name, name + "_{}.json".format(ver))) \
                             as f:
                         content = json.loads(f.read())
-                if temp2 is not None:
+                if viz_browser is not None:
                     try:
                         with open(os.path.join(self.path, name,
                                                name + ".bin"), "rb") as f:
@@ -600,7 +609,7 @@ class ZOIALibrarianMain(QMainWindow):
             # pointed to, as QTextViews don't support downloading from
             # external sources. Maybe create a cache of images?
 
-            temp.setHtml("<html><h3>"
+            curr_browser.setHtml("<html><h3>"
                          + content["title"] + "</h3><u>Author:</u> "
                          + content["author"]["name"] + "<br/><u>Likes:</u> "
                          + str(content["like_count"])
@@ -614,11 +623,12 @@ class ZOIALibrarianMain(QMainWindow):
                          + content["content"] + "</html>")
 
             if viz is not None:
-                temp2.setText(viz)
+                viz_browser.setText(viz)
 
     def display_patch_versions(self, context):
         """ Displays the contents of a patch that has multiple versions.
         Currently triggered via a button press.
+
         context: True for the Local Storage View tab, False for the
                  Banks tab.
         """
@@ -799,7 +809,8 @@ class ZOIALibrarianMain(QMainWindow):
         elif table_index == 3 and self.ui.searchbar_bank.text() != "" \
                 and self.ui.back_btn_bank.isEnabled():
             if self.search_data_bank_version is None:
-                self.search_data_bank_version = self.local.get_data_bank_version()
+                self.search_data_bank_version = \
+                    self.local.get_data_bank_version()
             util.sort_metadata(7, self.search_data_bank_version,
                                False)
             self.set_data(True, True)
@@ -817,6 +828,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.msg.setStandardButtons(QMessageBox.Ok)
 
         pch = QFileDialog.getOpenFileName()[0]
+        # Didn't make a selection.
         if pch == "":
             return
         try:
@@ -825,6 +837,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setWindowTitle("Import Complete")
             self.msg.setText("The patch has been successfully imported!")
             self.msg.exec_()
+            # Reload the tables if we are currently displaying them.
             if (self.ui.tabs.currentIndex() == 1 and not
                 self.ui.back_btn_local.isEnabled()) or \
                     (self.ui.tabs.currentIndex() == 3 and not
@@ -838,6 +851,24 @@ class ZOIALibrarianMain(QMainWindow):
         except errors.SavingError:
             self.msg.exec_()
 
+    def directory_select(self):
+        """ Allows the user to select a directory via their OS specific
+        file explorer.
+
+        return: The path of the directory chosen, as a string.
+        """
+
+        input_dir = QFileDialog.getExistingDirectory(
+            None, 'Select a directory', expanduser("~"))
+        if input_dir == "" or not os.path.isdir(input_dir):
+            self.msg.setWindowTitle("Invalid Selection")
+            self.msg.setIcon(QMessageBox.Information)
+            self.msg.setText("Please select a directory.")
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+            return
+        return input_dir
+
     def mass_import(self):
         """ Attempts to mass import any patches found within a target
         directory. Unlike import_patch, failing to import a patch will
@@ -849,16 +880,7 @@ class ZOIALibrarianMain(QMainWindow):
         fail_cnt = 0
         if self.sender() is not None and self.sender().objectName() == \
                 "actionImport_Multiple_Patches":
-            input_dir = QFileDialog.getExistingDirectory(
-                None, 'Select a directory', expanduser("~"))
-
-            if input_dir == "" or not os.path.isdir(input_dir):
-                self.msg.setWindowTitle("Invalid Selection")
-                self.msg.setIcon(QMessageBox.Information)
-                self.msg.setText("Please select a directory.")
-                self.msg.setStandardButtons(QMessageBox.Ok)
-                self.msg.exec_()
-                return
+            input_dir = self.directory_select()
         else:
             input_dir = self.sd.get_sd_path()
         for pch in os.listdir(input_dir):
@@ -895,15 +917,7 @@ class ZOIALibrarianMain(QMainWindow):
         Currently triggered via a button press or a menu action.
         """
         if self.sender().objectName() != "import_all_ver_btn":
-            input_dir = QFileDialog.getExistingDirectory(
-                None, 'Select a directory', expanduser("~"))
-            if input_dir == "" or not os.path.isdir(input_dir):
-                self.msg.setWindowTitle("Invalid Selection")
-                self.msg.setIcon(QMessageBox.Information)
-                self.msg.setText("Please select a directory.")
-                self.msg.setStandardButtons(QMessageBox.Ok)
-                self.msg.exec_()
-                return
+            input_dir = self.directory_select()
         else:
             input_dir = self.sd.get_sd_path()
         fails = save.import_to_backend(input_dir, True)
@@ -924,9 +938,9 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
         if (self.ui.tabs.currentIndex() == 1 and not
-        self.ui.back_btn_local.isEnabled()) or \
+            self.ui.back_btn_local.isEnabled()) or \
                 (self.ui.tabs.currentIndex() == 3 and not
-                self.ui.back_btn_bank.isEnabled()):
+                 self.ui.back_btn_bank.isEnabled()):
             self.local.get_local_patches()
 
     def eventFilter(self, o, e):
@@ -940,9 +954,11 @@ class ZOIALibrarianMain(QMainWindow):
         if o.objectName() == "table_sd_left" or o.objectName() == \
                 "table_sd_right":
             self.sd.events(o, e)
+        # Bank tab swap/move
         elif o.objectName() == "table_bank_local" or o.objectName() == \
                 "table_bank_left" or o.objectName() == "table_bank_right":
             self.bank.events(o, e)
+        # Searching via searchbar
         elif o.objectName() == "searchbar_PS" \
                 or o.objectName() == "searchbar_local" \
                 or o.objectName() == "searchbar_bank":
@@ -967,6 +983,7 @@ class ZOIALibrarianMain(QMainWindow):
                         and self.ui.back_btn_bank.isEnabled():
                     self.local.get_version_patches(False)
                 return True
+        # Update tags/categories on Local tab.
         elif o.objectName() == "table_local":
             self.local.events(e)
         return False
