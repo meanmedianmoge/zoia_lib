@@ -384,31 +384,30 @@ class ZOIALibrarianBank(QMainWindow):
 
         if o.objectName() == "table_bank_local":
             if e.type() == QEvent.ChildAdded:
+                # Hide the columns the user can't drop patches into.
                 self.ui.table_bank_left.hideColumn(1)
                 self.ui.table_bank_right.hideColumn(1)
             elif e.type() == QEvent.ChildRemoved:
+                # Once the item has been dropped we can show the columns again.
                 self.ui.table_bank_left.showColumn(1)
                 self.ui.table_bank_right.showColumn(1)
 
                 # Get the current row that was dragged.
                 src = self.ui.table_bank_local.currentRow()
-                # We need to find out where we dragged the item to
+                # We need to find out where we dragged the item to.
                 drop_index = None
-                for i in range(64):
-                    if i < 32:
-                        if self.ui.table_bank_left.item(i, 1) is not None:
-                            drop_index = i
-                            break
-                    else:
-                        if self.ui.table_bank_right.item(i - 32, 1) is not \
-                                None:
-                            drop_index = i
-                            break
+                for i in range(32):
+                    if self.ui.table_bank_left.item(i, 1) is not None:
+                        drop_index = i
+                        break
+                    if self.ui.table_bank_right.item(i, 1) is not None:
+                        drop_index = i + 32
+                        break
 
                 if drop_index is not None:
                     # We actually dragged it over.
-                    idx = self.ui.table_bank_local.cellWidget(src,
-                                                              0).objectName()
+                    idx = self.ui.table_bank_local.cellWidget(
+                        src, 0).objectName()
                     if ("_" not in idx and len(os.listdir(os.path.join(
                             self.path, idx))) == 2) or "_" in idx:
                         # Not working within a version directory.
@@ -466,11 +465,9 @@ class ZOIALibrarianBank(QMainWindow):
                                 })
                     self.set_data_bank()
                 else:
-                    # Check for phantom rows to delete.
-                    while self.ui.table_bank_left.rowCount() > 32 or \
-                            self.ui.table_bank_right.rowCount() > 32:
-                        self.ui.table_bank_left.removeRow(32)
-                        self.ui.table_bank_right.removeRow(32)
+                    # Delete phantom rows.
+                    self.ui.table_bank_left.setRowCount(32)
+                    self.ui.table_bank_right.setRowCount(32)
                 self.get_bank_data()
                 self.ui.btn_save_bank.setEnabled(len(self.data_banks) > 0)
                 self.ui.btn_export_bank.setEnabled(len(self.data_banks) > 0)

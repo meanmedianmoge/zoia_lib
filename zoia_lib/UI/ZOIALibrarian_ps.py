@@ -1,10 +1,10 @@
 import json
 import os
 
-from PySide2.QtCore import QThreadPool
+from PySide2 import QtCore
+from PySide2.QtCore import QThread
 from PySide2.QtWidgets import QMainWindow, QMessageBox, QPushButton
 
-from zoia_lib.backend.worker import Worker
 from zoia_lib.common import errors
 
 
@@ -14,7 +14,7 @@ class ZOIALibrarianPS(QMainWindow):
     application.
     """
 
-    def __init__(self, ui, api, path, msg, save):
+    def __init__(self, ui, api, path, msg, save, f1):
         """ Initializes the class with the required parameters.
 
         ui: The UI component of ZOIALibrarianMain
@@ -22,7 +22,9 @@ class ZOIALibrarianPS(QMainWindow):
         path: A String representing the path to the backend application
               directory.
         msg: A template QMessageBox.
-        save: Backend class to aid with the downloading of classes.
+        save: Backend class to aid with the saving of patches.
+        f1: Provides access to the sort_and_set() method located in the
+            ZOIALibrarianMain class.
         """
 
         super().__init__()
@@ -33,29 +35,15 @@ class ZOIALibrarianPS(QMainWindow):
         self.path = path
         self.msg = msg
         self.save = save
+        self.sort_and_set = f1
 
-        self.thread_pool = QThreadPool()
-        self.cnt = 0
-        self.fails = 0
+        # Threads
+        self.worker_dwn = DownloadAllWorker(self.ui, self.save, self.api)
+        self.worker_dwn.signal.connect(self.download_all_done)
+        self.worker_dwn.signal_2.connect(self.download_all_progress)
 
-    def reload_ps(self, f1):
-        """ Reloads the PS table view to accurately reflect new uploads.
-        Currently triggered via a menu action.
-        """
-
-        # Get the new patch metadata that we don't have (if any).
-        self.ui.refresh_pch_btn.setEnabled(False)
-        with open(os.path.join(self.path, "data.json"), "w") as f:
-            f.write(json.dumps(self.api.get_all_patch_data_init()))
-        self.ui.searchbar_PS.setText("")
-        f1()
-        self.ui.refresh_pch_btn.setEnabled(True)
-        self.ui.statusbar.showMessage("Patch list refreshed!", timeout=5000)
-        self.msg.setWindowTitle("Patches Refreshed")
-        self.msg.setText("The PatchStorage patch list has been refreshed.")
-        self.msg.setIcon(QMessageBox.Information)
-        self.msg.setStandardButtons(QMessageBox.Ok)
-        self.msg.exec_()
+        self.worker_ps = ReloadPSWorker(self.path, self.api)
+        self.worker_ps.signal.connect(self.reload_ps_done)
 
     def metadata_init(self):
         """ Retrieves all PS metadata via API calls.
@@ -88,24 +76,54 @@ class ZOIALibrarianPS(QMainWindow):
             f.write(json.dumps(ps_data))
             self.data_PS = ps_data
 
+    def reload_ps_thread(self):
+        """ Initializes a Worker thread to manage the refreshing of
+        all ZOIA patches currently hosted on PatchStorage.
+        Currently triggered via a button press.
+        """
+
+        # Disable the necessary buttons.
+        self.ui.btn_dwn_all.setEnabled(False)
+        self.ui.refresh_pch_btn.setEnabled(False)
+        self.ui.statusbar.showMessage("Retrieving patches...", timeout=5000)
+
+        # Execute
+        self.worker_ps.start()
+
+    def reload_ps_done(self):
+        """ Notifies the user once all PatchStorage patches have been
+        retrieved.
+        """
+
+        self.ui.searchbar_PS.setText("")
+        self.sort_and_set()
+        self.ui.btn_dwn_all.setEnabled(True)
+        self.ui.refresh_pch_btn.setEnabled(True)
+        self.ui.statusbar.showMessage("Patch list refreshed!", timeout=5000)
+        self.msg.setWindowTitle("Patches Refreshed")
+        self.msg.setText("The PatchStorage patch list has been refreshed.")
+        self.msg.setIcon(QMessageBox.Information)
+        self.msg.setStandardButtons(QMessageBox.Ok)
+        self.msg.exec_()
+
     def download_all_thread(self):
         """ Initializes a Worker thread to manage the downloading of
         all ZOIA patches currently hosted on PatchStorage.
         Currently triggered via a button press.
         """
 
-        # Pass the function to execute
-        worker = Worker(self.download_all)
-        worker.signals.finished.connect(self.download_all_done)
-        worker.signals.progress.connect(self.download_all_progress)
+        # Disable the necessary buttons.
+        self.ui.btn_dwn_all.setEnabled(False)
+        self.ui.refresh_pch_btn.setEnabled(False)
+        self.ui.check_for_updates_btn.setEnabled(False)
+        self.ui.searchbar_PS.setEnabled(False)
 
         # Execute
-        self.thread_pool.start(worker)
+        self.worker_dwn.start()
 
     def download_all_progress(self, i):
         """ Progress update provided by the worker to display how
         many patches have been downloaded.
-
         i: The current patch that is being downloaded.
         """
 
@@ -113,7 +131,7 @@ class ZOIALibrarianPS(QMainWindow):
             "Trying to download patch #{} of {}".format(
                 i + 1, self.ui.table_PS.rowCount()))
 
-    def download_all_done(self):
+    def download_all_done(self, cnt, fails):
         """ Notifies the user once all PatchStorage patches have been
         downloaded. Will also notify the user with the number of
         patches that failed to download and explain why they failed.
@@ -122,11 +140,11 @@ class ZOIALibrarianPS(QMainWindow):
         self.msg.setWindowTitle("Download Complete")
         self.msg.setIcon(QMessageBox.Information)
         self.msg.setText("Successfully downloaded {} patch(es)."
-                         "".format(self.cnt))
+                         "".format(cnt))
         self.msg.setInformativeText("Did not download {} patch(es) because "
                                     "they are either .py files or use a "
                                     "compression algorithm other than .zip"
-                                    "".format(self.fails))
+                                    "".format(fails))
         self.msg.setStandardButtons(QMessageBox.Ok)
         self.msg.exec_()
         self.msg.setInformativeText(None)
@@ -135,34 +153,6 @@ class ZOIALibrarianPS(QMainWindow):
         self.ui.refresh_pch_btn.setEnabled(True)
         self.ui.check_for_updates_btn.setEnabled(True)
         self.ui.searchbar_PS.setEnabled(True)
-
-    def download_all(self, progress_callback):
-        """ Attempts to download all patches currently stored on
-        PatchStorage. This method will ignore failures and continue
-        on to the next patch until it has exhausted the list.
-        """
-
-        self.ui.btn_dwn_all.setEnabled(False)
-        self.ui.refresh_pch_btn.setEnabled(False)
-        self.ui.check_for_updates_btn.setEnabled(False)
-        self.ui.searchbar_PS.setEnabled(False)
-
-        self.fails = 0
-        self.cnt = 0
-
-        for i in range(self.ui.table_PS.rowCount()):
-            btn = self.ui.table_PS.cellWidget(i, 4)
-            if btn.isEnabled():
-                # Try to download the patch.
-                try:
-                    self.save.save_to_backend(self.api.download(
-                        btn.objectName()))
-                    btn.setEnabled(False)
-                    btn.setText("Downloaded!")
-                    self.cnt += 1
-                except errors.SavingError:
-                    self.fails += 1
-            progress_callback.emit(i)
 
     def initiate_download(self):
         """ Attempts to download a patch from the PS API. Once the
@@ -217,3 +207,85 @@ class ZOIALibrarianPS(QMainWindow):
         """
 
         return self.data_PS
+
+
+class DownloadAllWorker(QThread):
+    """ The DownloadAllWorker class runs as a separate thread in the
+    application to prevent application snag. This thread will attempt
+    to download every ZOIA patch currently hosted on PatchStorage.
+    """
+
+    # UI communication
+    signal = QtCore.Signal(int, int)
+    signal_2 = QtCore.Signal(int)
+
+    def __init__(self, ui, save, api):
+        """ Initializes the thread.
+
+        ui: The UI component of ZOIALibrarianMain.
+        save: Backend class to aid with the saving of patches.
+        api: Backend class to aid with PS API requests.
+        """
+
+        QThread.__init__(self)
+        self.ui = ui
+        self.save = save
+        self.api = api
+
+        self.fails = 0
+        self.cnt = 0
+
+    def run(self):
+        """ Attempts to download all patches currently stored on
+        PatchStorage. This method will ignore failures and continue
+        on to the next patch until it has exhausted the list.
+        """
+
+        self.fails = 0
+        self.cnt = 0
+
+        for i in range(self.ui.table_PS.rowCount()):
+            btn = self.ui.table_PS.cellWidget(i, 4)
+            if btn.isEnabled():
+                # Try to download the patch.
+                try:
+                    self.save.save_to_backend(self.api.download(
+                        btn.objectName()))
+                    btn.setEnabled(False)
+                    btn.setText("Downloaded!")
+                    self.cnt += 1
+                except errors.SavingError:
+                    self.fails += 1
+                self.signal_2.emit(i)
+        self.signal.emit(self.cnt, self.fails)
+
+
+class ReloadPSWorker(QThread):
+    """ The ReloadPSWorker class runs as a separate thread in the
+    application to prevent application snag. This thread will reload
+    the PS patch list that is displayed on the PatchStorage View tab.
+    """
+
+    # UI communication
+    signal = QtCore.Signal()
+
+    def __init__(self, path, api):
+        """ Initializes the thread.
+
+        path: A string to the backend .ZoiaLibraryApp directory.
+        api: Backend class to aid with PS API requests.
+        """
+
+        QThread.__init__(self)
+        self.path = path
+        self.api = api
+
+    def run(self):
+        """ Attempts to download all patches currently stored on
+        PatchStorage. This method will ignore failures and continue
+        on to the next patch until it has exhausted the list.
+        """
+
+        with open(os.path.join(self.path, "data.json"), "w") as f:
+            f.write(json.dumps(self.api.get_all_patch_data_init()))
+        self.signal.emit()

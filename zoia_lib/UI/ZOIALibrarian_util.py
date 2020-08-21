@@ -270,102 +270,82 @@ class ZOIALibrarianUtil:
         table_1: The left table associated with the multi drag/drop.
         table_2: The right table associated with the multi drag/drop.
         f1: A function to move the useful data associated with the rows.
-        TODO Refactor this mess.
         """
 
         first_item = None
         first_item_index = -1
-        if len(rows_left) > 1 and len(rows_right) == 0:
-            for i in sorted(rows_left):
-                i = i.row()
-                i = int('%d' % i)
-                temp = table_1.item(i, 0)
-                if temp is not None and temp.text() != "":
-                    first_item = temp
-                    first_item_index = i
-                    break
-            first_item_text = first_item.text()
-            for i in range(64):
-                if i < 32:
-                    temp_left = table_1.item(i, 0)
-                    temp_right = None
-                else:
-                    temp_right = table_2.item(i - 32, 0)
-                    temp_left = None
-                if (temp_left is not None and i != first_item_index
-                    and temp_left.text() == first_item_text) or (
-                        temp_right is not None and temp_right.text()
-                        == first_item_text):
-                    # We found the first item!
-                    row = sorted(rows_left)[-1].row()
-                    row = int('%d' % row)
-                    for j in range(first_item_index, row + 1):
-                        if j == first_item_index:
-                            i = i + (j - first_item_index)
-                        else:
-                            i += 1
-                        if i > 31:
-                            temp1 = table_1.item(j, 0)
-                            temp2 = table_2.item(i - 32, 0)
-                        else:
-                            temp1 = table_1.item(j, 0)
-                            temp2 = table_1.item(i, 0)
-                        if temp1 is None and temp2 is None:
-                            continue
-                        elif temp1 is None and temp2 is not None:
-                            f1(i, j)
-                        elif temp1 is not None and temp2 is None or \
-                                temp1 is not None and temp2 is not \
-                                None:
-                            f1(j, i)
-                        elif temp1 is None and temp2 is not None:
-                            f1(i, j)
 
+        # Figure out which rows var to use depending on whether we
+        # originate from the left or right.
+        if len(rows_left) > 1 and len(rows_right) == 0:
+            curr_rows = rows_left
+            main_table = table_1
+            other_table = table_2
         else:
-            for i in sorted(rows_right):
-                i = i.row()
-                i = int('%d' % i)
-                temp = table_2.item(i, 0)
-                if temp is not None and temp.text() != "":
-                    first_item = temp
-                    first_item_index = i + 32
-                    break
-            first_item_text = first_item.text()
-            for i in range(64):
-                if i < 32:
-                    temp_left = table_1.item(i, 0)
-                    temp_right = None
-                else:
-                    temp_right = table_2.item(i - 32, 0)
-                    temp_left = None
-                if (temp_right is not None and i != first_item_index
-                    and temp_right.text() == first_item_text) or (
-                        temp_left is not None and temp_left.text()
-                        == first_item_text):
-                    # We found the first item!
-                    row = sorted(rows_right)[-1].row()
-                    row = int('%d' % row) + 32
-                    for j in range(first_item_index, row + 1):
-                        if j == first_item_index:
-                            i = i + (j - first_item_index)
+            curr_rows = rows_right
+            main_table = table_2
+            other_table = table_1
+
+        for i in sorted(curr_rows):
+            i = i.row()
+            i = int('%d' % i)
+            temp = main_table.item(i, 0)
+            if temp is not None and temp.text() != "":
+                first_item = temp
+                first_item_index = i
+                if main_table == table_2:
+                    first_item_index += 32
+                break
+        first_item_text = first_item.text()
+        for i in range(64):
+            if i < 32:
+                temp_left = table_1.item(i, 0)
+                temp_right = None
+            else:
+                temp_right = table_2.item(i - 32, 0)
+                temp_left = None
+            if main_table == table_1:
+                temp_main = temp_left
+                temp_other = temp_right
+            else:
+                temp_main = temp_right
+                temp_other = temp_left
+            if (temp_main is not None and i != first_item_index
+                and temp_main.text() == first_item_text) or (
+                    temp_other is not None and temp_other.text()
+                    == first_item_text):
+                # We found the first item!
+                row = sorted(curr_rows)[-1].row()
+                row = int('%d' % row)
+                if curr_rows == rows_right:
+                    row += 32
+                for j in range(first_item_index, row + 1):
+                    if j == first_item_index:
+                        i = i + (j - first_item_index)
+                    else:
+                        i += 1
+                    if i > 31:
+                        if curr_rows == rows_right:
+                            temp1 = main_table.item(j - 32, 0)
                         else:
-                            i += 1
-                        if i > 31:
-                            temp1 = table_2.item(j - 32, 0)
-                            temp2 = table_1.item(i - 32, 0)
+                            temp1 = main_table.item(j, 0)
+                        temp2 = other_table.item(i - 32, 0)
+                    else:
+                        if curr_rows == rows_right:
+                            temp1 = main_table.item(j - 32, 0)
                         else:
-                            temp1 = table_2.item(j - 32, 0)
-                            temp2 = table_2.item(i, 0)
-                        if temp1 is None and temp2 is None:
-                            continue
-                        elif temp1 is None and temp2 is not None:
-                            f1(i, j)
-                        elif temp1 is not None and temp2 is None or \
-                                temp1 is not None and temp2 is not \
-                                None:
-                            f1(j, i)
-                        elif temp1 is None and temp2 is not None:
-                            f1(i, j)
-        # Delete phantom rows.
+                            temp1 = main_table.item(j, 0)
+                        temp2 = main_table.item(i, 0)
+                    if temp1 is None and temp2 is None:
+                        continue
+                    elif temp1 is None and temp2 is not None:
+                        f1(i, j)
+                    elif temp1 is not None and temp2 is None or \
+                            temp1 is not None and temp2 is not \
+                            None:
+                        f1(j, i)
+                    elif temp1 is None and temp2 is not None:
+                        f1(i, j)
+        # Delete phantom rows from row insertions.
         table_1.setRowCount(32)
         table_2.setRowCount(32)

@@ -1,7 +1,8 @@
 import json
 import os
 
-from PySide2.QtCore import QEvent
+from PySide2 import QtCore
+from PySide2.QtCore import QEvent, QThread
 from PySide2.QtWidgets import QMainWindow, QMessageBox, QInputDialog, \
     QPushButton
 
@@ -48,6 +49,10 @@ class ZOIALibrarianLocal(QMainWindow):
         self.prev_tag_cat = None
         self.prev_search = ""
         self.local_selected = None
+
+        # Thread
+        self.worker_updates = UpdatesWorker()
+        self.worker_updates.signal.connect(self.update_local_patches_done)
 
     def initiate_export(self, window, export):
         """ Attempts to export a patch saved in the backend to an SD
@@ -250,15 +255,29 @@ class ZOIALibrarianLocal(QMainWindow):
         self.ui.update_patch_notes.setEnabled(not context)
         self.sort_and_set()
 
-    def update_local_patches(self):
-        """ Attempts to update any patch that is stored in the user's
-        backend directory.
+    def update_local_patches_thread(self):
+        """ Initializes a Worker thread to manage the updating of
+        patches currently stored on a user's machine.
         Currently triggered via a button press.
         """
 
+        self.ui.check_for_updates_btn.setEnabled(False)
+        self.ui.refresh_pch_btn.setEnabled(False)
+        self.ui.btn_dwn_all.setEnabled(False)
         self.ui.statusbar.showMessage("Checking for updates...",
                                       timeout=5000)
-        count = update.check_for_updates()
+        self.worker_updates.start()
+
+    def update_local_patches_done(self, count):
+        """ Notifies the user once all local patches have been checked
+        for updates. Will also notify the user of which patches were
+        updated (should any actually update).
+
+        count: An array, the first element contains the number of
+               patches that updated, while the second element contains
+               an array with the names of every patch that was updated.
+        """
+
         if count[0] == 0:
             self.msg.setWindowTitle("No Updates")
             self.msg.setIcon(QMessageBox.Information)
@@ -280,6 +299,9 @@ class ZOIALibrarianLocal(QMainWindow):
                     text += "\t* {}\n".format(count[1][i])
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
+        self.ui.check_for_updates_btn.setEnabled(True)
+        self.ui.refresh_pch_btn.setEnabled(True)
+        self.ui.btn_dwn_all.setEnabled(True)
 
     def go_back(self):
         """ Returns to the default local patch screen.
@@ -451,3 +473,28 @@ class ZOIALibrarianLocal(QMainWindow):
         """
 
         self.prev_search = data
+
+
+class UpdatesWorker(QThread):
+    """ The UpdatesWorker class runs as a separate thread in the
+    application to prevent application snag. This thread will attempt
+    to update every patches stored in the .ZoiaLibraryApp directory.
+    """
+
+    # UI communication
+    signal = QtCore.Signal(list)
+
+    def __init__(self):
+        """ Initializes the thread.
+        """
+
+        QThread.__init__(self)
+
+    def run(self):
+        """ Attempts to update any patch that is stored in the user's
+        backend directory.
+        Currently triggered via a button press.
+        """
+
+        count = update.check_for_updates()
+        self.signal.emit(count)

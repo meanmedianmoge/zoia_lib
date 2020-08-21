@@ -71,7 +71,8 @@ class ZOIALibrarianMain(QMainWindow):
         self.util = ZOIALibrarianUtil(self.ui)
         self.sd = ZOIALibrarianSD(self.ui, save, self.msg, delete, self.util)
         self.bank = ZOIALibrarianBank(self.ui, self.path, self.msg, self.util)
-        self.ps = ZOIALibrarianPS(self.ui, api, self.path, self.msg, save)
+        self.ps = ZOIALibrarianPS(self.ui, api, self.path, self.msg, save,
+                                  self.sort_and_set)
         self.local = ZOIALibrarianLocal(self.ui, self.path, self.sd, self.msg,
                                         self.sort_and_set)
 
@@ -210,11 +211,10 @@ class ZOIALibrarianMain(QMainWindow):
             lambda: self.util.change_font("-"))
         self.ui.actionQuit.triggered.connect(self.try_quit)
         self.ui.check_for_updates_btn.clicked.connect(
-            self.local.update_local_patches)
+            self.local.update_local_patches_thread)
         self.ui.actionImport_Version_History_directory.triggered.connect(
             self.version_import)
-        self.ui.refresh_pch_btn.clicked.connect(
-            lambda: self.ps.reload_ps(self.sort_and_set))
+        self.ui.refresh_pch_btn.clicked.connect(self.ps.reload_ps_thread)
         self.ui.update_patch_notes.clicked.connect(
             self.local.update_patch_notes)
         self.ui.actionImport_A_Patch.triggered.connect(self.import_patch)
@@ -876,6 +876,7 @@ class ZOIALibrarianMain(QMainWindow):
         end indicating how many patches were and were not imported.
         Currently triggered via a button press or a menu action.
         """
+
         imp_cnt = 0
         fail_cnt = 0
         if self.sender() is not None and self.sender().objectName() == \
@@ -946,6 +947,7 @@ class ZOIALibrarianMain(QMainWindow):
     def eventFilter(self, o, e):
         """ Deals with events that originate from various widgets
         present in the GUI.
+
         o: The source object that triggered the event.
         e: The event that was triggered.
         """
