@@ -74,6 +74,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.ps = ZOIALibrarianPS(self.ui, api, self.path, self.msg, save,
                                   self.sort_and_set)
         self.local = ZOIALibrarianLocal(self.ui, self.path, self.sd, self.msg,
+                                        self, export, delete,
                                         self.sort_and_set)
 
         # Instance variables.
@@ -310,10 +311,12 @@ class ZOIALibrarianMain(QMainWindow):
         if self.ui.tabs.currentIndex() == 1 \
                 or self.ui.tabs.currentIndex() == 3:
             # Only reload the table data if we need to (new # of patches).
-            if self.local_pch_count == -1 \
-                    or self.local_pch_count != len(os.listdir(self.path))\
-                    or self.ui.table_local.rowCount() == 1\
-                    or self.ui.table_bank_local.rowCount() == 1:
+            if (self.ui.tabs.currentIndex() == 1
+                    and self.ui.table_local.rowCount() == 1) or \
+                    (self.ui.tabs.currentIndex() == 3 and
+                     self.ui.table_bank_local.rowCount() == 1) or \
+                    self.local_pch_count == -1 or \
+                    self.local_pch_count != len(os.listdir(self.path)):
                 self.local.get_local_patches()
                 self.local_pch_count = len(os.listdir(self.path))
             # Context cleanup
@@ -458,8 +461,7 @@ class ZOIALibrarianMain(QMainWindow):
             # header items.
             elif table_index == 1:
                 self.local.create_expt_and_del_btns(
-                    btn_title, i, idx, str(data[i]["revision"]),
-                    self, export, delete)
+                    btn_title, i, idx, str(data[i]["revision"]))
 
         # Also set the title size and resize the columns.
         if table_index == 0 and self.ps_sizes is None:

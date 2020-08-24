@@ -49,40 +49,63 @@ class PatchBinary(Patch):
             name = str(pch_data[4:]).split("\\")[0]
         data = struct.unpack('i'*int(len(pch_data) / 4), pch_data)
 
-        pch_viz = "Everything listed below is experimental and may not " \
-                  "reflect the patch correctly.\n" \
+        pch_viz = "<html>Everything listed below is experimental and may " \
+                  "not reflect the patch correctly.\n" \
                   "-----------------------------------------------------" \
                   "---------------------------\n"
 
-        pch_viz += "Preset size = {}".format(data[0])
-        pch_viz += "\nPatch name = {}".format(name)
-        pch_viz += "\nModule count = {}".format(data[5])
+        pch_viz += "<br/><b>Preset size</b> = {}".format(data[0])
+        pch_viz += "<br/><b>Patch name</b> = {}".format(name)
+        pch_viz += "<br/><b>Module count</b> = {}".format(data[5])
+        temp = [i for i, e in enumerate(data) if e != 0]
+        last_color = temp[-1] + 1
+        first_color = last_color - int(data[5])
+        colors = []
+        skip_real = False
+        for j in range(first_color, last_color):
+            if int(data[j]) > 15:
+                skip_real = True
+                colors = []
+                break
+            colors.append(data[j])
+
         curr_step = 6
         for i in range(int(data[5])):
             size = data[curr_step]
-            pch_viz += "\n     Module #{}".format(i)
-            pch_viz += "\n\tModule size = {}".format(size)
-            pch_viz += "\n\tModule type: {}".format(
+            pch_viz += "<br/>&ensp;<b>Module #{}</b>".format(i)
+            pch_viz += "<br/>&emsp;<u>Module size</u> = {}".format(size)
+            pch_viz += "<br/>&emsp;<u>Module type:</u> {}".format(
                 self._get_module_type(data[curr_step + 1]))
-            pch_viz += "\n\tPage number: {}".format(data[curr_step + 3])
-            pch_viz += "\n\tOld color value: {}".format(
+            pch_viz += "<br/>&emsp;<u>Page number:</u> {}".format(
+                data[curr_step + 3])
+            pch_viz += "<br/>&emsp;<u>Old color value:</u> {}".format(
                 self._get_color_name(data[curr_step + 4]))
-            pch_viz += "\n\tGrid position: {}".format(data[curr_step + 5])
-            pch_viz += "\n\tNumber of parameters on grid: " \
-                       "{}".format(data[curr_step + 6])
+            if not skip_real:
+                pch_viz += "<br/>&emsp;<u>Real color value:</u> {}".format(
+                    self._get_color_name(colors[i]))
+            pch_viz += "<br/>&emsp;<u>Grid position:</u> {}".format(
+                data[curr_step + 5])
+            pch_viz += "<br/>&emsp;<u>Number of parameters on grid:" \
+                       "</u> {}".format(data[curr_step + 6])
+            if size > 14:
+                pch_viz += "<br/>&emsp;<u>Module options 1:</u> {}".format(
+                    data[curr_step + 8])
+                pch_viz += "<br/>&emsp;<u>Module options 2:</u> {}".format(
+                    data[curr_step + 9])
+
             curr_step += size
 
-        pch_viz += "\nConnection count: {}".format(data[curr_step])
+        pch_viz += "<br/>Connection count: {}".format(data[curr_step])
         for j in range(data[curr_step]):
-            pch_viz += "\n  Connection #{}".format(j)
-            pch_viz += "\n\t{}.{} -> {}.{} {}%".format(data[curr_step + 1],
-                                                       data[curr_step + 2],
-                                                       data[curr_step + 3],
-                                                       data[curr_step + 4],
-                                                       int(data[curr_step + 5]
-                                                           / 100))
+            pch_viz += "<br/>&ensp;Connection #{}".format(j)
+            pch_viz += "<br/>&emsp;{}.{} -> {}.{} {}%".format(
+                data[curr_step + 1], data[curr_step + 2],
+                data[curr_step + 3], data[curr_step + 4],
+                int(data[curr_step + 5] / 100))
             curr_step += 5
-        pch_viz += "\nNumber of pages = {}".format(data[curr_step + 1])
+        pch_viz += "<br/><b>Number of pages</b> = {}".format(
+            data[curr_step + 1])
+        pch_viz += "</html>"
 
         return pch_viz
 

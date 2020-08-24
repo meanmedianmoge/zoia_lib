@@ -14,7 +14,7 @@
    <enum>Qt::StrongFocus</enum>
   </property>
   <property name="windowTitle">
-   <string>ZOIA Librarian -  Beta 2</string>
+   <string>ZOIA Librarian -  Beta 3</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -83,7 +83,7 @@
          <enum>QTabWidget::Rounded</enum>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <property name="movable">
          <bool>false</bool>

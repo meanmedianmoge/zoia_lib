@@ -22,7 +22,7 @@ class ZOIALibrarianLocal(QMainWindow):
     this class.
     """
 
-    def __init__(self, ui, path, sd, msg, f1):
+    def __init__(self, ui, path, sd, msg, window, expt, delete, f1):
         """ Initializes the class with the required parameters.
 
         ui: The UI component of ZOIALibrarianMain
@@ -30,15 +30,23 @@ class ZOIALibrarianLocal(QMainWindow):
               directory.
         sd: Helper class to access UI-related SD methods.
         msg: A template QMessageBox.
+        window: A reference to the main UI window for icon consistency.
+        expt: Helper class to access backend exporting methods.
+        delete: Helper class to access backend deletion methods.
         f1: Reference to ZOIALibrarianMain's sort_and_set function.
         """
 
+        # Needed to make use of self.sender()
         super().__init__()
 
+        # Variable init.
         self.ui = ui
         self.path = path
         self.sd = sd
         self.msg = msg
+        self.window = window
+        self.export = expt
+        self.delete = delete
         self.sort_and_set = f1
 
         self.data_local = []
@@ -54,80 +62,7 @@ class ZOIALibrarianLocal(QMainWindow):
         self.worker_updates = UpdatesWorker()
         self.worker_updates.signal.connect(self.update_local_patches_done)
 
-    def initiate_export(self, window, export):
-        """ Attempts to export a patch saved in the backend to an SD
-        card. This requires that the user has previously set their SD
-        card path using sd_path(). Should the patch be missing, a
-        message prompt will inform the user that it must be specified.
-        The application will ask for a slot number, and this is forced
-        to be between 0 and 63 inclusive. Should the user specify a slot
-        and the application detects that the slot is occupied by another
-        patch on the SD card, the user will be asked if they wish to
-        overwrite the other patch. If yes, exporting will export the new
-        patch and delete the other patch that previously occupied the
-        slot. If no, the user will be asked to enter a different slot
-        number. At any point, the user can abort the operation by
-        closing the message dialog or hitting the "Cancel" button.
-        Currently triggered via a button press.
-
-        window: A reference to the main UI window for icon consistency.
-        export: Helper class to access backend exporting methods.
-        """
-
-        # Exporting this way will only export to a directory named "to_zoia"
-        # So we need to check if it exists. If it doesn't, we create it.
-        if self.sd.get_sd_root() is None:
-            # No SD path.
-            self.msg.setWindowTitle("No SD Path")
-            self.msg.setIcon(QMessageBox.Information)
-            self.msg.setText("Please specify your SD card path!")
-            self.msg.setStandardButtons(QMessageBox.Ok)
-            self.msg.exec_()
-            self.sd.sd_path(False, window.width())
-            self.msg.setInformativeText(None)
-        else:
-            if "to_zoia" not in os.listdir(self.sd.get_sd_root()):
-                os.mkdir(os.path.join(self.sd.get_sd_root(), "to_zoia"))
-            while True:
-                # Ask for a slot
-                slot, ok = QInputDialog().getInt(
-                    window, "Patch Export", "Slot number:", minValue=0,
-                    maxValue=63)
-                if ok:
-                    self.ui.statusbar.showMessage("Patch be movin",
-                                                  timeout=5000)
-                    # Got a slot and the user hit "OK"
-                    try:
-                        export.export_patch_bin(
-                            self.sender().objectName(), os.path.join(
-                                self.sd.get_sd_root(), "to_zoia"), slot)
-                        self.ui.statusbar.showMessage("Export complete!",
-                                                      timeout=5000)
-                        break
-                    except errors.ExportingError:
-                        # There was already a patch in that slot.
-                        self.msg.setWindowTitle("Slot Exists")
-                        self.msg.setIcon(QMessageBox.Information)
-                        self.msg.setText(
-                            "That slot is occupied by another patch. "
-                            "Would you like to overwrite it?")
-                        self.msg.setStandardButtons(QMessageBox.Yes |
-                                                    QMessageBox.No)
-                        value = self.msg.exec_()
-                        if value == QMessageBox.Yes:
-                            # Overwrite the other patch.
-                            export.export_patch_bin(
-                                self.sender().objectName(),
-                                os.path.join(self.sd.get_sd_root(),
-                                             "to_zoia"), slot, True)
-                            self.ui.statusbar.showMessage(
-                                "Export complete!", timeout=5000)
-                            break
-                else:
-                    # Operation was aborted.
-                    break
-
-    def create_expt_and_del_btns(self, btn, i, idx, ver, window, expt, delete):
+    def create_expt_and_del_btns(self, btn, i, idx, ver):
         """ Creates the export and delete buttons that are displayed on
         the Local Storage View tab's QTableView. Each button is mapped
         to a respective function. Namely, initiate_export() and
@@ -138,33 +73,30 @@ class ZOIALibrarianLocal(QMainWindow):
         i: The current row the buttons are being created for.
         idx: The id number associated with this row.
         ver: The version associated with this row (if it exists).
-        window: A reference to the main UI window for icon consistency.
-        expt: Helper class to access backend exporting methods.
-        delete: Helper class to access backend deletion methods.
         """
 
         if "[Multiple Versions]" in btn.text():
-            expt = QPushButton("See Version\nHistory to\nexport!", self)
-            expt.setEnabled(False)
+            ext_btn = QPushButton("See Version\nHistory to\nexport!", self)
+            ext_btn.setEnabled(False)
         else:
-            expt = QPushButton("Click me\nto export!", self)
+            ext_btn = QPushButton("Click me\nto export!", self)
 
         del_btn = QPushButton("X", self)
 
         if self.ui.back_btn_local.isEnabled():
             name = "{}_v{}".format(idx, ver)
-            expt.setObjectName(name)
+            ext_btn.setObjectName(name)
             del_btn.setObjectName(name)
         else:
-            expt.setObjectName(idx)
+            ext_btn.setObjectName(idx)
             del_btn.setObjectName(idx)
 
-        expt.setFont(self.ui.table_PS.horizontalHeader().font())
-        expt.clicked.connect(lambda: self.initiate_export(expt, window))
-        self.ui.table_local.setCellWidget(i, 4, expt)
+        ext_btn.setFont(self.ui.table_PS.horizontalHeader().font())
+        ext_btn.clicked.connect(self.initiate_export)
+        self.ui.table_local.setCellWidget(i, 4, ext_btn)
 
         del_btn.setFont(self.ui.table_PS.horizontalHeader().font())
-        del_btn.clicked.connect(lambda: self.initiate_delete(delete))
+        del_btn.clicked.connect(self.initiate_delete)
         self.ui.table_local.setCellWidget(i, 5, del_btn)
 
     def get_local_patches(self):
@@ -220,6 +152,78 @@ class ZOIALibrarianLocal(QMainWindow):
             self.get_local_patches()
             self.ui.back_btn_local.setEnabled(False)
             self.ui.searchbar_local.setText("")
+
+    def initiate_export(self):
+        """ Attempts to export a patch saved in the backend to an SD
+        card. This requires that the user has previously set their SD
+        card path using sd_path(). Should the patch be missing, a
+        message prompt will inform the user that it must be specified.
+        The application will ask for a slot number, and this is forced
+        to be between 0 and 63 inclusive. Should the user specify a slot
+        and the application detects that the slot is occupied by another
+        patch on the SD card, the user will be asked if they wish to
+        overwrite the other patch. If yes, exporting will export the new
+        patch and delete the other patch that previously occupied the
+        slot. If no, the user will be asked to enter a different slot
+        number. At any point, the user can abort the operation by
+        closing the message dialog or hitting the "Cancel" button.
+        Currently triggered via a button press.
+
+        window: A reference to the main UI window for icon consistency.
+        export: Helper class to access backend exporting methods.
+        """
+
+        # Exporting this way will only export to a directory named "to_zoia"
+        # So we need to check if it exists. If it doesn't, we create it.
+        if self.sd.get_sd_root() is None:
+            # No SD path.
+            self.msg.setWindowTitle("No SD Path")
+            self.msg.setIcon(QMessageBox.Information)
+            self.msg.setText("Please specify your SD card path!")
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+            self.sd.sd_path(False, self.window.width())
+            self.msg.setInformativeText(None)
+        else:
+            if "to_zoia" not in os.listdir(self.sd.get_sd_root()):
+                os.mkdir(os.path.join(self.sd.get_sd_root(), "to_zoia"))
+            while True:
+                # Ask for a slot
+                slot, ok = QInputDialog().getInt(
+                    self.window, "Patch Export", "Slot number:", minValue=0,
+                    maxValue=63)
+                if ok:
+                    self.ui.statusbar.showMessage("Patch be movin",
+                                                  timeout=5000)
+                    # Got a slot and the user hit "OK"
+                    try:
+                        self.export.export_patch_bin(
+                            self.sender().objectName(), os.path.join(
+                                self.sd.get_sd_root(), "to_zoia"), slot)
+                        self.ui.statusbar.showMessage("Export complete!",
+                                                      timeout=5000)
+                        break
+                    except errors.ExportingError:
+                        # There was already a patch in that slot.
+                        self.msg.setWindowTitle("Slot Exists")
+                        self.msg.setIcon(QMessageBox.Information)
+                        self.msg.setText(
+                            "That slot is occupied by another patch. "
+                            "Would you like to overwrite it?")
+                        self.msg.setStandardButtons(QMessageBox.Yes |
+                                                    QMessageBox.No)
+                        value = self.msg.exec_()
+                        if value == QMessageBox.Yes:
+                            # Overwrite the other patch.
+                            self.export.export_patch_bin(
+                                self.sender().objectName(),
+                                os.path.join(self.sd.get_sd_root(),
+                                             "to_zoia"), slot, True)
+                            self.ui.statusbar.showMessage(
+                                "Export complete!", timeout=5000)
+                            break
+                # Operation was aborted.
+                break
 
     def get_version_patches(self, context, idx=None):
         """ Retrieves the versions of a patch that is locally stored to
