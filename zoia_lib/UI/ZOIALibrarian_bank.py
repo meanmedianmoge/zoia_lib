@@ -575,7 +575,7 @@ class ZOIALibrarianBank(QMainWindow):
                 break
             elif item_right is not None and \
                     item_right.objectName() == self.sender().objectName():
-                curr_table = self.ui.table_bank_left
+                curr_table = self.ui.table_bank_right
                 break
         # Clear the item and determine if buttons need to be disabled.
         curr_table.setItem(i, 0, QTableWidgetItem(None))
