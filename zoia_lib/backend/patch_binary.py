@@ -26,6 +26,7 @@ class PatchBinary(Patch):
             - Module type
             - Page number
             - Old color value
+            - New color value
             - Grid position
             - Number of parameters on the grid
         - Connection count
@@ -34,29 +35,21 @@ class PatchBinary(Patch):
         - Number of pages
           - For each page:
             - The page name (if it has one) (not yet implemented)
-        - The color of each module (not yet implemented)
+        - The color of each module
 
         pch_data: The binary to be parsed and analyzed.
 
-        return: A formatted string that can be shown in the frontend.
+        return: A formatted JSON that can be shown in the frontend.
         """
 
         # Massive credit to apparent1 for figuring this stuff out.
-        # They did all the heavy lifting. Still a WIP.
+        # They did all the heavy lifting.
         try:
             name = str(pch_data[4:]).split("\\")[0].split("\'")[1]
         except IndexError:
             name = str(pch_data[4:]).split("\\")[0]
         data = struct.unpack('i'*int(len(pch_data) / 4), pch_data)
 
-        pch_viz = "<html>Everything listed below is experimental and may " \
-                  "not reflect the patch correctly.\n" \
-                  "-----------------------------------------------------" \
-                  "---------------------------\n"
-
-        pch_viz += "<br/><b>Preset size</b> = {}".format(data[0])
-        pch_viz += "<br/><b>Patch name</b> = {}".format(name)
-        pch_viz += "<br/><b>Module count</b> = {}".format(data[5])
         temp = [i for i, e in enumerate(data) if e != 0]
         last_color = temp[-1] + 1
         first_color = last_color - int(data[5])
@@ -69,32 +62,24 @@ class PatchBinary(Patch):
                 break
             colors.append(data[j])
 
+        modules = []
+
         curr_step = 6
         for i in range(int(data[5])):
             size = data[curr_step]
-            pch_viz += "<br/>&ensp;<b>Module #{}</b>".format(i)
-            pch_viz += "<br/>&emsp;<u>Module size</u> = {}".format(size)
-            pch_viz += "<br/>&emsp;<u>Module type:</u> {}".format(
-                self._get_module_type(data[curr_step + 1]))
-            pch_viz += "<br/>&emsp;<u>Page number:</u> {}".format(
-                data[curr_step + 3])
-            pch_viz += "<br/>&emsp;<u>Old color value:</u> {}".format(
-                self._get_color_name(data[curr_step + 4]))
-            if not skip_real:
-                pch_viz += "<br/>&emsp;<u>Real color value:</u> {}".format(
-                    self._get_color_name(colors[i]))
-            pch_viz += "<br/>&emsp;<u>Grid position:</u> {}".format(
-                data[curr_step + 5])
-            pch_viz += "<br/>&emsp;<u>Number of parameters on grid:" \
-                       "</u> {}".format(data[curr_step + 6])
-            if size > 14:
-                pch_viz += "<br/>&emsp;<u>Module options 1:</u> {}".format(
-                    data[curr_step + 8])
-                pch_viz += "<br/>&emsp;<u>Module options 2:</u> {}".format(
-                    data[curr_step + 9])
-
+            curr_module = {
+                "type": self._get_module_type(data[curr_step + 1]),
+                "page": int(data[curr_step + 3]),
+                "position": int(data[curr_step + 5]),
+                "old_color": self._get_color_name(data[curr_step + 4]),
+                "new_color": "" if skip_real else self._get_color_name(
+                    colors[i]),
+                "options_1": "" if size <= 14 else data[curr_step + 8],
+                "options_2": "" if size <= 14 else data[curr_step + 9]
+            }
+            modules.append(curr_module)
             curr_step += size
-
+        pch_viz = ""
         pch_viz += "<br/>Connection count: {}".format(data[curr_step])
         for j in range(data[curr_step]):
             pch_viz += "<br/>&ensp;Connection #{}".format(j)
@@ -106,8 +91,14 @@ class PatchBinary(Patch):
         pch_viz += "<br/><b>Number of pages</b> = {}".format(
             data[curr_step + 1])
         pch_viz += "</html>"
+        print(pch_viz)
 
-        return pch_viz
+        json_bin = {
+            "name": name,
+            "modules": modules
+        }
+
+        return json_bin
 
     @staticmethod
     def _get_module_type(module_id):
@@ -134,7 +125,7 @@ class PatchBinary(Patch):
             12: "Env Follower",
             13: "Delay line",
             14: "Oscillator",
-            15: "Pushbutton",
+            15: "Push Button",
             16: "Keyboard",
             17: "CV Invert",
             18: "Steps",

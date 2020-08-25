@@ -76,7 +76,7 @@ class ZOIALibrarianUtil:
             self.ui.tabs.setFont(new_font)
             self.ui.sd_tree.setFont(new_font)
             self.ui.text_browser_PS.setFont(big_font)
-            self.ui.text_browser_viz.setFont(big_font)
+            self.ui.page_label.setFont(new_font)
             self.ui.text_browser_local.setFont(big_font)
             self.ui.text_browser_bank.setFont(big_font)
 

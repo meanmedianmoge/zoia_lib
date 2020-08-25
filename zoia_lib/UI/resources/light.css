@@ -1,3 +1,8 @@
+QLabel {
+    color: #000;
+    background-color: #FFF;
+}
+
 QTabBar::tab:selected {
     background-color: qlineargradient(spread:pad,
     x1: 0,

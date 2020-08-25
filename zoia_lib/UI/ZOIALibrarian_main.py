@@ -245,6 +245,48 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.actionToggle_Dark_Mode_2.triggered.connect(
             self.util.toggle_dark)
         self.ui.btn_dwn_all.clicked.connect(self.ps.download_all_thread)
+        self.ui.btn_next_page.clicked.connect(self.local.viz_page)
+        self.ui.btn_prev_page.clicked.connect(self.local.viz_page)
+        self.ui.btn_0.clicked.connect(self.local.viz_display)
+        self.ui.btn_1.clicked.connect(self.local.viz_display)
+        self.ui.btn_2.clicked.connect(self.local.viz_display)
+        self.ui.btn_3.clicked.connect(self.local.viz_display)
+        self.ui.btn_4.clicked.connect(self.local.viz_display)
+        self.ui.btn_5.clicked.connect(self.local.viz_display)
+        self.ui.btn_6.clicked.connect(self.local.viz_display)
+        self.ui.btn_7.clicked.connect(self.local.viz_display)
+        self.ui.btn_8.clicked.connect(self.local.viz_display)
+        self.ui.btn_9.clicked.connect(self.local.viz_display)
+        self.ui.btn_10.clicked.connect(self.local.viz_display)
+        self.ui.btn_11.clicked.connect(self.local.viz_display)
+        self.ui.btn_12.clicked.connect(self.local.viz_display)
+        self.ui.btn_13.clicked.connect(self.local.viz_display)
+        self.ui.btn_14.clicked.connect(self.local.viz_display)
+        self.ui.btn_15.clicked.connect(self.local.viz_display)
+        self.ui.btn_16.clicked.connect(self.local.viz_display)
+        self.ui.btn_17.clicked.connect(self.local.viz_display)
+        self.ui.btn_18.clicked.connect(self.local.viz_display)
+        self.ui.btn_19.clicked.connect(self.local.viz_display)
+        self.ui.btn_20.clicked.connect(self.local.viz_display)
+        self.ui.btn_21.clicked.connect(self.local.viz_display)
+        self.ui.btn_22.clicked.connect(self.local.viz_display)
+        self.ui.btn_23.clicked.connect(self.local.viz_display)
+        self.ui.btn_24.clicked.connect(self.local.viz_display)
+        self.ui.btn_25.clicked.connect(self.local.viz_display)
+        self.ui.btn_26.clicked.connect(self.local.viz_display)
+        self.ui.btn_27.clicked.connect(self.local.viz_display)
+        self.ui.btn_28.clicked.connect(self.local.viz_display)
+        self.ui.btn_29.clicked.connect(self.local.viz_display)
+        self.ui.btn_30.clicked.connect(self.local.viz_display)
+        self.ui.btn_31.clicked.connect(self.local.viz_display)
+        self.ui.btn_32.clicked.connect(self.local.viz_display)
+        self.ui.btn_33.clicked.connect(self.local.viz_display)
+        self.ui.btn_34.clicked.connect(self.local.viz_display)
+        self.ui.btn_35.clicked.connect(self.local.viz_display)
+        self.ui.btn_36.clicked.connect(self.local.viz_display)
+        self.ui.btn_37.clicked.connect(self.local.viz_display)
+        self.ui.btn_38.clicked.connect(self.local.viz_display)
+        self.ui.btn_39.clicked.connect(self.local.viz_display)
 
         # Set the theme.
         self.util.toggle_dark()
@@ -324,8 +366,12 @@ class ZOIALibrarianMain(QMainWindow):
                 self.ui.text_browser_bank.setText("")
             else:
                 self.ui.text_browser_local.setText("")
-                self.ui.text_browser_viz.setText("")
+                self.ui.page_label.setText("")
                 self.ui.update_patch_notes.setEnabled(False)
+                self.ui.text_browser_viz.setText("")
+                self.ui.btn_prev_page.setEnabled(False)
+                self.ui.btn_next_page.setEnabled(False)
+                self.local.viz_disable()
         elif self.ui.tabs.currentIndex() == 2:
             # SD card tab, need to check if an SD card has been specified.
             if self.sd.get_sd_root() is None:
@@ -567,8 +613,9 @@ class ZOIALibrarianMain(QMainWindow):
                 viz_browser = None
                 if self.ui.tabs.currentIndex() == 1:
                     curr_browser = self.ui.text_browser_local
-                    viz_browser = self.ui.text_browser_viz
+                    viz_browser = self.ui.page_label
                     self.ui.update_patch_notes.setEnabled(True)
+                    self.ui.text_browser_viz.setText("")
                 elif self.ui.tabs.currentIndex() == 3:
                     curr_browser = self.ui.text_browser_bank
                 self.local.set_local_selected(name)
@@ -609,23 +656,22 @@ class ZOIALibrarianMain(QMainWindow):
             # TODO Add artwork to HTML view.
             # Artwork needs to be downloaded ahead of time and then
             # pointed to, as QTextViews don't support downloading from
-            # external sources. Maybe create a cache of images?
+            # external sources. Maybe create a cache of images? Not
+            # easily implementable without speed hitch.
 
-            curr_browser.setHtml("<html><h3>"
-                         + content["title"] + "</h3><u>Author:</u> "
-                         + content["author"]["name"] + "<br/><u>Likes:</u> "
-                         + str(content["like_count"])
-                         + "<br/><u>Downloads:</u> "
-                         + str(content["download_count"])
-                         + "<br/><u>Views:</u> "
-                         + str(content["view_count"]) + "<br/><u>License:</u> "
-                         + legal + "<br/><u>Preview:</u> "
-                         + content["preview_url"]
-                         + "<br/><br/><u>Patch Notes:</u><br/>"
-                         + content["content"] + "</html>")
+            curr_browser.setHtml(
+                "<html><h3>" + content["title"]
+                + "</h3><u>Author:</u> " + content["author"]["name"]
+                + "<br/><u>Likes:</u> " + str(content["like_count"])
+                + "<br/><u>Downloads:</u> " + str(content["download_count"])
+                + "<br/><u>Views:</u> " + str(content["view_count"])
+                + "<br/><u>License:</u> " + legal
+                + "<br/><u>Preview:</u> " + content["preview_url"]
+                + "<br/><br/><u>Patch Notes:</u><br/>" + content["content"]
+                + "</html>")
 
             if viz is not None:
-                viz_browser.setText(viz)
+                self.local.setup_viz(viz)
 
     def display_patch_versions(self, context):
         """ Displays the contents of a patch that has multiple versions.
@@ -638,7 +684,7 @@ class ZOIALibrarianMain(QMainWindow):
             # Clean up the tab.
             self.local.set_prev_search(self.ui.searchbar_local.text())
             self.ui.text_browser_local.setText("")
-            self.ui.text_browser_viz.setText("")
+            self.ui.page_label.setText("")
             self.ui.searchbar_local.setText("")
             self.ui.update_patch_notes.setEnabled(False)
             self.ui.back_btn_local.setEnabled(True)

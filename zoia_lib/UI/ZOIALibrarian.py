@@ -8,8 +8,11 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import (QCoreApplication, QMetaObject, QRect, Qt)
-from PySide2.QtGui import (QCursor, QFont)
+from PySide2.QtCore import (QCoreApplication, QDate, QDateTime, QMetaObject,
+    QObject, QPoint, QRect, QSize, QTime, QUrl, Qt)
+from PySide2.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont,
+    QFontDatabase, QIcon, QKeySequence, QLinearGradient, QPalette, QPainter,
+    QPixmap, QRadialGradient)
 from PySide2.QtWidgets import *
 
 
@@ -17,7 +20,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1567, 1185)
+        MainWindow.resize(1567, 1280)
         MainWindow.setFocusPolicy(Qt.StrongFocus)
         MainWindow.setStyleSheet(u"")
         MainWindow.setTabShape(QTabWidget.Rounded)
@@ -313,14 +316,14 @@ class Ui_MainWindow(object):
         self.splitter_local.setObjectName(u"splitter_local")
         self.splitter_local.setOrientation(Qt.Horizontal)
         self.splitter_local.setHandleWidth(10)
-        self.layoutWidget_7 = QWidget(self.splitter_local)
-        self.layoutWidget_7.setObjectName(u"layoutWidget_7")
-        self.verticalLayout_7 = QVBoxLayout(self.layoutWidget_7)
+        self.layoutWidget = QWidget(self.splitter_local)
+        self.layoutWidget.setObjectName(u"layoutWidget")
+        self.verticalLayout_7 = QVBoxLayout(self.layoutWidget)
         self.verticalLayout_7.setObjectName(u"verticalLayout_7")
         self.verticalLayout_7.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_12 = QHBoxLayout()
         self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
-        self.back_btn_local = QPushButton(self.layoutWidget_7)
+        self.back_btn_local = QPushButton(self.layoutWidget)
         self.back_btn_local.setObjectName(u"back_btn_local")
         self.back_btn_local.setCursor(QCursor(Qt.PointingHandCursor))
         self.back_btn_local.setMouseTracking(True)
@@ -328,7 +331,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_12.addWidget(self.back_btn_local)
 
-        self.searchbar_local = QLineEdit(self.layoutWidget_7)
+        self.searchbar_local = QLineEdit(self.layoutWidget)
         self.searchbar_local.setObjectName(u"searchbar_local")
         sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         sizePolicy1.setHorizontalStretch(0)
@@ -340,7 +343,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_12.addWidget(self.searchbar_local)
 
-        self.check_for_updates_btn = QPushButton(self.layoutWidget_7)
+        self.check_for_updates_btn = QPushButton(self.layoutWidget)
         self.check_for_updates_btn.setObjectName(u"check_for_updates_btn")
         self.check_for_updates_btn.setCursor(QCursor(Qt.PointingHandCursor))
         self.check_for_updates_btn.setMouseTracking(True)
@@ -351,7 +354,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_7.addLayout(self.horizontalLayout_12)
 
-        self.table_local = QTableWidget(self.layoutWidget_7)
+        self.table_local = QTableWidget(self.layoutWidget)
         if (self.table_local.columnCount() < 6):
             self.table_local.setColumnCount(6)
         __qtablewidgetitem5 = QTableWidgetItem()
@@ -387,42 +390,427 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_7.addWidget(self.table_local)
 
-        self.splitter_local.addWidget(self.layoutWidget_7)
-        self.layoutWidget_8 = QWidget(self.splitter_local)
-        self.layoutWidget_8.setObjectName(u"layoutWidget_8")
-        self.verticalLayout_12 = QVBoxLayout(self.layoutWidget_8)
-        self.verticalLayout_12.setObjectName(u"verticalLayout_12")
-        self.verticalLayout_12.setContentsMargins(0, 0, 0, 0)
-        self.update_patch_notes = QPushButton(self.layoutWidget_8)
+        self.splitter_local.addWidget(self.layoutWidget)
+        self.layoutWidget_7 = QWidget(self.splitter_local)
+        self.layoutWidget_7.setObjectName(u"layoutWidget_7")
+        self.verticalLayout_22 = QVBoxLayout(self.layoutWidget_7)
+        self.verticalLayout_22.setObjectName(u"verticalLayout_22")
+        self.verticalLayout_22.setContentsMargins(0, 0, 0, 0)
+        self.update_patch_notes = QPushButton(self.layoutWidget_7)
         self.update_patch_notes.setObjectName(u"update_patch_notes")
         self.update_patch_notes.setCursor(QCursor(Qt.PointingHandCursor))
         self.update_patch_notes.setMouseTracking(True)
         self.update_patch_notes.setStyleSheet(u"")
 
-        self.verticalLayout_12.addWidget(self.update_patch_notes)
+        self.verticalLayout_22.addWidget(self.update_patch_notes)
 
-        self.splitter_viz_2 = QSplitter(self.layoutWidget_8)
-        self.splitter_viz_2.setObjectName(u"splitter_viz_2")
-        self.splitter_viz_2.setOrientation(Qt.Vertical)
-        self.splitter_viz_2.setHandleWidth(10)
-        self.text_browser_local = QTextBrowser(self.splitter_viz_2)
+        self.splitter_local_hori = QSplitter(self.layoutWidget_7)
+        self.splitter_local_hori.setObjectName(u"splitter_local_hori")
+        self.splitter_local_hori.setOrientation(Qt.Vertical)
+        self.splitter_local_hori.setHandleWidth(10)
+        self.text_browser_local = QTextBrowser(self.splitter_local_hori)
         self.text_browser_local.setObjectName(u"text_browser_local")
         self.text_browser_local.setStyleSheet(u"")
         self.text_browser_local.setTextInteractionFlags(Qt.LinksAccessibleByKeyboard|Qt.LinksAccessibleByMouse|Qt.TextBrowserInteraction|Qt.TextEditable|Qt.TextSelectableByMouse)
         self.text_browser_local.setOpenExternalLinks(True)
         self.text_browser_local.setOpenLinks(True)
-        self.splitter_viz_2.addWidget(self.text_browser_local)
-        self.text_browser_viz = QTextBrowser(self.splitter_viz_2)
+        self.splitter_local_hori.addWidget(self.text_browser_local)
+        self.layoutWidget_8 = QWidget(self.splitter_local_hori)
+        self.layoutWidget_8.setObjectName(u"layoutWidget_8")
+        self.verticalLayout_23 = QVBoxLayout(self.layoutWidget_8)
+        self.verticalLayout_23.setObjectName(u"verticalLayout_23")
+        self.verticalLayout_23.setContentsMargins(0, 0, 0, 0)
+        self.page_label = QLabel(self.layoutWidget_8)
+        self.page_label.setObjectName(u"page_label")
+        self.page_label.setFrameShape(QFrame.Panel)
+        self.page_label.setFrameShadow(QFrame.Plain)
+        self.page_label.setAlignment(Qt.AlignCenter)
+        self.page_label.setWordWrap(True)
+        self.page_label.setMargin(5)
+
+        self.verticalLayout_23.addWidget(self.page_label)
+
+        self.horizontalLayout_13 = QHBoxLayout()
+        self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
+        self.verticalLayout_24 = QVBoxLayout()
+        self.verticalLayout_24.setObjectName(u"verticalLayout_24")
+        self.text_browser_viz = QTextBrowser(self.layoutWidget_8)
         self.text_browser_viz.setObjectName(u"text_browser_viz")
-        self.text_browser_viz.setStyleSheet(u"")
-        self.text_browser_viz.setTextInteractionFlags(Qt.TextBrowserInteraction)
-        self.text_browser_viz.setOpenExternalLinks(True)
-        self.text_browser_viz.setOpenLinks(True)
-        self.splitter_viz_2.addWidget(self.text_browser_viz)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.text_browser_viz.sizePolicy().hasHeightForWidth())
+        self.text_browser_viz.setSizePolicy(sizePolicy2)
 
-        self.verticalLayout_12.addWidget(self.splitter_viz_2)
+        self.verticalLayout_24.addWidget(self.text_browser_viz)
 
-        self.splitter_local.addWidget(self.layoutWidget_8)
+        self.btn_next_page = QPushButton(self.layoutWidget_8)
+        self.btn_next_page.setObjectName(u"btn_next_page")
+        sizePolicy3 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.btn_next_page.sizePolicy().hasHeightForWidth())
+        self.btn_next_page.setSizePolicy(sizePolicy3)
+
+        self.verticalLayout_24.addWidget(self.btn_next_page)
+
+        self.btn_prev_page = QPushButton(self.layoutWidget_8)
+        self.btn_prev_page.setObjectName(u"btn_prev_page")
+        sizePolicy3.setHeightForWidth(self.btn_prev_page.sizePolicy().hasHeightForWidth())
+        self.btn_prev_page.setSizePolicy(sizePolicy3)
+
+        self.verticalLayout_24.addWidget(self.btn_prev_page)
+
+
+        self.horizontalLayout_13.addLayout(self.verticalLayout_24)
+
+        self.frame_2 = QFrame(self.layoutWidget_8)
+        self.frame_2.setObjectName(u"frame_2")
+        self.frame_2.setFrameShape(QFrame.StyledPanel)
+        self.frame_2.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout_14 = QHBoxLayout(self.frame_2)
+        self.horizontalLayout_14.setSpacing(0)
+        self.horizontalLayout_14.setObjectName(u"horizontalLayout_14")
+        self.horizontalLayout_14.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_15 = QHBoxLayout()
+        self.horizontalLayout_15.setObjectName(u"horizontalLayout_15")
+        self.verticalLayout_25 = QVBoxLayout()
+        self.verticalLayout_25.setObjectName(u"verticalLayout_25")
+        self.btn_0 = QPushButton(self.frame_2)
+        self.btn_0.setObjectName(u"btn_0")
+        self.btn_0.setEnabled(True)
+        sizePolicy.setHeightForWidth(self.btn_0.sizePolicy().hasHeightForWidth())
+        self.btn_0.setSizePolicy(sizePolicy)
+        self.btn_0.setMinimumSize(QSize(0, 0))
+        self.btn_0.setFlat(False)
+
+        self.verticalLayout_25.addWidget(self.btn_0)
+
+        self.btn_8 = QPushButton(self.frame_2)
+        self.btn_8.setObjectName(u"btn_8")
+        sizePolicy.setHeightForWidth(self.btn_8.sizePolicy().hasHeightForWidth())
+        self.btn_8.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_25.addWidget(self.btn_8)
+
+        self.btn_16 = QPushButton(self.frame_2)
+        self.btn_16.setObjectName(u"btn_16")
+        sizePolicy.setHeightForWidth(self.btn_16.sizePolicy().hasHeightForWidth())
+        self.btn_16.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_25.addWidget(self.btn_16)
+
+        self.btn_24 = QPushButton(self.frame_2)
+        self.btn_24.setObjectName(u"btn_24")
+        sizePolicy.setHeightForWidth(self.btn_24.sizePolicy().hasHeightForWidth())
+        self.btn_24.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_25.addWidget(self.btn_24)
+
+        self.btn_32 = QPushButton(self.frame_2)
+        self.btn_32.setObjectName(u"btn_32")
+        sizePolicy.setHeightForWidth(self.btn_32.sizePolicy().hasHeightForWidth())
+        self.btn_32.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_25.addWidget(self.btn_32)
+
+
+        self.horizontalLayout_15.addLayout(self.verticalLayout_25)
+
+        self.verticalLayout_26 = QVBoxLayout()
+        self.verticalLayout_26.setObjectName(u"verticalLayout_26")
+        self.btn_1 = QPushButton(self.frame_2)
+        self.btn_1.setObjectName(u"btn_1")
+        sizePolicy.setHeightForWidth(self.btn_1.sizePolicy().hasHeightForWidth())
+        self.btn_1.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_26.addWidget(self.btn_1)
+
+        self.btn_9 = QPushButton(self.frame_2)
+        self.btn_9.setObjectName(u"btn_9")
+        sizePolicy.setHeightForWidth(self.btn_9.sizePolicy().hasHeightForWidth())
+        self.btn_9.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_26.addWidget(self.btn_9)
+
+        self.btn_17 = QPushButton(self.frame_2)
+        self.btn_17.setObjectName(u"btn_17")
+        sizePolicy.setHeightForWidth(self.btn_17.sizePolicy().hasHeightForWidth())
+        self.btn_17.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_26.addWidget(self.btn_17)
+
+        self.btn_25 = QPushButton(self.frame_2)
+        self.btn_25.setObjectName(u"btn_25")
+        sizePolicy.setHeightForWidth(self.btn_25.sizePolicy().hasHeightForWidth())
+        self.btn_25.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_26.addWidget(self.btn_25)
+
+        self.btn_33 = QPushButton(self.frame_2)
+        self.btn_33.setObjectName(u"btn_33")
+        sizePolicy.setHeightForWidth(self.btn_33.sizePolicy().hasHeightForWidth())
+        self.btn_33.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_26.addWidget(self.btn_33)
+
+
+        self.horizontalLayout_15.addLayout(self.verticalLayout_26)
+
+        self.verticalLayout_27 = QVBoxLayout()
+        self.verticalLayout_27.setObjectName(u"verticalLayout_27")
+        self.btn_2 = QPushButton(self.frame_2)
+        self.btn_2.setObjectName(u"btn_2")
+        sizePolicy.setHeightForWidth(self.btn_2.sizePolicy().hasHeightForWidth())
+        self.btn_2.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_27.addWidget(self.btn_2)
+
+        self.btn_10 = QPushButton(self.frame_2)
+        self.btn_10.setObjectName(u"btn_10")
+        sizePolicy.setHeightForWidth(self.btn_10.sizePolicy().hasHeightForWidth())
+        self.btn_10.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_27.addWidget(self.btn_10)
+
+        self.btn_18 = QPushButton(self.frame_2)
+        self.btn_18.setObjectName(u"btn_18")
+        sizePolicy.setHeightForWidth(self.btn_18.sizePolicy().hasHeightForWidth())
+        self.btn_18.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_27.addWidget(self.btn_18)
+
+        self.btn_26 = QPushButton(self.frame_2)
+        self.btn_26.setObjectName(u"btn_26")
+        sizePolicy.setHeightForWidth(self.btn_26.sizePolicy().hasHeightForWidth())
+        self.btn_26.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_27.addWidget(self.btn_26)
+
+        self.btn_34 = QPushButton(self.frame_2)
+        self.btn_34.setObjectName(u"btn_34")
+        sizePolicy.setHeightForWidth(self.btn_34.sizePolicy().hasHeightForWidth())
+        self.btn_34.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_27.addWidget(self.btn_34)
+
+
+        self.horizontalLayout_15.addLayout(self.verticalLayout_27)
+
+        self.verticalLayout_28 = QVBoxLayout()
+        self.verticalLayout_28.setObjectName(u"verticalLayout_28")
+        self.btn_3 = QPushButton(self.frame_2)
+        self.btn_3.setObjectName(u"btn_3")
+        sizePolicy.setHeightForWidth(self.btn_3.sizePolicy().hasHeightForWidth())
+        self.btn_3.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_28.addWidget(self.btn_3)
+
+        self.btn_11 = QPushButton(self.frame_2)
+        self.btn_11.setObjectName(u"btn_11")
+        sizePolicy.setHeightForWidth(self.btn_11.sizePolicy().hasHeightForWidth())
+        self.btn_11.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_28.addWidget(self.btn_11)
+
+        self.btn_19 = QPushButton(self.frame_2)
+        self.btn_19.setObjectName(u"btn_19")
+        sizePolicy.setHeightForWidth(self.btn_19.sizePolicy().hasHeightForWidth())
+        self.btn_19.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_28.addWidget(self.btn_19)
+
+        self.btn_27 = QPushButton(self.frame_2)
+        self.btn_27.setObjectName(u"btn_27")
+        sizePolicy.setHeightForWidth(self.btn_27.sizePolicy().hasHeightForWidth())
+        self.btn_27.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_28.addWidget(self.btn_27)
+
+        self.btn_35 = QPushButton(self.frame_2)
+        self.btn_35.setObjectName(u"btn_35")
+        sizePolicy.setHeightForWidth(self.btn_35.sizePolicy().hasHeightForWidth())
+        self.btn_35.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_28.addWidget(self.btn_35)
+
+
+        self.horizontalLayout_15.addLayout(self.verticalLayout_28)
+
+        self.verticalLayout_29 = QVBoxLayout()
+        self.verticalLayout_29.setObjectName(u"verticalLayout_29")
+        self.btn_4 = QPushButton(self.frame_2)
+        self.btn_4.setObjectName(u"btn_4")
+        sizePolicy.setHeightForWidth(self.btn_4.sizePolicy().hasHeightForWidth())
+        self.btn_4.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_29.addWidget(self.btn_4)
+
+        self.btn_12 = QPushButton(self.frame_2)
+        self.btn_12.setObjectName(u"btn_12")
+        sizePolicy.setHeightForWidth(self.btn_12.sizePolicy().hasHeightForWidth())
+        self.btn_12.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_29.addWidget(self.btn_12)
+
+        self.btn_20 = QPushButton(self.frame_2)
+        self.btn_20.setObjectName(u"btn_20")
+        sizePolicy.setHeightForWidth(self.btn_20.sizePolicy().hasHeightForWidth())
+        self.btn_20.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_29.addWidget(self.btn_20)
+
+        self.btn_28 = QPushButton(self.frame_2)
+        self.btn_28.setObjectName(u"btn_28")
+        sizePolicy.setHeightForWidth(self.btn_28.sizePolicy().hasHeightForWidth())
+        self.btn_28.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_29.addWidget(self.btn_28)
+
+        self.btn_36 = QPushButton(self.frame_2)
+        self.btn_36.setObjectName(u"btn_36")
+        sizePolicy.setHeightForWidth(self.btn_36.sizePolicy().hasHeightForWidth())
+        self.btn_36.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_29.addWidget(self.btn_36)
+
+
+        self.horizontalLayout_15.addLayout(self.verticalLayout_29)
+
+        self.verticalLayout_30 = QVBoxLayout()
+        self.verticalLayout_30.setObjectName(u"verticalLayout_30")
+        self.btn_5 = QPushButton(self.frame_2)
+        self.btn_5.setObjectName(u"btn_5")
+        sizePolicy.setHeightForWidth(self.btn_5.sizePolicy().hasHeightForWidth())
+        self.btn_5.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_30.addWidget(self.btn_5)
+
+        self.btn_13 = QPushButton(self.frame_2)
+        self.btn_13.setObjectName(u"btn_13")
+        sizePolicy.setHeightForWidth(self.btn_13.sizePolicy().hasHeightForWidth())
+        self.btn_13.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_30.addWidget(self.btn_13)
+
+        self.btn_21 = QPushButton(self.frame_2)
+        self.btn_21.setObjectName(u"btn_21")
+        sizePolicy.setHeightForWidth(self.btn_21.sizePolicy().hasHeightForWidth())
+        self.btn_21.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_30.addWidget(self.btn_21)
+
+        self.btn_29 = QPushButton(self.frame_2)
+        self.btn_29.setObjectName(u"btn_29")
+        sizePolicy.setHeightForWidth(self.btn_29.sizePolicy().hasHeightForWidth())
+        self.btn_29.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_30.addWidget(self.btn_29)
+
+        self.btn_37 = QPushButton(self.frame_2)
+        self.btn_37.setObjectName(u"btn_37")
+        sizePolicy.setHeightForWidth(self.btn_37.sizePolicy().hasHeightForWidth())
+        self.btn_37.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_30.addWidget(self.btn_37)
+
+
+        self.horizontalLayout_15.addLayout(self.verticalLayout_30)
+
+        self.verticalLayout_31 = QVBoxLayout()
+        self.verticalLayout_31.setObjectName(u"verticalLayout_31")
+        self.btn_6 = QPushButton(self.frame_2)
+        self.btn_6.setObjectName(u"btn_6")
+        sizePolicy.setHeightForWidth(self.btn_6.sizePolicy().hasHeightForWidth())
+        self.btn_6.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_31.addWidget(self.btn_6)
+
+        self.btn_14 = QPushButton(self.frame_2)
+        self.btn_14.setObjectName(u"btn_14")
+        sizePolicy.setHeightForWidth(self.btn_14.sizePolicy().hasHeightForWidth())
+        self.btn_14.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_31.addWidget(self.btn_14)
+
+        self.btn_22 = QPushButton(self.frame_2)
+        self.btn_22.setObjectName(u"btn_22")
+        sizePolicy.setHeightForWidth(self.btn_22.sizePolicy().hasHeightForWidth())
+        self.btn_22.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_31.addWidget(self.btn_22)
+
+        self.btn_30 = QPushButton(self.frame_2)
+        self.btn_30.setObjectName(u"btn_30")
+        sizePolicy.setHeightForWidth(self.btn_30.sizePolicy().hasHeightForWidth())
+        self.btn_30.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_31.addWidget(self.btn_30)
+
+        self.btn_38 = QPushButton(self.frame_2)
+        self.btn_38.setObjectName(u"btn_38")
+        sizePolicy.setHeightForWidth(self.btn_38.sizePolicy().hasHeightForWidth())
+        self.btn_38.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_31.addWidget(self.btn_38)
+
+
+        self.horizontalLayout_15.addLayout(self.verticalLayout_31)
+
+        self.verticalLayout_32 = QVBoxLayout()
+        self.verticalLayout_32.setObjectName(u"verticalLayout_32")
+        self.btn_7 = QPushButton(self.frame_2)
+        self.btn_7.setObjectName(u"btn_7")
+        sizePolicy.setHeightForWidth(self.btn_7.sizePolicy().hasHeightForWidth())
+        self.btn_7.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_32.addWidget(self.btn_7)
+
+        self.btn_15 = QPushButton(self.frame_2)
+        self.btn_15.setObjectName(u"btn_15")
+        sizePolicy.setHeightForWidth(self.btn_15.sizePolicy().hasHeightForWidth())
+        self.btn_15.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_32.addWidget(self.btn_15)
+
+        self.btn_23 = QPushButton(self.frame_2)
+        self.btn_23.setObjectName(u"btn_23")
+        sizePolicy.setHeightForWidth(self.btn_23.sizePolicy().hasHeightForWidth())
+        self.btn_23.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_32.addWidget(self.btn_23)
+
+        self.btn_31 = QPushButton(self.frame_2)
+        self.btn_31.setObjectName(u"btn_31")
+        sizePolicy.setHeightForWidth(self.btn_31.sizePolicy().hasHeightForWidth())
+        self.btn_31.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_32.addWidget(self.btn_31)
+
+        self.btn_39 = QPushButton(self.frame_2)
+        self.btn_39.setObjectName(u"btn_39")
+        sizePolicy.setHeightForWidth(self.btn_39.sizePolicy().hasHeightForWidth())
+        self.btn_39.setSizePolicy(sizePolicy)
+
+        self.verticalLayout_32.addWidget(self.btn_39)
+
+
+        self.horizontalLayout_15.addLayout(self.verticalLayout_32)
+
+
+        self.horizontalLayout_14.addLayout(self.horizontalLayout_15)
+
+
+        self.horizontalLayout_13.addWidget(self.frame_2)
+
+
+        self.verticalLayout_23.addLayout(self.horizontalLayout_13)
+
+        self.splitter_local_hori.addWidget(self.layoutWidget_8)
+
+        self.verticalLayout_22.addWidget(self.splitter_local_hori)
+
+        self.splitter_local.addWidget(self.layoutWidget_7)
 
         self.verticalLayout_13.addWidget(self.splitter_local)
 
@@ -1037,6 +1425,7 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
 
         self.tabs.setCurrentIndex(0)
+        self.btn_0.setDefault(False)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -1300,12 +1689,49 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(accessibility)
         self.text_browser_local.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)", None))
 #endif // QT_CONFIG(accessibility)
-#if QT_CONFIG(accessibility)
-        self.text_browser_viz.setAccessibleName(QCoreApplication.translate("MainWindow", u"Additional Patch Notes Display", None))
-#endif // QT_CONFIG(accessibility)
-#if QT_CONFIG(accessibility)
-        self.text_browser_viz.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)", None))
-#endif // QT_CONFIG(accessibility)
+        self.page_label.setText("")
+        self.btn_next_page.setText(QCoreApplication.translate("MainWindow", u"Next Page ->", None))
+        self.btn_prev_page.setText(QCoreApplication.translate("MainWindow", u"<- Prev. Page", None))
+        self.btn_0.setText("")
+        self.btn_8.setText("")
+        self.btn_16.setText("")
+        self.btn_24.setText("")
+        self.btn_32.setText("")
+        self.btn_1.setText("")
+        self.btn_9.setText("")
+        self.btn_17.setText("")
+        self.btn_25.setText("")
+        self.btn_33.setText("")
+        self.btn_2.setText("")
+        self.btn_10.setText("")
+        self.btn_18.setText("")
+        self.btn_26.setText("")
+        self.btn_34.setText("")
+        self.btn_3.setText("")
+        self.btn_11.setText("")
+        self.btn_19.setText("")
+        self.btn_27.setText("")
+        self.btn_35.setText("")
+        self.btn_4.setText("")
+        self.btn_12.setText("")
+        self.btn_20.setText("")
+        self.btn_28.setText("")
+        self.btn_36.setText("")
+        self.btn_5.setText("")
+        self.btn_13.setText("")
+        self.btn_21.setText("")
+        self.btn_29.setText("")
+        self.btn_37.setText("")
+        self.btn_6.setText("")
+        self.btn_14.setText("")
+        self.btn_22.setText("")
+        self.btn_30.setText("")
+        self.btn_38.setText("")
+        self.btn_7.setText("")
+        self.btn_15.setText("")
+        self.btn_23.setText("")
+        self.btn_31.setText("")
+        self.btn_39.setText("")
         self.tabs.setTabText(self.tabs.indexOf(self.tab_ls), QCoreApplication.translate("MainWindow", u"Local Storage View", None))
 #if QT_CONFIG(tooltip)
         self.tabs.setTabToolTip(self.tabs.indexOf(self.tab_ls), QCoreApplication.translate("MainWindow", u"Switch to your locally saved patches", None))

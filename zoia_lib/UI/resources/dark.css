@@ -1,3 +1,8 @@
+QLabel {
+    color: #FFF;
+    background-color: #5e616e;
+}
+
 QTabBar::tab:selected {
     background-color: #444851;
     border-bottom: 0;

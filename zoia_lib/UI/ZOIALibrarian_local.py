@@ -57,10 +57,17 @@ class ZOIALibrarianLocal(QMainWindow):
         self.prev_tag_cat = None
         self.prev_search = ""
         self.local_selected = None
+        self.curr_page_viz = 0
+        self.curr_viz = None
 
         # Thread
         self.worker_updates = UpdatesWorker()
         self.worker_updates.signal.connect(self.update_local_patches_done)
+
+        # Disable the viz buttons
+        self.ui.btn_next_page.setEnabled(False)
+        self.ui.btn_prev_page.setEnabled(False)
+        self.viz_disable()
 
     def create_expt_and_del_btns(self, btn, i, idx, ver):
         """ Creates the export and delete buttons that are displayed on
@@ -316,7 +323,7 @@ class ZOIALibrarianLocal(QMainWindow):
         if self.sender().objectName() == "back_btn_local":
             self.ui.searchbar_local.setText(self.prev_search)
             self.ui.text_browser_local.setText("")
-            self.ui.text_browser_viz.setText("")
+            self.ui.page_label.setText("")
             self.ui.back_btn_local.setEnabled(False)
             self.ui.update_patch_notes.setEnabled(False)
         elif self.sender().objectName() == "back_btn_bank":
@@ -420,6 +427,164 @@ class ZOIALibrarianLocal(QMainWindow):
                 return
             except IndexError:
                 return
+
+    def setup_viz(self, viz):
+        """
+
+        viz:
+        """
+
+        self.ui.btn_next_page.setEnabled(True)
+        self.ui.btn_prev_page.setEnabled(False)
+
+        self.curr_page_viz = 0
+        self.curr_viz = viz
+
+        self.ui.page_label.setText("<html><b>" + viz["name"] + "</b>  Page "
+                                   + str(self.curr_page_viz) + "</html>")
+
+        # Set the colors of the buttons
+        self.set_viz()
+
+    def viz_page(self):
+        """
+        """
+
+        if self.sender().objectName() == "btn_prev_page":
+            self.curr_page_viz -= 1
+        else:
+            self.curr_page_viz += 1
+
+        self.ui.btn_prev_page.setEnabled(not self.curr_page_viz == 0)
+
+        self.set_viz()
+
+        self.ui.page_label.setText("<html><b>" + self.curr_viz["name"]
+                                   + "</b>  Page " + str(self.curr_page_viz)
+                                   + "</html>")
+
+    def viz_display(self):
+        """
+        """
+
+        btn_num = int(self.sender().objectName().split("_")[-1])
+        for curr_module in self.curr_viz["modules"]:
+            if curr_module["page"] == self.curr_page_viz and \
+                    curr_module["position"] == btn_num:
+                # Display the module info
+                if curr_module["new_color"] == "":
+                    color = curr_module["old_color"]
+                else:
+                    color = curr_module["new_color"]
+                self.ui.text_browser_viz.setText(
+                    "<html><b><h2>" + curr_module["type"] + "</b></h2>"
+                    + "<u>Color:</u> " + color + "<br/><u>"
+                    + "Options 1:</u> " + str(curr_module["options_1"])
+                    + "<br/><u>Options 2:</u> " + str(curr_module["options_2"])
+                )
+
+    def set_viz(self):
+        """
+        """
+
+        # Reset the buttons.
+        self.viz_disable()
+
+        for curr_module in self.curr_viz["modules"]:
+            if curr_module["page"] == self.curr_page_viz:
+                curr_btn = self._get_btn(curr_module["position"])
+                try:
+                    color_hex = self._get_color_hex(curr_module["new_color"])
+                except KeyError:
+                    color_hex = self._get_color_hex(curr_module["old_color"])
+                curr_btn.setStyleSheet("QPushButton{background-color:"
+                                       + color_hex + ";"
+                                       + "border: 1px solid #696969;}"
+                                       + "QPushButton:hover{"
+                                       + "border: 5px solid #000000;}")
+
+                curr_btn.setEnabled(True)
+
+    def viz_disable(self):
+        """
+        """
+        
+        for i in range(40):
+            curr_btn = self._get_btn(i)
+            curr_btn.setEnabled(False)
+            curr_btn.setStyleSheet("border: 1px solid #696969;"
+                                   "background-color: gray;")
+
+    def _get_color_hex(self, color):
+        """
+        """
+
+        return {
+            "Blue": "#0000FF",
+            "Green": "#00FF00",
+            "Red": "#FF0000",
+            "Yellow": "#FFFF00",
+            "Aqua": "#00FFFF",
+            "Magenta": "#FF00FF",
+            "White": "#FFFFFF",
+            "Orange": "#FFA500",
+            "Lima": "#BFFF00",
+            "Surf": "#3627F6",
+            "Sky": "#87CEEB",
+            "Purple": "#A020F0",
+            "Pink": "#FF007F",
+            "Peach": "#FFE5B4",
+            "Mango": "#FF8243"
+        }[color]
+
+    def _get_btn(self, index):
+        """
+
+        index:
+        """
+
+        return {
+            0: self.ui.btn_0,
+            1: self.ui.btn_1,
+            2: self.ui.btn_2,
+            3: self.ui.btn_3,
+            4: self.ui.btn_4,
+            5: self.ui.btn_5,
+            6: self.ui.btn_6,
+            7: self.ui.btn_7,
+            8: self.ui.btn_8,
+            9: self.ui.btn_9,
+            10: self.ui.btn_10,
+            11: self.ui.btn_11,
+            12: self.ui.btn_12,
+            13: self.ui.btn_13,
+            14: self.ui.btn_14,
+            15: self.ui.btn_15,
+            16: self.ui.btn_16,
+            17: self.ui.btn_17,
+            18: self.ui.btn_18,
+            19: self.ui.btn_19,
+            20: self.ui.btn_20,
+            21: self.ui.btn_21,
+            22: self.ui.btn_22,
+            23: self.ui.btn_23,
+            24: self.ui.btn_24,
+            25: self.ui.btn_25,
+            26: self.ui.btn_26,
+            27: self.ui.btn_27,
+            28: self.ui.btn_28,
+            29: self.ui.btn_29,
+            30: self.ui.btn_30,
+            31: self.ui.btn_31,
+            32: self.ui.btn_32,
+            33: self.ui.btn_33,
+            34: self.ui.btn_34,
+            35: self.ui.btn_35,
+            36: self.ui.btn_36,
+            37: self.ui.btn_37,
+            38: self.ui.btn_38,
+            39: self.ui.btn_39,
+        }[index]
 
     def get_data_local(self):
         """ Gets the data for the patches in the Local Storage View tab
