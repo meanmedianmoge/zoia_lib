@@ -49,32 +49,43 @@ class ZOIALibrarianPS(QMainWindow):
         """ Retrieves all PS metadata via API calls.
         """
 
-        # Check for metadata in the user's backend.
-        if "data.json" not in os.listdir(self.path):
-            ps_data = self.api.get_all_patch_data_init()
-        else:
-            # Got previous metadata, need to ensure that there are no
-            # new patches.
-            with open(os.path.join(self.path, "data.json"),
-                      "r") as f:
-                data = json.loads(f.read())
-            if len(data) == self.api.patch_count:
-                # Assume no new patches; allow the user to refresh manually.
-                self.data_PS = data
-                return
-            elif len(data) > self.api.patch_count:
-                # Uh oh, some patches got deleted on PatchStorage.
+        try:
+            # Check for metadata in the user's backend.
+            if "data.json" not in os.listdir(self.path):
                 ps_data = self.api.get_all_patch_data_init()
             else:
-                # Get the new patch metadata that we don't have.
-                new_patches = self.api.get_newest_patches(len(data))
-                ps_data = new_patches + data
+                # Got previous metadata, need to ensure that there are no
+                # new patches.
+                with open(os.path.join(self.path, "data.json"),
+                          "r") as f:
+                    data = json.loads(f.read())
+                if len(data) == self.api.patch_count:
+                    # Assume no new patches; allow the user to refresh manually.
+                    self.data_PS = data
+                    return
+                elif len(data) > self.api.patch_count:
+                    # Uh oh, some patches got deleted on PatchStorage.
+                    ps_data = self.api.get_all_patch_data_init()
+                else:
+                    # Get the new patch metadata that we don't have.
+                    new_patches = self.api.get_newest_patches(len(data))
+                    ps_data = new_patches + data
 
-        # Create/update the data file with the new data.
-        with open(os.path.join(self.path, "data.json"),
-                  "w") as f:
-            f.write(json.dumps(ps_data))
-            self.data_PS = ps_data
+            # Create/update the data file with the new data.
+            with open(os.path.join(self.path, "data.json"),
+                      "w") as f:
+                f.write(json.dumps(ps_data))
+                self.data_PS = ps_data
+        except:
+            self.msg.setWindowTitle("No Internet Connection")
+            self.msg.setIcon(QMessageBox.Information)
+            self.msg.setText("Failed to retrieve patches from PatchStorage.\n"
+                             "Please check your internet connection and try"
+                             "again.")
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+            self.msg.setInformativeText(None)
+            self.ui.tabs.setCurrentIndex(2)
 
     def reload_ps_thread(self):
         """ Initializes a Worker thread to manage the refreshing of
@@ -124,6 +135,7 @@ class ZOIALibrarianPS(QMainWindow):
     def download_all_progress(self, i):
         """ Progress update provided by the worker to display how
         many patches have been downloaded.
+
         i: The current patch that is being downloaded.
         """
 
@@ -135,6 +147,9 @@ class ZOIALibrarianPS(QMainWindow):
         """ Notifies the user once all PatchStorage patches have been
         downloaded. Will also notify the user with the number of
         patches that failed to download and explain why they failed.
+
+        cnt: The count of patches that downloaded successfully.
+        fails: The count of patches that failed to download.
         """
 
         self.msg.setWindowTitle("Download Complete")
@@ -159,8 +174,9 @@ class ZOIALibrarianPS(QMainWindow):
         download completes, it will be saved to the backend application
         directory.
         Currently, only patches uploaded as .bin or .zip files will
-        successfully download. Support for additional file formats will
-        be implemented in subsequent releases.
+        successfully download. .rar files can be downloaded if a user
+        has WinRAR installed. Further compression methods can be added
+        if users begin to use them on PatchStorage.
         """
 
         self.ui.statusbar.showMessage("Starting download...",
@@ -183,12 +199,22 @@ class ZOIALibrarianPS(QMainWindow):
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
             self.msg.setInformativeText(None)
+        except:
+            self.msg.setWindowTitle("No Internet Connection")
+            self.msg.setIcon(QMessageBox.Information)
+            self.msg.setText("Failed to retrieve patches from PatchStorage.\n"
+                             "Please check your internet connection and try "
+                             "again.")
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+            self.msg.setInformativeText(None)
 
     def create_dwn_btn(self, i, idx):
         """ Creates a download button for patches on the PatchStorage
         tab.
 
         i: The row for which the button will be inserted into.
+        idx: The id for the patch the button is being created for.
         """
 
         # Prepare the button.
@@ -204,6 +230,8 @@ class ZOIALibrarianPS(QMainWindow):
 
     def get_data_ps(self):
         """ Getter method to get PS table data.
+
+        return: The PatchStorage data as a list.
         """
 
         return self.data_PS
@@ -241,23 +269,33 @@ class DownloadAllWorker(QThread):
         on to the next patch until it has exhausted the list.
         """
 
-        self.fails = 0
-        self.cnt = 0
+        try:
+            self.fails = 0
+            self.cnt = 0
 
-        for i in range(self.ui.table_PS.rowCount()):
-            btn = self.ui.table_PS.cellWidget(i, 4)
-            if btn.isEnabled():
-                # Try to download the patch.
-                try:
-                    self.save.save_to_backend(self.api.download(
-                        btn.objectName()))
-                    btn.setEnabled(False)
-                    btn.setText("Downloaded!")
-                    self.cnt += 1
-                except errors.SavingError:
-                    self.fails += 1
-                self.signal_2.emit(i)
-        self.signal.emit(self.cnt, self.fails)
+            for i in range(self.ui.table_PS.rowCount()):
+                btn = self.ui.table_PS.cellWidget(i, 4)
+                if btn.isEnabled():
+                    # Try to download the patch.
+                    try:
+                        self.save.save_to_backend(self.api.download(
+                            btn.objectName()))
+                        btn.setEnabled(False)
+                        btn.setText("Downloaded!")
+                        self.cnt += 1
+                    except errors.SavingError:
+                        self.fails += 1
+                    self.signal_2.emit(i)
+            self.signal.emit(self.cnt, self.fails)
+        except:
+            self.msg.setWindowTitle("No Internet Connection")
+            self.msg.setIcon(QMessageBox.Information)
+            self.msg.setText("Failed to download patches from PatchStorage.\n"
+                             "Please check your internet connection and try"
+                             "again.")
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+            self.msg.setInformativeText(None)
 
 
 class ReloadPSWorker(QThread):
@@ -285,7 +323,16 @@ class ReloadPSWorker(QThread):
         PatchStorage. This method will ignore failures and continue
         on to the next patch until it has exhausted the list.
         """
-
-        with open(os.path.join(self.path, "data.json"), "w") as f:
-            f.write(json.dumps(self.api.get_all_patch_data_init()))
-        self.signal.emit()
+        try:
+            with open(os.path.join(self.path, "data.json"), "w") as f:
+                f.write(json.dumps(self.api.get_all_patch_data_init()))
+            self.signal.emit()
+        except:
+            self.msg.setWindowTitle("No Internet Connection")
+            self.msg.setIcon(QMessageBox.Information)
+            self.msg.setText("Failed to download the patch from "
+                             "PatchStorage.\nPlease check your internet "
+                             "connection and try again.")
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+            self.msg.setInformativeText(None)

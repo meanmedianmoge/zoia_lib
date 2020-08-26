@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import platform
 import shutil
 import zipfile
 
@@ -284,9 +285,11 @@ class PatchSave(Patch):
             if patch_name[1] == ":":
                 patch_name = patch_name.split(":")[-1]
             ext = "bin"
-        patch_name = patch_name.split(os.path.sep)[-1]
         # PySide2 bug where the path separator is incorrect on Windows :')
-        patch_name = patch_name.split("/")[-1]
+        if platform.system().lower() == "windows":
+            patch_name = patch_name.split("/")[-1]
+        else:
+            patch_name = patch_name.split(os.path.sep)[-1]
 
         title = patch_name
 

@@ -68,6 +68,7 @@ class ZOIALibrarianUtil:
             self.ui.table_bank_local.setFont(new_font)
             self.ui.table_bank_local.horizontalHeader().setFont(new_font)
             self.ui.table_bank_left.setFont(new_font)
+            self.ui.text_browser_viz.setFont(new_font)
             self.ui.table_bank_left.horizontalHeader().setFont(new_font)
             self.ui.table_bank_left.verticalHeader().setFont(new_font)
             self.ui.table_bank_right.setFont(new_font)
@@ -171,7 +172,9 @@ class ZOIALibrarianUtil:
             "col_4": self.ui.table_local.columnWidth(4),
             "col_5": self.ui.table_local.columnWidth(5),
             "split_left": self.ui.splitter_local.sizes()[0],
-            "split_right": self.ui.splitter_local.sizes()[1]
+            "split_right": self.ui.splitter_local.sizes()[1],
+            "split_top": self.ui.splitter_local_hori.sizes()[0],
+            "split_bottom": self.ui.splitter_local_hori.sizes()[1]
         }
         sd_sizes = {
             "col_0": self.ui.table_sd_left.columnWidth(0),

@@ -36,7 +36,10 @@ class PatchStorage:
         # Set defaults for query params
         self.url = 'https://patchstorage.com/api/alpha/'
         self.platform = 3003  # ZOIA
-        self.patch_count = self._determine_patch_count()
+        try:
+            self.patch_count = self._determine_patch_count()
+        except:
+            pass
 
     def search(self, more_params=None):
         """ Make a query to the PS API.
@@ -147,6 +150,7 @@ class PatchStorage:
         }
 
         all_patches = []
+
         for page in range(1, math.ceil(self.patch_count / per_page) + 1):
             # Get all the patches on the current page.
             all_patches.extend(self.search({**search, **{'page': page}}))

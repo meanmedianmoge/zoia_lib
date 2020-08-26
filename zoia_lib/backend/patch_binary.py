@@ -48,7 +48,9 @@ class PatchBinary(Patch):
             name = str(pch_data[4:]).split("\\")[0].split("\'")[1]
         except IndexError:
             name = str(pch_data[4:]).split("\\")[0]
-        data = struct.unpack('i'*int(len(pch_data) / 4), pch_data)
+        data = struct.unpack('i' * int(len(pch_data) / 4), pch_data)
+
+        name = name.split("b\"")[-1]
 
         temp = [i for i, e in enumerate(data) if e != 0]
         last_color = temp[-1] + 1
@@ -68,6 +70,7 @@ class PatchBinary(Patch):
         for i in range(int(data[5])):
             size = data[curr_step]
             curr_module = {
+                "size": int(size),
                 "type": self._get_module_type(data[curr_step + 1]),
                 "page": int(data[curr_step + 3]),
                 "position": int(data[curr_step + 5]),
@@ -79,23 +82,24 @@ class PatchBinary(Patch):
             }
             modules.append(curr_module)
             curr_step += size
-        pch_viz = ""
-        pch_viz += "<br/>Connection count: {}".format(data[curr_step])
+
+        connections = []
+
         for j in range(data[curr_step]):
-            pch_viz += "<br/>&ensp;Connection #{}".format(j)
-            pch_viz += "<br/>&emsp;{}.{} -> {}.{} {}%".format(
-                data[curr_step + 1], data[curr_step + 2],
-                data[curr_step + 3], data[curr_step + 4],
-                int(data[curr_step + 5] / 100))
+            curr_connection = {
+                "source": int(data[curr_step + 1]),
+                "output": int(data[curr_step + 2]),
+                "destination": int(data[curr_step + 3]),
+                "input": int(data[curr_step + 4]),
+                "strength": int(data[curr_step + 5] / 100)
+            }
+            connections.append(curr_connection)
             curr_step += 5
-        pch_viz += "<br/><b>Number of pages</b> = {}".format(
-            data[curr_step + 1])
-        pch_viz += "</html>"
-        print(pch_viz)
 
         json_bin = {
             "name": name,
-            "modules": modules
+            "modules": modules,
+            "connections": connections
         }
 
         return json_bin

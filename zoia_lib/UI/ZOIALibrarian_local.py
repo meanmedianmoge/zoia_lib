@@ -326,6 +326,9 @@ class ZOIALibrarianLocal(QMainWindow):
             self.ui.page_label.setText("")
             self.ui.back_btn_local.setEnabled(False)
             self.ui.update_patch_notes.setEnabled(False)
+            self.ui.btn_prev_page.setEnabled(False)
+            self.ui.btn_next_page.setEnabled(False)
+            self.viz_disable()
         elif self.sender().objectName() == "back_btn_bank":
             self.ui.searchbar_bank.setText(self.prev_search)
             self.ui.text_browser_bank.setText("")
@@ -429,14 +432,17 @@ class ZOIALibrarianLocal(QMainWindow):
                 return
 
     def setup_viz(self, viz):
-        """
+        """ Prepares the patch visualizer once a patch has been
+        selected.
+        Currently triggered via a button press.
 
-        viz:
+        viz: The parsed binary data that will be used in the visualizer.
         """
 
         self.ui.btn_next_page.setEnabled(True)
         self.ui.btn_prev_page.setEnabled(False)
 
+        # Save the data for future method calls.
         self.curr_page_viz = 0
         self.curr_viz = viz
 
@@ -447,8 +453,12 @@ class ZOIALibrarianLocal(QMainWindow):
         self.set_viz()
 
     def viz_page(self):
+        """ Either increases or decreases the current visualizer page,
+        depending on which button was pressed.
+        Currently triggered via a button press.
         """
-        """
+
+        self.ui.text_browser_viz.setText("")
 
         if self.sender().objectName() == "btn_prev_page":
             self.curr_page_viz -= 1
@@ -464,7 +474,9 @@ class ZOIALibrarianLocal(QMainWindow):
                                    + "</html>")
 
     def viz_display(self):
-        """
+        """ Displays additional information about a module that appears
+        on the visualizer.
+        Currently triggered via a button press.
         """
 
         btn_num = int(self.sender().objectName().split("_")[-1])
@@ -484,7 +496,7 @@ class ZOIALibrarianLocal(QMainWindow):
                 )
 
     def set_viz(self):
-        """
+        """ Sets the visualizer for the current page of the patch.
         """
 
         # Reset the buttons.
@@ -506,17 +518,21 @@ class ZOIALibrarianLocal(QMainWindow):
                 curr_btn.setEnabled(True)
 
     def viz_disable(self):
+        """ Disables all internal visualizer buttons.
         """
-        """
-        
+
         for i in range(40):
             curr_btn = self._get_btn(i)
             curr_btn.setEnabled(False)
             curr_btn.setStyleSheet("border: 1px solid #696969;"
                                    "background-color: gray;")
 
-    def _get_color_hex(self, color):
-        """
+    @staticmethod
+    def _get_color_hex(color):
+        """ Lookup table to get the correct hex value for a given color.
+
+        color: The color for which the hex value is being looked up.
+        return: The correct hex value for the color as a string.
         """
 
         return {
@@ -538,9 +554,10 @@ class ZOIALibrarianLocal(QMainWindow):
         }[color]
 
     def _get_btn(self, index):
-        """
+        """ Lookup table to get the correct UI button for the visualizer
 
-        index:
+        index: The index that corresponds to the UI button.
+        return:
         """
 
         return {

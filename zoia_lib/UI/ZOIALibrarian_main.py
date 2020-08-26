@@ -2,7 +2,8 @@ import json
 import os
 from os.path import expanduser
 
-from PySide2.QtCore import QEvent, Qt
+from PySide2 import QtCore
+from PySide2.QtCore import QEvent, Qt, QThread
 from PySide2.QtGui import QIcon, QFont
 from PySide2.QtWidgets import QMainWindow, QMessageBox, \
     QTableWidgetItem, QRadioButton, QDesktopWidget, QFileDialog
@@ -94,6 +95,17 @@ class ZOIALibrarianMain(QMainWindow):
         self.bank_sizes = None
         self.font = None
         self.local_pch_count = -1
+
+        # Threads
+        self.worker_mass = ImportMassWorker(self)
+        self.worker_mass.signal.connect(self.mass_import_done)
+        self.worker_mass_sd = ImportMassSDWorker(self)
+        self.worker_mass_sd.signal.connect(self.mass_import_done)
+
+        self.worker_version = ImportVersionWorker(self)
+        self.worker_version.signal.connect(self.version_import_done)
+        self.worker_version_sd = ImportVersionSDWorker(self)
+        self.worker_version_sd.signal.connect(self.version_import_done)
 
         # Get the data necessary for the PS tab.
         self.ps.metadata_init()
@@ -203,7 +215,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.actionSpecify_SD_Card_Location.triggered.connect(
             lambda: self.sd.sd_path(False, self.width()))
         self.ui.actionImport_Multiple_Patches.triggered.connect(
-            self.mass_import)
+            self.mass_import_thread)
         self.ui.actionFont.triggered.connect(
             lambda: self.util.change_font(""))
         self.ui.actionIncrease_Font_Size.triggered.connect(
@@ -214,7 +226,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.check_for_updates_btn.clicked.connect(
             self.local.update_local_patches_thread)
         self.ui.actionImport_Version_History_directory.triggered.connect(
-            self.version_import)
+            self.version_import_thread)
         self.ui.refresh_pch_btn.clicked.connect(self.ps.reload_ps_thread)
         self.ui.update_patch_notes.clicked.connect(
             self.local.update_patch_notes)
@@ -232,8 +244,9 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.searchbar_local.installEventFilter(self)
         self.ui.searchbar_bank.installEventFilter(self)
         self.ui.sd_tree.clicked.connect(self.sd.prepare_sd_view)
-        self.ui.import_all_btn.clicked.connect(self.mass_import)
-        self.ui.import_all_ver_btn.clicked.connect(self.version_import)
+        self.ui.import_all_btn.clicked.connect(self.mass_import_thread_sd)
+        self.ui.import_all_ver_btn.clicked.connect(
+            self.version_import_thread_sd)
         self.ui.back_btn_local.clicked.connect(self.local.go_back)
         self.ui.back_btn_bank.clicked.connect(self.local.go_back)
         self.ui.btn_load_bank.clicked.connect(self.bank.load_bank)
@@ -306,9 +319,18 @@ class ZOIALibrarianMain(QMainWindow):
         if self.local_sizes is None:
             self.ui.splitter_local.setSizes([self.width() * 0.325,
                                              self.width() * 0.675])
+            self.ui.splitter_local_hori.setSizes([self.width() * 0.5,
+                                                  self.width() * 0.5])
         else:
             self.ui.splitter_local.setSizes([self.local_sizes["split_left"],
                                              self.local_sizes["split_right"]])
+            try:
+                self.ui.splitter_local_hori.setSizes(
+                    [self.local_sizes["split_top"],
+                     self.local_sizes["split_bottom"]])
+            except KeyError:
+                self.ui.splitter_local_hori.setSizes([self.width() * 0.5,
+                                                      self.width() * 0.5])
         if self.sd_sizes is None:
             self.ui.splitter_sd_hori.setSizes([self.width() * 0.5,
                                                self.width() * 0.5])
@@ -383,6 +405,10 @@ class ZOIALibrarianMain(QMainWindow):
                 self.msg.setInformativeText(None)
                 self.sd.sd_path(False, self.width())
                 self.ui.tabs.setCurrentIndex(1)
+        elif self.ui.tabs.currentIndex() == 0 \
+            and self.ui.table_PS.rowCount() == 1:
+            self.ps.metadata_init()
+            self.sort_and_set()
 
     def set_data(self, search=False, version=False):
         """ Sets the data for the various patch tables. This is done
@@ -605,10 +631,21 @@ class ZOIALibrarianMain(QMainWindow):
                         skip = True
                         break
                 if content is None:
-                    # Didn't find it, need to query.
-                    content = api.get_patch_meta(name)
-                    # Add it to the cache for next time.
-                    self.patch_cache.append(content)
+                    try:
+                        # Didn't find it, need to query.
+                        content = api.get_patch_meta(name)
+                        # Add it to the cache for next time.
+                        self.patch_cache.append(content)
+                    except:
+                        self.msg.setWindowTitle("No Internet Connection")
+                        self.msg.setIcon(QMessageBox.Information)
+                        self.msg.setText(
+                            "Failed to retrieve the patch metadata "
+                            "from PatchStorage.\nPlease check your internet "
+                            "connection and try again.")
+                        self.msg.setStandardButtons(QMessageBox.Ok)
+                        self.msg.exec_()
+                        self.msg.setInformativeText(None)
             else:
                 viz_browser = None
                 if self.ui.tabs.currentIndex() == 1:
@@ -688,6 +725,9 @@ class ZOIALibrarianMain(QMainWindow):
             self.ui.searchbar_local.setText("")
             self.ui.update_patch_notes.setEnabled(False)
             self.ui.back_btn_local.setEnabled(True)
+            self.ui.btn_prev_page.setEnabled(False)
+            self.ui.btn_next_page.setEnabled(False)
+            self.local.viz_disable()
             # Prepare the table.
             self.local.get_version_patches(True, self.sender().objectName())
         else:
@@ -917,30 +957,25 @@ class ZOIALibrarianMain(QMainWindow):
             return
         return input_dir
 
-    def mass_import(self):
-        """ Attempts to mass import any patches found within a target
-        directory. Unlike import_patch, failing to import a patch will
-        not create a message box. A message box will be displayed at the
-        end indicating how many patches were and were not imported.
-        Currently triggered via a button press or a menu action.
+    def mass_import_thread(self):
+        """ Initializes a Worker thread to manage the importing of
+        patches as individual patches into the backend.
+        Currently triggered via a menu action.
         """
 
-        imp_cnt = 0
-        fail_cnt = 0
-        if self.sender() is not None and self.sender().objectName() == \
-                "actionImport_Multiple_Patches":
-            input_dir = self.directory_select()
-        else:
-            input_dir = self.sd.get_sd_path()
-        for pch in os.listdir(input_dir):
-            if pch.split(".")[1] == "bin":
-                # At this point we have done everything to ensure it's a
-                # ZOIA patch, save for binary analysis.
-                try:
-                    save.import_to_backend(os.path.join(input_dir, pch))
-                    imp_cnt += 1
-                except errors.SavingError:
-                    fail_cnt += 1
+        self.worker_mass.start()
+
+    def mass_import_thread_sd(self):
+        """ Initializes a Worker thread to manage the importing of
+        patches as individual patches into the backend.
+        Currently triggered via a menu action.
+        """
+
+        self.worker_mass_sd.start()
+
+    def mass_import_done(self, imp_cnt, fail_cnt):
+        """
+        """
 
         self.msg.setWindowTitle("Import Complete")
         self.msg.setIcon(QMessageBox.Information)
@@ -959,17 +994,26 @@ class ZOIALibrarianMain(QMainWindow):
         self.msg.setInformativeText(None)
         self.local.get_local_patches()
 
-    def version_import(self):
-        """ Attempts to import a directory of patches as a version
-        history within the application. Should any non-bin files be
-        encountered, they will simply be ignored.
-        Currently triggered via a button press or a menu action.
+    def version_import_thread(self):
+        """ Initializes a Worker thread to manage the importing of
+        patches as a version directory into the backend.
+        Currently triggered via a menu action.
         """
-        if self.sender().objectName() != "import_all_ver_btn":
-            input_dir = self.directory_select()
-        else:
-            input_dir = self.sd.get_sd_path()
-        fails = save.import_to_backend(input_dir, True)
+
+        self.worker_version.start()
+
+    def version_import_thread_sd(self):
+        """ Initializes a Worker thread to manage the importing of
+        patches as a version directory into the backend.
+        Currently triggered via a menu action.
+        """
+
+        self.worker_version_sd.start()
+
+    def version_import_done(self, fails):
+        """
+        """
+
         if fails == 0:
             self.msg.setWindowTitle("Success")
             self.msg.setText("Successfully created a Version History.")
@@ -1054,3 +1098,143 @@ class ZOIALibrarianMain(QMainWindow):
         # Save application settings and then exit.
         self.closeEvent(None)
         self.close()
+
+
+class ImportMassSDWorker(QThread):
+    """ The ImportMassSDWorker class runs as a separate thread in the
+    application to prevent application snag. This thread will attempt
+    to import specified binary files into the backend as individual
+    patches that reside on an SD card.
+    """
+
+    # UI communication
+    signal = QtCore.Signal(int, int)
+
+    def __init__(self, window):
+        """ Initializes the thread.
+        """
+
+        QThread.__init__(self)
+        self.window = window
+
+    def run(self):
+        """ Attempts to mass import any patches found within a target
+        directory. Unlike import_patch, failing to import a patch will
+        not create a message box. A message box will be displayed at the
+        end indicating how many patches were and were not imported.
+        Currently triggered via a button press or a menu action.
+        """
+
+        imp_cnt = 0
+        fail_cnt = 0
+
+        input_dir = self.window.sd.get_sd_path()
+
+        for pch in os.listdir(input_dir):
+            if pch.split(".")[1] == "bin":
+                # Try to save the binary.
+                try:
+                    save.import_to_backend(os.path.join(input_dir, pch))
+                    imp_cnt += 1
+                except errors.SavingError:
+                    fail_cnt += 1
+
+        self.signal.emit(imp_cnt, fail_cnt)
+
+
+class ImportMassWorker(QThread):
+    """ The ImportMassWorker class runs as a separate thread in the
+    application to prevent application snag. This thread will attempt
+    to import specified binary files into the backend as individual
+    patches.
+    """
+
+    # UI communication
+    signal = QtCore.Signal(int, int)
+
+    def __init__(self, window):
+        """ Initializes the thread.
+        """
+
+        QThread.__init__(self)
+        self.window = window
+
+    def run(self):
+        """ Attempts to mass import any patches found within a target
+        directory. Unlike import_patch, failing to import a patch will
+        not create a message box. A message box will be displayed at the
+        end indicating how many patches were and were not imported.
+        Currently triggered via a button press or a menu action.
+        """
+
+        imp_cnt = 0
+        fail_cnt = 0
+
+        input_dir = self.window.directory_select()
+
+        for pch in os.listdir(input_dir):
+            if pch.split(".")[1] == "bin":
+                # Try to save the binary.
+                try:
+                    save.import_to_backend(os.path.join(input_dir, pch))
+                    imp_cnt += 1
+                except errors.SavingError:
+                    fail_cnt += 1
+
+        self.signal.emit(imp_cnt, fail_cnt)
+
+
+class ImportVersionWorker(QThread):
+    """ The ImportVersionWorker class runs as a separate thread in the
+    application to prevent application snag. This thread will attempt
+    to import specified binary files into the backend as a version
+    history.
+    """
+
+    # UI communication
+    signal = QtCore.Signal(int)
+
+    def __init__(self, window):
+        """ Initializes the thread.
+        """
+
+        QThread.__init__(self)
+        self.window = window
+
+    def run(self):
+        """ Attempts to import a directory of patches as a version
+        history within the application. Should any non-bin files be
+        encountered, they will simply be ignored.
+        Currently triggered via a button press or a menu action.
+        """
+
+        input_dir = self.window.directory_select()
+        self.signal.emit(save.import_to_backend(input_dir, True))
+
+
+class ImportVersionSDWorker(QThread):
+    """ The ImportVersionSDWorker class runs as a separate thread in the
+    application to prevent application snag. This thread will attempt
+    to import specified binary files into the backend as a version
+    history that are located on an SD card.
+    """
+
+    # UI communication
+    signal = QtCore.Signal(int)
+
+    def __init__(self, window):
+        """ Initializes the thread.
+        """
+
+        QThread.__init__(self)
+        self.window = window
+
+    def run(self):
+        """ Attempts to import a directory of patches as a version
+        history within the application. Should any non-bin files be
+        encountered, they will simply be ignored.
+        Currently triggered via a button press or a menu action.
+        """
+
+        input_dir = self.window.sd.get_sd_path()
+        self.signal.emit(save.import_to_backend(input_dir, True))

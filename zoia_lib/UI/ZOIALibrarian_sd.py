@@ -411,7 +411,6 @@ class ZOIALibrarianSD(QMainWindow):
                 self.rows_left = []
                 self.rows_right = []
 
-
     def remove_sd(self):
         """ Removes a patch that is stored on a user's SD card.
         Currently triggered via a button press.
@@ -428,6 +427,8 @@ class ZOIALibrarianSD(QMainWindow):
     def get_sd_path(self):
         """ Gets the current SD card path.
         Will be None if it has not been determined.
+
+        return: The SD card path as a string.
         """
 
         return self.sd_path_full
@@ -435,6 +436,8 @@ class ZOIALibrarianSD(QMainWindow):
     def get_sd_root(self):
         """ Gets the current SD card root.
         Will be None if it has not been determined.
+
+        return: The SD card root as a string.
         """
 
         return self.sd_root
