@@ -122,6 +122,12 @@ class PatchExport(Patch):
         machine to an SD card.
 
         bank: The bank data to be processed.
+        dest: A string representing the path to the backend destination.
+        name: The name of the bank directory that will be created.
+        overwrite: Optional. This should be set to True when the export
+                   will conflict with a directory that is already in the
+                   dest, but the user has specified that it is okay to
+                   overwrite said file.
 
         return: An array of slot numbers for patches that failed to
                 export.

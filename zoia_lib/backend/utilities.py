@@ -130,6 +130,7 @@ def add_test_patch(name, idx, path):
     name: The name of the patch, to be used for the title attribute
           in the JSON metadata.
     idx: The id number to be used for the patch.
+    path: The path where the test patch will be located.
     """
 
     if os.path.sep in name:

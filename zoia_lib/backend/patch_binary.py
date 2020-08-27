@@ -28,7 +28,9 @@ class PatchBinary(Patch):
             - Old color value
             - New color value
             - Grid position
-            - Number of parameters on the grid
+            - Number of parameters on the grid (deprecated)
+            - Options 1 (needs to be expanded)
+            - Options 2 (needs to be expanded)
         - Connection count
           - For each connection:
             - Connection values and strength (as a %)
@@ -44,14 +46,23 @@ class PatchBinary(Patch):
 
         # Massive credit to apparent1 for figuring this stuff out.
         # They did all the heavy lifting.
+
+        # Extract the string name of the patch.
         try:
             name = str(pch_data[4:]).split("\\")[0].split("\'")[1]
         except IndexError:
             name = str(pch_data[4:]).split("\\")[0]
+
+        # TODO Extract the string names of the pages of the patch.
+
+        # Unpack the binary data.
         data = struct.unpack('i' * int(len(pch_data) / 4), pch_data)
 
+        # Remove the binary identifier it it stuck.
         name = name.split("b\"")[-1]
 
+        # Get a list of colors for the modules
+        # (appears at the end of the binary)
         temp = [i for i, e in enumerate(data) if e != 0]
         last_color = temp[-1] + 1
         first_color = last_color - int(data[5])
@@ -66,6 +77,7 @@ class PatchBinary(Patch):
 
         modules = []
 
+        # Extract the module data for each module in the patch.
         curr_step = 6
         for i in range(int(data[5])):
             size = data[curr_step]
@@ -85,6 +97,7 @@ class PatchBinary(Patch):
 
         connections = []
 
+        # Extract the connection data for each connection in the patch.
         for j in range(data[curr_step]):
             curr_connection = {
                 "source": int(data[curr_step + 1]),
@@ -96,6 +109,7 @@ class PatchBinary(Patch):
             connections.append(curr_connection)
             curr_step += 5
 
+        # Prepare a dict to pass to the frontend.
         json_bin = {
             "name": name,
             "modules": modules,

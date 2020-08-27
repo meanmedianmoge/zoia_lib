@@ -12,12 +12,17 @@ class ZOIALibrarianUtil:
     classes.
     """
 
-    def __init__(self, ui):
+    def __init__(self, ui, window):
         """ Initializes the class with the required parameters.
+
+        ui: The UI component of ZOIALibrarianMain
+        window: A reference to the main UI window for icon consistency.
         """
 
         # Get the ui reference
         self.ui = ui
+        self.window = window
+
         self.dark = True
         self.font = QFont("Verdana", 10)
 
@@ -32,7 +37,7 @@ class ZOIALibrarianUtil:
         # Get the context.
         if name == "":
             # Case 1: Default Change Font menu option.
-            ok, f = QFontDialog.getFont()
+            ok, f = QFontDialog.getFont(self.window)
             start = False
         elif name == "+" or name == "-":
             # Case 2: Increase/Decrease font size menu option.
@@ -91,6 +96,8 @@ class ZOIALibrarianUtil:
                         self.ui.table_local.cellWidget(i, 4).setFont(new_font)
                         self.ui.table_local.cellWidget(i, 5).setFont(new_font)
                 for i in range(32):
+                    # Need trys here in case the table does not have a
+                    # cell widget there yet.
                     try:
                         self.ui.table_sd_left.cellWidget(i, 1).setFont(
                             new_font)
@@ -202,6 +209,7 @@ class ZOIALibrarianUtil:
             "enabled": not self.dark
         }
 
+        # Write the data to pref.json for subsequent launches.
         with open(os.path.join(path, "pref.json"), "w") as f:
             f.write(json.dumps([window, ps_sizes, local_sizes,
                                 sd_sizes, bank_sizes, dark_mode]))
@@ -236,6 +244,7 @@ class ZOIALibrarianUtil:
         Currently triggered via a menu action.
         """
 
+        # Set the property for all tables in the UI.
         self.ui.table_PS.setAlternatingRowColors(
             not self.ui.table_PS.alternatingRowColors())
         self.ui.table_local.setAlternatingRowColors(
@@ -289,6 +298,7 @@ class ZOIALibrarianUtil:
             main_table = table_2
             other_table = table_1
 
+        # Find the first entry for the current set of rows.
         for i in sorted(curr_rows):
             i = i.row()
             i = int('%d' % i)

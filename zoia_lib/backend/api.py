@@ -5,7 +5,6 @@ Author: Mike Moger
 Usage: https://patchstorage.com/docs/
 """
 
-import datetime
 import json
 import math
 import os
@@ -39,9 +38,10 @@ class PatchStorage:
         try:
             self.patch_count = self._determine_patch_count()
         except:
+            # No internet connection.
             pass
 
-    def search(self, more_params=None):
+    def _search(self, more_params=None):
         """ Make a query to the PS API.
         Default args:
             - page (int): current page, default 1
@@ -153,7 +153,7 @@ class PatchStorage:
 
         for page in range(1, math.ceil(self.patch_count / per_page) + 1):
             # Get all the patches on the current page.
-            all_patches.extend(self.search({**search, **{'page': page}}))
+            all_patches.extend(self._search({**search, **{'page': page}}))
 
         return all_patches
 
@@ -168,17 +168,16 @@ class PatchStorage:
         return: An array containing the metadata and binaries for all
                  patches that had been updated.
         """
+
         new_bin = []
 
         for entry in meta:
             idx = str(entry["id"])
-            # Check to see if the patch has been updated by comparing the dates
             curr_meta = self.get_patch_meta(idx)
-            try:
-                if curr_meta["updated_at"] > entry["updated_at"]:
-                    new_bin.append((self.download(idx), curr_meta))
-            except KeyError:
-                continue
+            # Check to see if the patch has been updated by comparing
+            # the dates.
+            if curr_meta["updated_at"] > entry["updated_at"]:
+                new_bin.append((self.download(idx), curr_meta))
 
         return new_bin
 
@@ -193,6 +192,8 @@ class PatchStorage:
         return: A list of patch metadata that was not present in the
                 data.json file.
         """
+
+        # Max on per_page is 100, so we can't go over that.
         per_page = self.patch_count - pch_num
         if per_page > 100:
             per_page = 100
@@ -208,19 +209,22 @@ class PatchStorage:
 
         # Query for each page of patches we need to retrieve.
         if pages == 2:
-            return self.search({**search, **{'page': 1}})
+            return self._search({**search, **{'page': 1}})
         else:
             for i in range(1, pages):
-                new_patches.extend(self.search({**search, **{'page': i}}))
+                new_patches.extend(self._search({**search, **{'page': i}}))
             return new_patches
 
     @staticmethod
     def _determine_patch_count():
         """ Determines the number of ZOIA patches that
         are currently being stored on PS.
+        Does not count questions as patches.
 
         return: An integer representing the total of ZOIA patches.
         """
+
+        # Hi PS, yes we are a normal Firefox browser and not a program.
         soup_patch = BeautifulSoup(urlopen(Request(
             "https://patchstorage.com/", headers={"User-Agent": "Mozilla/5.0"})
         ).read(), "html.parser")
@@ -229,7 +233,7 @@ class PatchStorage:
 
         """ Convert the ResultSet to a string so we can split on what we are 
         looking for. The PS website does not have unique div names, so this
-        is to workaround that. 
+        is to workaround that.
         """
         zoia = unicode.join(u'\n', map(unicode, found_pedals)
                             ).split("ZOIA", 1)[1].split("<strong>", 1)[1]

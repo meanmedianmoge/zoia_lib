@@ -31,15 +31,18 @@ class PatchUpdate(Patch):
               - 3 -> Modify the patch notes
         """
 
+        # Lookup the right term to use.
         index = {
             1: "tags",
             2: "categories",
             3: "content"
         }[mode]
 
+        # Get the patch name and id.
         pch = idx
         idx = idx.split("_")[0]
 
+        # Update the key with the new data.
         with open(os.path.join(self.back_path, idx, "{}.json".format(pch)),
                   "r") as f:
             temp = json.loads(f.read())
@@ -83,11 +86,13 @@ class PatchUpdate(Patch):
                     temp = json.loads(f.read())
             elif os.path.isdir(os.path.join(self.back_path, patch)) \
                     and len(patch) > 5:
+                # Just a single patch in the directory, easy.
                 with open(os.path.join(self.back_path, patch,
                                        "{}.json".format(patch)), "r") as f:
                     temp = json.loads(f.read())
             else:
                 continue
+            # Only need the id and updated_at for comparison purposes.
             meta_small = {
                 "id": temp["id"],
                 "updated_at": temp["updated_at"]
@@ -106,7 +111,7 @@ class PatchUpdate(Patch):
             try:
                 save.save_to_backend(patch[0])
             except errors.SavingError:
-                # TODO If we fail to save, at least update the metadata.
+                # Same binary, but patch notes are different, update those.
                 idx = str(patch[1]["id"])
                 try:
                     with open(os.path.join(self.back_path, idx,
@@ -120,4 +125,5 @@ class PatchUpdate(Patch):
                         pchs.append(patch[1]["title"])
             pchs.append(patch)
 
+        # Pass the number of updates and titles of patches updated.
         return len(pch_list), pchs

@@ -44,6 +44,8 @@ class PatchDelete(Patch):
             os.remove(os.path.join(new_path, patch + ".bin"))
             os.remove(os.path.join(new_path, patch + ".json"))
             if new_path is not None and len(os.listdir(new_path)) == 2:
+                # If there aren't multiple patches left, drop the version
+                # extension on the remaining patch.
                 for left_files in os.listdir(new_path):
                     try:
                         os.rename(os.path.join(new_path, left_files),

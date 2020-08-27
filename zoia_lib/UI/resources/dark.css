@@ -3,6 +3,37 @@ QLabel {
     background-color: #5e616e;
 }
 
+QMessageBox {
+    background-color: #5e616e;
+}
+
+QMenu {
+    border: #5e616e;
+}
+
+QMenu::separator
+{
+    background: #444850;
+}
+
+QMenu::item {
+    background-color: #5e616e;
+    color: #FFF
+}
+
+QMenu::item:selected {
+    background-color: #747788;
+}
+
+QFontDialog {
+    background-color: #5e616e;
+    color: #FFF
+}
+
+QInputDialog {
+    background-color: #5e616e;
+}
+
 QTabBar::tab:selected {
     background-color: #444851;
     border-bottom: 0;

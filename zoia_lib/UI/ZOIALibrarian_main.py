@@ -38,8 +38,10 @@ class ZOIALibrarianMain(QMainWindow):
     following command is run from the UI directory:
         pyside2-uic.exe ZOIALibrarian.ui -o ZOIALibrarian.py
     Known issues:
-     - The code is still a mess.
      - Certain UI elements do not like font changes (headers, tabs, etc).
+     - Deleting items in the banks table will always delete the first entry
+       if the item appears more than once.
+     - The code is a huge mess.
     """
 
     def __init__(self):
@@ -69,7 +71,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.msg.setWindowIcon(self.icon)
 
         # Helper classes init
-        self.util = ZOIALibrarianUtil(self.ui)
+        self.util = ZOIALibrarianUtil(self.ui, self)
         self.sd = ZOIALibrarianSD(self.ui, save, self.msg, delete, self.util)
         self.bank = ZOIALibrarianBank(self.ui, self.path, self.msg, self.util)
         self.ps = ZOIALibrarianPS(self.ui, api, self.path, self.msg, save,
@@ -98,14 +100,14 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Threads
         self.worker_mass = ImportMassWorker(self)
-        self.worker_mass.signal.connect(self.mass_import_done)
+        self.worker_mass.signal.connect(self._mass_import_done)
         self.worker_mass_sd = ImportMassSDWorker(self)
-        self.worker_mass_sd.signal.connect(self.mass_import_done)
+        self.worker_mass_sd.signal.connect(self._mass_import_done)
 
         self.worker_version = ImportVersionWorker(self)
-        self.worker_version.signal.connect(self.version_import_done)
+        self.worker_version.signal.connect(self._version_import_done)
         self.worker_version_sd = ImportVersionSDWorker(self)
-        self.worker_version_sd.signal.connect(self.version_import_done)
+        self.worker_version_sd.signal.connect(self._version_import_done)
 
         # Get the data necessary for the PS tab.
         self.ps.metadata_init()
@@ -182,6 +184,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.util.set_dark(data[5]["enabled"])
 
         else:
+            # No pref.json, use default values.
             self.ui.table_sd_left.setColumnWidth(0, self.width() * 0.4)
             self.ui.table_sd_left.setColumnWidth(1, self.width() * 0.1)
             self.ui.table_sd_right.setColumnWidth(0, self.width() * 0.4)
@@ -215,19 +218,19 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.actionSpecify_SD_Card_Location.triggered.connect(
             lambda: self.sd.sd_path(False, self.width()))
         self.ui.actionImport_Multiple_Patches.triggered.connect(
-            self.mass_import_thread)
+            self._mass_import_thread)
         self.ui.actionFont.triggered.connect(
             lambda: self.util.change_font(""))
         self.ui.actionIncrease_Font_Size.triggered.connect(
             lambda: self.util.change_font("+"))
         self.ui.actionDecrease_Font_Size.triggered.connect(
             lambda: self.util.change_font("-"))
-        self.ui.actionQuit.triggered.connect(self.try_quit)
+        self.ui.actionQuit.triggered.connect(self._try_quit)
         self.ui.check_for_updates_btn.clicked.connect(
             self.local.update_local_patches_thread)
         self.ui.actionImport_Version_History_directory.triggered.connect(
-            self.version_import_thread)
-        self.ui.refresh_pch_btn.clicked.connect(self.ps.reload_ps_thread)
+            self._version_import_thread)
+        self.ui.refresh_pch_btn.clicked.connect(self.ps._reload_ps_thread)
         self.ui.update_patch_notes.clicked.connect(
             self.local.update_patch_notes)
         self.ui.actionImport_A_Patch.triggered.connect(self.import_patch)
@@ -244,9 +247,9 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.searchbar_local.installEventFilter(self)
         self.ui.searchbar_bank.installEventFilter(self)
         self.ui.sd_tree.clicked.connect(self.sd.prepare_sd_view)
-        self.ui.import_all_btn.clicked.connect(self.mass_import_thread_sd)
+        self.ui.import_all_btn.clicked.connect(self._mass_import_thread_sd)
         self.ui.import_all_ver_btn.clicked.connect(
-            self.version_import_thread_sd)
+            self._version_import_thread_sd)
         self.ui.back_btn_local.clicked.connect(self.local.go_back)
         self.ui.back_btn_bank.clicked.connect(self.local.go_back)
         self.ui.btn_load_bank.clicked.connect(self.bank.load_bank)
@@ -257,49 +260,12 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.delete_folder_sd_btn.clicked.connect(self.sd.delete_sd_item)
         self.ui.actionToggle_Dark_Mode_2.triggered.connect(
             self.util.toggle_dark)
-        self.ui.btn_dwn_all.clicked.connect(self.ps.download_all_thread)
+        self.ui.btn_dwn_all.clicked.connect(self.ps._download_all_thread)
         self.ui.btn_next_page.clicked.connect(self.local.viz_page)
         self.ui.btn_prev_page.clicked.connect(self.local.viz_page)
-        self.ui.btn_0.clicked.connect(self.local.viz_display)
-        self.ui.btn_1.clicked.connect(self.local.viz_display)
-        self.ui.btn_2.clicked.connect(self.local.viz_display)
-        self.ui.btn_3.clicked.connect(self.local.viz_display)
-        self.ui.btn_4.clicked.connect(self.local.viz_display)
-        self.ui.btn_5.clicked.connect(self.local.viz_display)
-        self.ui.btn_6.clicked.connect(self.local.viz_display)
-        self.ui.btn_7.clicked.connect(self.local.viz_display)
-        self.ui.btn_8.clicked.connect(self.local.viz_display)
-        self.ui.btn_9.clicked.connect(self.local.viz_display)
-        self.ui.btn_10.clicked.connect(self.local.viz_display)
-        self.ui.btn_11.clicked.connect(self.local.viz_display)
-        self.ui.btn_12.clicked.connect(self.local.viz_display)
-        self.ui.btn_13.clicked.connect(self.local.viz_display)
-        self.ui.btn_14.clicked.connect(self.local.viz_display)
-        self.ui.btn_15.clicked.connect(self.local.viz_display)
-        self.ui.btn_16.clicked.connect(self.local.viz_display)
-        self.ui.btn_17.clicked.connect(self.local.viz_display)
-        self.ui.btn_18.clicked.connect(self.local.viz_display)
-        self.ui.btn_19.clicked.connect(self.local.viz_display)
-        self.ui.btn_20.clicked.connect(self.local.viz_display)
-        self.ui.btn_21.clicked.connect(self.local.viz_display)
-        self.ui.btn_22.clicked.connect(self.local.viz_display)
-        self.ui.btn_23.clicked.connect(self.local.viz_display)
-        self.ui.btn_24.clicked.connect(self.local.viz_display)
-        self.ui.btn_25.clicked.connect(self.local.viz_display)
-        self.ui.btn_26.clicked.connect(self.local.viz_display)
-        self.ui.btn_27.clicked.connect(self.local.viz_display)
-        self.ui.btn_28.clicked.connect(self.local.viz_display)
-        self.ui.btn_29.clicked.connect(self.local.viz_display)
-        self.ui.btn_30.clicked.connect(self.local.viz_display)
-        self.ui.btn_31.clicked.connect(self.local.viz_display)
-        self.ui.btn_32.clicked.connect(self.local.viz_display)
-        self.ui.btn_33.clicked.connect(self.local.viz_display)
-        self.ui.btn_34.clicked.connect(self.local.viz_display)
-        self.ui.btn_35.clicked.connect(self.local.viz_display)
-        self.ui.btn_36.clicked.connect(self.local.viz_display)
-        self.ui.btn_37.clicked.connect(self.local.viz_display)
-        self.ui.btn_38.clicked.connect(self.local.viz_display)
-        self.ui.btn_39.clicked.connect(self.local.viz_display)
+        for i in range(40):
+            btn = self.local.get_btn(i)
+            btn.clicked.connect(self.local.viz_display)
 
         # Set the theme.
         self.util.toggle_dark()
@@ -407,6 +373,11 @@ class ZOIALibrarianMain(QMainWindow):
                 self.ui.tabs.setCurrentIndex(1)
         elif self.ui.tabs.currentIndex() == 0 \
             and self.ui.table_PS.rowCount() == 1:
+            # We started the app with no internet, need to check if there
+            # is a connection now and retry to get the patches.
+            api_2 = PatchStorage()
+            self.ps = ZOIALibrarianPS(self.ui, api_2, self.path, self.msg,
+                                      save, self.sort_and_set)
             self.ps.metadata_init()
             self.sort_and_set()
 
@@ -474,11 +445,14 @@ class ZOIALibrarianMain(QMainWindow):
                         count = 0
                         title += "\n"
                 btn_title.setText(title.rstrip())
+            # Check to see if we are in a version directory.
             if (table_index == 1 and self.ui.back_btn_local.isEnabled()) or \
                     (table_index == 3 and self.ui.back_btn_bank.isEnabled()):
                 btn_title.setObjectName("{}_v{}".format(
                     idx, str(data[i]["revision"])))
                 btn_title.setText(data[i]["files"][0]["filename"])
+            # Check to see if we need to add the version text outside of
+            # a version directory to show you can enter one.
             elif (table_index == 1 and
                   not self.ui.back_btn_local.isEnabled()) \
                     or (table_index == 3 and
@@ -488,6 +462,7 @@ class ZOIALibrarianMain(QMainWindow):
                 btn_title.setObjectName(idx)
             else:
                 btn_title.setObjectName(idx)
+            # Connect the button and insert into the table.
             btn_title.toggled.connect(self.display_patch_info)
             btn_title.setFont(self.ui.table_PS.font())
             curr_table.setCellWidget(i, 0, btn_title)
@@ -512,6 +487,7 @@ class ZOIALibrarianMain(QMainWindow):
 
                 text_item = QTableWidgetItem(text)
                 text_item.setTextAlignment(Qt.AlignCenter)
+                # Can only edit tags/cats in Local Storage View.
                 if table_index == 1 and not \
                         self.ui.back_btn_local.isEnabled() and \
                         len(os.listdir(os.path.join(self.path, idx))) > 2:
@@ -536,6 +512,7 @@ class ZOIALibrarianMain(QMainWindow):
                     btn_title, i, idx, str(data[i]["revision"]))
 
         # Also set the title size and resize the columns.
+        # Only use defaults if pref.json doesn't exist.
         if table_index == 0 and self.ps_sizes is None:
             curr_table.resizeColumnsToContents()
             curr_table.setColumnWidth(1, self.width() * 0.1)
@@ -637,6 +614,8 @@ class ZOIALibrarianMain(QMainWindow):
                         # Add it to the cache for next time.
                         self.patch_cache.append(content)
                     except:
+                        # Let the user know they aren't connected to the
+                        # internet.
                         self.msg.setWindowTitle("No Internet Connection")
                         self.msg.setIcon(QMessageBox.Information)
                         self.msg.setText(
@@ -647,6 +626,7 @@ class ZOIALibrarianMain(QMainWindow):
                         self.msg.exec_()
                         self.msg.setInformativeText(None)
             else:
+                # Get the context.
                 viz_browser = None
                 if self.ui.tabs.currentIndex() == 1:
                     curr_browser = self.ui.text_browser_local
@@ -656,6 +636,7 @@ class ZOIALibrarianMain(QMainWindow):
                 elif self.ui.tabs.currentIndex() == 3:
                     curr_browser = self.ui.text_browser_bank
                 self.local.set_local_selected(name)
+                # Determine if we need to worry about a version extension.
                 if ver != "":
                     self.local.set_local_selected("{}_{}".format(name, ver))
                 try:
@@ -667,6 +648,7 @@ class ZOIALibrarianMain(QMainWindow):
                             self.path, name, name + "_{}.json".format(ver))) \
                             as f:
                         content = json.loads(f.read())
+                # We are on the Local Storage View, so set the viz up.
                 if viz_browser is not None:
                     try:
                         with open(os.path.join(self.path, name,
@@ -677,6 +659,9 @@ class ZOIALibrarianMain(QMainWindow):
                                 self.path, name, name + "_{}.bin".format(ver)),
                                 "rb") as f:
                             viz = binary.parse_data(f.read())
+                    self.local.setup_viz(viz)
+
+            # Oh boy HTML code for the patch preview.
             if not skip:
                 if content["preview_url"] == "":
                     content["preview_url"] = "None provided"
@@ -706,9 +691,6 @@ class ZOIALibrarianMain(QMainWindow):
                 + "<br/><u>Preview:</u> " + content["preview_url"]
                 + "<br/><br/><u>Patch Notes:</u><br/>" + content["content"]
                 + "</html>")
-
-            if viz is not None:
-                self.local.setup_viz(viz)
 
     def display_patch_versions(self, context):
         """ Displays the contents of a patch that has multiple versions.
@@ -944,8 +926,10 @@ class ZOIALibrarianMain(QMainWindow):
         file explorer.
 
         return: The path of the directory chosen, as a string.
+                Will be None if no directory is chosen.
         """
 
+        # Let the user specify a directory.
         input_dir = QFileDialog.getExistingDirectory(
             None, 'Select a directory', expanduser("~"))
         if input_dir == "" or not os.path.isdir(input_dir):
@@ -954,10 +938,10 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setText("Please select a directory.")
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-            return
+            return None
         return input_dir
 
-    def mass_import_thread(self):
+    def _mass_import_thread(self):
         """ Initializes a Worker thread to manage the importing of
         patches as individual patches into the backend.
         Currently triggered via a menu action.
@@ -965,7 +949,7 @@ class ZOIALibrarianMain(QMainWindow):
 
         self.worker_mass.start()
 
-    def mass_import_thread_sd(self):
+    def _mass_import_thread_sd(self):
         """ Initializes a Worker thread to manage the importing of
         patches as individual patches into the backend.
         Currently triggered via a menu action.
@@ -973,10 +957,18 @@ class ZOIALibrarianMain(QMainWindow):
 
         self.worker_mass_sd.start()
 
-    def mass_import_done(self, imp_cnt, fail_cnt):
-        """
+    def _mass_import_done(self, imp_cnt, fail_cnt):
+        """ Notifies the user once the mass import has completed.
+        Will also notify the user with the number of patches that were
+        successfully imported and the number of patches that were not
+        imported.
+
+        imp_cnt: The number of patches that were imported, as an int.
+        fail_cnt: The number of patches that failed to import, as an
+                  int.
         """
 
+        # Prepare a popup for the user.
         self.msg.setWindowTitle("Import Complete")
         self.msg.setIcon(QMessageBox.Information)
         if imp_cnt > 0:
@@ -992,9 +984,14 @@ class ZOIALibrarianMain(QMainWindow):
         self.msg.setStandardButtons(QMessageBox.Ok)
         self.msg.exec_()
         self.msg.setInformativeText(None)
-        self.local.get_local_patches()
+        if (self.ui.tabs.currentIndex() == 1 and not
+            self.ui.back_btn_local.isEnabled()) or \
+                (self.ui.tabs.currentIndex() == 3 and not
+                 self.ui.back_btn_bank.isEnabled()):
+            # Reload the table to show the new patches.
+            self.local.get_local_patches()
 
-    def version_import_thread(self):
+    def _version_import_thread(self):
         """ Initializes a Worker thread to manage the importing of
         patches as a version directory into the backend.
         Currently triggered via a menu action.
@@ -1002,7 +999,7 @@ class ZOIALibrarianMain(QMainWindow):
 
         self.worker_version.start()
 
-    def version_import_thread_sd(self):
+    def _version_import_thread_sd(self):
         """ Initializes a Worker thread to manage the importing of
         patches as a version directory into the backend.
         Currently triggered via a menu action.
@@ -1010,10 +1007,16 @@ class ZOIALibrarianMain(QMainWindow):
 
         self.worker_version_sd.start()
 
-    def version_import_done(self, fails):
-        """
+    def _version_import_done(self, fails):
+        """ Notifies the user once the version import has completed.
+        Will also notify the user with the number of patches that failed
+        to be imported if they already existed within the Librarian.
+        Should be expanded to list which patches failed to import.
+
+        fails: The number of patches that failed to import, as an int.
         """
 
+        # Prepare a popup for the user.
         if fails == 0:
             self.msg.setWindowTitle("Success")
             self.msg.setText("Successfully created a Version History.")
@@ -1034,6 +1037,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.ui.back_btn_local.isEnabled()) or \
                 (self.ui.tabs.currentIndex() == 3 and not
                  self.ui.back_btn_bank.isEnabled()):
+            # Reload the table to show the new patches.
             self.local.get_local_patches()
 
     def eventFilter(self, o, e):
@@ -1048,10 +1052,12 @@ class ZOIALibrarianMain(QMainWindow):
         if o.objectName() == "table_sd_left" or o.objectName() == \
                 "table_sd_right":
             self.sd.events(o, e)
+            return True
         # Bank tab swap/move
         elif o.objectName() == "table_bank_local" or o.objectName() == \
                 "table_bank_left" or o.objectName() == "table_bank_right":
             self.bank.events(o, e)
+            return True
         # Searching via searchbar
         elif o.objectName() == "searchbar_PS" \
                 or o.objectName() == "searchbar_local" \
@@ -1090,7 +1096,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.util.save_pref(self.width(), self.height(), self.sd.get_sd_root(),
                             self.path)
 
-    def try_quit(self):
+    def _try_quit(self):
         """ Forces the application to close.
         Currently triggered via a menu action.
         """

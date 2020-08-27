@@ -3,6 +3,37 @@ QLabel {
     background-color: #FFF;
 }
 
+QMessageBox {
+    background-color: #FFF;
+}
+
+QMenu {
+    border: #FFF;
+}
+
+QMenu::separator
+{
+    background: #dadadd;
+}
+
+QMenu::item {
+    background-color: #FFF;
+    color: #000
+}
+
+QMenu::item:selected {
+    background-color: #a9e3e6;
+}
+
+QFontDialog {
+    background-color: #FFF;
+    color: #000
+}
+
+QInputDialog {
+    background-color: #FFF;
+}
+
 QTabBar::tab:selected {
     background-color: qlineargradient(spread:pad,
     x1: 0,

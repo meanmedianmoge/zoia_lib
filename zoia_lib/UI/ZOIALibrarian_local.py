@@ -82,6 +82,7 @@ class ZOIALibrarianLocal(QMainWindow):
         ver: The version associated with this row (if it exists).
         """
 
+        # Only enable exporting if there is a single version on the main page.
         if "[Multiple Versions]" in btn.text():
             ext_btn = QPushButton("See Version\nHistory to\nexport!", self)
             ext_btn.setEnabled(False)
@@ -90,6 +91,8 @@ class ZOIALibrarianLocal(QMainWindow):
 
         del_btn = QPushButton("X", self)
 
+        # We are in a version history view, so the buttons need the version
+        # suffix.
         if self.ui.back_btn_local.isEnabled():
             name = "{}_v{}".format(idx, ver)
             ext_btn.setObjectName(name)
@@ -98,6 +101,7 @@ class ZOIALibrarianLocal(QMainWindow):
             ext_btn.setObjectName(idx)
             del_btn.setObjectName(idx)
 
+        # Connect the buttons and put them in the table.
         ext_btn.setFont(self.ui.table_PS.horizontalHeader().font())
         ext_btn.clicked.connect(self.initiate_export)
         self.ui.table_local.setCellWidget(i, 4, ext_btn)
@@ -111,12 +115,14 @@ class ZOIALibrarianLocal(QMainWindow):
         downloaded and saved to their machine's backend.
         """
 
+        # Get the context.
         if self.ui.tabs.currentIndex() == 1:
             self.data_local = []
             curr_data = self.data_local
         else:
             self.data_bank = []
             curr_data = self.data_bank
+
         for patches in os.listdir(self.path):
             # Look for patch directories in the backend.
             if patches != "Banks" and patches != "data.json" and \
@@ -135,6 +141,7 @@ class ZOIALibrarianLocal(QMainWindow):
         filesystem.
         """
 
+        # Check to see if we are deleting in a version directory or not.
         if "_" not in self.sender().objectName():
             if not self.ui.back_btn_local.isEnabled() and \
                     len(os.listdir(os.path.join(
@@ -243,6 +250,7 @@ class ZOIALibrarianLocal(QMainWindow):
              self.curr_ver is used in its place.
         """
 
+        # Get the context.
         if idx is None:
             idx = self.curr_ver
         else:
@@ -263,6 +271,7 @@ class ZOIALibrarianLocal(QMainWindow):
                     temp = json.loads(f.read())
                 curr_data.append(temp)
 
+        # Reload the table.
         self.ui.update_patch_notes.setEnabled(not context)
         self.sort_and_set()
 
@@ -272,11 +281,11 @@ class ZOIALibrarianLocal(QMainWindow):
         Currently triggered via a button press.
         """
 
+        # Disable the necessary buttons and start the thread.
         self.ui.check_for_updates_btn.setEnabled(False)
         self.ui.refresh_pch_btn.setEnabled(False)
         self.ui.btn_dwn_all.setEnabled(False)
-        self.ui.statusbar.showMessage("Checking for updates...",
-                                      timeout=5000)
+        self.ui.statusbar.showMessage("Checking for updates...", timeout=5000)
         self.worker_updates.start()
 
     def update_local_patches_done(self, count):
@@ -289,6 +298,7 @@ class ZOIALibrarianLocal(QMainWindow):
                an array with the names of every patch that was updated.
         """
 
+        # Check to see if we actually got an updates and let the user know.
         if count[0] == 0:
             self.msg.setWindowTitle("No Updates")
             self.msg.setIcon(QMessageBox.Information)
@@ -310,6 +320,8 @@ class ZOIALibrarianLocal(QMainWindow):
                     text += "\t* {}\n".format(count[1][i])
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
+
+        # Re-enable the buttons now that the thread is done.
         self.ui.check_for_updates_btn.setEnabled(True)
         self.ui.refresh_pch_btn.setEnabled(True)
         self.ui.btn_dwn_all.setEnabled(True)
@@ -342,6 +354,8 @@ class ZOIALibrarianLocal(QMainWindow):
         Currently triggered via a button click.
         """
 
+        # Right now, we only update after Patch Notes:, ideally in the
+        # future a user could update the author, title, etc.
         text = self.ui.text_browser_local.toPlainText()
         try:
             text = text.split("Patch Notes:")[1]
@@ -378,7 +392,7 @@ class ZOIALibrarianLocal(QMainWindow):
             for curr in items:
                 curr = curr.strip()
                 if " and " in curr and curr[0] != " ":
-                    # They listed tags as "This and that"
+                    # They listed tags as "... and ..."
                     done.append({
                         "name": curr.split(" and ")[0]
                     })
@@ -388,10 +402,13 @@ class ZOIALibrarianLocal(QMainWindow):
                 done.append({
                     "name": curr
                 })
+            # Determine the context and update the metadata.
             if mode:
                 update.update_data(idx, done, 1)
             else:
                 update.update_data(idx, done, 2)
+
+            # Reload the table to show the changes.
             if not self.ui.back_btn_local.isEnabled():
                 self.get_local_patches()
             else:
@@ -406,9 +423,11 @@ class ZOIALibrarianLocal(QMainWindow):
         """
 
         if e.type() == QEvent.FocusIn:
+            # We are updating a tag/category.
             if self.prev_tag_cat is None:
                 return
             else:
+                # Get the next text and if it differs, update the metadata.
                 new_text = self.ui.table_local.item(
                     self.prev_tag_cat[0], self.prev_tag_cat[1]).text()
                 if new_text == self.prev_tag_cat[2] \
@@ -422,6 +441,8 @@ class ZOIALibrarianLocal(QMainWindow):
                     return
         elif e.type() == QEvent.FocusOut:
             try:
+                # Figure out what the previous tag/cat was now that we are
+                # no longer in edit mode.
                 if self.ui.table_local.currentColumn() != 3:
                     self.prev_tag_cat = \
                         (self.ui.table_local.currentRow(),
@@ -460,6 +481,7 @@ class ZOIALibrarianLocal(QMainWindow):
 
         self.ui.text_browser_viz.setText("")
 
+        # Decrease if prev, increase if next.
         if self.sender().objectName() == "btn_prev_page":
             self.curr_page_viz -= 1
         else:
@@ -467,8 +489,10 @@ class ZOIALibrarianLocal(QMainWindow):
 
         self.ui.btn_prev_page.setEnabled(not self.curr_page_viz == 0)
 
+        # Load the viz for the new page.
         self.set_viz()
 
+        # Update the page number.
         self.ui.page_label.setText("<html><b>" + self.curr_viz["name"]
                                    + "</b>  Page " + str(self.curr_page_viz)
                                    + "</html>")
@@ -488,6 +512,7 @@ class ZOIALibrarianLocal(QMainWindow):
                     color = curr_module["old_color"]
                 else:
                     color = curr_module["new_color"]
+                # Output the data for that module.
                 self.ui.text_browser_viz.setText(
                     "<html><b><h2>" + curr_module["type"] + "</b></h2>"
                     + "<u>Color:</u> " + color + "<br/><u>"
@@ -503,8 +528,9 @@ class ZOIALibrarianLocal(QMainWindow):
         self.viz_disable()
 
         for curr_module in self.curr_viz["modules"]:
+            # Setup the buttons for each module if we are on the correct page.
             if curr_module["page"] == self.curr_page_viz:
-                curr_btn = self._get_btn(curr_module["position"])
+                curr_btn = self.get_btn(curr_module["position"])
                 try:
                     color_hex = self._get_color_hex(curr_module["new_color"])
                 except KeyError:
@@ -522,7 +548,7 @@ class ZOIALibrarianLocal(QMainWindow):
         """
 
         for i in range(40):
-            curr_btn = self._get_btn(i)
+            curr_btn = self.get_btn(i)
             curr_btn.setEnabled(False)
             curr_btn.setStyleSheet("border: 1px solid #696969;"
                                    "background-color: gray;")
@@ -553,7 +579,7 @@ class ZOIALibrarianLocal(QMainWindow):
             "Mango": "#FF8243"
         }[color]
 
-    def _get_btn(self, index):
+    def get_btn(self, index):
         """ Lookup table to get the correct UI button for the visualizer
 
         index: The index that corresponds to the UI button.
