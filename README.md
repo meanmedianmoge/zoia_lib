@@ -44,7 +44,7 @@ This software is intended to be free and will be supported by the development te
   - Python 3.7.X: https://www.python.org/downloads/release/python-379/
 
 ## Authors
-- John Breton (primary dev up to Beta 3 release)
+- John Breton (primary dev, designer, and documentation creator up to Beta 3 release)
 - Mike Moger (initial Python implementation, Mac testing, app owner)
 - djigneo (C# binary decoder and testing)
 - Matthew Allen (initial UI frames and app planning)
