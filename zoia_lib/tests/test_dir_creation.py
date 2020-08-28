@@ -24,10 +24,10 @@ class TestDirectoryCreation(unittest.TestCase):
     def setUp(self):
         # Create a backend directory and another
         # directory for additional tests.
-        save.create_backend_directories()
+        save._create_backend_directories()
         save.back_path = os.path.join(os.getcwd(), "zoia_lib",
                                       "tests", ".ZoiaLibraryApp")
-        save.create_backend_directories()
+        save._create_backend_directories()
 
     def tearDown(self):
         # Remove the testing ZoiaLibraryApp directory.

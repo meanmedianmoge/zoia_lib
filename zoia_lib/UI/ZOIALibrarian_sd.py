@@ -6,14 +6,22 @@ from PySide2.QtCore import QEvent
 from PySide2.QtWidgets import QTableWidgetItem, QPushButton, QFileDialog, \
     QFileSystemModel, QMessageBox, QTableWidgetSelectionRange, QMainWindow
 
+from zoia_lib.common import errors
+
 
 class ZOIALibrarianSD(QMainWindow):
     """ The ZOIALibrarianSD class is responsible for all
     activities contained within the SD Card View tab of the application.
     """
 
-    def __init__(self, ui, f2, msg, delete):
+    def __init__(self, ui, save, msg, delete, util):
         """ Initializes the class with the required parameters.
+
+        ui: The UI component of ZOIALibrarianMain
+        save: Helper class to access backend saving methods.
+        msg: A template QMessageBox.
+        delete: Helper class to access backend deletion methods.
+        util: Helper class to access UI utility methods.
         """
 
         # Needed to make use of self.sender()
@@ -21,12 +29,13 @@ class ZOIALibrarianSD(QMainWindow):
 
         # Variable init.
         self.ui = ui
+        self.save = save
+        self.msg = msg
         self.delete = delete
+        self.util = util
+
         self.sd_path_full = None
         self.sd_root = None
-        self.can_export_bank = False
-        self.f2 = f2
-        self.msg = msg
         self.rows_left = []
         self.rows_right = []
 
@@ -35,6 +44,10 @@ class ZOIALibrarianSD(QMainWindow):
         their OS file explorer dialog. Note, nothing is done to ensure
         that the location selected is actually an SD card.
         Currently triggered via a menu action.
+
+        startup: True if this is being called during startup, False
+                 otherwise.
+        width: The width of the main window.
         """
 
         if not startup:
@@ -47,24 +60,15 @@ class ZOIALibrarianSD(QMainWindow):
                     # This comes from a bug with QFileDialog returning the
                     # wrong path separator on Windows for some odd reason.
                     input_dir = input_dir.split("/")[0]
-                elif "/" in input_dir and platform.system().lower() != \
-                        "windows":
+                elif "/" in input_dir:
                     # OSX case.
                     pass
-                elif "\\" in input_dir:
-                    input_dir = input_dir.split("\\")[0]
-                elif "//" in input_dir:
-                    input_dir = input_dir.split("//")[0]
-                elif "\\\\" in input_dir:
-                    input_dir = input_dir.split("\\\\")[0]
                 else:
                     input_dir = input_dir.split(os.path.sep)[0]
                 self.sd_root = str(input_dir)
                 self.ui.tab_sd.setEnabled(True)
-                self.can_export_bank = True
             else:
                 self.ui.tab_sd.setEnabled(False)
-                self.can_export_bank = False
                 self.ui.tabs.setCurrentIndex(1)
 
         # Setup the SD card tree view for the SD Card tab.
@@ -85,33 +89,41 @@ class ZOIALibrarianSD(QMainWindow):
         self.ui.import_all_ver_btn.setEnabled(False)
         path = self.ui.sd_tree.currentIndex().data()
         temp = self.ui.sd_tree.currentIndex()
+        # Get the top directory for a specified path.
         while True:
             temp = temp.parent()
-            if temp.data() is not None and self.sd_root \
-                    not in temp.data():
+            if temp.data() is not None and self.sd_root not in temp.data():
                 path = os.path.join(temp.data(), path)
                 continue
             break
 
         self.sd_path_full = os.path.join(self.sd_root, path)
 
-        self.set_data_sd()
-        # If any patches populate the tables, enable the import all button.
-        # TODO Find out if this can be determined without iterating through the
-        #  entire table.
+        # Setup the tree widget.
+        self._set_data_sd()
+        self._has_item()
+
+    def _has_item(self):
+        """ Determines whether the SD tables contain an entry.
+
+        return: True if the SD tables contain an entry, False
+                otherwise.
+        """
+
+        # Determine which buttons should be enabled.
         count = 0
-        for i in range(64):
-            if i < 32:
-                if self.ui.table_sd_left.item(i, 0).text() != "":
-                    count += 1
-            else:
-                if self.ui.table_sd_right.item(i - 32, 0).text() != "":
-                    count += 1
+        for i in range(32):
+            if self.ui.table_sd_left.item(i, 0).text() != "":
+                count += 1
+            if self.ui.table_sd_right.item(i, 0).text() != "":
+                count += 1
+            if count > 1:
+                break
         self.ui.import_all_btn.setEnabled(count > 0)
         self.ui.import_all_ver_btn.setEnabled(count > 1)
         self.ui.delete_folder_sd_btn.setEnabled(True)
 
-    def set_data_sd(self):
+    def _set_data_sd(self):
         """ Sets the data for the SD card table.
         """
 
@@ -138,11 +150,11 @@ class ZOIALibrarianSD(QMainWindow):
                 rmv_btn = QPushButton("X", self)
                 rmv_btn.setObjectName(str(index))
                 rmv_btn.setFont(self.ui.table_PS.horizontalHeader().font())
-                rmv_btn.clicked.connect(self.remove_sd)
+                rmv_btn.clicked.connect(self._remove_sd)
                 import_btn = QPushButton("Click me to import!", self)
                 import_btn.setObjectName(str(index))
                 import_btn.setFont(self.ui.table_PS.horizontalHeader().font())
-                import_btn.clicked.connect(self.f2)
+                import_btn.clicked.connect(self._import_patch_sd)
 
                 if index < 32:
                     # Left sd table.
@@ -159,11 +171,51 @@ class ZOIALibrarianSD(QMainWindow):
                     self.ui.table_sd_right.setCellWidget(index - 32, 2,
                                                          import_btn)
 
-    def delete_sd_item(self, delete):
+    def _import_patch_sd(self):
+        """ Imports a single patch from an SD card into the Librarian.
+        Will alert the user if the patch exists in the Librarian.
+        Currently triggered via a button press.
+        """
+
+        # Only proceed if there is actually an SD path.
+        if self.sd_path_full is not None:
+            for sd_pch in os.listdir(self.sd_path_full):
+                index = int(self.sender().objectName())
+                if index < 10:
+                    index = "00{}".format(index)
+                else:
+                    index = "0{}".format(index)
+                if index == sd_pch[:3]:
+                    # Try to import the patch and notify the user of the
+                    # result via a popup.
+                    try:
+                        self.save.import_to_backend(
+                            os.path.join(self.sd_path_full, sd_pch))
+                        self.ui.statusbar.showMessage("Import complete!")
+                        self.msg.setIcon(QMessageBox.Information)
+                        self.msg.setWindowTitle("Import Complete")
+                        self.msg.setText(
+                            "The patch has been successfully imported!")
+                        self.msg.exec_()
+                        return
+                    except errors.SavingError:
+                        self.msg.setWindowTitle("Patch Already In Library")
+                        self.msg.setIcon(QMessageBox.Information)
+                        self.msg.setText(
+                            "That patch exists within your locally "
+                            "saved patches.\nNo importing has occurred.")
+                        self.msg.setStandardButtons(QMessageBox.Ok)
+                        self.msg.exec_()
+                        self.msg.setInformativeText(None)
+                        return
+
+    def delete_sd_item(self):
         """ Deletes the currently selected directory from the SD card.
         Currently triggered via a button press.
         """
 
+        # Give the user a chance to cancel if they hit the button by
+        # mistake.
         if os.path.isdir(self.sd_path_full):
             self.msg.setWindowTitle("Warning")
             self.msg.setIcon(QMessageBox.Warning)
@@ -175,16 +227,17 @@ class ZOIALibrarianSD(QMainWindow):
             self.msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
             val = self.msg.exec_()
             if val == QMessageBox.Yes:
-                delete.delete_full_patch_directory(self.sd_path_full)
-                self.prepare_sd_view()
+                self.delete.delete_full_patch_directory(self.sd_path_full)
         else:
-            delete.delete_file(self.get_sd_path())
-            self.prepare_sd_view()
+            self.delete.delete_file(self.get_sd_path())
 
+        # Reload the tree view.
+        self._set_data_sd()
+        self._has_item()
         self.ui.sd_tree.clearSelection()
         self.ui.delete_folder_sd_btn.setEnabled(False)
 
-    def move_patch_sd(self, src, dest):
+    def _move_patch_sd(self, src, dest):
         """ Attempts to move a patch from one SD card slot to another
         Currently triggered via a QTableWidget move event.
 
@@ -236,7 +289,7 @@ class ZOIALibrarianSD(QMainWindow):
                                            + src_pch[3:]),
                               os.path.join(self.sd_path_full, dest
                                            + src_pch[3:]))
-                self.set_data_sd()
+                self._set_data_sd()
                 dest = int(dest)
                 for i in range(64):
                     if i == dest:
@@ -250,11 +303,12 @@ class ZOIALibrarianSD(QMainWindow):
 
         # We are doing a move.
         if src_pch is None:
-            self.set_data_sd()
+            self._set_data_sd()
             return
         os.rename(os.path.join(self.sd_path_full, src_pch),
                   os.path.join(self.sd_path_full, dest + src_pch[3:]))
 
+        # Clear the selections and reload the tables.
         dest = int(dest)
         for i in range(64):
             if i == dest:
@@ -265,7 +319,7 @@ class ZOIALibrarianSD(QMainWindow):
                     self.ui.table_sd_left.setRangeSelected(
                         QTableWidgetSelectionRange(i, 0, i, 0), True)
 
-        self.set_data_sd()
+        self._set_data_sd()
 
     def events(self, o, e):
         """ Handles events that relate to dragging and dropping entries
@@ -291,6 +345,7 @@ class ZOIALibrarianSD(QMainWindow):
             for index in sorted(indexes):
                 self.rows_right.append(index)
 
+            # Hide these rows so they can be dragged into.
             self.ui.table_sd_left.hideColumn(1)
             self.ui.table_sd_left.hideColumn(2)
             self.ui.table_sd_right.hideColumn(1)
@@ -342,10 +397,8 @@ class ZOIALibrarianSD(QMainWindow):
                             for pch in os.listdir(self.sd_path_full):
                                 if "{}_zoia_".format(temp_index) in pch:
                                     if i != dst_index:
-                                        self.move_patch_sd(i, dst_index)
-                                        return
-                                    else:
-                                        return
+                                        self._move_patch_sd(i, dst_index)
+                                    return
                 else:
                     for i in range(64):
                         if i < 32:
@@ -367,136 +420,37 @@ class ZOIALibrarianSD(QMainWindow):
                         self.ui.table_sd_right.removeRow(32)
                         return
                     if src_index != dst_index:
-                        self.move_patch_sd(src_index, dst_index)
+                        self._move_patch_sd(src_index, dst_index)
                     return
             else:
                 # Multiple selections
-                first_item = None
-                first_item_index = -1
-                if len(self.rows_left) > 1 and len(self.rows_right) == 0:
-                    for i in sorted(self.rows_left):
-                        i = i.row()
-                        i = int('%d' % i)
-                        temp = self.ui.table_sd_left.item(i, 0)
-                        if temp is not None and temp.text() != "":
-                            first_item = temp
-                            first_item_index = i
-                            break
-                    first_item_text = first_item.text()
-                    for i in range(64):
-                        if i < 32:
-                            temp_left = self.ui.table_sd_left.item(i, 0)
-                            temp_right = None
-                        else:
-                            temp_right = self.ui.table_sd_right.item(i - 32, 0)
-                            temp_left = None
-                        if (temp_left is not None and i != first_item_index
-                            and temp_left.text() == first_item_text) or (
-                                temp_right is not None and temp_right.text()
-                                == first_item_text):
-                            # We found the first item!
-                            row = sorted(self.rows_left)[-1].row()
-                            row = int('%d' % row)
-                            for j in range(first_item_index, row + 1):
-                                if j == first_item_index:
-                                    i = i + (j - first_item_index)
-                                else:
-                                    i += 1
-                                if i > 31:
-                                    temp1 = self.ui.table_sd_left.item(j, 0)
-                                    temp2 = self.ui.table_sd_right.item(i - 32,
-                                                                        0)
-                                else:
-                                    temp1 = self.ui.table_sd_left.item(j, 0)
-                                    temp2 = self.ui.table_sd_left.item(i, 0)
-                                if temp1 is None and temp2 is None:
-                                    continue
-                                elif temp1 is None and temp2 is not None:
-                                    self.move_patch_sd(i, j)
-                                elif temp1 is not None and temp2 is None or \
-                                        temp1 is not None and temp2 is not None:
-                                    self.move_patch_sd(j, i)
-                                elif temp1 is None and temp2 is not None:
-                                    self.move_patch_sd(i, j)
-
-                else:
-                    for i in sorted(self.rows_right):
-                        i = i.row()
-                        i = int('%d' % i)
-                        temp = self.ui.table_sd_right.item(i, 0)
-                        if temp is not None and temp.text() != "":
-                            first_item = temp
-                            first_item_index = i + 32
-                            break
-                    first_item_text = first_item.text()
-                    for i in range(64):
-                        if i < 32:
-                            temp_left = self.ui.table_sd_left.item(i, 0)
-                            temp_right = None
-                        else:
-                            temp_right = self.ui.table_sd_right.item(i - 32, 0)
-                            temp_left = None
-                        if (temp_right is not None and i != first_item_index
-                            and temp_right.text() == first_item_text) or (
-                                temp_left is not None and temp_left.text()
-                                == first_item_text):
-                            # We found the first item!
-                            row = sorted(self.rows_right)[-1].row()
-                            row = int('%d' % row) + 32
-                            for j in range(first_item_index, row + 1):
-                                if j == first_item_index:
-                                    i = i + (j - first_item_index)
-                                else:
-                                    i += 1
-                                if i > 31:
-                                    temp1 = self.ui.table_sd_right.item(j - 32,
-                                                                        0)
-                                    temp2 = self.ui.table_sd_left.item(i - 32,
-                                                                       0)
-                                else:
-                                    temp1 = self.ui.table_sd_right.item(j - 32,
-                                                                        0)
-                                    temp2 = self.ui.table_sd_right.item(i, 0)
-                                if temp1 is None and temp2 is None:
-                                    continue
-                                elif temp1 is None and temp2 is not None:
-                                    self.move_patch_sd(i, j)
-                                elif temp1 is not None and temp2 is None or \
-                                        temp1 is not None and temp2 is not \
-                                        None:
-                                    self.move_patch_sd(j, i)
-                                elif temp1 is None and temp2 is not None:
-                                    self.move_patch_sd(i, j)
+                self.util.multi_drag_drop(self.rows_left, self.rows_right,
+                                          self.ui.table_sd_left,
+                                          self.ui.table_sd_right,
+                                          self._move_patch_sd)
                 self.rows_left = []
                 self.rows_right = []
-                while self.ui.table_sd_left.rowCount() > 32:
-                    self.ui.table_sd_left.removeRow(32)
-                while self.ui.table_sd_right.rowCount() > 32:
-                    self.ui.table_sd_right.removeRow(32)
 
-    def remove_sd(self):
+    def _remove_sd(self):
         """ Removes a patch that is stored on a user's SD card.
         Currently triggered via a button press.
         """
 
+        # Get the row and delete it.
         row = self.sender().objectName()
         index = "00{}".format(row) if len(row) < 2 else "0{}".format(row)
         self.delete.delete_patch_sd(index, self.sd_path_full)
-        count = 0
-        for i in range(64):
-            if i < 32:
-                if self.ui.table_sd_left.item(i, 0).text() != "":
-                    count += 1
-            else:
-                if self.ui.table_sd_right.item(i - 32, 0).text() != "":
-                    count += 1
-        self.ui.import_all_btn.setEnabled(count > 0)
-        self.ui.import_all_ver_btn.setEnabled(count > 1)
-        self.set_data_sd()
+        # Reload the tables.
+        self._set_data_sd()
+        self.ui.table_sd_right.clearSelection()
+        self.ui.table_sd_left.clearSelection()
+        self._has_item()
 
     def get_sd_path(self):
         """ Gets the current SD card path.
         Will be None if it has not been determined.
+
+        return: The SD card path as a string.
         """
 
         return self.sd_path_full
@@ -504,25 +458,16 @@ class ZOIALibrarianSD(QMainWindow):
     def get_sd_root(self):
         """ Gets the current SD card root.
         Will be None if it has not been determined.
+
+        return: The SD card root as a string.
         """
 
         return self.sd_root
 
-    def get_can_export(self):
-        """ Gets whether the application can export.
-        Will be None if it has not been determined.
-        """
-
-        return self.can_export_bank
-
     def set_sd_root(self, path):
         """ Sets the current SD card root.
+
+        path: The path that will be set.
         """
 
         self.sd_root = path
-
-    def set_export(self, val):
-        """ Sets whether the application can export.
-        """
-
-        self.can_export_bank = val

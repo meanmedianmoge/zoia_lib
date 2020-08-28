@@ -1,3 +1,39 @@
+QLabel {
+    color: #FFF;
+    background-color: #5e616e;
+}
+
+QMessageBox {
+    background-color: #5e616e;
+}
+
+QMenu {
+    border: #5e616e;
+}
+
+QMenu::separator
+{
+    background: #444850;
+}
+
+QMenu::item {
+    background-color: #5e616e;
+    color: #FFF
+}
+
+QMenu::item:selected {
+    background-color: #747788;
+}
+
+QFontDialog {
+    background-color: #5e616e;
+    color: #FFF
+}
+
+QInputDialog {
+    background-color: #5e616e;
+}
+
 QTabBar::tab:selected {
     background-color: #444851;
     border-bottom: 0;
@@ -27,10 +63,13 @@ QPushButton#btn_load_bank {
 
 QPushButton#delete_folder_sd_btn,
 QPushButton#import_all_btn,
-QPushButton#import_all_ver_btn {
-border-radius: 5px;
-padding: 2px 2px 2px 2px;
-border: 1px solid black;
+QPushButton#import_all_ver_btn,
+QPushButton#btn_dwn_all,
+QPushButton#btn_prev_page,
+QPushButton#btn_next_page {
+    border-radius: 5px;
+    padding: 2px 2px 2px 2px;
+    border: 1px solid black;
 }
 
 QPushButton#back_btn_local,

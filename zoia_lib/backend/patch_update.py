@@ -29,21 +29,29 @@ class PatchUpdate(Patch):
               - 1 -> Modify the tags
               - 2 -> Modify the categories
               - 3 -> Modify the patch notes
+              - 4 -> Modify the author
+              - 5 -> Modify the patch title
         """
 
+        # Lookup the right term to use.
         index = {
             1: "tags",
             2: "categories",
-            3: "content"
+            3: "content",
+            4: "author",
+            5: "title"
         }[mode]
 
+        # Get the patch name and id.
         pch = idx
-        if "_" in idx:
-            idx = idx.split("_")[0]
+        idx = idx.split("_")[0]
 
+        # Update the key with the new data.
         with open(os.path.join(self.back_path, idx, "{}.json".format(pch)),
                   "r") as f:
             temp = json.loads(f.read())
+        #if mode == 4:
+        #    temp[index]["name"] = data
         temp[index] = data
         with open(os.path.join(self.back_path, idx, "{}.json".format(pch)),
                   "w") as f:
@@ -54,12 +62,18 @@ class PatchUpdate(Patch):
         patches from PS, should any that have been previously downloaded
         are updated.
 
-        This method will check the updated_at attribute of each downloaded
-        patch, should this differ compared to what is returned by PS, a
-        new patch will attempt to be saved. If the binary file is determined
-        to be identical to the one stored within the backend, the saving is
-        aborted at there was no update to the patch itself. Otherwise, a new
-        version of the patch is added and saved within the patch directory.
+        This method will check the updated_at attribute of each
+        downloaded patch, should this differ compared to what is
+        returned by PS, a new patch will attempt to be saved. If the
+        binary file is determined to be identical to the one stored
+        within the backend, the saving is aborted at there was no update
+        to the patch itself. Otherwise, a new version of the patch is
+        added and saved within the patch directory.
+
+        return: A tuple containing the number of patches that updated as
+                an int as the first element, and the names of the
+                patches that updated in as strings in an array as the
+                second element.
         """
 
         meta = []
@@ -76,21 +90,20 @@ class PatchUpdate(Patch):
                 with open(os.path.join(self.back_path, patch,
                                        "{}_v1.json".format(patch)), "r") as f:
                     temp = json.loads(f.read())
-                meta_small = {
-                    "id": temp["id"],
-                    "updated_at": temp["updated_at"]
-                }
-                meta.append(meta_small)
             elif os.path.isdir(os.path.join(self.back_path, patch)) \
                     and len(patch) > 5:
+                # Just a single patch in the directory, easy.
                 with open(os.path.join(self.back_path, patch,
                                        "{}.json".format(patch)), "r") as f:
                     temp = json.loads(f.read())
-                meta_small = {
-                    "id": temp["id"],
-                    "updated_at": temp["updated_at"]
-                }
-                meta.append(meta_small)
+            else:
+                continue
+            # Only need the id and updated_at for comparison purposes.
+            meta_small = {
+                "id": temp["id"],
+                "updated_at": temp["updated_at"]
+            }
+            meta.append(meta_small)
 
         # Get a list of binary/metadata for all files that have been updated
         # on PatchStorage.
@@ -98,28 +111,25 @@ class PatchUpdate(Patch):
         pch_list = ps.get_potential_updates(meta)
 
         # Try to save the new binaries to the backend.
-        updates = 0
+        save = PatchSave()
+        pchs = []
         for patch in pch_list:
             try:
-                save = PatchSave()
                 save.save_to_backend(patch[0])
-                updates += 1
             except errors.SavingError:
-                # TODO If we fail to save, at least update the metadata.
+                # Same binary, but patch notes are different, update those.
+                idx = str(patch[1]["id"])
                 try:
-                    with open(os.path.join(self.back_path,
-                                           str(patch[1]["id"]),
-                                           "{}.bin".format(
-                                               str(patch[1]["id"]))),
-                              "w") as f:
+                    with open(os.path.join(self.back_path, idx,
+                                           "{}.bin".format(idx)), "w") as f:
                         f.write(json.dumps(patch[1]))
+                        pchs.append(patch[1]["title"])
                 except FileNotFoundError:
-                    with open(os.path.join(self.back_path,
-                                           str(patch[1]["id"]),
-                                           "{}_v1.bin".format(
-                                               str(patch[1]["id"]))),
-                              "r") as f:
+                    with open(os.path.join(self.back_path, idx,
+                                           "{}_v1.bin".format(idx)), "r") as f:
                         f.write(json.dumps(patch[1]))
-                updates += 1
+                        pchs.append(patch[1]["title"])
+            pchs.append(patch)
 
-        return updates
+        # Pass the number of updates and titles of patches updated.
+        return len(pch_list), pchs

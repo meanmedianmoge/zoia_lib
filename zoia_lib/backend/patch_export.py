@@ -7,8 +7,8 @@ from zoia_lib.common import errors
 
 
 class PatchExport(Patch):
-    """ The PatchExport class is a child of the Patch class. It is
-    responsible for patch exporting operations.
+    """ The PatchExport class is a child of the Patch class.
+    It is responsible for all patch exporting operations.
     """
 
     def __init__(self):
@@ -40,7 +40,9 @@ class PatchExport(Patch):
                    will conflict with a file that is already in the
                    dest, but the user has specified that it is okay to
                    overwrite said file.
-        Raises ExportingError if an invalid slot number is provided or
+
+        raise: BadPathError if path did not lead to a file.
+        raise: ExportingError if an invalid slot number is provided or
                shutil is unable to copy the file over to the dest.
         """
 
@@ -57,18 +59,13 @@ class PatchExport(Patch):
                 if pch[:3] == "00{}".format(slot) or pch[:3] == "0{}".format(
                         slot):
                     os.remove(os.path.join(dest, pch))
+                    break
 
         # Prepare the name of the patch. We need to access the metadata.
         # Extract the patch id from the supplied patch parameter.
-        idx = patch
-        if "." in patch:
-            patch = patch.split(".")[0]
-
-        if "." in idx:
-            idx = patch.split(".")[0]
-
-        if "_" in idx:
-            idx = idx.split("_")[0]
+        patch = patch.split(".")[0]
+        idx = patch.split(".")[0]
+        idx = idx.split("_")[0]
 
         # Get the metadata for this patch.
         try:
@@ -82,14 +79,12 @@ class PatchExport(Patch):
         name = metadata["files"][0]["filename"]
         # Check to see if the patch author included a ZOIA prefix.
         # (and drop it from the name).
-        if "_" in name:
-            prefix = name.split("_")[0]
-            if len(prefix) == 3:
-                try:
-                    float(prefix)
-                    name = name[4:]
-                except ValueError:
-                    pass
+        if "_" in name and len(name.split("_")[0]) == 3:
+            try:
+                float(name.split("_")[0])
+                name = name[4:]
+            except ValueError:
+                pass
         try:
             if -1 < slot < 10:
                 # one digit
@@ -123,20 +118,28 @@ class PatchExport(Patch):
 
     def export_bank(self, bank, dest, name, overwrite=False):
         """ Exports an entire bank to be ready for use on a ZOIA.
-        Ideally,this is used to export a bank from a local user's
-        machine to a ZOIA SD card.
+        Ideally, this is used to export a bank from a local user's
+        machine to an SD card.
 
         bank: The bank data to be processed.
+        dest: A string representing the path to the backend destination.
+        name: The name of the bank directory that will be created.
+        overwrite: Optional. This should be set to True when the export
+                   will conflict with a directory that is already in the
+                   dest, but the user has specified that it is okay to
+                   overwrite said file.
+
+        return: An array of slot numbers for patches that failed to
+                export.
         """
 
         fail_list = []
 
-        # Prepare a destination directory.
+        # Prepare a destination directory (remove the previous if
+        # overwrite is true).
         if overwrite and name in os.listdir(dest):
             shutil.rmtree(os.path.join(dest, name))
-            os.mkdir(os.path.join(dest, name))
-        else:
-            os.mkdir(os.path.join(dest, name))
+        os.mkdir(os.path.join(dest, name))
 
         # Process the bank and add each to the bank directory.
         for pch in bank:

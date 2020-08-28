@@ -5,7 +5,6 @@ Author: Mike Moger
 Usage: https://patchstorage.com/docs/
 """
 
-import datetime
 import json
 import math
 import os
@@ -21,50 +20,30 @@ http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 
 
 class PatchStorage:
+    """ The PatchStorage class is responsible for all API calls to the
+    PatchStorage API. This includes the querying of metadata, the
+    downloading of patches binaries, and determining the number of
+    ZOIA patches currently stored on PatchStorage.
+    Documentation for the PatchStorage API can be found at:
+        https://patchstorage.com/docs/
+    """
 
     def __init__(self):
-        """initializes PatchStorage class"""
+        """ Initializes the PatchStorage class.
+        """
 
-        # set defaults for query params
+        # Set defaults for query params
         self.url = 'https://patchstorage.com/api/alpha/'
         self.platform = 3003  # ZOIA
-        self.patch_count = self.determine_patch_count()
-
-    @staticmethod
-    def _validate_intlist(lst: list):
-        """ Forces all items in a list to take on the type int
-
-        lst: The list of items to convert to ints
-        Returns the converted list.
-        """
-        return [int(v) for v in lst]
-
-    @staticmethod
-    def _validate_strlist(lst: list):
-        """ Forces all items in a list to take on the type str
-
-        lst: The list of items to convert to strings
-        Returns the converted list.
-        """
-        return [str(s) for s in lst]
-
-    @staticmethod
-    def _validate_date(date: str):
-        """ Ensures a date follows the format YYYY-MM-DD
-
-        date: The date to check the format of.
-        Returns the date in the correct format.
-        Raises a ValueError on incorrect format.
-        """
         try:
-            date = datetime.datetime.strptime(date, '%Y-%m-%d')
-            return date.isoformat()
-        except ValueError:
-            raise ValueError('Incorrect date format, should be YYYY-MM-DD')
+            self.patch_count = self._determine_patch_count()
+        except:
+            # No internet connection.
+            pass
 
-    def search(self, more_params=None):
-        """ Make a query to the PS API and return a JSON
-        default args:
+    def _search(self, more_params=None):
+        """ Make a query to the PS API.
+        Default args:
             - page (int): current page, default 1
             - per_page (int): max number to return, default 10
             - order (str enum): [asc, desc], order sort, default desc
@@ -72,7 +51,7 @@ class PatchStorage:
                                    title relevance
                                    (must include search term)],
                                     order sort by, default date
-        optional args:
+        Optional args:
             - search (str): search for given string
             - before (str): published before given ISO8601 date
             - after (str): published after given ISO8601 date
@@ -83,13 +62,20 @@ class PatchStorage:
             - author (str): search for items by an author(s)
             - author_exclude (str): exclude specific author(s)
             - categories (int []): search for items with a category(ies)
-            - categories_exclude (int []): exclude specific category(ies)
+            - categories_exclude (int []): exclude specific
+                                           category(ies)
             - tags (int []): search for items with tag(s)
             - tags_exclude (int []): exclude specific tag(s)
             - platforms (int []): search for items within a platform
             - platforms_exclude (int []): exclude specific platform(s)
             - states (int []): search for items with a given state
             - states_exclude (int []); exclude specific state(s)
+
+        Please note that the use of optional args is deprecated as of
+        Beta 3 of the ZOIA Librarian. Should the implementation be
+        needed, please consult the repo for the previous implementation.
+
+        return: The retrieved metadata in JSON form.
         """
 
         if more_params is None:
@@ -105,32 +91,6 @@ class PatchStorage:
             'platforms': self.platform
         }
 
-        # check type of optional args
-        for key in list(more_params.keys()):
-            # date
-            if key in ['before', 'after']:
-                more_params[key] = self._validate_date(more_params[key])
-            # str
-            if key in ['search', 'exclude', 'include', 'order',
-                       'orderby', 'slug', 'author', 'author_exclude'] and \
-                    type(more_params[key]) != list:
-                more_params[key] = str(more_params[key])
-            # int
-            if key in ['offset', 'categories', 'categories_exclude',
-                       'tags', 'tags_exclude', 'page', 'platforms',
-                       'platforms_exclude', 'states', 'states_exclude'] and \
-                    type(more_params[key]) != list:
-                more_params[key] = int(more_params[key])
-            # str list
-            if key in ['slug'] and type(more_params[key]) == list:
-                more_params[key] = self._validate_strlist(more_params[key])
-            # int list
-            if key in ['categories', 'categories_exclude', 'tags',
-                       'tags_exclude', 'platforms', 'platforms_exclude',
-                       'states', 'states_exclude'] and \
-                    type(more_params[key]) == list:
-                more_params[key] = self._validate_intlist(more_params[key])
-
         params = {**default_params, **more_params}
 
         # make request
@@ -144,21 +104,14 @@ class PatchStorage:
         patch ID.
 
         idx: The id that the metadata will be retrieved for.
+
         return: The metadata for the patch, in a MetadataSchema
-                compliant form.
+                 compliant form.
         """
         endpoint = os.path.join(self.url, 'patches/{}/'.format(idx))
 
         # Make the request
         raw_data = json.loads(http.request('GET', endpoint).data)
-        # Remove the data that is not apart
-        # of the MetadataSchema.json schema
-        raw_data.pop("slug", None)
-        raw_data.pop("excerpt", None)
-        raw_data.pop("comment_count", None)
-        raw_data.pop("platform", None)
-        raw_data.pop("code", None)
-        raw_data.pop("source_code_url", None)
 
         # Return the metadata
         return raw_data
@@ -166,8 +119,8 @@ class PatchStorage:
     def download(self, idx: str):
         """ Download a file using patch id
 
-        return: The raw binary data for the patch if it was found,
-                None otherwise.
+        Returns: The raw binary data for the patch if it was found,
+                 None otherwise.
         """
 
         # Patches stored on PS use a 6-digit unique id number.
@@ -177,20 +130,18 @@ class PatchStorage:
 
         try:
             body = self.get_patch_meta(idx)
-            path = str(body['files'][0]['url'])
-            f = http.request('GET', path).data, body
+            f = http.request('GET', str(body['files'][0]['url'])).data, body
             return f
         except KeyError:
             # No patch with the supplied id was found.
             return None
 
     def get_all_patch_data_init(self):
-        """ Returns the initial amount of information
-        needed for display purposes once the user starts
-        the application.
+        """ Retrieves the initial amount of information needed for
+        display purposes once the user starts the application.
 
         return: A list of data, where each item contains the
-                information outlined above.
+                 information outlined above.
         """
 
         per_page = 100
@@ -199,29 +150,90 @@ class PatchStorage:
         }
 
         all_patches = []
+
         for page in range(1, math.ceil(self.patch_count / per_page) + 1):
             # Get all the patches on the current page.
-            all_patches += self.search({**search, **{'page': page}})
+            all_patches.extend(self._search({**search, **{'page': page}}))
 
         return all_patches
 
+    def get_potential_updates(self, meta):
+        """ Queries the PS API for all patches that have an updated_at
+        attribute that is more recent than the one present for patches
+        that have been previously downloaded.
+
+        meta: An array containing the id and updated_at attributes for
+              patches that may need to be updated.
+
+        return: An array containing the metadata and binaries for all
+                 patches that had been updated.
+        """
+
+        new_bin = []
+
+        for entry in meta:
+            idx = str(entry["id"])
+            curr_meta = self.get_patch_meta(idx)
+            # Check to see if the patch has been updated by comparing
+            # the dates.
+            if curr_meta["updated_at"] > entry["updated_at"]:
+                new_bin.append((self.download(idx), curr_meta))
+
+        return new_bin
+
+    def get_newest_patches(self, pch_num):
+        """ Queries the PS API for the latest patches that have not been
+        stored in data.json previously. This is only called after the
+        initial launch of the application and only if new patches have
+        been uploaded to PS since that initial launch.
+
+        pch_num: The number of patches currently stored in data.json
+
+        return: A list of patch metadata that was not present in the
+                data.json file.
+        """
+
+        # Max on per_page is 100, so we can't go over that.
+        per_page = self.patch_count - pch_num
+        if per_page > 100:
+            per_page = 100
+        search = {
+            'per_page': per_page
+        }
+
+        new_patches = []
+        pages = 2
+        # Find out how many pages of patches there are.
+        if per_page == 100:
+            pages = math.ceil((self.patch_count - pch_num) / 100) + 1
+
+        # Query for each page of patches we need to retrieve.
+        if pages == 2:
+            return self._search({**search, **{'page': 1}})
+        else:
+            for i in range(1, pages):
+                new_patches.extend(self._search({**search, **{'page': i}}))
+            return new_patches
+
     @staticmethod
-    def determine_patch_count():
+    def _determine_patch_count():
         """ Determines the number of ZOIA patches that
         are currently being stored on PS.
+        Does not count questions as patches.
 
         return: An integer representing the total of ZOIA patches.
         """
-        soup_patch = BeautifulSoup(urlopen(Request("https://patchstorage.com/",
-                                                   headers={"User-Agent":
-                                                                "Mozilla/5.0"})
-                                           ).read(), "html.parser")
+
+        # Hi PS, yes we are a normal Firefox browser and not a program.
+        soup_patch = BeautifulSoup(urlopen(Request(
+            "https://patchstorage.com/", headers={"User-Agent": "Mozilla/5.0"})
+        ).read(), "html.parser")
         found_pedals = soup_patch.find_all(class_="d-flex flex-column "
                                                   "justify-content-center")
 
         """ Convert the ResultSet to a string so we can split on what we are 
         looking for. The PS website does not have unique div names, so this
-        is to workaround that. 
+        is to workaround that.
         """
         zoia = unicode.join(u'\n', map(unicode, found_pedals)
                             ).split("ZOIA", 1)[1].split("<strong>", 1)[1]
@@ -237,52 +249,3 @@ class PatchStorage:
 
         # Return the total minus the number of questions found.
         return int(zoia[:3]) - len(soup_ques.find_all(class_="card"))
-
-    def get_potential_updates(self, meta):
-        """ Queries the PS API for all patches that have an updated_at
-        attribute that is more recent than the one present for patches
-        that have been previously downloaded.
-
-        meta: An array containing the id and updated_at attributes for
-              patches that may need to be updated.
-        """
-        new_bin = []
-
-        for entry in meta:
-            idx = entry["id"]
-
-            # Check to see if the patch has been updated by comparing the dates
-            curr_meta = self.get_patch_meta(idx)
-            try:
-                if curr_meta["updated_at"] > entry["updated_at"]:
-                    new_bin.append((self.download(str(entry["id"])), curr_meta))
-            except KeyError:
-                continue
-
-        return new_bin
-
-    def get_newest_patches(self, pch_num):
-        """ Queries the PS API for the latest patches that have not been
-        stored in data.json previously. This is only called after the
-        initial launch of the application and only if new patches have
-        been uploaded to PS since that initial launch.
-
-        pch_num: The number of patches currently stored in data.json
-        """
-        per_page = self.patch_count - pch_num
-        if per_page > 100:
-            per_page = 100
-        search = {
-            'per_page': per_page
-        }
-
-        new_patches = []
-        pages = 2
-        if per_page == 100:
-            pages = math.ceil((self.patch_count - pch_num) / 100) + 1
-        if pages == 2:
-            return self.search({**search, **{'page': 1}})
-        else:
-            for i in range(1, pages):
-                new_patches += self.search({**search, **{'page': 1}})
-            return new_patches

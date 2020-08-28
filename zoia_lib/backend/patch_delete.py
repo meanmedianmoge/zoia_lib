@@ -21,11 +21,14 @@ class PatchDelete(Patch):
         """Attempts to delete a patch and its metadata from
         the backend ZoiaLibraryApp directory.
 
-        patch: A string representing the patch to be deleted.
-        Raises RenamingError if the file could not be renamed
+        patch: A string representing the path to the patch to be
+               deleted.
+
+        raise: RenamingError if the file could not be renamed
                correctly.
-        Raises BadPathError if patch was not a valid path.
+        raise: BadPathError if patch was not a valid path.
         """
+
         if patch is None:
             raise errors.DeletionError(None)
 
@@ -41,13 +44,14 @@ class PatchDelete(Patch):
             os.remove(os.path.join(new_path, patch + ".bin"))
             os.remove(os.path.join(new_path, patch + ".json"))
             if new_path is not None and len(os.listdir(new_path)) == 2:
+                # If there aren't multiple patches left, drop the version
+                # extension on the remaining patch.
                 for left_files in os.listdir(new_path):
                     try:
-                        front = left_files.split("_")[0]
-                        end = left_files.split(".")[1]
                         os.rename(os.path.join(new_path, left_files),
-                                  os.path.join(new_path,
-                                               "{}.{}".format(front, end)))
+                                  os.path.join(new_path, "{}.{}".format(
+                                      left_files.split("_")[0],
+                                      left_files.split(".")[-1])))
                     except FileNotFoundError or FileExistsError:
                         raise errors.RenamingError(left_files, 601)
             elif new_path is not None and len(os.listdir(new_path)) == 0:
@@ -66,8 +70,9 @@ class PatchDelete(Patch):
         name of the patch directory that will be deleted.
 
         patch_dir: A string representing the patch directory to be deleted.
-        Raises DeletionError if patch_dir is malformed.
-        Raises BadPathError if patch_dir does not lead to a patch.
+
+        raise: DeletionError if patch_dir is malformed.
+        raise: BadPathError if patch_dir does not lead to a patch.
         """
 
         if patch_dir is None:
@@ -93,8 +98,9 @@ class PatchDelete(Patch):
                a patch be found that matches the passed index, it will
                be deleted.
         sd_path: A string representing the path to the inserted SD card.
-        Raises BadPatchError if path does not lead to a patch.
-        Raises DeletionError if patch_dir is malformed, cannot find a
+
+        raise: BadPatchError if path does not lead to a patch.
+        raise: DeletionError if patch_dir is malformed, cannot find a
                a patch to delete, or the SD card is removed during
                deletion.
         """
@@ -120,6 +126,8 @@ class PatchDelete(Patch):
         """ Deletes a file at the specified path.
 
         path: The path at which the file to be deleted is located.
+
+        raise: BadPathError if path did not lead to a file.
         """
 
         # Delete the patch.

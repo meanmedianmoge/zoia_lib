@@ -11,10 +11,10 @@ class BadPathError(ZoiaLibError):
      - 301: The path did not lead to a file or directory.
     """
 
-    def __init__(self, path, error_code=0):
+    def __init__(self, path, error_code_zoia=0):
         if path is None:
             print(f'Expected a file path but got None instead.')
-        elif error_code == 301:
+        elif error_code_zoia == 301:
             print(f'Path {path} did not lead to a file or directory.')
         else:
             # Default case. We don't want to see this.
@@ -30,27 +30,28 @@ class DeletionError(ZoiaLibError):
      - 401: Encountered a file extension when none was expected.
      - 402: Encountered a version extension when none was expected.
      - 403: Failed to encounter a file extension when one was expected.
-     - 404: Incorrect index provided for deletion purposes.
     """
 
-    def __init__(self, patch, error_code=0):
+    def __init__(self, patch, error_code_zoia=0):
         if patch is None:
-            print(f'Expected a patch name but got None instead.')
-        elif error_code == 401:
-            print(f'Patch {patch} contains a file extension, which is not'
-                  f'applicable when a patch directory is being deleted.')
-        elif error_code == 402:
-            print(f'Patch {patch} contains a version extension, which is not'
-                  f'applicable when a patch directory is being deleted.')
-        elif error_code == 403:
-            print(f'Patch {patch} does not contain a file extension, which is '
-                  f'required when an SD card patch is being deleted.')
-        elif error_code == 404:
-            print(f'Expected an index of length 3, but got {patch} instead.')
+            error_msg = f'Expected a patch name but got None instead.'
         else:
-            # Default case. We do not want to get here.
-            print(f'Could not delete the file {patch} from the backend '
-                  f'ZoiaLibraryApp directory due to an expected error.')
+            try:
+                error_msg = {
+                    401: f'Patch {patch} contains a file extension, which is '
+                         f'not valid when a patch directory is being deleted.',
+                    402: f'Patch {patch} contains a version extension, which '
+                         f'is not valid when a patch directory is being '
+                         f'deleted.',
+                    403: f'Patch {patch} does not contain a file extension, '
+                         f'which is required when an SD card patch is being '
+                         f'deleted.'
+                }[error_code_zoia]
+            except KeyError:
+                error_msg = f'Could not delete the file {patch} from the ' \
+                            f'backend ZoiaLibraryApp directory due to an ' \
+                            f'unexpected error.'
+        print(error_msg)
 
 
 class SavingError(ZoiaLibError):
@@ -69,28 +70,28 @@ class SavingError(ZoiaLibError):
             existed.
     """
 
-    def __init__(self, patch, error_code=0):
+    def __init__(self, patch, error_code_zoia=0):
         if patch is None:
-            print(f'Expected a patch name but got None instead.')
-        elif error_code == 501:
-            print(f'Could not save the file {patch} because a file extension '
-                  f'was encountered when none should have been supplied.')
-        elif error_code == 502:
-            print(f'Could not save the file {patch} because necessary '
-                  f'\"files\" attribute was missing in the metadata.')
-        elif error_code == 503:
-            print(f'Could not save the file {patch} because the binary '
-                  f'content has already been saved and still exists.')
-        elif error_code == 504:
-            print(f'Could not save the file {patch} because it lacked '
-                  f'a file extension.')
-        elif error_code == 505:
-            print(f'Could not create a directory with id {patch} because it '
-                  f'already existed.')
+            error_msg = f'Expected a patch name but got None instead.'
         else:
-            # Default case. We do not want to get here.
-            print(f'Could not save the file {patch} from the backend '
-                  f'due to an unexpected error.')
+            try:
+                error_msg = {
+                    501: f'Could not save the file {patch} because a file '
+                         f'extension was encountered when none should have '
+                         f'been supplied.',
+                    502: f'Could not save the file {patch} because necessary '
+                         f'\"files\" attribute was missing in the metadata.',
+                    503: f'Could not save the file {patch} because the binary '
+                         f'content has already been saved and still exists.',
+                    504: f'Could not save the file {patch} because it lacked '
+                         f'a file extension.',
+                    505: f'Could not create a directory with id {patch} '
+                         f'because it already existed.'
+                }[error_code_zoia]
+            except KeyError:
+                error_msg = f'Could not save the file {patch} from the ' \
+                            f'backend due to an unexpected error.'
+        print(error_msg)
 
 
 class RenamingError(ZoiaLibError):
@@ -120,24 +121,25 @@ class ExportingError(ZoiaLibError):
      - 702: Exporting would result in overwriting of data.
     """
 
-    def __init__(self, patch, slot=-1, error_code=0):
+    def __init__(self, patch, slot=-1, error_code_zoia=0):
         if patch is None:
-            print(f'Expected a patch name but got None instead.')
-        elif error_code == 701:
-            print(f'Could not export the file {patch} correctly '
-                  f'due to the slot number being greater than 63 '
-                  f'(got {slot}).')
-        elif error_code == 702:
-            print(f'Exporting would result in overwriting of data,'
-                  f'as a bank directory already existed on the SD'
-                  f'card')
-        elif error_code == 703:
-            print(f'Exporting would create a conflict between two'
-                  f'patches.')
+            error_msg = f'Expected a patch name but got None instead.'
         else:
-            # Default case. We do not want to get here.
-            print(f'Could not export the file {patch} correctly '
-                  f'due to an unexpected error.')
+            try:
+                error_msg = {
+                    701: f'Could not export the file {patch} correctly '
+                         f'due to the slot number being greater than 63 '
+                         f'(got {slot}).',
+                    702: f'Exporting would result in overwriting of data,'
+                         f'as a bank directory already existed on the SD'
+                         f'card',
+                    703: f'Exporting would create a conflict between two'
+                         f'patches.'
+                }[error_code_zoia]
+            except KeyError:
+                error_msg = f'Could not export the file {patch} correctly ' \
+                            f'due to an unexpected error.'
+        print(error_msg)
 
 
 class JSONError(ZoiaLibError):
@@ -147,10 +149,10 @@ class JSONError(ZoiaLibError):
      - 801: The JSON data was malformed.
     """
 
-    def __init__(self, data, error_code=0):
+    def __init__(self, data, error_code_zoia=0):
         if data is None:
             print(f'Expected a JSON data but got None instead.')
-        elif error_code == 801:
+        elif error_code_zoia == 801:
             print(f'Could not process {data} because the JSON data '
                   f'was mal-formatted (i.e., it was not JSON compliant).')
         else:
@@ -165,20 +167,25 @@ class SortingError(ZoiaLibError):
     Possible error codes:
      - 901: The mode was invalid.
      - 902: The data supplied was not a list.
+     - 903: One or more passed parameters contained None.
     """
-    def __init__(self, info, error_code=0):
+    def __init__(self, info, error_code_zoia=0):
         if info is None:
-            print(f'Expected information but got None instead.')
-        elif error_code == 901:
-            print(f'Sorting mode {info} is invalid. Valid sorting modes '
-                  f'occur between 1 and 6 inclusive.')
-        elif error_code == 902:
-            print(f'The supplied metadata {info} is not a list. Sorting '
-                  f'can only occur on valid lists.')
+            error_msg = f'Expected information but got None instead.'
         else:
-            # Default case. We do not want to get here.
-            print(f'Could not process {info} correctly '
-                  f'due to an unexpected error.')
+            try:
+                error_msg = {
+                    901: f'Sorting mode {info} is invalid. Valid sorting '
+                         f'modes occur between 1 and 6 inclusive.',
+                    902: f'The supplied metadata {info} is not a list. '
+                         f'Sorting can only occur on valid lists.',
+                    903: f'The parameter list was invalid. Ensure that no '
+                         f'parameters contain None as a value.'
+                }[error_code_zoia]
+            except KeyError:
+                error_msg = f'Could not process {info} correctly due to an ' \
+                            f'unexpected error.'
+        print(error_msg)
 
 
 class SearchingError(ZoiaLibError):
@@ -186,16 +193,21 @@ class SearchingError(ZoiaLibError):
     successfully.
 
     Possible error codes:
-     - 1001: The mode was invalid.
-     - 1002: The query supplied was not a list.
+     - 1001:  The query supplied was not a list.
+     - 1002: One or more passed parameters contained None.
     """
-    def __init__(self, info, error_code=0):
+    def __init__(self, info, error_code_zoia=0):
         if info is None:
-            print(f'Expected information but got None instead.')
-        elif error_code == 1001:
-            print(f'The supplied metadata {info} is not a list. Searching '
-                  f'can only occur on valid lists.')
+            error_msg = f'Expected information but got None instead.'
         else:
-            # Default case. We do not want to get here.
-            print(f'Could not process {info} correctly '
-                  f'due to an unexpected error.')
+            try:
+                error_msg = {
+                    1001: f'The supplied metadata {info} is not a list. '
+                          f'Searching can only occur on valid lists.',
+                    1002: f'The parameter list was invalid. Ensure that no '
+                          f'parameters contain None as a value.'
+                }[error_code_zoia]
+            except KeyError:
+                error_msg = f'Could not process {info} correctly due to an ' \
+                            f'unexpected error.'
+        print(error_msg)

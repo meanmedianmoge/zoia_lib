@@ -7,22 +7,37 @@ import json
 
 
 class ZOIALibrarianUtil:
+    """ The ZOIALibrarianUTIL class is responsible for all
+    auxiliary activities that may be required by other ZOIALibrarian
+    classes.
+    """
 
-    def __init__(self, ui):
+    def __init__(self, ui, window):
+        """ Initializes the class with the required parameters.
+
+        ui: The UI component of ZOIALibrarianMain
+        window: A reference to the main UI window for icon consistency.
+        """
 
         # Get the ui reference
         self.ui = ui
+        self.window = window
+
         self.dark = True
+        self.font = QFont("Verdana", 10)
 
     def change_font(self, name):
         """ Changes the font used throughout the application.
         Currently triggered via a menu action.
+
+        name: Used to specify whether the font should be resized or
+              changed to a different font family.
         """
 
         # Get the context.
         if name == "":
             # Case 1: Default Change Font menu option.
-            ok, f = QFontDialog.getFont()
+            ok, f = QFontDialog.getFont(self.window)
             start = False
         elif name == "+" or name == "-":
             # Case 2: Increase/Decrease font size menu option.
@@ -58,6 +73,7 @@ class ZOIALibrarianUtil:
             self.ui.table_bank_local.setFont(new_font)
             self.ui.table_bank_local.horizontalHeader().setFont(new_font)
             self.ui.table_bank_left.setFont(new_font)
+            self.ui.text_browser_viz.setFont(new_font)
             self.ui.table_bank_left.horizontalHeader().setFont(new_font)
             self.ui.table_bank_left.verticalHeader().setFont(new_font)
             self.ui.table_bank_right.setFont(new_font)
@@ -66,6 +82,7 @@ class ZOIALibrarianUtil:
             self.ui.tabs.setFont(new_font)
             self.ui.sd_tree.setFont(new_font)
             self.ui.text_browser_PS.setFont(big_font)
+            self.ui.page_label.setFont(new_font)
             self.ui.text_browser_local.setFont(big_font)
             self.ui.text_browser_bank.setFont(big_font)
 
@@ -79,6 +96,8 @@ class ZOIALibrarianUtil:
                         self.ui.table_local.cellWidget(i, 4).setFont(new_font)
                         self.ui.table_local.cellWidget(i, 5).setFont(new_font)
                 for i in range(32):
+                    # Need trys here in case the table does not have a
+                    # cell widget there yet.
                     try:
                         self.ui.table_sd_left.cellWidget(i, 1).setFont(
                             new_font)
@@ -126,6 +145,11 @@ class ZOIALibrarianUtil:
 
     def save_pref(self, w, h, sd, path):
         """ Saves and writes the state of a UI window to pref.json
+
+        w: The width of the main window.
+        h: The height of the main window.
+        sd: The path to an the root of a specified SD card.
+        path: The path to the backend .ZoiaLibraryApp directory.
         """
 
         # Capture the necessary specs on exit.
@@ -135,7 +159,8 @@ class ZOIALibrarianUtil:
             "font":
                 self.ui.table_PS.horizontalHeader().font().toString().split(
                     ",")[0],
-            "font_size": self.ui.table_PS.horizontalHeader().font().pointSize(),
+            "font_size":
+                self.ui.table_PS.horizontalHeader().font().pointSize(),
             "sd_root": "" if sd is None else sd
         }
         ps_sizes = {
@@ -154,7 +179,9 @@ class ZOIALibrarianUtil:
             "col_4": self.ui.table_local.columnWidth(4),
             "col_5": self.ui.table_local.columnWidth(5),
             "split_left": self.ui.splitter_local.sizes()[0],
-            "split_right": self.ui.splitter_local.sizes()[1]
+            "split_right": self.ui.splitter_local.sizes()[1],
+            "split_top": self.ui.splitter_local_hori.sizes()[0],
+            "split_bottom": self.ui.splitter_local_hori.sizes()[1]
         }
         sd_sizes = {
             "col_0": self.ui.table_sd_left.columnWidth(0),
@@ -182,40 +209,42 @@ class ZOIALibrarianUtil:
             "enabled": not self.dark
         }
 
+        # Write the data to pref.json for subsequent launches.
         with open(os.path.join(path, "pref.json"), "w") as f:
             f.write(json.dumps([window, ps_sizes, local_sizes,
                                 sd_sizes, bank_sizes, dark_mode]))
 
     def toggle_dark(self):
-        app = QApplication.instance()
-        if self.dark:
-            if platform.system().lower() == "darwin":
-                with open(os.path.join("zoia_lib", "UI", "resources",
-                                       "osx-light.css"), "r") as f:
-                    data = f.read()
-            else:
-                with open(os.path.join("zoia_lib", "UI", "resources",
-                                       "light.css"), "r") as f:
-                    data = f.read()
-            self.dark = False
-        else:
-            if platform.system().lower() == "darwin":
-                with open(os.path.join("zoia_lib", "UI", "resources",
-                                       "osx-dark.css"), "r") as f:
-                    data = f.read()
-            else:
-                with open(os.path.join("zoia_lib", "UI", "resources",
-                                       "dark.css"), "r") as f:
-                    data = f.read()
-            self.dark = True
-        app.setStyleSheet(data)
-
-    def row_invert(self):
-        """ Either enables of disables alternating row colours for
-        tables; depending on the previous state of the tables.
+        """ Toggles the theme for the application.
         Currently triggered via a menu action.
         """
 
+        app = QApplication.instance()
+        # Pick the right stylesheet based on the OS.
+        sheet = {
+            ("darwin", True): "osx-light.css",
+            ("windows", True): "light.css",
+            ("linux", True): "light.css",
+            ("darwin", False): "osx-dark.css",
+            ("windows", False): "dark.css",
+            ("linux", True): "dark.css"
+        }[(platform.system().lower(), self.dark)]
+
+        with open(os.path.join("zoia_lib", "UI", "resources",
+                               sheet), "r") as f:
+            data = f.read()
+
+        self.dark = not self.dark
+        app.setStyleSheet(data)
+        self.change_font(self.font)
+
+    def row_invert(self):
+        """ Either enables of disables alternating row colours for
+        tables depending on the previous state of the tables.
+        Currently triggered via a menu action.
+        """
+
+        # Set the property for all tables in the UI.
         self.ui.table_PS.setAlternatingRowColors(
             not self.ui.table_PS.alternatingRowColors())
         self.ui.table_local.setAlternatingRowColors(
@@ -232,7 +261,104 @@ class ZOIALibrarianUtil:
             not self.ui.table_bank_right.alternatingRowColors())
 
     def set_dark(self, value):
-        """ Setter method to specify the state of the application with
-        regards to dark mode being enabled.
+        """ Setter method to specify whether dark mode is enabled.
         """
         self.dark = value
+
+    def set_font(self, f):
+        """ Setter method to specify the font to be used for the app.
+        """
+        self.font = f
+
+    @staticmethod
+    def multi_drag_drop(rows_left, rows_right, table_1, table_2, f1):
+        """ Attempts to move multiple rows from one table at the same
+        time. This can be within the same table or to a companion table.
+
+        rows_left: An array containing the rows currently stored in the
+                   left table.
+        rows_right: And array containing the rows currently stored in
+                    the right table.
+        table_1: The left table associated with the multi drag/drop.
+        table_2: The right table associated with the multi drag/drop.
+        f1: A function to move the useful data associated with the rows.
+        """
+
+        first_item = None
+        first_item_index = -1
+
+        # Figure out which rows var to use depending on whether we
+        # originate from the left or right.
+        if len(rows_left) > 1 and len(rows_right) == 0:
+            curr_rows = rows_left
+            main_table = table_1
+            other_table = table_2
+        else:
+            curr_rows = rows_right
+            main_table = table_2
+            other_table = table_1
+
+        # Find the first entry for the current set of rows.
+        for i in sorted(curr_rows):
+            i = i.row()
+            i = int('%d' % i)
+            temp = main_table.item(i, 0)
+            if temp is not None and temp.text() != "":
+                first_item = temp
+                first_item_index = i
+                if main_table == table_2:
+                    first_item_index += 32
+                break
+        first_item_text = first_item.text()
+        for i in range(64):
+            if i < 32:
+                temp_left = table_1.item(i, 0)
+                temp_right = None
+            else:
+                temp_right = table_2.item(i - 32, 0)
+                temp_left = None
+            if main_table == table_1:
+                temp_main = temp_left
+                temp_other = temp_right
+            else:
+                temp_main = temp_right
+                temp_other = temp_left
+            if (temp_main is not None and i != first_item_index
+                and temp_main.text() == first_item_text) or (
+                    temp_other is not None and temp_other.text()
+                    == first_item_text):
+                # We found the first item!
+                row = sorted(curr_rows)[-1].row()
+                row = int('%d' % row)
+                if curr_rows == rows_right:
+                    row += 32
+                for j in range(first_item_index, row + 1):
+                    if j == first_item_index:
+                        i = i + (j - first_item_index)
+                    else:
+                        i += 1
+                    if i > 31:
+                        if curr_rows == rows_right:
+                            temp1 = main_table.item(j - 32, 0)
+                        else:
+                            temp1 = main_table.item(j, 0)
+                        temp2 = other_table.item(i - 32, 0)
+                    else:
+                        if curr_rows == rows_right:
+                            temp1 = main_table.item(j - 32, 0)
+                        else:
+                            temp1 = main_table.item(j, 0)
+                        temp2 = main_table.item(i, 0)
+                    if temp1 is None and temp2 is None:
+                        continue
+                    elif temp1 is None and temp2 is not None:
+                        f1(i, j)
+                    elif temp1 is not None and temp2 is None or \
+                            temp1 is not None and temp2 is not \
+                            None:
+                        f1(j, i)
+                    elif temp1 is None and temp2 is not None:
+                        f1(i, j)
+        # Delete phantom rows from row insertions.
+        table_1.setRowCount(32)
+        table_2.setRowCount(32)
