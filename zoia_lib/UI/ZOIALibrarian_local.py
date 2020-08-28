@@ -285,7 +285,7 @@ class ZOIALibrarianLocal(QMainWindow):
         self.ui.check_for_updates_btn.setEnabled(False)
         self.ui.refresh_pch_btn.setEnabled(False)
         self.ui.btn_dwn_all.setEnabled(False)
-        self.ui.statusbar.showMessage("Checking for updates...", timeout=5000)
+        self.ui.statusbar.showMessage("Checking for updates...")
         self.worker_updates.start()
 
     def update_local_patches_done(self, count):

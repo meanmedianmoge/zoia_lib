@@ -480,9 +480,14 @@ class PatchSave(Patch):
 
         # Get to the uncompressed directory.
         for file in os.listdir(pch):
-            if os.path.isdir(os.path.join(pch, file)):
+            if os.path.isdir(os.path.join(pch, file)) \
+                    and len(os.listdir(pch)) == 1:
                 to_delete = (os.path.join(pch, file))
                 pch = os.path.join(pch, file)
+            elif os.path.isdir(os.path.join(pch, file)):
+                # Oh boy they compressed it with a directory and some
+                # stray files because they hate us.
+                shutil.rmtree(os.path.join(pch, file))
 
         if len(os.listdir(pch)) == 1:
             # The compressed file only contained 1 patch.
