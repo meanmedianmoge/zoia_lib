@@ -3,6 +3,7 @@ import os
 import platform
 
 from PySide2.QtCore import QEvent
+from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QTableWidgetItem, QPushButton, QFileDialog, \
     QMessageBox, QInputDialog, QTableWidgetSelectionRange, QMainWindow
 
