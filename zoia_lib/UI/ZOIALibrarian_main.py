@@ -230,7 +230,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.local.update_local_patches_thread)
         self.ui.actionImport_Version_History_directory.triggered.connect(
             self._version_import_thread)
-        self.ui.refresh_pch_btn.clicked.connect(self.ps._reload_ps_thread)
+        self.ui.refresh_pch_btn.clicked.connect(self.ps.reload_ps_thread)
         self.ui.update_patch_notes.clicked.connect(
             self.local.update_patch_notes)
         self.ui.actionImport_A_Patch.triggered.connect(self.import_patch)
@@ -260,7 +260,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.delete_folder_sd_btn.clicked.connect(self.sd.delete_sd_item)
         self.ui.actionToggle_Dark_Mode_2.triggered.connect(
             self.util.toggle_dark)
-        self.ui.btn_dwn_all.clicked.connect(self.ps._download_all_thread)
+        self.ui.btn_dwn_all.clicked.connect(self.ps.download_all_thread)
         self.ui.btn_next_page.clicked.connect(self.local.viz_page)
         self.ui.btn_prev_page.clicked.connect(self.local.viz_page)
         for i in range(40):
@@ -571,12 +571,11 @@ class ZOIALibrarianMain(QMainWindow):
         a patch is selected in the PS table or local table. Information
         is displayed via HTML.
         Should the patch contain multiple versions, a call to
-        display_patch_versions is ran instead.
+        display_patch_versions() is ran instead.
         Currently triggered via a radio button selection.
         """
 
         skip = False
-        viz = None
 
         # The "sender" here is every radio button, so we need to see
         # which one is actually checked.
@@ -913,7 +912,7 @@ class ZOIALibrarianMain(QMainWindow):
                     (self.ui.tabs.currentIndex() == 3 and not
                      self.ui.back_btn_bank.isEnabled()):
                 self.local.get_local_patches()
-
+        # Let the user know of any errors that occurred.
         except errors.BadPathError:
             self.msg.setWindowTitle("No Patch Found")
             self.msg.setText("Incorrect file selected, importing failed.")
@@ -1052,12 +1051,10 @@ class ZOIALibrarianMain(QMainWindow):
         if o.objectName() == "table_sd_left" or o.objectName() == \
                 "table_sd_right":
             self.sd.events(o, e)
-            return True
         # Bank tab swap/move
         elif o.objectName() == "table_bank_local" or o.objectName() == \
                 "table_bank_left" or o.objectName() == "table_bank_right":
             self.bank.events(o, e)
-            return True
         # Searching via searchbar
         elif o.objectName() == "searchbar_PS" \
                 or o.objectName() == "searchbar_local" \

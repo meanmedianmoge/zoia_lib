@@ -88,7 +88,7 @@ class ZOIALibrarianPS(QMainWindow):
             self.msg.setInformativeText(None)
             self.ui.tabs.setCurrentIndex(2)
 
-    def _reload_ps_thread(self):
+    def reload_ps_thread(self):
         """ Initializes a Worker thread to manage the refreshing of
         all ZOIA patches currently hosted on PatchStorage.
         Currently triggered via a button press.
@@ -119,7 +119,7 @@ class ZOIALibrarianPS(QMainWindow):
         self.msg.setStandardButtons(QMessageBox.Ok)
         self.msg.exec_()
 
-    def _download_all_thread(self):
+    def download_all_thread(self):
         """ Initializes a Worker thread to manage the downloading of
         all ZOIA patches currently hosted on PatchStorage.
         Currently triggered via a button press.

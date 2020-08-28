@@ -308,6 +308,7 @@ class ZOIALibrarianSD(QMainWindow):
         os.rename(os.path.join(self.sd_path_full, src_pch),
                   os.path.join(self.sd_path_full, dest + src_pch[3:]))
 
+        # Clear the selections and reload the tables.
         dest = int(dest)
         for i in range(64):
             if i == dest:

@@ -29,13 +29,17 @@ class PatchUpdate(Patch):
               - 1 -> Modify the tags
               - 2 -> Modify the categories
               - 3 -> Modify the patch notes
+              - 4 -> Modify the author
+              - 5 -> Modify the patch title
         """
 
         # Lookup the right term to use.
         index = {
             1: "tags",
             2: "categories",
-            3: "content"
+            3: "content",
+            4: "author",
+            5: "title"
         }[mode]
 
         # Get the patch name and id.
@@ -46,6 +50,8 @@ class PatchUpdate(Patch):
         with open(os.path.join(self.back_path, idx, "{}.json".format(pch)),
                   "r") as f:
             temp = json.loads(f.read())
+        #if mode == 4:
+        #    temp[index]["name"] = data
         temp[index] = data
         with open(os.path.join(self.back_path, idx, "{}.json".format(pch)),
                   "w") as f:
