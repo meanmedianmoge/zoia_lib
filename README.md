@@ -34,9 +34,6 @@ This software is intended to be free and will be supported by the development te
 - Drag & drop patches into bank directories, configured automatically into a ZOIA-readable format
 - Version control and change-detection
 
-## Video Demonstration
-- Placeholder
-
 ## Contributing
 - We welcome all contributions! If you want to see something added, 
   either fork or clone the repo to get started.
