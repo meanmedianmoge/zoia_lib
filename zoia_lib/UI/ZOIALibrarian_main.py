@@ -133,9 +133,7 @@ class ZOIALibrarianMain(QMainWindow):
             # SD Card previously specified.
             with open(os.path.join(self.path, "pref.json"), "r") as f:
                 data = json.loads(f.read())
-            if data[0]["sd_root"] != "" \
-                    and data[0]["sd_root"] != "/Volumes/Untitled" \
-                    and os.path.exists(data[0]["sd_root"]):
+            if data[0]["sd_root"] != "" and os.path.exists(data[0]["sd_root"]):
                 self.sd.set_sd_root(data[0]["sd_root"])
                 self.ui.tab_sd.setEnabled(True)
                 self.sd.sd_path(True, self.width())
@@ -283,8 +281,8 @@ class ZOIALibrarianMain(QMainWindow):
             self.ui.splitter_PS.setSizes([self.ps_sizes["split_left"],
                                           self.ps_sizes["split_right"]])
         if self.local_sizes is None:
-            self.ui.splitter_local.setSizes([self.width() * 0.325,
-                                             self.width() * 0.675])
+            self.ui.splitter_local.setSizes([self.width() * 0.6,
+                                             self.width() * 0.4])
             self.ui.splitter_local_hori.setSizes([self.width() * 0.5,
                                                   self.width() * 0.5])
         else:
