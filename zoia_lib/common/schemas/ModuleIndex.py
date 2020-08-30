@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created: 9:58 AM on 7/25/20
-Author: Mike Moger
-Usage:
-"""
-
 # format:
 # {
 #   module type: {
@@ -18,9 +11,9 @@ Usage:
 #   }
 # }
 
-properties = {
+module_index = {
     0: {
-        'name': 'sv_filter',
+        'name': 'SV Filter',
         'category': 'audio',
         'max_blocks': 6,
         'params': 2,
@@ -64,7 +57,7 @@ properties = {
         }
     },
     1: {
-        'name': 'audio_input',
+        'name': 'Audio Input',
         'category': 'interface',
         'max_blocks': 2,
         'params': 0,
@@ -86,7 +79,7 @@ properties = {
         }
     },
     2: {
-        'name': 'audio_output',
+        'name': 'Audio Output',
         'category': 'interface',
         'max_blocks': 3,
         'params': 1,
@@ -114,7 +107,7 @@ properties = {
         }
     },
     3: {
-        'name': 'aliaser',
+        'name': 'Aliaser',
         'category': 'audio',
         'max_blocks': 3,
         'params': 1,
@@ -141,7 +134,7 @@ properties = {
         }
     },
     4: {
-        'name': 'sequencer',
+        'name': 'Sequencer',
         'category': 'cv',
         'max_blocks': 42,
         'params': 34,
@@ -178,17 +171,16 @@ properties = {
         }
     },
     5: {
-        'name': 'lfo',
+        'name': 'LFO',
         'category': 'cv',
         'max_blocks': 5,
         'params': 4,
         'cpu': 0.3,
         'blocks': {
-            'frequency_trigger_in': {
+            'frequency': {
                 'isDefault': True,
                 'isParam': True,
-                'position': 0,
-                'type': ['frequency', 'trigger_in']
+                'position': 0
             },
             'swing_amount': {
                 'isDefault': False,
@@ -216,13 +208,13 @@ properties = {
                          'sawtooth', 'ramp', 'random'],
             'swing_control': ['off', 'on'],
             'output': ['0 to 1', '-1 to 1'],
-            'input': ['cv', 'trigger'],
+            'input': ['cv', 'tap', 'linear_cv'],
             'phase_input': ['off', 'on'],
             'phase_reset': ['off', 'on']
         }
     },
     6: {
-        'name': 'adsr',
+        'name': 'ADSR',
         'category': 'cv',
         'max_blocks': 10,
         'params': 9,
@@ -285,11 +277,12 @@ properties = {
             'hold_attack_decay': ['off', 'on'],
             'str': ['on', 'off'],
             'immediate_release': ['on', 'off'],
-            'hold_sustain_release': ['off', 'on']
+            'hold_sustain_release': ['off', 'on'],
+            'time_scale': ['exponent', 'linear']
         }
     },
     7: {
-        'name': 'vca',
+        'name': 'VCA',
         'category': 'audio',
         'max_blocks': 5,
         'params': 1,
@@ -326,7 +319,7 @@ properties = {
         }
     },
     8: {
-        'name': 'audio_multiply',
+        'name': 'Audio Multiply',
         'category': 'audio',
         'max_blocks': 3,
         'params': 0,
@@ -353,7 +346,7 @@ properties = {
         }
     },
     9: {
-        'name': 'bit_crusher',
+        'name': 'Bit Crusher',
         'category': 'audio',
         'max_blocks': 3,
         'params': 1,
@@ -380,7 +373,7 @@ properties = {
         }
     },
     10: {
-        'name': 'sample_and_hold',
+        'name': 'Sample & Hold',
         'category': 'cv',
         'max_blocks': 3,
         'params': 2,
@@ -407,7 +400,7 @@ properties = {
         }
     },
     11: {
-        'name': 'od_and_distortion',
+        'name': 'OD and Distortion',
         'category': 'effect',
         'max_blocks': 4,
         'params': 2,
@@ -439,7 +432,7 @@ properties = {
         }
     },
     12: {
-        'name': 'env_follower',
+        'name': 'Env Follower',
         'category': 'analysis',
         'max_blocks': 4,
         'params': 2,
@@ -472,7 +465,7 @@ properties = {
         }
     },
     13: {
-        'name': 'delay_line',
+        'name': 'Delay Line',
         'category': 'audio',
         'max_blocks': 4,
         'params': 2,
@@ -510,7 +503,7 @@ properties = {
         }
     },
     14: {
-        'name': 'oscillator',
+        'name': 'Oscillator',
         'category': 'audio',
         'max_blocks': 4,
         'params': 2,
@@ -545,7 +538,7 @@ properties = {
         }
     },
     15: {
-        'name': 'pushbutton',
+        'name': 'Pushbutton',
         'category': 'interface',
         'max_blocks': 1,
         'params': 0,
@@ -563,7 +556,7 @@ properties = {
         }
     },
     16: {
-        'name': 'keyboard',
+        'name': 'Keyboard',
         'category': 'interface',
         'max_blocks': 26,
         'params': 23,
@@ -591,11 +584,11 @@ properties = {
             }
         },
         'options': {
-            '#_of_notes': [1-23]
+            '#_of_notes': list(range(1, 24))
         }
     },
     17: {
-        'name': 'cv_filter',
+        'name': 'CV Filter',
         'category': 'cv',
         'max_blocks': 3,
         'params': 2,
@@ -622,7 +615,7 @@ properties = {
         }
     },
     18: {
-        'name': 'steps',
+        'name': 'Steps',
         'category': 'cv',
         'max_blocks': 3,
         'params': 2,
@@ -649,7 +642,7 @@ properties = {
         }
     },
     19: {
-        'name': 'slew_limiter',
+        'name': 'Slew Limiter',
         'category': 'cv',
         'max_blocks': 4,
         'params': 2,
@@ -686,7 +679,7 @@ properties = {
         }
     },
     20: {
-        'name': 'midi_notes_in',
+        'name': 'Midi Notes In',
         'category': 'interface',
         'max_blocks': 32,
         'params': 0,
@@ -714,18 +707,18 @@ properties = {
             }
         },
         'options': {
-            'midi_channel': [1-16],
-            '#_of_outputs': [1-8],
-            'priority': ['newest', 'oldest', 'highest', 'lowest', 'round_robin'],
+            'midi_channel': list(range(1, 17)),
+            '#_of_outputs': list(range(1, 9)),
+            'priority': ['newest', 'oldest', 'highest', 'lowest', 'RoundRobin'],
             'greedy': ['no', 'yes'],
             'velocity_output': ['off', 'on'],
-            'low_note': [0-127],
-            'high_note': [127-0],
+            'low_note': list(range(0, 128)),
+            'high_note': list(range(0, 128))[::-1],
             'trigger_pulse': ['off', 'on']
         }
     },
     21: {
-        'name': 'midi_cc_in',
+        'name': 'Midi CC In',
         'category': 'interface',
         'max_blocks': 1,
         'params': 0,
@@ -738,13 +731,13 @@ properties = {
             }
         },
         'options': {
-            'midi_channel': [1-16],
-            'controller': [0-127],
+            'midi_channel': list(range(1, 17)),
+            'controller': list(range(0, 128)),
             'output_range': ['0 to 1', '-1 to 1']
         }
     },
     22: {
-        'name': 'multiplier',
+        'name': 'Multiplier',
         'category': 'cv',
         'max_blocks': 4,
         'params': 2,
@@ -766,7 +759,7 @@ properties = {
         }
     },
     23: {
-        'name': 'compressor',
+        'name': 'Compressor',
         'category': 'effect',
         'max_blocks': 9,
         'params': 4,
@@ -827,7 +820,7 @@ properties = {
         }
     },
     24: {
-        'name': 'multi-filter',
+        'name': 'Multi Filter',
         'category': 'audio',
         'max_blocks': 5,
         'params': 3,
@@ -864,7 +857,7 @@ properties = {
         }
     },
     25: {
-        'name': 'plate_reverb',
+        'name': 'Plate Reverb',
         'category': 'effect',
         'max_blocks': 8,
         'params': 4,
@@ -916,7 +909,7 @@ properties = {
         }
     },
     26: {
-        'name': 'buffer_delay',
+        'name': 'Buffer Delay',
         'category': 'audio',
         'max_blocks': 2,
         'params': 0,
@@ -938,7 +931,7 @@ properties = {
         }
     },
     27: {
-        'name': 'all_pass_filter',
+        'name': 'All Pass Filter',
         'category': 'audio',
         'max_blocks': 3,
         'params': 1,
@@ -965,7 +958,7 @@ properties = {
         }
     },
     28: {
-        'name': 'quantizer',
+        'name': 'Quantizer',
         'category': 'cv',
         'max_blocks': 4,
         'params': 3,
@@ -997,7 +990,7 @@ properties = {
         }
     },
     29: {
-        'name': 'phaser',
+        'name': 'Phaser',
         'category': 'effect',
         'max_blocks': 8,
         'params': 4,
@@ -1051,7 +1044,7 @@ properties = {
         }
     },
     30: {
-        'name': 'looper',
+        'name': 'Looper',
         'category': 'audio',
         'max_blocks': 9,
         'params': 6,
@@ -1115,7 +1108,7 @@ properties = {
         }
     },
     31: {
-        'name': 'in_switch',
+        'name': 'In Switch',
         'category': 'cv',
         'max_blocks': 18,
         'params': 17,
@@ -1142,7 +1135,7 @@ properties = {
         }
     },
     32: {
-        'name': 'out_switch',
+        'name': 'Out Switch',
         'category': 'cv',
         'max_blocks': 18,
         'params': 2,
@@ -1169,7 +1162,7 @@ properties = {
         }
     },
     33: {
-        'name': 'audio_in_switch',
+        'name': 'Audio In Switch',
         'category': 'audio',
         'max_blocks': 18,
         'params': 1,
@@ -1196,7 +1189,7 @@ properties = {
         }
     },
     34: {
-        'name': 'audio_out_switch',
+        'name': 'Audio Out Switch',
         'category': 'audio',
         'max_blocks': 18,
         'params': 1,
@@ -1223,7 +1216,7 @@ properties = {
         }
     },
     35: {
-        'name': 'midi_pressure',
+        'name': 'Midi Pressure',
         'category': 'interface',
         'max_blocks': 1,
         'params': 0,
@@ -1236,11 +1229,11 @@ properties = {
             }
         },
         'options': {
-            'midi_channel': [1-16]
+            'midi_channel': list(range(1, 17))
         }
     },
     36: {
-        'name': 'onset_detector',
+        'name': 'Onset Detector',
         'category': 'analysis',
         'max_blocks': 3,
         'params': 1,
@@ -1267,7 +1260,7 @@ properties = {
         }
     },
     37: {
-        'name': 'rhythm',
+        'name': 'Rhythm',
         'category': 'cv',
         'max_blocks': 5,
         'params': 3,
@@ -1304,7 +1297,7 @@ properties = {
         }
     },
     38: {
-        'name': 'noise',
+        'name': 'Noise',
         'category': 'audio',
         'max_blocks': 1,
         'params': 0,
@@ -1321,7 +1314,7 @@ properties = {
         }
     },
     39: {
-        'name': 'random',
+        'name': 'Random',
         'category': 'cv',
         'max_blocks': 2,
         'params': 1,
@@ -1344,7 +1337,7 @@ properties = {
         }
     },
     40: {
-        'name': 'gate',
+        'name': 'Gate',
         'category': 'effect',
         'max_blocks': 8,
         'params': 3,
@@ -1399,7 +1392,7 @@ properties = {
         }
     },
     41: {
-        'name': 'tremolo',
+        'name': 'Tremolo',
         'category': 'effect',
         'max_blocks': 6,
         'params': 2,
@@ -1443,7 +1436,7 @@ properties = {
         }
     },
     42: {
-        'name': 'tone_control',
+        'name': 'Tone Control',
         'category': 'effect',
         'max_blocks': 10,
         'params': 6,
@@ -1506,7 +1499,7 @@ properties = {
         }
     },
     43: {
-        'name': 'delay_w_mod',
+        'name': 'Delay w Mod',
         'category': 'effect',
         'max_blocks': 9,
         'params': 5,
@@ -1567,7 +1560,7 @@ properties = {
         }
     },
     44: {
-        'name': 'stompswitch',
+        'name': 'Stompswitch',
         'category': 'interface',
         'max_blocks': 1,
         'params': 0,
@@ -1586,7 +1579,7 @@ properties = {
         }
     },
     45: {
-        'name': 'value',
+        'name': 'Value',
         'category': 'cv',
         'max_blocks': 2,
         'params': 1,
@@ -1608,7 +1601,7 @@ properties = {
         }
     },
     46: {
-        'name': 'cv_delay',
+        'name': 'CV Delay',
         'category': 'cv',
         'max_blocks': 3,
         'params': 2,
@@ -1635,7 +1628,7 @@ properties = {
         }
     },
     47: {
-        'name': 'cv_loop',
+        'name': 'CV Loop',
         'category': 'cv',
         'max_blocks': 8,
         'params': 7,
@@ -1683,12 +1676,12 @@ properties = {
             }
         },
         'options': {
-            'max_rec_time': [1-16],
+            'max_rec_time': list(range(1, 17)),
             'length_edit': ['off', 'on']
         }
     },
     48: {
-        'name': 'cv_filter',
+        'name': 'CV Filter',
         'category': 'cv',
         'max_blocks': 3,
         'params': 2,
@@ -1715,10 +1708,10 @@ properties = {
         }
     },
     49: {
-        'name': 'clock_divider',
+        'name': 'Clock Divider',
         'category': 'cv',
-        'max_blocks': 4,
-        'params': 3,
+        'max_blocks': 5,
+        'params': 4,
         'cpu': 0.4,
         'blocks': {
             'cv_input': {
@@ -1731,23 +1724,28 @@ properties = {
                 'isParam': True,
                 'position': 1
             },
-            'clock_ratio': {
+            'dividend': {
                 'isDefault': True,
                 'isParam': True,
                 'position': 2
             },
+            'divisor': {
+                'isDefault': True,
+                'isParam': True,
+                'position': 3
+            },
             'cv_output': {
                 'isDefault': True,
                 'isParam': False,
-                'position': 3
+                'position': 4
             }
         },
         'options': {
-            None
+            'input': ['tap', 'cv_control']
         }
     },
     50: {
-        'name': 'comparator',
+        'name': 'Comparator',
         'category': 'cv',
         'max_blocks': 3,
         'params': 2,
@@ -1774,7 +1772,7 @@ properties = {
         }
     },
     51: {
-        'name': 'cv_rectify',
+        'name': 'CV Rectify',
         'category': 'cv',
         'max_blocks': 2,
         'params': 1,
@@ -1796,7 +1794,7 @@ properties = {
         }
     },
     52: {
-        'name': 'trigger',
+        'name': 'Trigger',
         'category': 'cv',
         'max_blocks': 2,
         'params': 1,
@@ -1818,7 +1816,7 @@ properties = {
         }
     },
     53: {
-        'name': 'stereo_spread',
+        'name': 'Stereo Spread',
         'category': 'audio',
         'max_blocks': 5,
         'params': 1,
@@ -1860,7 +1858,7 @@ properties = {
         }
     },
     54: {
-        'name': 'cport_exp_cv_in',
+        'name': 'Cport Exp CV In',
         'category': 'interface',
         'max_blocks': 1,
         'params': 0,
@@ -1877,7 +1875,7 @@ properties = {
         }
     },
     55: {
-        'name': 'cport_cv_out',
+        'name': 'Cport CV Out',
         'category': 'interface',
         'max_blocks': 1,
         'params': 0,
@@ -1894,7 +1892,7 @@ properties = {
         }
     },
     56: {
-        'name': 'ui_button',
+        'name': 'UI Button',
         'category': 'interface',
         'max_blocks': 2,
         'params': 1,
@@ -1916,7 +1914,7 @@ properties = {
         }
     },
     57: {
-        'name': 'audio_panner',
+        'name': 'Audio Panner',
         'category': 'audio',
         'max_blocks': 5,
         'params': 3,
@@ -1976,7 +1974,7 @@ properties = {
         }
     },
     59: {
-        'name': 'pitch_shifter',
+        'name': 'Pitch Shifter',
         'category': 'audio',
         'max_blocks': 3,
         'params': 1,
@@ -2003,7 +2001,7 @@ properties = {
         }
     },
     60: {
-        'name': 'midi_note_out',
+        'name': 'Midi Note Out',
         'category': 'interface',
         'max_blocks': 3,
         'params': 3,
@@ -2026,12 +2024,12 @@ properties = {
             }
         },
         'options': {
-            'midi_channel': [1-16],
+            'midi_channel': list(range(1, 17)),
             'velocity_output': ['off', 'on']
         }
     },
     61: {
-        'name': 'midi_cc_out',
+        'name': 'Midi CC Out',
         'category': 'interface',
         'max_blocks': 1,
         'params': 1,
@@ -2044,8 +2042,8 @@ properties = {
             }
         },
         'options': {
-            'midi_channel': [1-16],
-            'controller': [0-127]
+            'midi_channel': list(range(1, 17)),
+            'controller': list(range(0, 128))
         }
     },
     62: {
@@ -2067,11 +2065,11 @@ properties = {
             }
         },
         'options': {
-            'midi_channel': [1-16]
+            'midi_channel': list(range(1, 17))
         }
     },
     63: {
-        'name': 'bit_modulator',
+        'name': 'Bit Modulator',
         'category': 'audio',
         'max_blocks': 3,
         'params': 0,
@@ -2098,7 +2096,7 @@ properties = {
         }
     },
     64: {
-        'name': 'audio_balance',
+        'name': 'Audio Balance',
         'category': 'audio',
         'max_blocks': 6,
         'params': 1,
@@ -2145,7 +2143,7 @@ properties = {
         }
     },
     65: {
-        'name': 'inverter',
+        'name': 'Inverter',
         'category': 'audio',
         'max_blocks': 2,
         'params': 0,
@@ -2167,7 +2165,7 @@ properties = {
         }
     },
     66: {
-        'name': 'fuzz',
+        'name': 'Fuzz',
         'category': 'effect',
         'max_blocks': 4,
         'params': 2,
@@ -2199,7 +2197,7 @@ properties = {
         }
     },
     67: {
-        'name': 'ghostverb',
+        'name': 'Ghostverb',
         'category': 'effect',
         'max_blocks': 8,
         'params': 4,
@@ -2251,7 +2249,7 @@ properties = {
         }
     },
     68: {
-        'name': 'cabinet_sim',
+        'name': 'Cabinet Sim',
         'category': 'effect',
         'max_blocks': 4,
         'params': 0,
@@ -2285,7 +2283,7 @@ properties = {
         }
     },
     69: {
-        'name': 'flanger',
+        'name': 'Flanger',
         'category': 'effect',
         'max_blocks': 9,
         'params': 5,
@@ -2344,7 +2342,7 @@ properties = {
         }
     },
     70: {
-        'name': 'chorus',
+        'name': 'Chorus',
         'category': 'effect',
         'max_blocks': 8,
         'params': 4,
@@ -2398,7 +2396,7 @@ properties = {
         }
     },
     71: {
-        'name': 'vibrato',
+        'name': 'Vibrato',
         'category': 'effect',
         'max_blocks': 6,
         'params': 2,
@@ -2442,7 +2440,7 @@ properties = {
         }
     },
     72: {
-        'name': 'env_filter',
+        'name': 'Env Filter',
         'category': 'effect',
         'max_blocks': 8,
         'params': 4,
@@ -2496,7 +2494,7 @@ properties = {
         }
     },
     73: {
-        'name': 'ring_modulator',
+        'name': 'Ring Modulator',
         'category': 'effect',
         'max_blocks': 5,
         'params': 3,
@@ -2541,7 +2539,7 @@ properties = {
         }
     },
     74: {
-        'name': 'hall_reverb',
+        'name': 'Hall Reverb',
         'category': 'effect',
         'max_blocks': 8,
         'params': 4,
@@ -2593,7 +2591,7 @@ properties = {
         }
     },
     75: {
-        'name': 'ping_pong_delay',
+        'name': 'Ping Pong Delay',
         'category': 'effect',
         'max_blocks': 9,
         'params': 5,
@@ -2654,11 +2652,11 @@ properties = {
         }
     },
     76: {
-        'name': 'audio_mixer',
+        'name': 'Audio Mixer',
         'category': 'audio',
         'max_blocks': 34,
         'params': 16,
-        'cpu': [3-20],
+        'cpu': 7,
         'blocks': {
             'audio_in_1_L': {
                 'isDefault': True,
@@ -2718,7 +2716,7 @@ properties = {
         }
     },
     77: {
-        'name': 'cv_flip_flop',
+        'name': 'CV Flip Flop',
         'category': 'cv',
         'max_blocks': 2,
         'params': 1,
@@ -2740,7 +2738,7 @@ properties = {
         }
     },
     78: {
-        'name': 'diffuser',
+        'name': 'Diffuser',
         'category': 'audio',
         'max_blocks': 6,
         'params': 4,
@@ -2782,7 +2780,7 @@ properties = {
         }
     },
     79: {
-        'name': 'reverb_lite',
+        'name': 'Reverb Lite',
         'category': 'effect',
         'max_blocks': 6,
         'params': 2,
@@ -2824,7 +2822,7 @@ properties = {
         }
     },
     80: {
-        'name': 'room_reverb',
+        'name': 'Room Reverb',
         'category': 'effect',
         'max_blocks': 8,
         'params': 4,
@@ -2876,7 +2874,7 @@ properties = {
         }
     },
     81: {
-        'name': 'pixel',
+        'name': 'Pixel',
         'category': 'interface',
         'max_blocks': 1,
         'params': 1,
@@ -2893,7 +2891,7 @@ properties = {
         }
     },
     82: {
-        'name': 'midi_clock_in',
+        'name': 'Midi Clock In',
         'category': 'interface',
         'max_blocks': 4,
         'params': 0,
@@ -2924,7 +2922,8 @@ properties = {
             'clock_out': ['disabled', 'enabled'],
             'run_out': ['disabled', 'enabled'],
             'divider': ['disabled', 'enabled'],
-            'channel': [1-11]
+            'beat_modifier': ['1', '2', '3', '4', '6', '12',
+                              '1/12', '1/6', '1/4', '1/3', '1/2']
         }
     },
     83: {
@@ -2986,28 +2985,105 @@ properties = {
             }
         },
         'options': {
-            'num_grains': [1-8],
+            'num_grains': list(range(1, 9)),
             'channels': ['mono', 'stereo'],
             'pos_control': ['cv', 'tap_tempo'],
             'size_control': ['cv', 'tap_tempo']
         }
     },
-    84: [
-        'midi_clock_out',
-        'interface',
-        5,
-        5,
-        [2, 2, 2, 2],
-        ['tap', 'enabled', 'enabled', 'disabled'],
-        0.3
-    ],
-    85: [
-        'tap_to_cv',
-        'cv',
-        4,
-        2,
-        [2, 2],
-        ['40hz', 'linear'],
-        0.1
-    ]
+    84: {
+        'name': 'Midi Clock Out',
+        'category': 'interface',
+        'max_blocks': 5,
+        'params': 5,
+        'cpu': 0.3,
+        'blocks': {
+            'tap_control': {
+                'isDefault': True,
+                'isParam': False,
+                'position': 0
+            },
+            'cv_control': {
+                'isDefault': False,
+                'isParam': True,
+                'position': 0
+            },
+            'sent:': {
+                'isDefault': True,
+                'isParam': True,
+                'position': 1
+            },
+            'reset': {
+                'isDefault': True,
+                'isParam': True,
+                'position': 2
+            },
+            'send_position': {
+                'isDefault': False,
+                'isParam': True,
+                'position': 3
+            },
+            'song_position': {
+                'isDefault': False,
+                'isParam': True,
+                'position': 4
+            }
+        },
+        'options': {
+            'input': ['tap', 'cv_control'],
+            'run_in': ['enabled', 'disabled'],
+            'reset_in': ['enabled', 'disabled'],
+            'position': ['disabled', 'enabled']
+        }
+    },
+    85: {
+        'name': 'Tap to CV',
+        'category': 'cv',
+        'max_blocks': 4,
+        'params': 2,
+        'cpu': 0.1,
+        'blocks': {
+            'tap_input': {
+                'isDefault': True,
+                'isParam': False,
+                'position': 0
+            },
+            'min_time': {
+                'isDefault': False,
+                'isParam': True,
+                'position': 1
+            },
+            'max_time': {
+                'isDefault': False,
+                'isParam': True,
+                'position': 2
+            },
+            'output': {
+                'isDefault': True,
+                'isParam': False,
+                'position': 3
+            }
+        },
+        'options': {
+            'range': ['40hz', 'time'],
+            'output': ['linear', 'exponential']
+        }
+    },
+    86: {
+        'name': 'Midi Pitch Bend In',
+        'category': 'interface',
+        'max_blocks': 1,
+        'params': 0,
+        'cpu': 0.1,
+        'blocks': {
+            'pitch_bend': {
+                'isDefault': True,
+                'isParam': False,
+                'position': 0
+            },
+        'options': {
+            'midi_channel': list(range(1, 17))
+        }
+        }
+    }
 }

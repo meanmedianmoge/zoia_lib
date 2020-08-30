@@ -506,7 +506,7 @@ class ZOIALibrarianLocal(QMainWindow):
         btn_num = int(self.sender().objectName().split("_")[-1])
         for curr_module in self.curr_viz["modules"]:
             if curr_module["page"] == self.curr_page_viz and \
-                    curr_module["position"] == btn_num:
+                    btn_num in curr_module["position"]:
                 # Display the module info
                 if curr_module["new_color"] == "":
                     color = curr_module["old_color"]
@@ -530,18 +530,22 @@ class ZOIALibrarianLocal(QMainWindow):
         for curr_module in self.curr_viz["modules"]:
             # Setup the buttons for each module if we are on the correct page.
             if curr_module["page"] == self.curr_page_viz:
-                curr_btn = self.get_btn(curr_module["position"])
-                try:
-                    color_hex = self._get_color_hex(curr_module["new_color"])
-                except KeyError:
-                    color_hex = self._get_color_hex(curr_module["old_color"])
-                curr_btn.setStyleSheet("QPushButton{background-color:"
-                                       + color_hex + ";"
-                                       + "border: 1px solid #696969;}"
-                                       + "QPushButton:hover{"
-                                       + "border: 5px solid #000000;}")
+                curr_btns = curr_module["position"]
+                for btn in curr_btns:
+                    if btn > 39:
+                        break
+                    curr_btn = self.get_btn(btn)
+                    try:
+                        color_hex = self._get_color_hex(curr_module["new_color"])
+                    except KeyError:
+                        color_hex = self._get_color_hex(curr_module["old_color"])
+                    curr_btn.setStyleSheet("QPushButton{background-color:"
+                                           + color_hex + ";"
+                                           + "border: 1px solid #696969;}"
+                                           + "QPushButton:hover{"
+                                           + "border: 5px solid #000000;}")
 
-                curr_btn.setEnabled(True)
+                    curr_btn.setEnabled(True)
 
     def viz_disable(self):
         """ Disables all internal visualizer buttons.
