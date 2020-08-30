@@ -11,3079 +11,3049 @@
 #   }
 # }
 
+import json
 module_index = {
     0: {
-        'name': 'SV Filter',
-        'category': 'audio',
-        'max_blocks': 6,
-        'params': 2,
-        'cpu': 3,
-        'blocks': {
-            'audio_in': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "SV Filter",
+        "category": "audio",
+        "max_blocks": 6,
+        "params": 2,
+        "cpu": 3,
+        "blocks": {
+            "audio_in": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'frequency': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "frequency": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'resonance': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "resonance": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'lowpass_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 3
+            "lowpass_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 3
             },
-            'hipass_output': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 4
+            "hipass_output": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 4
             },
-            'bandpass_output': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 5
+            "bandpass_output": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 5
             }
         },
-        'options': {
-            'lowpass_output': ['on', 'off'],
-            'hipass_output': ['off', 'on'],
-            'bandpass_output': ['off', 'on']
+        "options": {
+            "lowpass_output": ["on", "off"],
+            "hipass_output": ["off", "on"],
+            "bandpass_output": ["off", "on"]
         }
     },
     1: {
-        'name': 'Audio Input',
-        'category': 'interface',
-        'max_blocks': 2,
-        'params': 0,
-        'cpu': 0.4,
-        'blocks': {
-            'input_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Audio Input",
+        "category": "interface",
+        "max_blocks": 2,
+        "params": 0,
+        "cpu": 0.4,
+        "blocks": {
+            "input_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'input_R': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 1
+            "input_R": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 1
             }
         },
-        'options': {
-            'channels': ['stereo', 'left', 'right']
+        "options": {
+            "channels": ["stereo", "left", "right"]
         }
     },
     2: {
-        'name': 'Audio Output',
-        'category': 'interface',
-        'max_blocks': 3,
-        'params': 1,
-        'cpu': 1.7,
-        'blocks': {
-            'input_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Audio Output",
+        "category": "interface",
+        "max_blocks": 3,
+        "params": 1,
+        "cpu": 1.7,
+        "blocks": {
+            "input_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'input_R': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 1
+            "input_R": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 1
             },
-            'gain': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 2
+            "gain": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 2
             }
         },
-        'options': {
-            'gain_control': ['off', 'on'],
-            'channels': ['stereo', 'left', 'right']
+        "options": {
+            "gain_control": ["off", "on"],
+            "channels": ["stereo", "left", "right"]
         }
     },
     3: {
-        'name': 'Aliaser',
-        'category': 'audio',
-        'max_blocks': 3,
-        'params': 1,
-        'cpu': 0.7,
-        'blocks': {
-            'audio_in': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Aliaser",
+        "category": "audio",
+        "max_blocks": 3,
+        "params": 1,
+        "cpu": 0.7,
+        "blocks": {
+            "audio_in": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            '#_of_samples': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "#_of_samples": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'audio_out': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 2
+            "audio_out": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 2
             }
         },
-        'options': {
-            None
-        }
+        "options": {}
     },
     4: {
-        'name': 'Sequencer',
-        'category': 'cv',
-        'max_blocks': 42,
-        'params': 34,
-        'cpu': 2,
-        'blocks': {
-            'step_#': {
-                'isDefault': True,
-                'isParam': True,
-                'position': [0-31]
+        "name": "Sequencer",
+        "category": "cv",
+        "max_blocks": 42,
+        "params": 34,
+        "cpu": 2,
+        "blocks": {
+            "step_#": {
+                "isDefault": True,
+                "isParam": True,
+                "position": list(range(0, 32))
             },
-            'gate_in': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 32
+            "gate_in": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 32
             },
-            'queue_start': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 33
+            "queue_start": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 33
             },
-            # type is determined by clicking the encoder per track
-            'out_type': {
-                'isDefault': True,
-                'isParam': False,
-                'position': [34-41],
-                'type': ['cv', 'gate', 'ratchet']
+            "out_type": {
+                "isDefault": True,
+                "isParam": False,
+                "position": list(range(34, 42)),
+                "type": ["cv", "gate", "ratchet"]
             }
         },
-        'options': {
-            'number_of_steps': [1-32],
-            'num_of_tracks': [1-8],
-            'restart_jack': ['off', 'on'],
-            'behavior': ['loop', 'once']
+        "options": {
+            "number_of_steps": list(range(1, 33)),
+            "num_of_tracks": list(range(1, 9)),
+            "restart_jack": ["off", "on"],
+            "behavior": ["loop", "once"]
         }
     },
     5: {
-        'name': 'LFO',
-        'category': 'cv',
-        'max_blocks': 5,
-        'params': 4,
-        'cpu': 0.3,
-        'blocks': {
-            'frequency': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "LFO",
+        "category": "cv",
+        "max_blocks": 5,
+        "params": 4,
+        "cpu": 0.3,
+        "blocks": {
+            "frequency": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             },
-            'swing_amount': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 1
+            "swing_amount": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 1
             },
-            'phase_input': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 2
+            "phase_input": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 2
             },
-            'phase_reset': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 3
+            "phase_reset": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 3
             },
-            'output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 4
+            "output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 4
             }
         },
-        'options': {
-            'waveform': ['square', 'sine', 'triangle',
-                         'sawtooth', 'ramp', 'random'],
-            'swing_control': ['off', 'on'],
-            'output': ['0 to 1', '-1 to 1'],
-            'input': ['cv', 'tap', 'linear_cv'],
-            'phase_input': ['off', 'on'],
-            'phase_reset': ['off', 'on']
+        "options": {
+            "waveform": ["square", "sine", "triangle",
+                         "sawtooth", "ramp", "random"],
+            "swing_control": ["off", "on"],
+            "output": ["0 to 1", "-1 to 1"],
+            "input": ["cv", "tap", "linear_cv"],
+            "phase_input": ["off", "on"],
+            "phase_reset": ["off", "on"]
         }
     },
     6: {
-        'name': 'ADSR',
-        'category': 'cv',
-        'max_blocks': 10,
-        'params': 9,
-        'cpu': 0.07,
-        'blocks': {
-            'cv_input': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "ADSR",
+        "category": "cv",
+        "max_blocks": 10,
+        "params": 9,
+        "cpu": 0.07,
+        "blocks": {
+            "cv_input": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             },
-            'retrigger': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 1
+            "retrigger": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 1
             },
-            'delay': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 2
+            "delay": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 2
             },
-            'attack': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 3
+            "attack": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 3
             },
-            'hold_attack_decay': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 4
+            "hold_attack_decay": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 4
             },
-            'decay': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 5
+            "decay": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 5
             },
-            'sustain': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 6
+            "sustain": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 6
             },
-            'hold_sustain_release': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 7
+            "hold_sustain_release": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 7
             },
-            'release': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 8
+            "release": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 8
             },
-            'cv_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 9
+            "cv_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 9
             }
         },
-        'options': {
-            'retrigger_input': ['off', 'on'],
-            'initial_delay': ['off', 'on'],
-            'hold_attack_decay': ['off', 'on'],
-            'str': ['on', 'off'],
-            'immediate_release': ['on', 'off'],
-            'hold_sustain_release': ['off', 'on'],
-            'time_scale': ['exponent', 'linear']
+        "options": {
+            "retrigger_input": ["off", "on"],
+            "initial_delay": ["off", "on"],
+            "hold_attack_decay": ["off", "on"],
+            "str": ["on", "off"],
+            "immediate_release": ["on", "off"],
+            "hold_sustain_release": ["off", "on"],
+            "time_scale": ["exponent", "linear"]
         }
     },
     7: {
-        'name': 'VCA',
-        'category': 'audio',
-        'max_blocks': 5,
-        'params': 1,
-        'cpu': 0.7,
-        'blocks': {
-            'audio_in_1': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "VCA",
+        "category": "audio",
+        "max_blocks": 5,
+        "params": 1,
+        "cpu": 0.7,
+        "blocks": {
+            "audio_in_1": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_2': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 1
+            "audio_in_2": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 1
             },
-            'level_control': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "level_control": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'audio_out_1': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 3
+            "audio_out_1": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 3
             },
-            'audio_out_2': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 4
+            "audio_out_2": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 4
             }
         },
-        'options': {
-            'channels': ['1in->1out', 'stereo']
+        "options": {
+            "channels": ["1in->1out", "stereo"]
         }
     },
     8: {
-        'name': 'Audio Multiply',
-        'category': 'audio',
-        'max_blocks': 3,
-        'params': 0,
-        'cpu': 0.4,
-        'blocks': {
-            'audio_in_1': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Audio Multiply",
+        "category": "audio",
+        "max_blocks": 3,
+        "params": 0,
+        "cpu": 0.4,
+        "blocks": {
+            "audio_in_1": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_2': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 1
+            "audio_in_2": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 1
             },
-            'audio_out': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 2
+            "audio_out": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 2
             }
         },
-        'options': {
-            None
-        }
+        "options": {}
     },
     9: {
-        'name': 'Bit Crusher',
-        'category': 'audio',
-        'max_blocks': 3,
-        'params': 1,
-        'cpu': 1,
-        'blocks': {
-            'audio_in': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Bit Crusher",
+        "category": "audio",
+        "max_blocks": 3,
+        "params": 1,
+        "cpu": 1,
+        "blocks": {
+            "audio_in": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'crushed_bits': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "crushed_bits": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'audio_out': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 2
+            "audio_out": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 2
             }
         },
-        'options': {
-            'fractions': ['off', 'on']
+        "options": {
+            "fractions": ["off", "on"]
         }
     },
     10: {
-        'name': 'Sample & Hold',
-        'category': 'cv',
-        'max_blocks': 3,
-        'params': 2,
-        'cpu': 0.1,
-        'blocks': {
-            'cv_input': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "Sample & Hold",
+        "category": "cv",
+        "max_blocks": 3,
+        "params": 2,
+        "cpu": 0.1,
+        "blocks": {
+            "cv_input": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             },
-            'trigger': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "trigger": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'cv_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 2
+            "cv_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 2
             }
         },
-        'options': {
-            None
-        }
+        "options": {}
     },
     11: {
-        'name': 'OD and Distortion',
-        'category': 'effect',
-        'max_blocks': 4,
-        'params': 2,
-        'cpu': 17,
-        'blocks': {
-            'audio_in': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "OD and Distortion",
+        "category": "effect",
+        "max_blocks": 4,
+        "params": 2,
+        "cpu": 17,
+        "blocks": {
+            "audio_in": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'input_gain': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "input_gain": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'output_gain': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "output_gain": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'audio_out': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 3
+            "audio_out": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 3
             }
         },
-        'options': {
-            'model': ['plexi', 'germ', 'classic', 'pushed']
+        "options": {
+            "model": ["plexi", "germ", "classic", "pushed"]
         }
     },
     12: {
-        'name': 'Env Follower',
-        'category': 'analysis',
-        'max_blocks': 4,
-        'params': 2,
-        'cpu': 5,
-        'blocks': {
-            'audio_in': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Env Follower",
+        "category": "analysis",
+        "max_blocks": 4,
+        "params": 2,
+        "cpu": 5,
+        "blocks": {
+            "audio_in": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'rise_time': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 1
+            "rise_time": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 1
             },
-            'fall_time': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 2
+            "fall_time": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 2
             },
-            'cv_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 3
+            "cv_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 3
             }
         },
-        'options': {
-            'rise_fall_time': ['off', 'on'],
-            'output_scale': ['log', 'linear']
+        "options": {
+            "rise_fall_time": ["off", "on"],
+            "output_scale": ["log", "linear"]
         }
     },
     13: {
-        'name': 'Delay Line',
-        'category': 'audio',
-        'max_blocks': 4,
-        'params': 2,
-        'cpu': 3,
-        'blocks': {
-            'audio_in': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Delay Line",
+        "category": "audio",
+        "max_blocks": 4,
+        "params": 2,
+        "cpu": 3,
+        "blocks": {
+            "audio_in": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'delay_time': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "delay_time": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'modulation_in': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 1
+            "modulation_in": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 2
             },
-            'tap_tempo_in': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 2
+            "tap_tempo_in": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 3
             },
-            'audio_out': {
-                'isDefault': True,
-                'isParam': False,
-                'position': [2-3]
+            "audio_out": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 4
             }
         },
-        'options': {
-            'max_time': ['1s', '2s', '4s', '8s', '16s', '100ms'],
-            'tap_tempo_in': ['no', 'yes']
+        "options": {
+            "max_time": ["1s", "2s", "4s", "8s", "16s", "100ms"],
+            "tap_tempo_in": ["no", "yes"]
         }
     },
     14: {
-        'name': 'Oscillator',
-        'category': 'audio',
-        'max_blocks': 4,
-        'params': 2,
-        'cpu': 10,
-        'blocks': {
-            'frequency': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "Oscillator",
+        "category": "audio",
+        "max_blocks": 4,
+        "params": 2,
+        "cpu": 10,
+        "blocks": {
+            "frequency": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             },
-            'fm_input': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 1
+            "fm_input": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 1
             },
-            'duty_cycle': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 2
+            "duty_cycle": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 2
             },
-            'audio_out': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 3
+            "audio_out": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 3
             }
         },
-        'options': {
-            'waveform': ['sine', 'square', 'triangle', 'sawtooth'],
-            'fm_in': ['off', 'on'],
-            'duty_cycle': ['off', 'on'],
-            'upsampling': ['none', '2x']
+        "options": {
+            "waveform": ["sine", "square", "triangle", "sawtooth"],
+            "fm_in": ["off", "on"],
+            "duty_cycle": ["off", "on"],
+            "upsampling": ["none", "2x"]
         }
     },
     15: {
-        'name': 'Pushbutton',
-        'category': 'interface',
-        'max_blocks': 1,
-        'params': 0,
-        'cpu': 0.02,
-        'blocks': {
-            'switch': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Pushbutton",
+        "category": "interface",
+        "max_blocks": 1,
+        "params": 0,
+        "cpu": 0.02,
+        "blocks": {
+            "switch": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             }
         },
-        'options': {
-            'action': ['momentary', 'latching'],
-            'normally': ['zero', 'one']
+        "options": {
+            "action": ["momentary", "latching"],
+            "normally": ["zero", "one"]
         }
     },
     16: {
-        'name': 'Keyboard',
-        'category': 'interface',
-        'max_blocks': 26,
-        'params': 23,
-        'cpu': 0.1,
-        'blocks': {
-            'note_#': {
-                'isDefault': True,
-                'isParam': True,
-                'position': [0-22]
+        "name": "Keyboard",
+        "category": "interface",
+        "max_blocks": 26,
+        "params": 23,
+        "cpu": 0.1,
+        "blocks": {
+            "note_#": {
+                "isDefault": True,
+                "isParam": True,
+                "position": list(range(0, 23))
             },
-            'note_out': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 23
+            "note_out": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 23
             },
-            'gate_out': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 24
+            "gate_out": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 24
             },
-            'trigger_out': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 25
+            "trigger_out": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 25
             }
         },
-        'options': {
-            '#_of_notes': list(range(1, 24))
+        "options": {
+            "#_of_notes": list(range(1, 24))
         }
     },
     17: {
-        'name': 'CV Filter',
-        'category': 'cv',
-        'max_blocks': 3,
-        'params': 2,
-        'cpu': 0.02,
-        'blocks': {
-            'cv_input': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "CV Filter",
+        "category": "cv",
+        "max_blocks": 3,
+        "params": 2,
+        "cpu": 0.02,
+        "blocks": {
+            "cv_input": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             },
-            'time_constant': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "time_constant": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'cv_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 2
+            "cv_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 2
             }
         },
-        'options': {
-            None
-        }
+        "options": {}
     },
     18: {
-        'name': 'Steps',
-        'category': 'cv',
-        'max_blocks': 3,
-        'params': 2,
-        'cpu': 0.7,
-        'blocks': {
-            'cv_input': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "Steps",
+        "category": "cv",
+        "max_blocks": 3,
+        "params": 2,
+        "cpu": 0.7,
+        "blocks": {
+            "cv_input": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             },
-            'quant_steps': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "quant_steps": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'cv_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 2
+            "cv_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 2
             }
         },
-        'options': {
-            None
-        }
+        "options": {}
     },
     19: {
-        'name': 'Slew Limiter',
-        'category': 'cv',
-        'max_blocks': 4,
-        'params': 2,
-        'cpu': 0.2,
-        'blocks': {
-            'cv_input': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "Slew Limiter",
+        "category": "cv",
+        "max_blocks": 4,
+        "params": 2,
+        "cpu": 0.2,
+        "blocks": {
+            "cv_input": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             },
-            'slew_rate': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "slew_rate": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'rising_lag': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 1
+            "rising_lag": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 1
             },
-            'falling_lag': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 2
+            "falling_lag": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 2
             },
-            'cv_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': [2-3]
+            "cv_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": [2-3]
             }
         },
-        'options': {
-            'control': ['linked', 'separate'],
+        "options": {
+            "control": ["linked", "separate"],
         }
     },
     20: {
-        'name': 'Midi Notes In',
-        'category': 'interface',
-        'max_blocks': 32,
-        'params': 0,
-        'cpu': 0.3,
-        'blocks': {
-            'note_out': {
-                'isDefault': True,
-                'isParam': False,
-                'position': [0, 4, 8, 12, 16, 20, 24, 28]
+        "name": "Midi Notes In",
+        "category": "interface",
+        "max_blocks": 32,
+        "params": 0,
+        "cpu": 0.3,
+        "blocks": {
+            "note_out": {
+                "isDefault": True,
+                "isParam": False,
+                "position": [0, 4, 8, 12, 16, 20, 24, 28]
             },
-            'gate_out': {
-                'isDefault': True,
-                'isParam': False,
-                'position': [1, 5, 9, 13, 17, 21, 25, 29]
+            "gate_out": {
+                "isDefault": True,
+                "isParam": False,
+                "position": [1, 5, 9, 13, 17, 21, 25, 29]
             },
-            'velocity_out': {
-                'isDefault': False,
-                'isParam': False,
-                'position': [2, 6, 10, 14, 18, 22, 26, 30]
+            "velocity_out": {
+                "isDefault": False,
+                "isParam": False,
+                "position": [2, 6, 10, 14, 18, 22, 26, 30]
             },
-            'trigger_out': {
-                'isDefault': False,
-                'isParam': False,
-                'position': [3, 7, 11, 15, 19, 23, 27, 31]
+            "trigger_out": {
+                "isDefault": False,
+                "isParam": False,
+                "position": [3, 7, 11, 15, 19, 23, 27, 31]
             }
         },
-        'options': {
-            'midi_channel': list(range(1, 17)),
-            '#_of_outputs': list(range(1, 9)),
-            'priority': ['newest', 'oldest', 'highest', 'lowest', 'RoundRobin'],
-            'greedy': ['no', 'yes'],
-            'velocity_output': ['off', 'on'],
-            'low_note': list(range(0, 128)),
-            'high_note': list(range(0, 128))[::-1],
-            'trigger_pulse': ['off', 'on']
+        "options": {
+            "midi_channel": list(range(1, 17)),
+            "#_of_outputs": list(range(1, 9)),
+            "priority": ["newest", "oldest", "highest", "lowest", "RoundRobin"],
+            "greedy": ["no", "yes"],
+            "velocity_output": ["off", "on"],
+            "low_note": list(range(0, 128)),
+            "high_note": list(range(0, 128))[::-1],
+            "trigger_pulse": ["off", "on"]
         }
     },
     21: {
-        'name': 'Midi CC In',
-        'category': 'interface',
-        'max_blocks': 1,
-        'params': 0,
-        'cpu': 0.1,
-        'blocks': {
-            'cc_value': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Midi CC In",
+        "category": "interface",
+        "max_blocks": 1,
+        "params": 0,
+        "cpu": 0.1,
+        "blocks": {
+            "cc_value": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             }
         },
-        'options': {
-            'midi_channel': list(range(1, 17)),
-            'controller': list(range(0, 128)),
-            'output_range': ['0 to 1', '-1 to 1']
+        "options": {
+            "midi_channel": list(range(1, 17)),
+            "controller": list(range(0, 128)),
+            "output_range": ["0 to 1", "-1 to 1"]
         }
     },
     22: {
-        'name': 'Multiplier',
-        'category': 'cv',
-        'max_blocks': 4,
-        'params': 2,
-        'cpu': 0.2,
-        'blocks': {
-            'cv_input': {
-                'isDefault': True,
-                'isParam': True,
-                'position': [0-8]
+        "name": "Multiplier",
+        "category": "cv",
+        "max_blocks": 4,
+        "params": 2,
+        "cpu": 0.2,
+        "blocks": {
+            "cv_input": {
+                "isDefault": True,
+                "isParam": True,
+                "position": list(range(0, 9))
             },
-            'cv_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 9
+            "cv_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 9
             }
         },
-        'options': {
-            'num_inputs': [2-8]
+        "options": {
+            "num_inputs": list(range(2, 9))
         }
     },
     23: {
-        'name': 'Compressor',
-        'category': 'effect',
-        'max_blocks': 9,
-        'params': 4,
-        'cpu': 3,
-        'blocks': {
-            'audio_in_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Compressor",
+        "category": "effect",
+        "max_blocks": 9,
+        "params": 4,
+        "cpu": 3,
+        "blocks": {
+            "audio_in_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 1
+            "audio_in_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 1
             },
-            'threshold': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "threshold": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'attack': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 3
+            "attack": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 3
             },
-            'release': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 4
+            "release": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 4
             },
-            'ratio': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 5
+            "ratio": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 5
             },
-            'sidechain_in': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 6
+            "sidechain_in": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 6
             },
-            'audio_out_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 7
+            "audio_out_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 7
             },
-            'audio_out_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 8
+            "audio_out_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 8
             }
         },
-        'options': {
-            'attack_ctrl': ['off', 'on'],
-            'release_ctrl': ['off', 'on'],
-            'ratio_ctrl': ['off', 'on'],
-            'channels': ['1in->1out', 'stereo'],
-            'sidechain': ['internal', 'external']
+        "options": {
+            "attack_ctrl": ["off", "on"],
+            "release_ctrl": ["off", "on"],
+            "ratio_ctrl": ["off", "on"],
+            "channels": ["1in->1out", "stereo"],
+            "sidechain": ["internal", "external"]
         }
     },
     24: {
-        'name': 'Multi Filter',
-        'category': 'audio',
-        'max_blocks': 5,
-        'params': 3,
-        'cpu': 0.8,
-        'blocks': {
-            'audio_in': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Multi Filter",
+        "category": "audio",
+        "max_blocks": 5,
+        "params": 3,
+        "cpu": 0.8,
+        "blocks": {
+            "audio_in": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'gain': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 1
+            "gain": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 1
             },
-            'frequency': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "frequency": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'q': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 3
+            "q": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 3
             },
-            'audio_out': {
-                'isDefault': True,
-                'isParam': False
+            "audio_out": {
+                "isDefault": True,
+                "isParam": False
             }
         },
-        'options': {
-            'filter_shape': ['lowpass', 'highpass', 'bandpass',
-                             'bell', 'hi_shelf', 'low_shelf'],
+        "options": {
+            "filter_shape": ["lowpass", "highpass", "bandpass",
+                             "bell", "hi_shelf", "low_shelf"],
         }
     },
     25: {
-        'name': 'Plate Reverb',
-        'category': 'effect',
-        'max_blocks': 8,
-        'params': 4,
-        'cpu': 22,
-        'blocks': {
-            'audio_in_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Plate Reverb",
+        "category": "effect",
+        "max_blocks": 8,
+        "params": 4,
+        "cpu": 22,
+        "blocks": {
+            "audio_in_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_R': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 1
+            "audio_in_R": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 1
             },
-            'decay_time': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "decay_time": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'low_eq': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 3
+            "low_eq": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 3
             },
-            'high_eq': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 4
+            "high_eq": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 4
             },
-            'mix': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 5
+            "mix": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 5
             },
-            'audio_out_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 6
+            "audio_out_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 6
             },
-            'audio_out_R': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 7
+            "audio_out_R": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 7
             }
         },
-        'options': {
-            None
-        }
+        "options": {}
     },
     26: {
-        'name': 'Buffer Delay',
-        'category': 'audio',
-        'max_blocks': 2,
-        'params': 0,
-        'cpu': 0.2,
-        'blocks': {
-            'audio_in': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Buffer Delay",
+        "category": "audio",
+        "max_blocks": 2,
+        "params": 0,
+        "cpu": 0.2,
+        "blocks": {
+            "audio_in": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_out': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 1
+            "audio_out": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 1
             }
         },
-        'options': {
-            'buffer_length': [0-16]
+        "options": {
+            "buffer_length": list(range(0, 17))
         }
     },
     27: {
-        'name': 'All Pass Filter',
-        'category': 'audio',
-        'max_blocks': 3,
-        'params': 1,
-        'cpu': 5,
-        'blocks': {
-            'audio_in': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "All Pass Filter",
+        "category": "audio",
+        "max_blocks": 3,
+        "params": 1,
+        "cpu": 5,
+        "blocks": {
+            "audio_in": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'filter_gain': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "filter_gain": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'audio_out': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 2
+            "audio_out": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 2
             }
         },
-        'options': {
-            '#_of_poles': [1-8]
+        "options": {
+            "#_of_poles": list(range(1, 9))
         }
     },
     28: {
-        'name': 'Quantizer',
-        'category': 'cv',
-        'max_blocks': 4,
-        'params': 3,
-        'cpu': 1,
-        'blocks': {
-            'cv_input': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "Quantizer",
+        "category": "cv",
+        "max_blocks": 4,
+        "params": 3,
+        "cpu": 1,
+        "blocks": {
+            "cv_input": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             },
-            'key': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 1
+            "key": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 1
             },
-            'scale': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 2
+            "scale": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 2
             },
-            'cv_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 3
+            "cv_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 3
             }
         },
-        'options': {
-            'key_scale_jacks': ['no', 'yes']
+        "options": {
+            "key_scale_jacks": ["no", "yes"]
         }
     },
     29: {
-        'name': 'Phaser',
-        'category': 'effect',
-        'max_blocks': 8,
-        'params': 4,
-        'cpu': 15,
-        'blocks': {
-            'audio_in_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Phaser",
+        "category": "effect",
+        "max_blocks": 8,
+        "params": 4,
+        "cpu": 15,
+        "blocks": {
+            "audio_in_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 1
+            "audio_in_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 1
             },
-            'control_in': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "control_in": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'resonance': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 3
+            "resonance": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 3
             },
-            'width': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 4
+            "width": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 4
             },
-            'mix': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 5
+            "mix": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 5
             },
-            'audio_out_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 6
+            "audio_out_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 6
             },
-            'audio_out_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 7
+            "audio_out_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 7
             }
         },
-        'options': {
-            'channels': ['1in->1out', '1in->2out', '2in->2out'],
-            'control': ['rate', 'tap_tempo', 'cv_direct'],
-            'number_of_stages': [4, 2, 1, 3, 6, 8]
+        "options": {
+            "channels": ["1in->1out", "1in->2out", "2in->2out"],
+            "control": ["rate", "tap_tempo", "cv_direct"],
+            "number_of_stages": [4, 2, 1, 3, 6, 8]
         }
     },
     30: {
-        'name': 'Looper',
-        'category': 'audio',
-        'max_blocks': 9,
-        'params': 6,
-        'cpu': 3,
-        'blocks': {
-            'audio_in': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Looper",
+        "category": "audio",
+        "max_blocks": 9,
+        "params": 6,
+        "cpu": 3,
+        "blocks": {
+            "audio_in": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'record': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "record": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'restart_playback': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 2
+            "restart_playback": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 2
             },
-            'stop_play': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 3
+            "stop_play": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 3
             },
-            'speed_pitch': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 4
+            "speed_pitch": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 4
             },
-            'start_position': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 5
+            "start_position": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 5
             },
-            'loop_length': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 6
+            "loop_length": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 6
             },
-            'reverse_playback': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 7
+            "reverse_playback": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 7
             },
-            'audio_out': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 8
+            "audio_out": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 8
             }
         },
-        'options': {
-            'max_rec_time': ['1s', '2s', '4s', '8s', '16s', '32s'],
-            'length_edit': ['off', 'on'],
-            'playback': ['once', 'loop'],
-            'length': ['fixed', 'pre_speed'],
-            'hear_while_rec': ['no', 'yes'],
-            'play_reverse': ['no', 'yes'],
-            'overdub': ['no', 'yes'],
-            'stop_play_button': ['no', 'yes']
+        "options": {
+            "max_rec_time": ["1s", "2s", "4s", "8s", "16s", "32s"],
+            "length_edit": ["off", "on"],
+            "playback": ["once", "loop"],
+            "length": ["fixed", "pre_speed"],
+            "hear_while_rec": ["no", "yes"],
+            "play_reverse": ["no", "yes"],
+            "overdub": ["no", "yes"],
+            "stop_play_button": ["no", "yes"]
         }
     },
     31: {
-        'name': 'In Switch',
-        'category': 'cv',
-        'max_blocks': 18,
-        'params': 17,
-        'cpu': 0.2,
-        'blocks': {
-            'cv_input': {
-                'isDefault': True,
-                'isParam': True,
-                'position': [0-15]
+        "name": "In Switch",
+        "category": "cv",
+        "max_blocks": 18,
+        "params": 17,
+        "cpu": 0.2,
+        "blocks": {
+            "cv_input": {
+                "isDefault": True,
+                "isParam": True,
+                "position": list(range(0, 16))
             },
-            'in_select': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 16
+            "in_select": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 16
             },
-            'cv_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 17
+            "cv_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 17
             }
         },
-        'options': {
-            'num_inputs': [2-16]
+        "options": {
+            "num_inputs": list(range(2, 17))
         }
     },
     32: {
-        'name': 'Out Switch',
-        'category': 'cv',
-        'max_blocks': 18,
-        'params': 2,
-        'cpu': 0.2,
-        'blocks': {
-            'cv_input': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "Out Switch",
+        "category": "cv",
+        "max_blocks": 18,
+        "params": 2,
+        "cpu": 0.2,
+        "blocks": {
+            "cv_input": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             },
-            'out_select': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "out_select": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'cv_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': [2-17]
+            "cv_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": list(range(2, 18))
             }
         },
-        'options': {
-            'num_outputs': [2-16]
+        "options": {
+            "num_outputs": list(range(2, 17))
         }
     },
     33: {
-        'name': 'Audio In Switch',
-        'category': 'audio',
-        'max_blocks': 18,
-        'params': 1,
-        'cpu': 0.8,
-        'blocks': {
-            'audio_input': {
-                'isDefault': True,
-                'isParam': False,
-                'position': [0-15]
+        "name": "Audio In Switch",
+        "category": "audio",
+        "max_blocks": 18,
+        "params": 1,
+        "cpu": 0.8,
+        "blocks": {
+            "audio_input": {
+                "isDefault": True,
+                "isParam": False,
+                "position": list(range(0, 16))
             },
-            'in_select': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 16
+            "in_select": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 16
             },
-            'audio_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 17
+            "audio_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 17
             }
         },
-        'options': {
-            'num_inputs': [2-16]
+        "options": {
+            "num_inputs": list(range(2, 17))
         }
     },
     34: {
-        'name': 'Audio Out Switch',
-        'category': 'audio',
-        'max_blocks': 18,
-        'params': 1,
-        'cpu': 0.7,
-        'blocks': {
-            'audio_input': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Audio Out Switch",
+        "category": "audio",
+        "max_blocks": 18,
+        "params": 1,
+        "cpu": 0.7,
+        "blocks": {
+            "audio_input": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'in_select': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "in_select": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'audio_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': [2-17]
+            "audio_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": list(range(2, 18))
             }
         },
-        'options': {
-            'num_outputs': [2-16]
+        "options": {
+            "num_outputs": list(range(2, 17))
         }
     },
     35: {
-        'name': 'Midi Pressure',
-        'category': 'interface',
-        'max_blocks': 1,
-        'params': 0,
-        'cpu': 0.03,
-        'blocks': {
-            'channel_pressure': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Midi Pressure",
+        "category": "interface",
+        "max_blocks": 1,
+        "params": 0,
+        "cpu": 0.03,
+        "blocks": {
+            "channel_pressure": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             }
         },
-        'options': {
-            'midi_channel': list(range(1, 17))
+        "options": {
+            "midi_channel": list(range(1, 17))
         }
     },
     36: {
-        'name': 'Onset Detector',
-        'category': 'analysis',
-        'max_blocks': 3,
-        'params': 1,
-        'cpu': 0.7,
-        'blocks': {
-            'audio_in': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Onset Detector",
+        "category": "analysis",
+        "max_blocks": 3,
+        "params": 1,
+        "cpu": 0.7,
+        "blocks": {
+            "audio_in": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'sensitivity': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 1
+            "sensitivity": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 1
             },
-            'audio_out': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 2
+            "audio_out": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 2
             }
         },
-        'options': {
-            'sensitivity': ['off', 'on']
+        "options": {
+            "sensitivity": ["off", "on"]
         }
     },
     37: {
-        'name': 'Rhythm',
-        'category': 'cv',
-        'max_blocks': 5,
-        'params': 3,
-        'cpu': 0.5,
-        'blocks': {
-            'rec_start_stop': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "Rhythm",
+        "category": "cv",
+        "max_blocks": 5,
+        "params": 3,
+        "cpu": 0.5,
+        "blocks": {
+            "rec_start_stop": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             },
-            'rhythm_in': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "rhythm_in": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'play': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "play": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'play_done': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 3
+            "play_done": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 3
             },
-            'rhythm_out': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 5
+            "rhythm_out": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 5
             }
         },
-        'options': {
-            'done_ctrl': ['off', 'on'],
+        "options": {
+            "done_ctrl": ["off", "on"],
         }
     },
     38: {
-        'name': 'Noise',
-        'category': 'audio',
-        'max_blocks': 1,
-        'params': 0,
-        'cpu': 0.4,
-        'blocks': {
-            'audio_out': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Noise",
+        "category": "audio",
+        "max_blocks": 1,
+        "params": 0,
+        "cpu": 0.4,
+        "blocks": {
+            "audio_out": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             }
         },
-        'options': {
-            None
-        }
+        "options": {}
     },
     39: {
-        'name': 'Random',
-        'category': 'cv',
-        'max_blocks': 2,
-        'params': 1,
-        'cpu': 0.1,
-        'blocks': {
-            'trigger_in': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 0
+        "name": "Random",
+        "category": "cv",
+        "max_blocks": 2,
+        "params": 1,
+        "cpu": 0.1,
+        "blocks": {
+            "trigger_in": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 0
             },
-            'cv_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 1
+            "cv_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 1
             }
         },
-        'options': {
-            'output': ['0 to 1', '-1 to 1'],
-            'new_val_on_trig': ['off', 'on']
+        "options": {
+            "output": ["0 to 1", "-1 to 1"],
+            "new_val_on_trig": ["off", "on"]
         }
     },
     40: {
-        'name': 'Gate',
-        'category': 'effect',
-        'max_blocks': 8,
-        'params': 3,
-        'cpu': 3,
-        'blocks': {
-            'audio_in_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Gate",
+        "category": "effect",
+        "max_blocks": 8,
+        "params": 3,
+        "cpu": 3,
+        "blocks": {
+            "audio_in_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 1
+            "audio_in_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 1
             },
-            'threshold': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "threshold": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'attack': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 3
+            "attack": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 3
             },
-            'release': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 4
+            "release": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 4
             },
-            'sidechain_in': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 5
+            "sidechain_in": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 5
             },
-            'audio_out_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 6
+            "audio_out_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 6
             },
-            'audio_out_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 7
+            "audio_out_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 7
             }
         },
-        'options': {
-            'attack_ctrl': ['off', 'on'],
-            'release_ctrl': ['off', 'on'],
-            'channels': ['1in->1out', '1in->2out', '2in->2out'],
-            'sidechain': ['internal', 'external']
+        "options": {
+            "attack_ctrl": ["off", "on"],
+            "release_ctrl": ["off", "on"],
+            "channels": ["1in->1out", "1in->2out", "2in->2out"],
+            "sidechain": ["internal", "external"]
         }
     },
     41: {
-        'name': 'Tremolo',
-        'category': 'effect',
-        'max_blocks': 6,
-        'params': 2,
-        'cpu': 2,
-        'blocks': {
-            'audio_in_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Tremolo",
+        "category": "effect",
+        "max_blocks": 6,
+        "params": 2,
+        "cpu": 2,
+        "blocks": {
+            "audio_in_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 1
+            "audio_in_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 1
             },
-            'control_in': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "control_in": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'depth': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 3
+            "depth": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 3
             },
-            'audio_out_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 4
+            "audio_out_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 4
             },
-            'audio_out_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 5
+            "audio_out_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 5
             }
         },
-        'options': {
-            'channels': ['1in->1out', '1in->2out', '2in->2out'],
-            'control': ['rate', 'tap_tempo', 'cv_direct'],
-            'waveform': ['fender-ish', 'vox-ish', 'triangle', 'sine', 'square']
+        "options": {
+            "channels": ["1in->1out", "1in->2out", "2in->2out"],
+            "control": ["rate", "tap_tempo", "cv_direct"],
+            "waveform": ["fender-ish", "vox-ish", "triangle", "sine", "square"]
         }
     },
     42: {
-        'name': 'Tone Control',
-        'category': 'effect',
-        'max_blocks': 10,
-        'params': 6,
-        'cpu': 5,
-        'blocks': {
-            'audio_in_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Tone Control",
+        "category": "effect",
+        "max_blocks": 10,
+        "params": 6,
+        "cpu": 5,
+        "blocks": {
+            "audio_in_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 1
+            "audio_in_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 1
             },
-            'low_shelf': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "low_shelf": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'mid_gain_1': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 3
+            "mid_gain_1": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 3
             },
-            'mid_freq_1': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 4
+            "mid_freq_1": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 4
             },
-            'mid_gain_2': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 5
+            "mid_gain_2": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 5
             },
-            'mid_freq_2': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 6
+            "mid_freq_2": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 6
             },
-            'high_shelf': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 7
+            "high_shelf": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 7
             },
-            'audio_out_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 8
+            "audio_out_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 8
             },
-            'audio_out_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 9
+            "audio_out_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 9
             }
         },
-        'options': {
-            'channels': ['1in->1out', '1in->2out', '2in->2out'],
-            'num_mid_bands': [1, 2]
+        "options": {
+            "channels": ["1in->1out", "1in->2out", "2in->2out"],
+            "num_mid_bands": [1, 2]
         }
     },
     43: {
-        'name': 'Delay w Mod',
-        'category': 'effect',
-        'max_blocks': 9,
-        'params': 5,
-        'cpu': 18,
-        'blocks': {
-            'audio_in_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Delay w Mod",
+        "category": "effect",
+        "max_blocks": 9,
+        "params": 5,
+        "cpu": 18,
+        "blocks": {
+            "audio_in_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 1
+            "audio_in_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 1
             },
-            'delay_time': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "delay_time": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'feedback': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 3
+            "feedback": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 3
             },
-            'mod_rate': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 4
+            "mod_rate": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 4
             },
-            'mod_depth': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 5
+            "mod_depth": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 5
             },
-            'mix': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 6
+            "mix": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 6
             },
-            'audio_out_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 7
+            "audio_out_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 7
             },
-            'audio_out_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 8
+            "audio_out_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 8
             }
         },
-        'options': {
-            'channels': ['1in->1out', '1in->2out', '2in->2out'],
-            'control': ['rate', 'tap_tempo'],
-            'type': ['clean', 'tape', 'old_tape', 'bbd'],
-            'tap_ratio': ['1:1', '2:3', '1:2', '1:3', '3:8', '1:4',
-                          '3:16', '1:8', '1:16', '1:32']
+        "options": {
+            "channels": ["1in->1out", "1in->2out", "2in->2out"],
+            "control": ["rate", "tap_tempo"],
+            "type": ["clean", "tape", "old_tape", "bbd"],
+            "tap_ratio": ["1:1", "2:3", "1:2", "1:3", "3:8", "1:4",
+                          "3:16", "1:8", "1:16", "1:32"]
         }
     },
     44: {
-        'name': 'Stompswitch',
-        'category': 'interface',
-        'max_blocks': 1,
-        'params': 0,
-        'cpu': 0.1,
-        'blocks': {
-            'cv_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Stompswitch",
+        "category": "interface",
+        "max_blocks": 1,
+        "params": 0,
+        "cpu": 0.1,
+        "blocks": {
+            "cv_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             }
         },
-        'options': {
-            'stompswitch': ['left', 'middle', 'right', 'ext'],
-            'action': ['momentary', 'latching'],
-            'normally': ['zero', 'one']
+        "options": {
+            "stompswitch": ["left", "middle", "right", "ext"],
+            "action": ["momentary", "latching"],
+            "normally": ["zero", "one"]
         }
     },
     45: {
-        'name': 'Value',
-        'category': 'cv',
-        'max_blocks': 2,
-        'params': 1,
-        'cpu': 0.15,
-        'blocks': {
-            'value': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "Value",
+        "category": "cv",
+        "max_blocks": 2,
+        "params": 1,
+        "cpu": 0.15,
+        "blocks": {
+            "value": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             },
-            'cv_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 1
+            "cv_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 1
             }
         },
-        'options': {
-            'output': ['0 to 1', '-1 to 1']
+        "options": {
+            "output": ["0 to 1", "-1 to 1"]
         }
     },
     46: {
-        'name': 'CV Delay',
-        'category': 'cv',
-        'max_blocks': 3,
-        'params': 2,
-        'cpu': 1.5,
-        'blocks': {
-            'cv_input': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "CV Delay",
+        "category": "cv",
+        "max_blocks": 3,
+        "params": 2,
+        "cpu": 1.5,
+        "blocks": {
+            "cv_input": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             },
-            'delay_time': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "delay_time": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'cv_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 2
+            "cv_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 2
             }
         },
-        'options': {
-            None
-        }
+        "options": {}
     },
     47: {
-        'name': 'CV Loop',
-        'category': 'cv',
-        'max_blocks': 8,
-        'params': 7,
-        'cpu': 0.1,
-        'blocks': {
-            'cv_input': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "CV Loop",
+        "category": "cv",
+        "max_blocks": 8,
+        "params": 7,
+        "cpu": 0.1,
+        "blocks": {
+            "cv_input": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             },
-            'record': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "record": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'play': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "play": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'playback_speed': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 3
+            "playback_speed": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 3
             },
-            'start_position': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 4
+            "start_position": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 4
             },
-            'stop_position': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 5
+            "stop_position": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 5
             },
-            'restart_loop': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 6
+            "restart_loop": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 6
             },
-            'cv_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 7
+            "cv_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 7
             }
         },
-        'options': {
-            'max_rec_time': list(range(1, 17)),
-            'length_edit': ['off', 'on']
+        "options": {
+            "max_rec_time": list(range(1, 17)),
+            "length_edit": ["off", "on"]
         }
     },
     48: {
-        'name': 'CV Filter',
-        'category': 'cv',
-        'max_blocks': 3,
-        'params': 2,
-        'cpu': 0.1,
-        'blocks': {
-            'cv_input': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "CV Filter",
+        "category": "cv",
+        "max_blocks": 3,
+        "params": 2,
+        "cpu": 0.1,
+        "blocks": {
+            "cv_input": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             },
-            'time_constant': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "time_constant": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'cv_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 2
+            "cv_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 2
             }
         },
-        'options': {
-            None
-        }
+        "options": {}
     },
     49: {
-        'name': 'Clock Divider',
-        'category': 'cv',
-        'max_blocks': 5,
-        'params': 4,
-        'cpu': 0.4,
-        'blocks': {
-            'cv_input': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "Clock Divider",
+        "category": "cv",
+        "max_blocks": 5,
+        "params": 4,
+        "cpu": 0.4,
+        "blocks": {
+            "cv_input": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             },
-            'reset_switch': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "reset_switch": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'dividend': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "dividend": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'divisor': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 3
+            "divisor": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 3
             },
-            'cv_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 4
+            "cv_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 4
             }
         },
-        'options': {
-            'input': ['tap', 'cv_control']
+        "options": {
+            "input": ["tap", "cv_control"]
         }
     },
     50: {
-        'name': 'Comparator',
-        'category': 'cv',
-        'max_blocks': 3,
-        'params': 2,
-        'cpu': 0.04,
-        'blocks': {
-            'cv_positive_input': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "Comparator",
+        "category": "cv",
+        "max_blocks": 3,
+        "params": 2,
+        "cpu": 0.04,
+        "blocks": {
+            "cv_positive_input": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             },
-            'cv_negative_input': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "cv_negative_input": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'cv_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 2
+            "cv_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 2
             }
         },
-        'options': {
-            'output': ['0 to 1', '-1 to 1']
+        "options": {
+            "output": ["0 to 1", "-1 to 1"]
         }
     },
     51: {
-        'name': 'CV Rectify',
-        'category': 'cv',
-        'max_blocks': 2,
-        'params': 1,
-        'cpu': 0.02,
-        'blocks': {
-            'cv_input': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "CV Rectify",
+        "category": "cv",
+        "max_blocks": 2,
+        "params": 1,
+        "cpu": 0.02,
+        "blocks": {
+            "cv_input": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             },
-            'cv_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 1
+            "cv_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 1
             }
         },
-        'options': {
-            None
-        }
+        "options": {}
     },
     52: {
-        'name': 'Trigger',
-        'category': 'cv',
-        'max_blocks': 2,
-        'params': 1,
-        'cpu': 0.1,
-        'blocks': {
-            'cv_input': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "Trigger",
+        "category": "cv",
+        "max_blocks": 2,
+        "params": 1,
+        "cpu": 0.1,
+        "blocks": {
+            "cv_input": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             },
-            'cv_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 1
+            "cv_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 1
             }
         },
-        'options': {
-            None
-        }
+        "options": {}
     },
     53: {
-        'name': 'Stereo Spread',
-        'category': 'audio',
-        'max_blocks': 5,
-        'params': 1,
-        'cpu': 2,
-        'blocks': {
-            'audio_in_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Stereo Spread",
+        "category": "audio",
+        "max_blocks": 5,
+        "params": 1,
+        "cpu": 2,
+        "blocks": {
+            "audio_in_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_R': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 1
+            "audio_in_R": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 1
             },
-            'delay_time': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "delay_time": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'side_gain': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "side_gain": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'audio_out_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': [2-3]
+            "audio_out_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": [2-3]
             },
-            'audio_out_R': {
-                'isDefault': True,
-                'isParam': False,
-                'position': [3-4]
+            "audio_out_R": {
+                "isDefault": True,
+                "isParam": False,
+                "position": [3-4]
             }
         },
-        'options': {
-            'method': ['mid_side', 'haas']
+        "options": {
+            "method": ["mid_side", "haas"]
         }
     },
     54: {
-        'name': 'Cport Exp CV In',
-        'category': 'interface',
-        'max_blocks': 1,
-        'params': 0,
-        'cpu': 0.1,
-        'blocks': {
-            'cv_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Cport Exp CV In",
+        "category": "interface",
+        "max_blocks": 1,
+        "params": 0,
+        "cpu": 0.1,
+        "blocks": {
+            "cv_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             }
         },
-        'options': {
-            'output_range': ['0 to 1', '-1 to 1']
+        "options": {
+            "output_range": ["0 to 1", "-1 to 1"]
         }
     },
     55: {
-        'name': 'Cport CV Out',
-        'category': 'interface',
-        'max_blocks': 1,
-        'params': 0,
-        'cpu': 0.2,
-        'blocks': {
-            'cv_input': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Cport CV Out",
+        "category": "interface",
+        "max_blocks": 1,
+        "params": 0,
+        "cpu": 0.2,
+        "blocks": {
+            "cv_input": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             }
         },
-        'options': {
-            'input_range': ['0 to 1', '-1 to 1']
+        "options": {
+            "input_range": ["0 to 1", "-1 to 1"]
         }
     },
     56: {
-        'name': 'UI Button',
-        'category': 'interface',
-        'max_blocks': 2,
-        'params': 1,
-        'cpu': 0.04,
-        'blocks': {
-            'in': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "UI Button",
+        "category": "interface",
+        "max_blocks": 2,
+        "params": 1,
+        "cpu": 0.04,
+        "blocks": {
+            "in": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             },
-            'cv_output': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 1
+            "cv_output": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 1
             }
         },
-        'options': {
-            None
-        }
+        "options": {}
     },
     57: {
-        'name': 'Audio Panner',
-        'category': 'audio',
-        'max_blocks': 5,
-        'params': 3,
-        'cpu': 1,
-        'blocks': {
-            'audio_in_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Audio Panner",
+        "category": "audio",
+        "max_blocks": 5,
+        "params": 3,
+        "cpu": 1,
+        "blocks": {
+            "audio_in_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 1
+            "audio_in_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 1
             },
-            'pan': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "pan": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'audio_out_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 3
+            "audio_out_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 3
             },
-            'audio_out_R': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 4
+            "audio_out_R": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 4
             }
         },
-        'options': {
-            'channels': ['1in->2out', '2in->2out'],
-            'pan_type': ['equal_pwr', '-4.5dB', 'linear']
+        "options": {
+            "channels": ["1in->2out", "2in->2out"],
+            "pan_type": ["equal_pwr", "-4.5dB", "linear"]
         }
     },
     58: {
-        'name': 'pitch_detector',
-        'category': 'analysis',
-        'max_blocks': 2,
-        'params': 0,
-        'cpu': 2.5,
-        'blocks': {
-            'audio_in': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "pitch_detector",
+        "category": "analysis",
+        "max_blocks": 2,
+        "params": 0,
+        "cpu": 2.5,
+        "blocks": {
+            "audio_in": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'cv_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 1
+            "cv_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 1
             }
         },
-        'options': {
-            None
+        "options": {
+
         }
     },
     59: {
-        'name': 'Pitch Shifter',
-        'category': 'audio',
-        'max_blocks': 3,
-        'params': 1,
-        'cpu': 15.5,
-        'blocks': {
-            'audio_in': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Pitch Shifter",
+        "category": "audio",
+        "max_blocks": 3,
+        "params": 1,
+        "cpu": 15.5,
+        "blocks": {
+            "audio_in": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'pitch_shift': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "pitch_shift": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'audio_out': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 2
+            "audio_out": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 2
             }
         },
-        'options': {
-            None
-        }
+        "options": {}
     },
     60: {
-        'name': 'Midi Note Out',
-        'category': 'interface',
-        'max_blocks': 3,
-        'params': 3,
-        'cpu': 0.1,
-        'blocks': {
-            'note_in': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "Midi Note Out",
+        "category": "interface",
+        "max_blocks": 3,
+        "params": 3,
+        "cpu": 0.1,
+        "blocks": {
+            "note_in": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             },
-            'gate_in': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "gate_in": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'velocity_out': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 2
+            "velocity_out": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 2
             }
         },
-        'options': {
-            'midi_channel': list(range(1, 17)),
-            'velocity_output': ['off', 'on']
+        "options": {
+            "midi_channel": list(range(1, 17)),
+            "velocity_output": ["off", "on"]
         }
     },
     61: {
-        'name': 'Midi CC Out',
-        'category': 'interface',
-        'max_blocks': 1,
-        'params': 1,
-        'cpu': 0.2,
-        'blocks': {
-            'cc_out': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "Midi CC Out",
+        "category": "interface",
+        "max_blocks": 1,
+        "params": 1,
+        "cpu": 0.2,
+        "blocks": {
+            "cc_out": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             }
         },
-        'options': {
-            'midi_channel': list(range(1, 17)),
-            'controller': list(range(0, 128))
+        "options": {
+            "midi_channel": list(range(1, 17)),
+            "controller": list(range(0, 128))
         }
     },
     62: {
-        'name': 'midi_pc_out',
-        'category': 'interface',
-        'max_blocks': 2,
-        'params': 2,
-        'cpu': 0.1,
-        'blocks': {
-            'pc_out': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "midi_pc_out",
+        "category": "interface",
+        "max_blocks": 2,
+        "params": 2,
+        "cpu": 0.1,
+        "blocks": {
+            "pc_out": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             },
-            'trigger_in': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "trigger_in": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             }
         },
-        'options': {
-            'midi_channel': list(range(1, 17))
+        "options": {
+            "midi_channel": list(range(1, 17))
         }
     },
     63: {
-        'name': 'Bit Modulator',
-        'category': 'audio',
-        'max_blocks': 3,
-        'params': 0,
-        'cpu': 1.2,
-        'blocks': {
-            'audio_in_1': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Bit Modulator",
+        "category": "audio",
+        "max_blocks": 3,
+        "params": 0,
+        "cpu": 1.2,
+        "blocks": {
+            "audio_in_1": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_2': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 1
+            "audio_in_2": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 1
             },
-            'audio_out': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 2
+            "audio_out": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 2
             }
         },
-        'options': {
-            'type': ['xor', 'and', 'or']
+        "options": {
+            "type": ["xor", "and", "or"]
         }
     },
     64: {
-        'name': 'Audio Balance',
-        'category': 'audio',
-        'max_blocks': 6,
-        'params': 1,
-        'cpu': 1.7,
-        'blocks': {
-            'audio_in_1_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Audio Balance",
+        "category": "audio",
+        "max_blocks": 6,
+        "params": 1,
+        "cpu": 1.7,
+        "blocks": {
+            "audio_in_1_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_1_R': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 1
+            "audio_in_1_R": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 1
             },
-            'audio_in_2_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 1
+            "audio_in_2_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 1
             },
-            'audio_in_2_R': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 3
+            "audio_in_2_R": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 3
             },
-            'mix': {
-                'isDefault': True,
-                'isParam': True,
-                'position': [2, 4]
+            "mix": {
+                "isDefault": True,
+                "isParam": True,
+                "position": [2, 4]
             },
-            'audio_output_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': [3, 5]
+            "audio_output_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": [3, 5]
             },
-            'audio_output_R': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 6
+            "audio_output_R": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 6
             }
         },
-        'options': {
-            'stereo': ['mono', 'stereo']
+        "options": {
+            "stereo": ["mono", "stereo"]
         }
     },
     65: {
-        'name': 'Inverter',
-        'category': 'audio',
-        'max_blocks': 2,
-        'params': 0,
-        'cpu': 0.3,
-        'blocks': {
-            'audio_in': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Inverter",
+        "category": "audio",
+        "max_blocks": 2,
+        "params": 0,
+        "cpu": 0.3,
+        "blocks": {
+            "audio_in": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_out': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 1
+            "audio_out": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 1
             }
         },
-        'options': {
-            None
-        }
+        "options": {}
     },
     66: {
-        'name': 'Fuzz',
-        'category': 'effect',
-        'max_blocks': 4,
-        'params': 2,
-        'cpu': 16,
-        'blocks': {
-            'audio_in': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Fuzz",
+        "category": "effect",
+        "max_blocks": 4,
+        "params": 2,
+        "cpu": 16,
+        "blocks": {
+            "audio_in": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'input_gain': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "input_gain": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'output_gain': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "output_gain": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'audio_out': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 3
+            "audio_out": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 3
             }
         },
-        'options': {
-            'model': ['efuzzy', 'burly', 'scoopy', 'ugly']
+        "options": {
+            "model": ["efuzzy", "burly", "scoopy", "ugly"]
         }
     },
     67: {
-        'name': 'Ghostverb',
-        'category': 'effect',
-        'max_blocks': 8,
-        'params': 4,
-        'cpu': 45,
-        'blocks': {
-            'audio_in_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Ghostverb",
+        "category": "effect",
+        "max_blocks": 8,
+        "params": 4,
+        "cpu": 45,
+        "blocks": {
+            "audio_in_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 1
+            "audio_in_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 1
             },
-            'decay_feedback': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "decay_feedback": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'rate': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 3
+            "rate": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 3
             },
-            'resonance': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 4
+            "resonance": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 4
             },
-            'mix': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 5
+            "mix": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 5
             },
-            'audio_out_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 6
+            "audio_out_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 6
             },
-            'audio_out_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 7
+            "audio_out_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 7
             }
         },
-        'options': {
-            'channels': ['1in->1out', '1in->2out', 'stereo']
+        "options": {
+            "channels": ["1in->1out", "1in->2out", "stereo"]
         }
     },
     68: {
-        'name': 'Cabinet Sim',
-        'category': 'effect',
-        'max_blocks': 4,
-        'params': 0,
-        'cpu': 10,
-        'blocks': {
-            'audio_in_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Cabinet Sim",
+        "category": "effect",
+        "max_blocks": 4,
+        "params": 0,
+        "cpu": 10,
+        "blocks": {
+            "audio_in_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 1
+            "audio_in_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 1
             },
-            'audio_out_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 2
+            "audio_out_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 2
             },
-            'audio_out_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 3
+            "audio_out_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 3
             }
         },
-        'options': {
-            'channels': ['mono', 'stereo'],
-            'type': ['4x12_full', '2x12_dark', '2x12_modern', '1x12',
-                     '1x8_lofi', '1x12_vintage', '4x12_hifi']
+        "options": {
+            "channels": ["mono", "stereo"],
+            "type": ["4x12_full", "2x12_dark", "2x12_modern", "1x12",
+                     "1x8_lofi", "1x12_vintage", "4x12_hifi"]
         }
     },
     69: {
-        'name': 'Flanger',
-        'category': 'effect',
-        'max_blocks': 9,
-        'params': 5,
-        'cpu': 11,
-        'blocks': {
-            'audio_in_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Flanger",
+        "category": "effect",
+        "max_blocks": 9,
+        "params": 5,
+        "cpu": 11,
+        "blocks": {
+            "audio_in_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 1
+            "audio_in_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 1
             },
-            'control_in': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "control_in": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'regen': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 3
+            "regen": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 3
             },
-            'width': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 4
+            "width": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 4
             },
-            'tone_tilt_eq': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 5
+            "tone_tilt_eq": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 5
             },
-            'mix': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 6
+            "mix": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 6
             },
-            'audio_out_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 7
+            "audio_out_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 7
             },
-            'audio_out_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 8
+            "audio_out_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 8
             }
         },
-        'options': {
-            'channels': ['1in->1out', '1in->2out', 'stereo'],
-            'control': ['rate', 'tap_tempo', 'cv_direct'],
-            'type': ['1960s', '1970s', 'thru_0']
+        "options": {
+            "channels": ["1in->1out", "1in->2out", "stereo"],
+            "control": ["rate", "tap_tempo", "cv_direct"],
+            "type": ["1960s", "1970s", "thru_0"]
         }
     },
     70: {
-        'name': 'Chorus',
-        'category': 'effect',
-        'max_blocks': 8,
-        'params': 4,
-        'cpu': 13,
-        'blocks': {
-            'audio_in_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Chorus",
+        "category": "effect",
+        "max_blocks": 8,
+        "params": 4,
+        "cpu": 13,
+        "blocks": {
+            "audio_in_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 1
+            "audio_in_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 1
             },
-            'control_in': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "control_in": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'width': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 3
+            "width": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 3
             },
-            'tone_tilt_eq': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 4
+            "tone_tilt_eq": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 4
             },
-            'mix': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 5
+            "mix": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 5
             },
-            'audio_out_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 6
+            "audio_out_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 6
             },
-            'audio_out_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 7
+            "audio_out_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 7
             }
         },
-        'options': {
-            'channels': ['1in->1out', '1in->2out', 'stereo'],
-            'control': ['rate', 'tap_tempo', 'cv_direct'],
-            'type': ['classic']
+        "options": {
+            "channels": ["1in->1out", "1in->2out", "stereo"],
+            "control": ["rate", "tap_tempo", "cv_direct"],
+            "type": ["classic"]
         }
     },
     71: {
-        'name': 'Vibrato',
-        'category': 'effect',
-        'max_blocks': 6,
-        'params': 2,
-        'cpu': 5,
-        'blocks': {
-            'audio_in_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Vibrato",
+        "category": "effect",
+        "max_blocks": 6,
+        "params": 2,
+        "cpu": 5,
+        "blocks": {
+            "audio_in_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 1
+            "audio_in_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 1
             },
-            'control_in': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "control_in": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'width': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 3
+            "width": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 3
             },
-            'audio_out_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 4
+            "audio_out_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 4
             },
-            'audio_out_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 5
+            "audio_out_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 5
             }
         },
-        'options': {
-            'channels': ['1in->1out', '1in->2out', 'stereo'],
-            'control': ['rate', 'tap_tempo', 'cv_direct'],
-            'waveform': ['sine', 'triangle', 'swung_sine', 'swung']
+        "options": {
+            "channels": ["1in->1out", "1in->2out", "stereo"],
+            "control": ["rate", "tap_tempo", "cv_direct"],
+            "waveform": ["sine", "triangle", "swung_sine", "swung"]
         }
     },
     72: {
-        'name': 'Env Filter',
-        'category': 'effect',
-        'max_blocks': 8,
-        'params': 4,
-        'cpu': 7,
-        'blocks': {
-            'audio_in_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Env Filter",
+        "category": "effect",
+        "max_blocks": 8,
+        "params": 4,
+        "cpu": 7,
+        "blocks": {
+            "audio_in_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 1
+            "audio_in_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 1
             },
-            'sensitivity': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "sensitivity": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'min_freq': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 3
+            "min_freq": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 3
             },
-            'max_freq': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 4
+            "max_freq": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 4
             },
-            'filter_q': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 5
+            "filter_q": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 5
             },
-            'audio_out_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 6
+            "audio_out_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 6
             },
-            'audio_out_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 7
+            "audio_out_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 7
             }
         },
-        'options': {
-            'channels': ['1in->1out', '1in->2out', 'stereo'],
-            'control': ['rate', 'tap_tempo', 'cv_direct'],
-            'direction': ['up', 'down']
+        "options": {
+            "channels": ["1in->1out", "1in->2out", "stereo"],
+            "control": ["rate", "tap_tempo", "cv_direct"],
+            "direction": ["up", "down"]
         }
     },
     73: {
-        'name': 'Ring Modulator',
-        'category': 'effect',
-        'max_blocks': 5,
-        'params': 3,
-        'cpu': 14,
-        'blocks': {
-            'audio_in': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Ring Modulator",
+        "category": "effect",
+        "max_blocks": 5,
+        "params": 3,
+        "cpu": 14,
+        "blocks": {
+            "audio_in": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'frequency': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "frequency": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'ext_in': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 1
+            "ext_in": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 1
             },
-            'duty_cycle': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 2
+            "duty_cycle": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 2
             },
-            'mix': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 3
+            "mix": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 3
             },
-            'audio_out': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 4
+            "audio_out": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 4
             }
         },
-        'options': {
-            'waveform': ['since', 'square', 'triangle', 'sawtooth'],
-            'ext_audio_in': ['off', 'on'],
-            'duty_cycle': ['off', 'on'],
-            'upsampling': ['none', '2x']
+        "options": {
+            "waveform": ["since", "square", "triangle", "sawtooth"],
+            "ext_audio_in": ["off", "on"],
+            "duty_cycle": ["off", "on"],
+            "upsampling": ["none", "2x"]
         }
     },
     74: {
-        'name': 'Hall Reverb',
-        'category': 'effect',
-        'max_blocks': 8,
-        'params': 4,
-        'cpu': 22,
-        'blocks': {
-            'audio_in_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Hall Reverb",
+        "category": "effect",
+        "max_blocks": 8,
+        "params": 4,
+        "cpu": 22,
+        "blocks": {
+            "audio_in_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_R': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 1
+            "audio_in_R": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 1
             },
-            'decay_time': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "decay_time": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'low_eq': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 3
+            "low_eq": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 3
             },
-            'lpf_freq': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 4
+            "lpf_freq": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 4
             },
-            'mix': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 5
+            "mix": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 5
             },
-            'audio_out_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 6
+            "audio_out_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 6
             },
-            'audio_out_R': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 7
+            "audio_out_R": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 7
             }
         },
-        'options': {
-            None
-        }
+        "options": {}
     },
     75: {
-        'name': 'Ping Pong Delay',
-        'category': 'effect',
-        'max_blocks': 9,
-        'params': 5,
-        'cpu': 18,
-        'blocks': {
-            'audio_in_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Ping Pong Delay",
+        "category": "effect",
+        "max_blocks": 9,
+        "params": 5,
+        "cpu": 18,
+        "blocks": {
+            "audio_in_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 1
+            "audio_in_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 1
             },
-            'delay_time': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "delay_time": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'feedback': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 3
+            "feedback": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 3
             },
-            'mod_rate': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 4
+            "mod_rate": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 4
             },
-            'mod_depth': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 5
+            "mod_depth": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 5
             },
-            'mix': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 6
+            "mix": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 6
             },
-            'audio_out_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 7
+            "audio_out_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 7
             },
-            'audio_out_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 8
+            "audio_out_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 8
             }
         },
-        'options': {
-            'channels': ['1in->1out', 'stereo'],
-            'control': ['rate', 'tap_tempo', 'cv_direct'],
-            'type': ['clean', 'tape', 'old_tape', 'bbd'],
-            'tap_ratio': ['1:1', '2:3', '1:2', '1:3', '3:8', '1:4',
-                          '3:16', '1:8', '1:16', '1:32']
+        "options": {
+            "channels": ["1in->1out", "stereo"],
+            "control": ["rate", "tap_tempo", "cv_direct"],
+            "type": ["clean", "tape", "old_tape", "bbd"],
+            "tap_ratio": ["1:1", "2:3", "1:2", "1:3", "3:8", "1:4",
+                          "3:16", "1:8", "1:16", "1:32"]
         }
     },
     76: {
-        'name': 'Audio Mixer',
-        'category': 'audio',
-        'max_blocks': 34,
-        'params': 16,
-        'cpu': 7,
-        'blocks': {
-            'audio_in_1_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': [0, 4, 8, 12, 16, 20, 24]
+        "name": "Audio Mixer",
+        "category": "audio",
+        "max_blocks": 34,
+        "params": 16,
+        "cpu": 7,
+        "blocks": {
+            "audio_in_1_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": [0, 4, 8, 12, 16, 20, 24]
             },
-            'audio_in_1_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': [1, 5, 9, 13, 17, 21, 25]
+            "audio_in_1_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": [1, 5, 9, 13, 17, 21, 25]
             },
-            'audio_in_2_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': [2, 6, 10, 14, 18, 22, 26]
+            "audio_in_2_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": [2, 6, 10, 14, 18, 22, 26]
             },
-            'audio_in_2_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': [3, 7, 11, 15, 19, 23, 27]
+            "audio_in_2_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": [3, 7, 11, 15, 19, 23, 27]
             },
-            'gain_1': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 28
+            "gain_1": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 28
             },
-            'gain_2': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 29
+            "gain_2": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 29
             },
-            'pan_1': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 30
+            "pan_1": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 30
             },
-            'pan_2': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 31
+            "pan_2": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 31
             },
-            'audio_out_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 32
+            "audio_out_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 32
             },
-            'audio_out_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 33
+            "audio_out_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 33
             }
         },
-        'options': {
-            'channels': [2-8],
-            'stereo': ['mono', 'stereo'],
-            'panning': ['off', 'on']
+        "options": {
+            "channels": list(range(2, 9)),
+            "stereo": ["mono", "stereo"],
+            "panning": ["off", "on"]
         }
     },
     77: {
-        'name': 'CV Flip Flop',
-        'category': 'cv',
-        'max_blocks': 2,
-        'params': 1,
-        'cpu': 0.2,
-        'blocks': {
-            'cv_input': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "CV Flip Flop",
+        "category": "cv",
+        "max_blocks": 2,
+        "params": 1,
+        "cpu": 0.2,
+        "blocks": {
+            "cv_input": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             },
-            'cv_output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 1
+            "cv_output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 1
             }
         },
-        'options': {
-            None
-        }
+        "options": {}
     },
     78: {
-        'name': 'Diffuser',
-        'category': 'audio',
-        'max_blocks': 6,
-        'params': 4,
-        'cpu': 2,
-        'blocks': {
-            'audio_in': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Diffuser",
+        "category": "audio",
+        "max_blocks": 6,
+        "params": 4,
+        "cpu": 2,
+        "blocks": {
+            "audio_in": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'gain': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "gain": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'size': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "size": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'mod_width': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 3
+            "mod_width": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 3
             },
-            'mod_rate': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 4
+            "mod_rate": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 4
             },
-            'audio_out': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 5
+            "audio_out": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 5
             }
         },
-        'options': {
-            None
-        }
+        "options": {}
     },
     79: {
-        'name': 'Reverb Lite',
-        'category': 'effect',
-        'max_blocks': 6,
-        'params': 2,
-        'cpu': 10,
-        'blocks': {
-            'audio_in_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Reverb Lite",
+        "category": "effect",
+        "max_blocks": 6,
+        "params": 2,
+        "cpu": 10,
+        "blocks": {
+            "audio_in_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 1
+            "audio_in_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 1
             },
-            'decay_time': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "decay_time": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'mix': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 3
+            "mix": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 3
             },
-            'audio_out_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 4
+            "audio_out_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 4
             },
-            'audio_out_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 5
+            "audio_out_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 5
             }
         },
-        'options': {
-            'channels': ['1in->1out', '1in->2out', 'stereo']
+        "options": {
+            "channels": ["1in->1out", "1in->2out", "stereo"]
         }
     },
     80: {
-        'name': 'Room Reverb',
-        'category': 'effect',
-        'max_blocks': 8,
-        'params': 4,
-        'cpu': 22,
-        'blocks': {
-            'audio_in_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Room Reverb",
+        "category": "effect",
+        "max_blocks": 8,
+        "params": 4,
+        "cpu": 22,
+        "blocks": {
+            "audio_in_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_R': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 1
+            "audio_in_R": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 1
             },
-            'decay_time': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "decay_time": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'low_eq': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 3
+            "low_eq": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 3
             },
-            'lpf_freq': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 4
+            "lpf_freq": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 4
             },
-            'mix': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 5
+            "mix": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 5
             },
-            'audio_out_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 6
+            "audio_out_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 6
             },
-            'audio_out_R': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 7
+            "audio_out_R": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 7
             }
         },
-        'options': {
-            None
-        }
+        "options": {}
     },
     81: {
-        'name': 'Pixel',
-        'category': 'interface',
-        'max_blocks': 1,
-        'params': 1,
-        'cpu': 0.01,
-        'blocks': {
-            'cv_audio_in': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 0
+        "name": "Pixel",
+        "category": "interface",
+        "max_blocks": 1,
+        "params": 1,
+        "cpu": 0.01,
+        "blocks": {
+            "cv_audio_in": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 0
             }
         },
-        'options': {
-            'control': ['cv', 'audio']
+        "options": {
+            "control": ["cv", "audio"]
         }
     },
     82: {
-        'name': 'Midi Clock In',
-        'category': 'interface',
-        'max_blocks': 4,
-        'params': 0,
-        'cpu': 0.1,
-        'blocks': {
-            'cc_value': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Midi Clock In",
+        "category": "interface",
+        "max_blocks": 4,
+        "params": 0,
+        "cpu": 0.1,
+        "blocks": {
+            "cc_value": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'clock_out': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 1
+            "clock_out": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 1
             },
-            'run_out': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 2
+            "run_out": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 2
             },
-            'divider': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 3
+            "divider": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 3
             }
         },
-        'options': {
-            'clock_out': ['disabled', 'enabled'],
-            'run_out': ['disabled', 'enabled'],
-            'divider': ['disabled', 'enabled'],
-            'beat_modifier': ['1', '2', '3', '4', '6', '12',
-                              '1/12', '1/6', '1/4', '1/3', '1/2']
+        "options": {
+            "clock_out": ["disabled", "enabled"],
+            "run_out": ["disabled", "enabled"],
+            "divider": ["disabled", "enabled"],
+            "beat_modifier": ["1", "2", "3", "4", "6", "12",
+                              "1/12", "1/6", "1/4", "1/3", "1/2"]
         }
     },
     83: {
-        'name': 'granular',
-        'category': 'audio',
-        'max_blocks': 10,
-        'params': 6,
-        'cpu': 8,
-        'blocks': {
-            'audio_in_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "granular",
+        "category": "audio",
+        "max_blocks": 10,
+        "params": 6,
+        "cpu": 8,
+        "blocks": {
+            "audio_in_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'audio_in_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 1
+            "audio_in_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 1
             },
-            'grain_size': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "grain_size": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'grain_position': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 3
+            "grain_position": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 3
             },
-            'density': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 4
+            "density": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 4
             },
-            'texture': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 5
+            "texture": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 5
             },
-            'speed_pitch': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 6
+            "speed_pitch": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 6
             },
-            'freeze': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 7
+            "freeze": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 7
             },
-            'audio_out_L': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 8
+            "audio_out_L": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 8
             },
-            'audio_out_R': {
-                'isDefault': False,
-                'isParam': False,
-                'position': 9
+            "audio_out_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 9
             }
         },
-        'options': {
-            'num_grains': list(range(1, 9)),
-            'channels': ['mono', 'stereo'],
-            'pos_control': ['cv', 'tap_tempo'],
-            'size_control': ['cv', 'tap_tempo']
+        "options": {
+            "num_grains": list(range(1, 9)),
+            "channels": ["mono", "stereo"],
+            "pos_control": ["cv", "tap_tempo"],
+            "size_control": ["cv", "tap_tempo"]
         }
     },
     84: {
-        'name': 'Midi Clock Out',
-        'category': 'interface',
-        'max_blocks': 5,
-        'params': 5,
-        'cpu': 0.3,
-        'blocks': {
-            'tap_control': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Midi Clock Out",
+        "category": "interface",
+        "max_blocks": 5,
+        "params": 5,
+        "cpu": 0.3,
+        "blocks": {
+            "tap_control": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'cv_control': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 0
+            "cv_control": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 0
             },
-            'sent:': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 1
+            "sent:": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
             },
-            'reset': {
-                'isDefault': True,
-                'isParam': True,
-                'position': 2
+            "reset": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 2
             },
-            'send_position': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 3
+            "send_position": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 3
             },
-            'song_position': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 4
+            "song_position": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 4
             }
         },
-        'options': {
-            'input': ['tap', 'cv_control'],
-            'run_in': ['enabled', 'disabled'],
-            'reset_in': ['enabled', 'disabled'],
-            'position': ['disabled', 'enabled']
+        "options": {
+            "input": ["tap", "cv_control"],
+            "run_in": ["enabled", "disabled"],
+            "reset_in": ["enabled", "disabled"],
+            "position": ["disabled", "enabled"]
         }
     },
     85: {
-        'name': 'Tap to CV',
-        'category': 'cv',
-        'max_blocks': 4,
-        'params': 2,
-        'cpu': 0.1,
-        'blocks': {
-            'tap_input': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Tap to CV",
+        "category": "cv",
+        "max_blocks": 4,
+        "params": 2,
+        "cpu": 0.1,
+        "blocks": {
+            "tap_input": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             },
-            'min_time': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 1
+            "min_time": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 1
             },
-            'max_time': {
-                'isDefault': False,
-                'isParam': True,
-                'position': 2
+            "max_time": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 2
             },
-            'output': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 3
+            "output": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 3
             }
         },
-        'options': {
-            'range': ['40hz', 'time'],
-            'output': ['linear', 'exponential']
+        "options": {
+            "range": ["40hz", "time"],
+            "output": ["linear", "exponential"]
         }
     },
     86: {
-        'name': 'Midi Pitch Bend In',
-        'category': 'interface',
-        'max_blocks': 1,
-        'params': 0,
-        'cpu': 0.1,
-        'blocks': {
-            'pitch_bend': {
-                'isDefault': True,
-                'isParam': False,
-                'position': 0
+        "name": "Midi Pitch Bend In",
+        "category": "interface",
+        "max_blocks": 1,
+        "params": 0,
+        "cpu": 0.1,
+        "blocks": {
+            "pitch_bend": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 0
             }
         },
-        'options': {
-            'midi_channel': list(range(1, 17))
+        "options": {
+            "midi_channel": list(range(1, 17))
         }
     }
 }
+
+for k, v in list(module_index.items()):
+    module_index[str(k)] = module_index.pop(k)
+
+with open('zoia_lib/common/schemas/ModuleIndex.json', 'w') as f:
+    json.dump(module_index, f)

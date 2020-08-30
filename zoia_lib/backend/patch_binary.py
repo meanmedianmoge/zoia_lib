@@ -1,8 +1,9 @@
+import json
 import struct
 
 from zoia_lib.backend.patch import Patch
-from zoia_lib.common.schemas import ModuleIndex
-mod = ModuleIndex.module_index
+with open('zoia_lib/common/schemas/ModuleIndex.json', 'r') as f:
+    mod = json.load(f)
 
 
 class PatchBinary(Patch):
@@ -84,8 +85,7 @@ class PatchBinary(Patch):
             size = data[curr_step]
             curr_module = {
                 "number": i,
-                # "size": int(size),
-                "cpu": mod[data[curr_step + 1]]['cpu'],
+                "cpu": self._get_module_data(data[curr_step + 1], 'cpu'),
                 "type": self._get_module_data(data[curr_step + 1], 'name'),
                 "page": int(data[curr_step + 3]),
                 "position": [x for x in range(
@@ -133,7 +133,7 @@ class PatchBinary(Patch):
         return: The item within the module index.
         """
 
-        return mod[module_id][key]
+        return mod[str(module_id)][key]
 
     @staticmethod
     def _get_color_name(color_id):
