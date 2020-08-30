@@ -3080,10 +3080,10 @@ module_index = {
                 'isDefault': True,
                 'isParam': False,
                 'position': 0
-            },
+            }
+        },
         'options': {
             'midi_channel': list(range(1, 17))
-        }
         }
     }
 }
