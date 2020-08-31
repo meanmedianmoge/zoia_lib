@@ -23,29 +23,27 @@ class PatchBinary(Patch):
         is returned such that it can be displayed via the frontend.
         The returned data will specify the following:
         - Preset size
-        - Patch name (real name)
+        - Patch name
         - Module count
           - For each module:
-            - Module name (not yet implemented)
+            - Module name
             - Module type
             - Page number
             - Old color value
             - New color value
             - Grid position
-            - Number of parameters on the grid (deprecated)
-            - Options 1 (needs to be expanded)
-            - Options 2 (needs to be expanded)
+            - Number of parameters
+            - Options 1
+            - Options 2
+            - Parameter values
         - Connection count
           - For each connection:
             - Connection values and strength (as a %)
-        - Number of pages
-          - For each page:
-            - The page name (if it has one) (not yet implemented)
+        - Number of pages and their names
         - Number of starred parameters
           - For each param:
             - Parameter name (not yet implemented)
             - Parameter value
-        - The color of each module
 
         pch_data: The binary to be parsed and analyzed.
 
@@ -56,18 +54,10 @@ class PatchBinary(Patch):
         # They did all the heavy lifting.
 
         # Extract the string name of the patch.
-        try:
-            name = str(pch_data[4:]).split("\\")[0].split("\'")[1]
-        except IndexError:
-            name = str(pch_data[4:]).split("\\")[0]
-
-        # TODO Extract the string names of the pages of the patch.
+        name = self._qc_name(pch_data[4:])
 
         # Unpack the binary data.
         data = struct.unpack('i' * int(len(pch_data) / 4), pch_data)
-
-        # Remove the binary identifier if it stuck.
-        name = name.split("b\"")[-1]
 
         # Get a list of colors for the modules
         # (appears at the end of the binary)
@@ -90,6 +80,8 @@ class PatchBinary(Patch):
             size = data[curr_step]
             curr_module = {
                 "number": i,
+                "name": self._qc_name(pch_data[(curr_step+(size-4))*4:
+                                               (curr_step+(size-4))*4+16]),
                 "cpu": self._get_module_data(data[curr_step + 1], "cpu"),
                 "type": self._get_module_data(data[curr_step + 1], "name"),
                 "page": int(data[curr_step + 3]),
@@ -100,9 +92,14 @@ class PatchBinary(Patch):
                 "old_color": self._get_color_name(data[curr_step + 4]),
                 "new_color": "" if skip_real else self._get_color_name(
                     colors[i]),
-                "options_1": "" if size <= 14 else data[curr_step + 8],
-                "options_2": "" if size <= 14 else data[curr_step + 9]
+                "parameters": data[curr_step + 6],
+                "options_1": "" if size <= 14 else list(bytearray(
+                    pch_data[(curr_step+8)*4: (curr_step+8)*4+4])),
+                "options_2": "" if size <= 14 else list(bytearray(
+                    pch_data[(curr_step+9)*4: (curr_step+9)*4+4]))
             }
+            for param in range(curr_module["parameters"]):
+                curr_module["param_{}".format(param)] = data[curr_step + param + 10]
             modules.append(curr_module)
             curr_step += size
 
@@ -123,18 +120,20 @@ class PatchBinary(Patch):
         curr_step += 1
         # Extract the page data for each page in the patch.
         for k in range(data[curr_step]):
-            curr_page = {
-                "name": str(data[curr_step + 1])
-            }
+            curr_page = self._qc_name(pch_data[(curr_step+1)*4:
+                                               (curr_step+1)*4+16])
             pages.append(curr_page)
             curr_step += 4
+        # pad list with empty strings so that viz doesn't blow up
+        pages += [""] * (64 - len(pages))
 
         starred = []
         curr_step += 1
         # Extract the starred parameters in the patch.
         for l in range(data[curr_step]):
             curr_param = {
-                "name": "",
+                "name": self._qc_name(pch_data[(curr_step+1)*4:
+                                               (curr_step+1)*4+16]),
                 "value": data[curr_step + 1]
             }
             starred.append(curr_param)
@@ -143,9 +142,7 @@ class PatchBinary(Patch):
         colours = []
         # Extract the colors of each module in the patch.
         for m in range(len(modules)):
-            curr_color = {
-                "color": data[curr_step + 1]
-            }
+            curr_color = data[curr_step + 1]
             colours.append(curr_color)
             curr_step += 1
 
@@ -160,6 +157,15 @@ class PatchBinary(Patch):
         }
 
         return json_bin
+
+    @staticmethod
+    def _qc_name(name):
+        try:
+            name = str(name).split("\\")[0].split("\'")[1]
+        except IndexError:
+            name = str(name).split("\\")[0]
+
+        return name.split("b\"")[-1]
 
     @staticmethod
     def _get_module_data(module_id, key):

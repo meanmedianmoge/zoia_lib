@@ -468,7 +468,8 @@ class ZOIALibrarianLocal(QMainWindow):
         self.curr_viz = viz
 
         self.ui.page_label.setText("<html><b>" + viz["name"] + "</b>  Page "
-                                   + str(self.curr_page_viz) + "</html>")
+                                   + str(self.curr_page_viz) + ": {}".format(
+                                    viz["pages"][self.curr_page_viz]) + "</html>")
 
         # Set the colors of the buttons
         self.set_viz()
@@ -494,8 +495,9 @@ class ZOIALibrarianLocal(QMainWindow):
 
         # Update the page number.
         self.ui.page_label.setText("<html><b>" + self.curr_viz["name"]
-                                   + "</b>  Page " + str(self.curr_page_viz)
-                                   + "</html>")
+                                   + "</b>  Page " + str(self.curr_page_viz) +
+                                   ": {}".format(self.curr_viz["pages"]
+                                                 [self.curr_page_viz]) + "</html>")
 
     def viz_display(self):
         """ Displays additional information about a module that appears
