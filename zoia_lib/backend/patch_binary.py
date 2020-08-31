@@ -26,6 +26,7 @@ class PatchBinary(Patch):
         - Patch name (real name)
         - Module count
           - For each module:
+            - Module name (not yet implemented)
             - Module type
             - Page number
             - Old color value
@@ -40,6 +41,10 @@ class PatchBinary(Patch):
         - Number of pages
           - For each page:
             - The page name (if it has one) (not yet implemented)
+        - Number of starred parameters
+          - For each param:
+            - Parameter name (not yet implemented)
+            - Parameter value
         - The color of each module
 
         pch_data: The binary to be parsed and analyzed.
@@ -85,13 +90,13 @@ class PatchBinary(Patch):
             size = data[curr_step]
             curr_module = {
                 "number": i,
-                "cpu": self._get_module_data(data[curr_step + 1], 'cpu'),
-                "type": self._get_module_data(data[curr_step + 1], 'name'),
+                "cpu": self._get_module_data(data[curr_step + 1], "cpu"),
+                "type": self._get_module_data(data[curr_step + 1], "name"),
                 "page": int(data[curr_step + 3]),
                 "position": [x for x in range(
                     int(data[curr_step + 5]),
                     int(data[curr_step + 5]) + self._get_module_data(
-                        data[curr_step + 1], 'max_blocks'))],
+                        data[curr_step + 1], "max_blocks"))],
                 "old_color": self._get_color_name(data[curr_step + 4]),
                 "new_color": "" if skip_real else self._get_color_name(
                     colors[i]),
@@ -105,20 +110,53 @@ class PatchBinary(Patch):
         # Extract the connection data for each connection in the patch.
         for j in range(data[curr_step]):
             curr_connection = {
-                "source": '{}.{}'.format(int(data[curr_step + 1]),
+                "source": "{}.{}".format(int(data[curr_step + 1]),
                                          int(data[curr_step + 2])),
-                "destination": '{}.{}'.format(int(data[curr_step + 3]),
+                "destination": "{}.{}".format(int(data[curr_step + 3]),
                                               int(data[curr_step + 4])),
                 "strength": int(data[curr_step + 5] / 100)
             }
             connections.append(curr_connection)
             curr_step += 5
 
+        pages = []
+        curr_step += 1
+        # Extract the page data for each page in the patch.
+        for k in range(data[curr_step]):
+            curr_page = {
+                "name": str(data[curr_step + 1])
+            }
+            pages.append(curr_page)
+            curr_step += 4
+
+        starred = []
+        curr_step += 1
+        # Extract the starred parameters in the patch.
+        for l in range(data[curr_step]):
+            curr_param = {
+                "name": "",
+                "value": data[curr_step + 1]
+            }
+            starred.append(curr_param)
+            curr_step += 1
+
+        colours = []
+        # Extract the colors of each module in the patch.
+        for m in range(len(modules)):
+            curr_color = {
+                "color": data[curr_step + 1]
+            }
+            colours.append(curr_color)
+            curr_step += 1
+
         # Prepare a dict to pass to the frontend.
         json_bin = {
             "name": name,
             "modules": modules,
-            "connections": connections
+            "connections": connections,
+            "pages": pages,
+            "starred": starred,
+            "colours": colours
         }
 
         return json_bin
