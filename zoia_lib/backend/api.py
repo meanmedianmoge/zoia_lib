@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created: 9:47 PM on 2/23/20
-Author: Mike Moger
-Usage: https://patchstorage.com/docs/
-"""
-
 import json
 import math
 import os

@@ -838,7 +838,8 @@ module_index = {
             },
             "audio_out": {
                 "isDefault": True,
-                "isParam": False
+                "isParam": False,
+                "position": 4
             }
         },
         "options": {
@@ -3055,5 +3056,5 @@ module_index = {
 for k, v in list(module_index.items()):
     module_index[str(k)] = module_index.pop(k)
 
-with open('zoia_lib/common/schemas/ModuleIndex.json', 'w') as f:
+with open("zoia_lib/common/schemas/ModuleIndex.json", "w") as f:
     json.dump(module_index, f)

@@ -486,7 +486,7 @@ class ZOIALibrarianLocal(QMainWindow):
 
         self.ui.page_label.setText("""<html>
             Page {}: {}
-            </html""".format(
+            </html>""".format(
                 str(self.curr_page_viz),
                 viz["pages"][self.curr_page_viz]
             )
@@ -534,7 +534,7 @@ class ZOIALibrarianLocal(QMainWindow):
         # Update the page number.
         self.ui.page_label.setText("""<html>
             Page {}: {}
-            </html""".format(
+            </html>""".format(
                 str(self.curr_page_viz),
                 self.curr_viz["pages"][self.curr_page_viz]
             )
