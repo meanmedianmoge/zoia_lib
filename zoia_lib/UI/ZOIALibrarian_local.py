@@ -467,9 +467,30 @@ class ZOIALibrarianLocal(QMainWindow):
         self.curr_page_viz = 0
         self.curr_viz = viz
 
-        self.ui.page_label.setText("<html><b>" + viz["name"] + "</b>  Page "
-                                   + str(self.curr_page_viz) + ": {}".format(
-                                    viz["pages"][self.curr_page_viz]) + "</html>")
+        self.ui.text_browser_viz.setText("""<html>
+            <b><h2> {} </b></h2>
+            Est CPU: {} <br>
+            Number of Modules: {} <br>
+            Number of Pages: {} <br>
+            Number of Connections: {} <br>
+            Number of Starred Params: {}
+            </html>""".format(
+                viz["meta"]["name"],
+                viz["meta"]["cpu"],
+                viz["meta"]["n_modules"],
+                viz["meta"]["n_pages"],
+                viz["meta"]["n_connections"],
+                viz["meta"]["n_starred"]
+            )
+        )
+
+        self.ui.page_label.setText("""<html>
+            Page {}: {}
+            </html""".format(
+                str(self.curr_page_viz),
+                viz["pages"][self.curr_page_viz]
+            )
+        )
 
         # Set the colors of the buttons
         self.set_viz()
@@ -493,11 +514,31 @@ class ZOIALibrarianLocal(QMainWindow):
         # Load the viz for the new page.
         self.set_viz()
 
+        self.ui.text_browser_viz.setText("""<html>
+            <b><h2> {} </b></h2>
+            Est CPU: {} <br>
+            Number of Modules: {} <br>
+            Number of Pages: {} <br>
+            Number of Connections: {} <br>
+            Number of Starred Params: {}
+            </html>""".format(
+                self.curr_viz["meta"]["name"],
+                self.curr_viz["meta"]["cpu"],
+                self.curr_viz["meta"]["n_modules"],
+                self.curr_viz["meta"]["n_pages"],
+                self.curr_viz["meta"]["n_connections"],
+                self.curr_viz["meta"]["n_starred"]
+            )
+        )
+
         # Update the page number.
-        self.ui.page_label.setText("<html><b>" + self.curr_viz["name"]
-                                   + "</b>  Page " + str(self.curr_page_viz) +
-                                   ": {}".format(self.curr_viz["pages"]
-                                                 [self.curr_page_viz]) + "</html>")
+        self.ui.page_label.setText("""<html>
+            Page {}: {}
+            </html""".format(
+                str(self.curr_page_viz),
+                self.curr_viz["pages"][self.curr_page_viz]
+            )
+        )
 
     def viz_display(self):
         """ Displays additional information about a module that appears
@@ -515,11 +556,19 @@ class ZOIALibrarianLocal(QMainWindow):
                 else:
                     color = curr_module["new_color"]
                 # Output the data for that module.
-                self.ui.text_browser_viz.setText(
-                    "<html><b><h2>" + curr_module["type"] + "</b></h2>"
-                    + "<u>Color:</u> " + color + "<br/><u>"
-                    + "Options 1:</u> " + str(curr_module["options_1"])
-                    + "<br/><u>Options 2:</u> " + str(curr_module["options_2"])
+                self.ui.text_browser_viz.setText("""<html>
+                    <b><h2> {} </b></h2>
+                    Type: {} <br>
+                    Color: {} <br>
+                    Options 1: {} <br> 
+                    Options 2: {} </u>
+                    </html>""".format(
+                        curr_module["name"],
+                        curr_module["type"],
+                        color,
+                        str(curr_module["options_1"]),
+                        str(curr_module["options_2"])
+                    )
                 )
 
     def set_viz(self):

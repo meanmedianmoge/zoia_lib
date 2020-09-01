@@ -2,7 +2,7 @@ import json
 import struct
 
 from zoia_lib.backend.patch import Patch
-with open('zoia_lib/common/schemas/ModuleIndex.json', 'r') as f:
+with open("zoia_lib/common/schemas/ModuleIndex.json", "r") as f:
     mod = json.load(f)
 
 
@@ -57,7 +57,7 @@ class PatchBinary(Patch):
         name = self._qc_name(pch_data[4:])
 
         # Unpack the binary data.
-        data = struct.unpack('i' * int(len(pch_data) / 4), pch_data)
+        data = struct.unpack("i" * int(len(pch_data) / 4), pch_data)
 
         # Get a list of colors for the modules
         # (appears at the end of the binary)
@@ -100,6 +100,7 @@ class PatchBinary(Patch):
             }
             for param in range(curr_module["parameters"]):
                 curr_module["param_{}".format(param)] = data[curr_step + param + 10]
+            curr_module["connections"] = []
             modules.append(curr_module)
             curr_step += size
 
@@ -124,7 +125,8 @@ class PatchBinary(Patch):
                                                (curr_step+1)*4+16])
             pages.append(curr_page)
             curr_step += 4
-        # pad list with empty strings so that viz doesn't blow up
+        # Pad list with empty strings so that viz doesn't blow up
+        n_pages = len(pages)
         pages += [""] * (64 - len(pages))
 
         starred = []
@@ -149,11 +151,19 @@ class PatchBinary(Patch):
         # Prepare a dict to pass to the frontend.
         json_bin = {
             "name": name,
-            "modules": modules,
-            "connections": connections,
+            "modules": self._add_connections(modules, connections),
+            # "connections": connections,
             "pages": pages,
             "starred": starred,
-            "colours": colours
+            # "colours": colours
+            "meta": {
+                "name": name,
+                "cpu": round(sum([k["cpu"] for k in modules]), 2),
+                "n_modules": len(modules),
+                "n_connections": len(connections),
+                "n_pages": n_pages,
+                "n_starred": len(starred)
+            }
         }
 
         return json_bin
@@ -206,3 +216,27 @@ class PatchBinary(Patch):
         }[color_id]
 
         return color
+
+    @staticmethod
+    def _add_connections(modules, connections):
+        """
+
+        modules: List of modules in a patch.
+        connections: List of connections in a patch.
+
+        return: Appends the current module object with all
+            applicable connections so the front end can use it.
+        """
+
+        for conn in connections:
+            out_mod, out_block = conn["source"].split(".")
+            in_mod, in_block = conn["destination"].split(".")
+            data = {
+                "out_block": int(out_block),
+                "in_mod": int(in_mod),
+                "in_block": int(in_block),
+                "strength": conn["strength"]
+            }
+            modules[int(out_mod)]["connections"].append(data)
+
+        return modules
