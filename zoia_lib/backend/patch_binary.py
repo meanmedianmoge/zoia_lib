@@ -93,14 +93,32 @@ class PatchBinary(Patch):
                 "new_color": "" if skip_real else self._get_color_name(
                     colors[i]),
                 "parameters": data[curr_step + 6],
-                "options_1": "" if size <= 14 else list(bytearray(
-                    pch_data[(curr_step+8)*4: (curr_step+8)*4+4])),
-                "options_2": "" if size <= 14 else list(bytearray(
-                    pch_data[(curr_step+9)*4: (curr_step+9)*4+4]))
+                "options": {},
+                "options_copy": self._get_module_data(data[curr_step + 1], "options"),
+                "options_list": list(
+                    bytearray(pch_data[(curr_step+8)*4:(curr_step+8)*4+4])) + list(
+                    bytearray(pch_data[(curr_step+9)*4:(curr_step+9)*4+4])),
+                "connections": []
             }
+
+            # Create parameter keys if they exist
             for param in range(curr_module["parameters"]):
                 curr_module["param_{}".format(param)] = data[curr_step + param + 10]
-            curr_module["connections"] = []
+
+            # Select appropriate options from matrix
+            v = 0
+            for opt in list(curr_module["options_copy"]):
+                if not opt:
+                    continue
+                option = curr_module["options_list"][v]
+                value = curr_module["options_copy"][opt][option]
+                curr_module["options"][opt] = value
+                v += 1
+
+            # Remove extra keys from module dict
+            curr_module.pop("options_copy", None)
+            curr_module.pop("options_list", None)
+
             modules.append(curr_module)
             curr_step += size
 
@@ -219,13 +237,12 @@ class PatchBinary(Patch):
 
     @staticmethod
     def _add_connections(modules, connections):
-        """
+        """ Appends all applicable connections to each module.
 
         modules: List of modules in a patch.
         connections: List of connections in a patch.
 
-        return: Appends the current module object with all
-            applicable connections so the front end can use it.
+        return: Module object.
         """
 
         for conn in connections:

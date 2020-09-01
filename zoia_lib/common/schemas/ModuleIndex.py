@@ -1929,7 +1929,7 @@ module_index = {
         }
     },
     58: {
-        "name": "pitch_detector",
+        "name": "Pitch Detector",
         "category": "analysis",
         "max_blocks": 2,
         "params": 0,

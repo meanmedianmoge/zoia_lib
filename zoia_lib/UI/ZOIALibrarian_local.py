@@ -559,15 +559,17 @@ class ZOIALibrarianLocal(QMainWindow):
                 self.ui.text_browser_viz.setText("""<html>
                     <b><h2> {} </b></h2>
                     Type: {} <br>
-                    Color: {} <br>
-                    Options 1: {} <br> 
-                    Options 2: {} </u>
+                    {}
                     </html>""".format(
-                        curr_module["name"],
+                        curr_module["type"] if curr_module["name"] == ""
+                            else curr_module["name"],
                         curr_module["type"],
-                        color,
-                        str(curr_module["options_1"]),
-                        str(curr_module["options_2"])
+                        # color,
+                        json.dumps(list(curr_module["options"].items(
+                            ))).replace("[[", "[").replace("]]",
+                                "]").replace('",', '":').replace(", ",
+                                    "<br>").replace("[", "").replace("]",
+                                        "").replace('"', "")
                     )
                 )
 
