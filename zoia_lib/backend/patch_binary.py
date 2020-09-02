@@ -151,10 +151,11 @@ class PatchBinary(Patch):
         curr_step += 1
         # Extract the starred parameters in the patch.
         for l in range(data[curr_step]):
+            byte2 = struct.unpack('hh', pch_data[(curr_step+1)*4:(curr_step+1)*4+4])
             curr_param = {
-                "name": self._qc_name(pch_data[(curr_step+1)*4:
-                                               (curr_step+1)*4+16]),
-                "value": data[curr_step + 1]
+                "module": byte2[0],
+                "block": byte2[1] % 128,
+                "midi_cc": int(round(byte2[1]/128)-1) if byte2[1] >= 128 else "None",
             }
             starred.append(curr_param)
             curr_step += 1
