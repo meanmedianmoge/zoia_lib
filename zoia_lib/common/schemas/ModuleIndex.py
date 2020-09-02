@@ -1120,7 +1120,7 @@ module_index = {
             }
         },
         "options": {
-            "num_inputs": list(range(2, 17))
+            "num_inputs": list(range(1, 17))
         }
     },
     32: {
@@ -1147,7 +1147,7 @@ module_index = {
             }
         },
         "options": {
-            "num_outputs": list(range(2, 17))
+            "num_outputs": list(range(1, 17))
         }
     },
     33: {
@@ -1174,7 +1174,8 @@ module_index = {
             }
         },
         "options": {
-            "num_inputs": list(range(2, 17))
+            "num_inputs": list(range(1, 17)),
+            "fades": ["on", "off"]
         }
     },
     34: {
@@ -1201,7 +1202,8 @@ module_index = {
             }
         },
         "options": {
-            "num_outputs": list(range(2, 17))
+            "num_outputs": list(range(1, 17)),
+            "fades": ["on", "off"]
         }
     },
     35: {
