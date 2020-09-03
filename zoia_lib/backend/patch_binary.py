@@ -28,22 +28,22 @@ class PatchBinary(Patch):
           - For each module:
             - Module name
             - Module type
+            - Estimated CPU
             - Page number
-            - Old color value
-            - New color value
-            - Grid position
-            - Number of parameters
-            - Options 1
-            - Options 2
+            - Color
+            - Grid position(s)
+            - Parameter count
             - Parameter values
+            - Options
         - Connection count
           - For each connection:
-            - Connection values and strength (as a %)
+            - Out/In Module & Block pair
+            - Connection strength
         - Number of pages and their names
         - Number of starred parameters
           - For each param:
-            - Parameter name (not yet implemented)
-            - Parameter value
+            - Module and block
+            - MIDI CC (if applicable)
 
         pch_data: The binary to be parsed and analyzed.
 
@@ -185,7 +185,8 @@ class PatchBinary(Patch):
                 "n_modules": len(modules),
                 "n_connections": len(connections),
                 "n_pages": n_pages,
-                "n_starred": len(starred)
+                "n_starred": len(starred),
+                "i_o": self._get_io(modules)
             }
         }
 
@@ -281,3 +282,31 @@ class PatchBinary(Patch):
             modules[star["module"]]["starred"].append(data)
 
         return modules
+
+    @staticmethod
+    def _get_io(modules):
+        """ Figures out audio and MIDI I/O for a quick-view.
+
+        modules: List of modules in a patch
+
+        return: Module object.
+        """
+
+        in_type = None
+        out_type = None
+        midi = None
+        for mod in modules:
+            if mod["type"] == "Audio Input":
+                in_type = mod["options"]["channels"].title()
+            if mod["type"] == "Audio Output":
+                out_type = mod["options"]["channels"].title()
+            if "midi" in mod["type"].lower():
+                try:
+                    midi = mod["options"]["midi_channel"]
+                except KeyError:
+                    midi = None
+
+        return {"inputs": in_type,
+                "outputs": out_type,
+                "midi_channel": midi}
+
