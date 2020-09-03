@@ -1916,7 +1916,7 @@ module_index = {
     53: {
         "name": "Stereo Spread",
         "category": "audio",
-        "default_blocks": 4,
+        "default_blocks": 5,
         "max_blocks": 5,
         "params": 1,
         "cpu": 2,
@@ -1931,25 +1931,25 @@ module_index = {
                 "isParam": False,
                 "position": 1
             },
-            "delay_time": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
             "side_gain": {
                 "isDefault": False,
                 "isParam": True,
                 "position": 2
             },
+            "delay_time": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 3
+            },
             "audio_out_1": {
                 "isDefault": True,
                 "isParam": False,
-                "position": 3
+                "position": 4
             },
             "audio_out_2": {
                 "isDefault": True,
                 "isParam": False,
-                "position": 4
+                "position": 5
             }
         },
         "options": {
@@ -2768,7 +2768,7 @@ module_index = {
         "name": "Audio Mixer",
         "category": "audio",
         "default_blocks": 5,
-        "max_blocks": 34,
+        "max_blocks": 26,
         "params": 16,
         "cpu": 7,
         "blocks": {
@@ -2785,22 +2785,32 @@ module_index = {
             "audio_in_n_L": {
                 "isDefault": False,
                 "isParam": False,
-                "position": [4, 6, 10, 14, 18, 22, 26]
+                "position": [4, 6, 10, 14]
             },
             "audio_in_n_R": {
                 "isDefault": False,
                 "isParam": False,
-                "position": [1, 3, 5, 7, 11, 15, 19, 23, 27]
+                "position": [1, 3, 5, 7, 11, 15]
+            },
+            "gain_1": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 16
+            },
+            "gain_2": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 17
             },
             "gain_n": {
                 "isDefault": True,
                 "isParam": True,
-                "position": list(range(28, 30))
+                "position": list(range(18, 23))
             },
             "pan_n": {
                 "isDefault": False,
                 "isParam": True,
-                "position": list(range(30, 31))
+                "position": list(range(24, 31))
             },
             "audio_out_L": {
                 "isDefault": True,
@@ -3201,25 +3211,3 @@ for k, v in list(module_index.items()):
 
 with open("zoia_lib/common/schemas/ModuleIndex.json", "w") as f:
     json.dump(module_index, f)
-
-# for i in module_index:
-#     pos = []
-#     for j, k in module_index[i]['blocks'].items():
-#         if k['isDefault']:
-#             data = k['position']
-#             if isinstance(data, list):
-#                 for l in data:
-#                     pos.append(l)
-#             else:
-#                 pos.append(data)
-#     module_index[i]["default_blocks"] = len(pos)
-#
-#     pos = []
-#     for j, k in module_index[i]['blocks'].items():
-#         data = k['position']
-#         if isinstance(data, list):
-#             for l in data:
-#                 pos.append(l)
-#         else:
-#             pos.append(data)
-#     module_index[i]["max_blocks"] = max(pos)+1

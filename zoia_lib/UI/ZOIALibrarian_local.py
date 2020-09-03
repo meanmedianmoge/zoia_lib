@@ -550,26 +550,18 @@ class ZOIALibrarianLocal(QMainWindow):
         for curr_module in self.curr_viz["modules"]:
             if curr_module["page"] == self.curr_page_viz and \
                     btn_num in curr_module["position"]:
-                # Display the module info
-                if curr_module["new_color"] == "":
-                    color = curr_module["old_color"]
-                else:
-                    color = curr_module["new_color"]
                 # Output the data for that module.
                 self.ui.text_browser_viz.setText("""<html>
                     <b><h2> {} </b></h2>
                     Type: {} <br>
+                    {} <br>
                     {}
                     </html>""".format(
                         curr_module["type"] if curr_module["name"] == ""
                             else curr_module["name"],
                         curr_module["type"],
-                        # color,
-                        json.dumps(list(curr_module["options"].items(
-                            ))).replace("[[", "[").replace("]]",
-                                "]").replace('",', '":').replace(", ",
-                                    "<br>").replace("[", "").replace("]",
-                                        "").replace('"', "")
+                        self._parse_dict_for_html(curr_module, "options"),
+                        self._parse_dict_for_html(curr_module, "parameters"),
                     )
                 )
 
@@ -742,6 +734,25 @@ class ZOIALibrarianLocal(QMainWindow):
         """
 
         self.prev_search = data
+
+    @staticmethod
+    def _parse_dict_for_html(dct, key):
+        """Parse out items in dictionary into newlines for html.
+
+        dct: Input dictionary
+
+        return: Parsed html.
+        """
+
+        return json.dumps(
+            list(dct[key].items())
+        ).replace("[[", "["
+                  ).replace("]]", "]"
+                            ).replace('",', '":'
+                                      ).replace(", ", "<br>"
+                                                ).replace("[", ""
+                                                          ).replace("]", ""
+                                                                    ).replace('"', "")
 
 
 class UpdatesWorker(QThread):

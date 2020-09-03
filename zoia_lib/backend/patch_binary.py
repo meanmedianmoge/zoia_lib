@@ -92,19 +92,18 @@ class PatchBinary(Patch):
                 "old_color": self._get_color_name(data[curr_step + 4]),
                 "new_color": "" if skip_real else self._get_color_name(
                     colors[i]),
-                "parameters": data[curr_step + 6],
                 "options": {},
                 "options_copy": self._get_module_data(data[curr_step + 1], "options"),
                 "options_list": list(
                     bytearray(pch_data[(curr_step+8)*4:(curr_step+8)*4+4])) + list(
                     bytearray(pch_data[(curr_step+9)*4:(curr_step+9)*4+4])),
+                "parameters": dict(zip(
+                    ["param_{}".format(str(x)) for x in range(data[curr_step + 6])],
+                    [data[curr_step + x + 10] for x in range(data[curr_step + 6])]
+                )),
                 "connections": [],
                 "starred": []
             }
-
-            # Create parameter keys if they exist
-            for param in range(curr_module["parameters"]):
-                curr_module["param_{}".format(param)] = data[curr_step + param + 10]
 
             # Select appropriate options from matrix
             v = 0
