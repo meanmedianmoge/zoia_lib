@@ -3182,7 +3182,7 @@ module_index = {
             }
         },
         "options": {
-            "range": ["40hz", "time"],
+            "range": ["off", "on"],
             "output": ["linear", "exponential"]
         }
     },
