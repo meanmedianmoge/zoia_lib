@@ -88,7 +88,7 @@ class PatchBinary(Patch):
                 "position": [x for x in range(
                     int(data[curr_step + 5]),
                     int(data[curr_step + 5]) + self._get_module_data(
-                        data[curr_step + 1], "max_blocks"))],
+                        data[curr_step + 1], "default_blocks"))],
                 "old_color": self._get_color_name(data[curr_step + 4]),
                 "new_color": "" if skip_real else self._get_color_name(
                     colors[i]),
@@ -98,7 +98,8 @@ class PatchBinary(Patch):
                 "options_list": list(
                     bytearray(pch_data[(curr_step+8)*4:(curr_step+8)*4+4])) + list(
                     bytearray(pch_data[(curr_step+9)*4:(curr_step+9)*4+4])),
-                "connections": []
+                "connections": [],
+                "starred": []
             }
 
             # Create parameter keys if they exist
@@ -167,13 +168,17 @@ class PatchBinary(Patch):
             colours.append(curr_color)
             curr_step += 1
 
-        # Prepare a dict to pass to the frontend.
+        # Append data to module list
+        modules = self._add_connections(modules, connections)
+        modules = self._add_starred_param(modules, starred)
+
+        # Prepare a dict to pass to thee frontend.
         json_bin = {
             "name": name,
-            "modules": self._add_connections(modules, connections),
+            "modules": modules,
             # "connections": connections,
             "pages": pages,
-            "starred": starred,
+            # "starred": starred,
             # "colours": colours
             "meta": {
                 "name": name,
@@ -256,5 +261,24 @@ class PatchBinary(Patch):
                 "strength": conn["strength"]
             }
             modules[int(out_mod)]["connections"].append(data)
+
+        return modules
+
+    @staticmethod
+    def _add_starred_param(modules, starred):
+        """ Appends all applicable starred params to each module.
+
+        modules: List of modules in a patch.
+        starred: List of starred params in a patch.
+
+        return: Module object.
+        """
+
+        for star in starred:
+            data = {
+                "block": star["block"],
+                "midi_cc": star["midi_cc"],
+            }
+            modules[star["module"]]["starred"].append(data)
 
         return modules

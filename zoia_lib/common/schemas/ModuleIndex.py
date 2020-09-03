@@ -16,6 +16,7 @@ module_index = {
     0: {
         "name": "SV Filter",
         "category": "audio",
+        "default_blocks": 4,
         "max_blocks": 6,
         "params": 2,
         "cpu": 3,
@@ -60,6 +61,7 @@ module_index = {
     1: {
         "name": "Audio Input",
         "category": "interface",
+        "default_blocks": 2,
         "max_blocks": 2,
         "params": 0,
         "cpu": 0.4,
@@ -82,6 +84,7 @@ module_index = {
     2: {
         "name": "Audio Output",
         "category": "interface",
+        "default_blocks": 2,
         "max_blocks": 3,
         "params": 1,
         "cpu": 1.7,
@@ -110,6 +113,7 @@ module_index = {
     3: {
         "name": "Aliaser",
         "category": "audio",
+        "default_blocks": 3,
         "max_blocks": 3,
         "params": 1,
         "cpu": 0.7,
@@ -135,14 +139,20 @@ module_index = {
     4: {
         "name": "Sequencer",
         "category": "cv",
+        "default_blocks": 3,
         "max_blocks": 42,
         "params": 34,
         "cpu": 2,
         "blocks": {
-            "step_#": {
+            "step_1": {
                 "isDefault": True,
                 "isParam": True,
-                "position": list(range(0, 32))
+                "position": 0
+            },
+            "step_n": {
+                "isDefault": False,
+                "isParam": True,
+                "position": list(range(1, 32))
             },
             "gate_in": {
                 "isDefault": True,
@@ -154,11 +164,15 @@ module_index = {
                 "isParam": True,
                 "position": 33
             },
-            "out_type": {
+            "out_track_1": {
                 "isDefault": True,
                 "isParam": False,
-                "position": list(range(34, 42)),
-                "type": ["cv", "gate", "ratchet"]
+                "position": 34,
+            },
+            "out_track_n": {
+                "isDefault": False,
+                "isParam": False,
+                "position": list(range(35, 42))
             }
         },
         "options": {
@@ -171,6 +185,7 @@ module_index = {
     5: {
         "name": "LFO",
         "category": "cv",
+        "default_blocks": 2,
         "max_blocks": 5,
         "params": 4,
         "cpu": 0.3,
@@ -214,6 +229,7 @@ module_index = {
     6: {
         "name": "ADSR",
         "category": "cv",
+        "default_blocks": 6,
         "max_blocks": 10,
         "params": 9,
         "cpu": 0.07,
@@ -282,6 +298,7 @@ module_index = {
     7: {
         "name": "VCA",
         "category": "audio",
+        "default_blocks": 3,
         "max_blocks": 5,
         "params": 1,
         "cpu": 0.7,
@@ -319,6 +336,7 @@ module_index = {
     8: {
         "name": "Audio Multiply",
         "category": "audio",
+        "default_blocks": 3,
         "max_blocks": 3,
         "params": 0,
         "cpu": 0.4,
@@ -344,6 +362,7 @@ module_index = {
     9: {
         "name": "Bit Crusher",
         "category": "audio",
+        "default_blocks": 3,
         "max_blocks": 3,
         "params": 1,
         "cpu": 1,
@@ -371,6 +390,7 @@ module_index = {
     10: {
         "name": "Sample & Hold",
         "category": "cv",
+        "default_blocks": 3,
         "max_blocks": 3,
         "params": 2,
         "cpu": 0.1,
@@ -396,6 +416,7 @@ module_index = {
     11: {
         "name": "OD and Distortion",
         "category": "effect",
+        "default_blocks": 4,
         "max_blocks": 4,
         "params": 2,
         "cpu": 17,
@@ -428,6 +449,7 @@ module_index = {
     12: {
         "name": "Env Follower",
         "category": "analysis",
+        "default_blocks": 2,
         "max_blocks": 4,
         "params": 2,
         "cpu": 5,
@@ -461,8 +483,9 @@ module_index = {
     13: {
         "name": "Delay Line",
         "category": "audio",
-        "max_blocks": 4,
-        "params": 2,
+        "default_blocks": 3,
+        "max_blocks": 5,
+        "params": 3,
         "cpu": 3,
         "blocks": {
             "audio_in": {
@@ -499,6 +522,7 @@ module_index = {
     14: {
         "name": "Oscillator",
         "category": "audio",
+        "default_blocks": 2,
         "max_blocks": 4,
         "params": 2,
         "cpu": 10,
@@ -534,6 +558,7 @@ module_index = {
     15: {
         "name": "Pushbutton",
         "category": "interface",
+        "default_blocks": 1,
         "max_blocks": 1,
         "params": 0,
         "cpu": 0.02,
@@ -552,38 +577,45 @@ module_index = {
     16: {
         "name": "Keyboard",
         "category": "interface",
-        "max_blocks": 26,
-        "params": 23,
+        "default_blocks": 4,
+        "max_blocks": 43,
+        "params": 49,
         "cpu": 0.1,
         "blocks": {
-            "note_#": {
+            "note_1": {
                 "isDefault": True,
                 "isParam": True,
-                "position": list(range(0, 23))
+                "position": 0
+            },
+            "note_n": {
+                "isDefault": False,
+                "isParam": True,
+                "position": list(range(1, 40))
             },
             "note_out": {
                 "isDefault": True,
                 "isParam": False,
-                "position": 23
+                "position": 41
             },
             "gate_out": {
                 "isDefault": True,
                 "isParam": False,
-                "position": 24
+                "position": 42
             },
             "trigger_out": {
                 "isDefault": True,
                 "isParam": False,
-                "position": 25
+                "position": 43
             }
         },
         "options": {
-            "#_of_notes": list(range(1, 24))
+            "#_of_notes": list(range(1, 41))
         }
     },
     17: {
         "name": "CV Filter",
         "category": "cv",
+        "default_blocks": 3,
         "max_blocks": 3,
         "params": 2,
         "cpu": 0.02,
@@ -609,6 +641,7 @@ module_index = {
     18: {
         "name": "Steps",
         "category": "cv",
+        "default_blocks": 3,
         "max_blocks": 3,
         "params": 2,
         "cpu": 0.7,
@@ -634,6 +667,7 @@ module_index = {
     19: {
         "name": "Slew Limiter",
         "category": "cv",
+        "default_blocks": 3,
         "max_blocks": 4,
         "params": 2,
         "cpu": 0.2,
@@ -651,17 +685,17 @@ module_index = {
             "rising_lag": {
                 "isDefault": False,
                 "isParam": True,
-                "position": 1
+                "position": 2
             },
             "falling_lag": {
                 "isDefault": False,
                 "isParam": True,
-                "position": 2
+                "position": 3
             },
             "cv_output": {
                 "isDefault": True,
                 "isParam": False,
-                "position": [2-3]
+                "position": 4
             }
         },
         "options": {
@@ -671,30 +705,51 @@ module_index = {
     20: {
         "name": "Midi Notes In",
         "category": "interface",
+        "default_blocks": 2,
         "max_blocks": 32,
         "params": 0,
         "cpu": 0.3,
         "blocks": {
-            "note_out": {
+            "note_out_1": {
                 "isDefault": True,
                 "isParam": False,
-                "position": [0, 4, 8, 12, 16, 20, 24, 28]
+                "position": 0
             },
-            "gate_out": {
+            "gate_out_1": {
                 "isDefault": True,
                 "isParam": False,
-                "position": [1, 5, 9, 13, 17, 21, 25, 29]
+                "position": 1
             },
-            "velocity_out": {
+            "velocity_out_1": {
                 "isDefault": False,
                 "isParam": False,
-                "position": [2, 6, 10, 14, 18, 22, 26, 30]
+                "position": 2
             },
-            "trigger_out": {
+            "trigger_out_1": {
                 "isDefault": False,
                 "isParam": False,
-                "position": [3, 7, 11, 15, 19, 23, 27, 31]
-            }
+                "position": 3
+            },
+            "note_out_n": {
+                "isDefault": False,
+                "isParam": False,
+                "position": [4, 8, 12, 16, 20, 24, 28]
+            },
+            "gate_out_n": {
+                "isDefault": False,
+                "isParam": False,
+                "position": [5, 9, 13, 17, 21, 25, 29]
+            },
+            "velocity_out_n": {
+                "isDefault": False,
+                "isParam": False,
+                "position": [6, 10, 14, 18, 22, 26, 30]
+            },
+            "trigger_out_n": {
+                "isDefault": False,
+                "isParam": False,
+                "position": [7, 11, 15, 19, 23, 27, 31]
+            },
         },
         "options": {
             "midi_channel": list(range(1, 17)),
@@ -710,6 +765,7 @@ module_index = {
     21: {
         "name": "Midi CC In",
         "category": "interface",
+        "default_blocks": 1,
         "max_blocks": 1,
         "params": 0,
         "cpu": 0.1,
@@ -729,14 +785,25 @@ module_index = {
     22: {
         "name": "Multiplier",
         "category": "cv",
-        "max_blocks": 4,
+        "default_blocks": 3,
+        "max_blocks": 10,
         "params": 2,
         "cpu": 0.2,
         "blocks": {
-            "cv_input": {
+            "cv_input_1": {
                 "isDefault": True,
                 "isParam": True,
-                "position": list(range(0, 9))
+                "position": 0
+            },
+            "cv_input_2": {
+                "isDefault": True,
+                "isParam": True,
+                "position": 1
+            },
+            "cv_input_n": {
+                "isDefault": False,
+                "isParam": True,
+                "position": list(range(2, 9))
             },
             "cv_output": {
                 "isDefault": True,
@@ -751,6 +818,7 @@ module_index = {
     23: {
         "name": "Compressor",
         "category": "effect",
+        "default_blocks": 3,
         "max_blocks": 9,
         "params": 4,
         "cpu": 3,
@@ -812,6 +880,7 @@ module_index = {
     24: {
         "name": "Multi Filter",
         "category": "audio",
+        "default_blocks": 4,
         "max_blocks": 5,
         "params": 3,
         "cpu": 0.8,
@@ -850,6 +919,7 @@ module_index = {
     25: {
         "name": "Plate Reverb",
         "category": "effect",
+        "default_blocks": 8,
         "max_blocks": 8,
         "params": 4,
         "cpu": 22,
@@ -900,6 +970,7 @@ module_index = {
     26: {
         "name": "Buffer Delay",
         "category": "audio",
+        "default_blocks": 2,
         "max_blocks": 2,
         "params": 0,
         "cpu": 0.2,
@@ -922,6 +993,7 @@ module_index = {
     27: {
         "name": "All Pass Filter",
         "category": "audio",
+        "default_blocks": 3,
         "max_blocks": 3,
         "params": 1,
         "cpu": 5,
@@ -949,6 +1021,7 @@ module_index = {
     28: {
         "name": "Quantizer",
         "category": "cv",
+        "default_blocks": 2,
         "max_blocks": 4,
         "params": 3,
         "cpu": 1,
@@ -981,6 +1054,7 @@ module_index = {
     29: {
         "name": "Phaser",
         "category": "effect",
+        "default_blocks": 6,
         "max_blocks": 8,
         "params": 4,
         "cpu": 15,
@@ -1035,6 +1109,7 @@ module_index = {
     30: {
         "name": "Looper",
         "category": "audio",
+        "default_blocks": 5,
         "max_blocks": 9,
         "params": 6,
         "cpu": 3,
@@ -1099,14 +1174,20 @@ module_index = {
     31: {
         "name": "In Switch",
         "category": "cv",
+        "default_blocks": 3,
         "max_blocks": 18,
         "params": 17,
         "cpu": 0.2,
         "blocks": {
-            "cv_input": {
+            "cv_input_1": {
                 "isDefault": True,
                 "isParam": True,
-                "position": list(range(0, 16))
+                "position": 0
+            },
+            "cv_input_n": {
+                "isDefault": False,
+                "isParam": True,
+                "position": list(range(1, 16))
             },
             "in_select": {
                 "isDefault": True,
@@ -1126,6 +1207,7 @@ module_index = {
     32: {
         "name": "Out Switch",
         "category": "cv",
+        "default_blocks": 3,
         "max_blocks": 18,
         "params": 2,
         "cpu": 0.2,
@@ -1140,10 +1222,15 @@ module_index = {
                 "isParam": True,
                 "position": 1
             },
-            "cv_output": {
+            "cv_output_1": {
                 "isDefault": True,
                 "isParam": False,
-                "position": list(range(2, 18))
+                "position": 2
+            },
+            "cv_output_n": {
+                "isDefault": False,
+                "isParam": False,
+                "position": list(range(3, 18))
             }
         },
         "options": {
@@ -1153,14 +1240,20 @@ module_index = {
     33: {
         "name": "Audio In Switch",
         "category": "audio",
+        "default_blocks": 3,
         "max_blocks": 18,
         "params": 1,
         "cpu": 0.8,
         "blocks": {
-            "audio_input": {
+            "audio_input_1": {
                 "isDefault": True,
                 "isParam": False,
-                "position": list(range(0, 16))
+                "position": 0
+            },
+            "audio_input_n": {
+                "isDefault": False,
+                "isParam": False,
+                "position": list(range(1, 16))
             },
             "in_select": {
                 "isDefault": True,
@@ -1181,6 +1274,7 @@ module_index = {
     34: {
         "name": "Audio Out Switch",
         "category": "audio",
+        "default_blocks": 3,
         "max_blocks": 18,
         "params": 1,
         "cpu": 0.7,
@@ -1195,10 +1289,15 @@ module_index = {
                 "isParam": True,
                 "position": 1
             },
-            "audio_output": {
+            "audio_output_1": {
                 "isDefault": True,
                 "isParam": False,
-                "position": list(range(2, 18))
+                "position": 2
+            },
+            "audio_output_n": {
+                "isDefault": True,
+                "isParam": False,
+                "position": list(range(3, 18))
             }
         },
         "options": {
@@ -1209,6 +1308,7 @@ module_index = {
     35: {
         "name": "Midi Pressure",
         "category": "interface",
+        "default_blocks": 1,
         "max_blocks": 1,
         "params": 0,
         "cpu": 0.03,
@@ -1226,6 +1326,7 @@ module_index = {
     36: {
         "name": "Onset Detector",
         "category": "analysis",
+        "default_blocks": 2,
         "max_blocks": 3,
         "params": 1,
         "cpu": 0.7,
@@ -1253,6 +1354,7 @@ module_index = {
     37: {
         "name": "Rhythm",
         "category": "cv",
+        "default_blocks": 4,
         "max_blocks": 5,
         "params": 3,
         "cpu": 0.5,
@@ -1280,7 +1382,7 @@ module_index = {
             "rhythm_out": {
                 "isDefault": True,
                 "isParam": False,
-                "position": 5
+                "position": 4
             }
         },
         "options": {
@@ -1290,6 +1392,7 @@ module_index = {
     38: {
         "name": "Noise",
         "category": "audio",
+        "default_blocks": 1,
         "max_blocks": 1,
         "params": 0,
         "cpu": 0.4,
@@ -1305,6 +1408,7 @@ module_index = {
     39: {
         "name": "Random",
         "category": "cv",
+        "default_blocks": 1,
         "max_blocks": 2,
         "params": 1,
         "cpu": 0.1,
@@ -1328,6 +1432,7 @@ module_index = {
     40: {
         "name": "Gate",
         "category": "effect",
+        "default_blocks": 5,
         "max_blocks": 8,
         "params": 3,
         "cpu": 3,
@@ -1383,6 +1488,7 @@ module_index = {
     41: {
         "name": "Tremolo",
         "category": "effect",
+        "default_blocks": 4,
         "max_blocks": 6,
         "params": 2,
         "cpu": 2,
@@ -1427,6 +1533,7 @@ module_index = {
     42: {
         "name": "Tone Control",
         "category": "effect",
+        "default_blocks": 6,
         "max_blocks": 10,
         "params": 6,
         "cpu": 5,
@@ -1490,6 +1597,7 @@ module_index = {
     43: {
         "name": "Delay w Mod",
         "category": "effect",
+        "default_blocks": 7,
         "max_blocks": 9,
         "params": 5,
         "cpu": 18,
@@ -1551,6 +1659,7 @@ module_index = {
     44: {
         "name": "Stompswitch",
         "category": "interface",
+        "default_blocks": 1,
         "max_blocks": 1,
         "params": 0,
         "cpu": 0.1,
@@ -1570,6 +1679,7 @@ module_index = {
     45: {
         "name": "Value",
         "category": "cv",
+        "default_blocks": 2,
         "max_blocks": 2,
         "params": 1,
         "cpu": 0.15,
@@ -1592,6 +1702,7 @@ module_index = {
     46: {
         "name": "CV Delay",
         "category": "cv",
+        "default_blocks": 3,
         "max_blocks": 3,
         "params": 2,
         "cpu": 1.5,
@@ -1617,6 +1728,7 @@ module_index = {
     47: {
         "name": "CV Loop",
         "category": "cv",
+        "default_blocks": 6,
         "max_blocks": 8,
         "params": 7,
         "cpu": 0.1,
@@ -1670,6 +1782,7 @@ module_index = {
     48: {
         "name": "CV Filter",
         "category": "cv",
+        "default_blocks": 3,
         "max_blocks": 3,
         "params": 2,
         "cpu": 0.1,
@@ -1695,6 +1808,7 @@ module_index = {
     49: {
         "name": "Clock Divider",
         "category": "cv",
+        "default_blocks": 5,
         "max_blocks": 5,
         "params": 4,
         "cpu": 0.4,
@@ -1732,6 +1846,7 @@ module_index = {
     50: {
         "name": "Comparator",
         "category": "cv",
+        "default_blocks": 3,
         "max_blocks": 3,
         "params": 2,
         "cpu": 0.04,
@@ -1759,6 +1874,7 @@ module_index = {
     51: {
         "name": "CV Rectify",
         "category": "cv",
+        "default_blocks": 2,
         "max_blocks": 2,
         "params": 1,
         "cpu": 0.02,
@@ -1779,6 +1895,7 @@ module_index = {
     52: {
         "name": "Trigger",
         "category": "cv",
+        "default_blocks": 2,
         "max_blocks": 2,
         "params": 1,
         "cpu": 0.1,
@@ -1799,17 +1916,18 @@ module_index = {
     53: {
         "name": "Stereo Spread",
         "category": "audio",
+        "default_blocks": 4,
         "max_blocks": 5,
         "params": 1,
         "cpu": 2,
         "blocks": {
-            "audio_in_L": {
+            "audio_in_1": {
                 "isDefault": True,
                 "isParam": False,
                 "position": 0
             },
-            "audio_in_R": {
-                "isDefault": True,
+            "audio_in_2": {
+                "isDefault": False,
                 "isParam": False,
                 "position": 1
             },
@@ -1819,19 +1937,19 @@ module_index = {
                 "position": 1
             },
             "side_gain": {
-                "isDefault": True,
+                "isDefault": False,
                 "isParam": True,
                 "position": 2
             },
-            "audio_out_L": {
+            "audio_out_1": {
                 "isDefault": True,
                 "isParam": False,
-                "position": [2-3]
+                "position": 3
             },
-            "audio_out_R": {
+            "audio_out_2": {
                 "isDefault": True,
                 "isParam": False,
-                "position": [3-4]
+                "position": 4
             }
         },
         "options": {
@@ -1841,6 +1959,7 @@ module_index = {
     54: {
         "name": "Cport Exp CV In",
         "category": "interface",
+        "default_blocks": 1,
         "max_blocks": 1,
         "params": 0,
         "cpu": 0.1,
@@ -1858,6 +1977,7 @@ module_index = {
     55: {
         "name": "Cport CV Out",
         "category": "interface",
+        "default_blocks": 1,
         "max_blocks": 1,
         "params": 0,
         "cpu": 0.2,
@@ -1875,6 +1995,7 @@ module_index = {
     56: {
         "name": "UI Button",
         "category": "interface",
+        "default_blocks": 1,
         "max_blocks": 2,
         "params": 1,
         "cpu": 0.04,
@@ -1895,6 +2016,7 @@ module_index = {
     57: {
         "name": "Audio Panner",
         "category": "audio",
+        "default_blocks": 4,
         "max_blocks": 5,
         "params": 3,
         "cpu": 1,
@@ -1933,6 +2055,7 @@ module_index = {
     58: {
         "name": "Pitch Detector",
         "category": "analysis",
+        "default_blocks": 2,
         "max_blocks": 2,
         "params": 0,
         "cpu": 2.5,
@@ -1955,6 +2078,7 @@ module_index = {
     59: {
         "name": "Pitch Shifter",
         "category": "audio",
+        "default_blocks": 3,
         "max_blocks": 3,
         "params": 1,
         "cpu": 15.5,
@@ -1980,6 +2104,7 @@ module_index = {
     60: {
         "name": "Midi Note Out",
         "category": "interface",
+        "default_blocks": 2,
         "max_blocks": 3,
         "params": 3,
         "cpu": 0.1,
@@ -2008,6 +2133,7 @@ module_index = {
     61: {
         "name": "Midi CC Out",
         "category": "interface",
+        "default_blocks": 1,
         "max_blocks": 1,
         "params": 1,
         "cpu": 0.2,
@@ -2026,6 +2152,7 @@ module_index = {
     62: {
         "name": "midi_pc_out",
         "category": "interface",
+        "default_blocks": 2,
         "max_blocks": 2,
         "params": 2,
         "cpu": 0.1,
@@ -2048,6 +2175,7 @@ module_index = {
     63: {
         "name": "Bit Modulator",
         "category": "audio",
+        "default_blocks": 3,
         "max_blocks": 3,
         "params": 0,
         "cpu": 1.2,
@@ -2075,7 +2203,8 @@ module_index = {
     64: {
         "name": "Audio Balance",
         "category": "audio",
-        "max_blocks": 6,
+        "default_blocks": 4,
+        "max_blocks": 7,
         "params": 1,
         "cpu": 1.7,
         "blocks": {
@@ -2085,32 +2214,32 @@ module_index = {
                 "position": 0
             },
             "audio_in_1_R": {
-                "isDefault": True,
+                "isDefault": False,
                 "isParam": False,
                 "position": 1
             },
             "audio_in_2_L": {
                 "isDefault": True,
                 "isParam": False,
-                "position": 1
+                "position": 2
             },
             "audio_in_2_R": {
-                "isDefault": True,
+                "isDefault": False,
                 "isParam": False,
                 "position": 3
             },
             "mix": {
                 "isDefault": True,
                 "isParam": True,
-                "position": [2, 4]
+                "position": 4
             },
             "audio_output_L": {
                 "isDefault": True,
                 "isParam": False,
-                "position": [3, 5]
+                "position": 5
             },
             "audio_output_R": {
-                "isDefault": True,
+                "isDefault": False,
                 "isParam": False,
                 "position": 6
             }
@@ -2122,6 +2251,7 @@ module_index = {
     65: {
         "name": "Inverter",
         "category": "audio",
+        "default_blocks": 2,
         "max_blocks": 2,
         "params": 0,
         "cpu": 0.3,
@@ -2142,6 +2272,7 @@ module_index = {
     66: {
         "name": "Fuzz",
         "category": "effect",
+        "default_blocks": 4,
         "max_blocks": 4,
         "params": 2,
         "cpu": 16,
@@ -2174,6 +2305,7 @@ module_index = {
     67: {
         "name": "Ghostverb",
         "category": "effect",
+        "default_blocks": 6,
         "max_blocks": 8,
         "params": 4,
         "cpu": 45,
@@ -2226,6 +2358,7 @@ module_index = {
     68: {
         "name": "Cabinet Sim",
         "category": "effect",
+        "default_blocks": 2,
         "max_blocks": 4,
         "params": 0,
         "cpu": 10,
@@ -2260,6 +2393,7 @@ module_index = {
     69: {
         "name": "Flanger",
         "category": "effect",
+        "default_blocks": 7,
         "max_blocks": 9,
         "params": 5,
         "cpu": 11,
@@ -2319,6 +2453,7 @@ module_index = {
     70: {
         "name": "Chorus",
         "category": "effect",
+        "default_blocks": 6,
         "max_blocks": 8,
         "params": 4,
         "cpu": 13,
@@ -2373,6 +2508,7 @@ module_index = {
     71: {
         "name": "Vibrato",
         "category": "effect",
+        "default_blocks": 4,
         "max_blocks": 6,
         "params": 2,
         "cpu": 5,
@@ -2417,6 +2553,7 @@ module_index = {
     72: {
         "name": "Env Filter",
         "category": "effect",
+        "default_blocks": 6,
         "max_blocks": 8,
         "params": 4,
         "cpu": 7,
@@ -2471,7 +2608,8 @@ module_index = {
     73: {
         "name": "Ring Modulator",
         "category": "effect",
-        "max_blocks": 5,
+        "default_blocks": 4,
+        "max_blocks": 6,
         "params": 3,
         "cpu": 14,
         "blocks": {
@@ -2516,6 +2654,7 @@ module_index = {
     74: {
         "name": "Hall Reverb",
         "category": "effect",
+        "default_blocks": 8,
         "max_blocks": 8,
         "params": 4,
         "cpu": 22,
@@ -2566,6 +2705,7 @@ module_index = {
     75: {
         "name": "Ping Pong Delay",
         "category": "effect",
+        "default_blocks": 7,
         "max_blocks": 9,
         "params": 5,
         "cpu": 18,
@@ -2627,6 +2767,7 @@ module_index = {
     76: {
         "name": "Audio Mixer",
         "category": "audio",
+        "default_blocks": 5,
         "max_blocks": 34,
         "params": 16,
         "cpu": 7,
@@ -2634,42 +2775,32 @@ module_index = {
             "audio_in_1_L": {
                 "isDefault": True,
                 "isParam": False,
-                "position": [0, 4, 8, 12, 16, 20, 24]
-            },
-            "audio_in_1_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": [1, 5, 9, 13, 17, 21, 25]
+                "position": 0
             },
             "audio_in_2_L": {
                 "isDefault": True,
                 "isParam": False,
-                "position": [2, 6, 10, 14, 18, 22, 26]
+                "position": 2
             },
-            "audio_in_2_R": {
+            "audio_in_n_L": {
                 "isDefault": False,
                 "isParam": False,
-                "position": [3, 7, 11, 15, 19, 23, 27]
+                "position": [4, 6, 10, 14, 18, 22, 26]
             },
-            "gain_1": {
+            "audio_in_n_R": {
+                "isDefault": False,
+                "isParam": False,
+                "position": [1, 3, 5, 7, 11, 15, 19, 23, 27]
+            },
+            "gain_n": {
                 "isDefault": True,
                 "isParam": True,
-                "position": 28
+                "position": list(range(28, 30))
             },
-            "gain_2": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 29
-            },
-            "pan_1": {
+            "pan_n": {
                 "isDefault": False,
                 "isParam": True,
-                "position": 30
-            },
-            "pan_2": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 31
+                "position": list(range(30, 31))
             },
             "audio_out_L": {
                 "isDefault": True,
@@ -2691,6 +2822,7 @@ module_index = {
     77: {
         "name": "CV Flip Flop",
         "category": "cv",
+        "default_blocks": 2,
         "max_blocks": 2,
         "params": 1,
         "cpu": 0.2,
@@ -2711,6 +2843,7 @@ module_index = {
     78: {
         "name": "Diffuser",
         "category": "audio",
+        "default_blocks": 6,
         "max_blocks": 6,
         "params": 4,
         "cpu": 2,
@@ -2751,6 +2884,7 @@ module_index = {
     79: {
         "name": "Reverb Lite",
         "category": "effect",
+        "default_blocks": 4,
         "max_blocks": 6,
         "params": 2,
         "cpu": 10,
@@ -2793,6 +2927,7 @@ module_index = {
     80: {
         "name": "Room Reverb",
         "category": "effect",
+        "default_blocks": 8,
         "max_blocks": 8,
         "params": 4,
         "cpu": 22,
@@ -2843,6 +2978,7 @@ module_index = {
     81: {
         "name": "Pixel",
         "category": "interface",
+        "default_blocks": 1,
         "max_blocks": 1,
         "params": 1,
         "cpu": 0.01,
@@ -2860,6 +2996,7 @@ module_index = {
     82: {
         "name": "Midi Clock In",
         "category": "interface",
+        "default_blocks": 1,
         "max_blocks": 4,
         "params": 0,
         "cpu": 0.1,
@@ -2894,8 +3031,9 @@ module_index = {
         }
     },
     83: {
-        "name": "granular",
+        "name": "Granular",
         "category": "audio",
+        "default_blocks": 8,
         "max_blocks": 10,
         "params": 6,
         "cpu": 8,
@@ -2961,6 +3099,7 @@ module_index = {
     84: {
         "name": "Midi Clock Out",
         "category": "interface",
+        "default_blocks": 3,
         "max_blocks": 5,
         "params": 5,
         "cpu": 0.3,
@@ -3006,6 +3145,7 @@ module_index = {
     85: {
         "name": "Tap to CV",
         "category": "cv",
+        "default_blocks": 2,
         "max_blocks": 4,
         "params": 2,
         "cpu": 0.1,
@@ -3039,6 +3179,7 @@ module_index = {
     86: {
         "name": "Midi Pitch Bend In",
         "category": "interface",
+        "default_blocks": 1,
         "max_blocks": 1,
         "params": 0,
         "cpu": 0.1,
@@ -3060,3 +3201,25 @@ for k, v in list(module_index.items()):
 
 with open("zoia_lib/common/schemas/ModuleIndex.json", "w") as f:
     json.dump(module_index, f)
+
+# for i in module_index:
+#     pos = []
+#     for j, k in module_index[i]['blocks'].items():
+#         if k['isDefault']:
+#             data = k['position']
+#             if isinstance(data, list):
+#                 for l in data:
+#                     pos.append(l)
+#             else:
+#                 pos.append(data)
+#     module_index[i]["default_blocks"] = len(pos)
+#
+#     pos = []
+#     for j, k in module_index[i]['blocks'].items():
+#         data = k['position']
+#         if isinstance(data, list):
+#             for l in data:
+#                 pos.append(l)
+#         else:
+#             pos.append(data)
+#     module_index[i]["max_blocks"] = max(pos)+1
