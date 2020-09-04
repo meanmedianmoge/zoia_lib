@@ -232,6 +232,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.update_patch_notes.clicked.connect(
             self.local.update_patch_notes)
         self.ui.actionImport_A_Patch.triggered.connect(self.import_patch)
+        self.ui.actionReset_Sizes.triggered.connect(self.reset_ui)
         self.ui.table_local.installEventFilter(self)
         self.ui.table_sd_left.installEventFilter(self)
         self.ui.table_sd_right.installEventFilter(self)
@@ -563,6 +564,38 @@ class ZOIALibrarianMain(QMainWindow):
                 "split_bank_right": self.ui.splitter_bank_tables.sizes()[1]
             }
         curr_table.resizeRowsToContents()
+
+    def reset_ui(self):
+        """ Resets the UI panels and tables to their default positions.
+        Upon closing the application, pref.json will include the defaults.
+        Currently triggered via a menu action.
+        """
+
+        self.ui.table_sd_left.setColumnWidth(0, self.width() * 0.4)
+        self.ui.table_sd_left.setColumnWidth(1, self.width() * 0.1)
+        self.ui.table_sd_right.setColumnWidth(0, self.width() * 0.4)
+        self.ui.table_sd_right.setColumnWidth(1, self.width() * 0.1)
+        self.ui.table_bank_left.setColumnWidth(0, self.width() * 0.2)
+        self.ui.table_bank_left.setColumnWidth(1, self.width() * 0.1)
+        self.ui.table_bank_right.setColumnWidth(0, self.width() * 0.2)
+        self.ui.table_bank_right.setColumnWidth(1, self.width() * 0.1)
+        self.showMaximized()
+
+        # Modify the display sizes for some widgets.
+        self.ui.splitter_PS.setSizes([self.width() * 0.325,
+                                      self.width() * 0.675])
+        self.ui.splitter_local.setSizes([self.width() * 0.5,
+                                         self.width() * 0.5])
+        self.ui.splitter_local_hori.setSizes([self.width() * 0.5,
+                                              self.width() * 0.5])
+        self.ui.splitter_sd_hori.setSizes([self.width() * 0.5,
+                                           self.width() * 0.5])
+        self.ui.splitter_sd_vert.setSizes([self.width() * 0.185,
+                                           self.width() * 0.815])
+        self.ui.splitter_bank_tables.setSizes([self.width() * 0.5,
+                                               self.width() * 0.5])
+        self.ui.splitter_bank.setSizes([self.width() * 0.5, self.width() *
+                                        0.25, self.width() * 0.25])
 
     def display_patch_info(self):
         """ Queries the PS API for additional patch information whenever

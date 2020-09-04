@@ -319,10 +319,10 @@
                          <attribute name="horizontalHeaderCascadingSectionResizes">
                           <bool>true</bool>
                          </attribute>
-                         <attribute name="horizontalHeaderMinimumSectionSize">
+                         <attribute name="horizontalHeaderDefaultSectionSize">
                           <number>0</number>
                          </attribute>
-                         <attribute name="horizontalHeaderDefaultSectionSize">
+                         <attribute name="horizontalHeaderMinimumSectionSize">
                           <number>0</number>
                          </attribute>
                          <attribute name="horizontalHeaderStretchLastSection">
@@ -562,10 +562,10 @@
                    <attribute name="horizontalHeaderCascadingSectionResizes">
                     <bool>true</bool>
                    </attribute>
-                   <attribute name="horizontalHeaderMinimumSectionSize">
+                   <attribute name="horizontalHeaderDefaultSectionSize">
                     <number>0</number>
                    </attribute>
-                   <attribute name="horizontalHeaderDefaultSectionSize">
+                   <attribute name="horizontalHeaderMinimumSectionSize">
                     <number>0</number>
                    </attribute>
                    <attribute name="horizontalHeaderStretchLastSection">
@@ -574,10 +574,10 @@
                    <attribute name="verticalHeaderVisible">
                     <bool>false</bool>
                    </attribute>
-                   <attribute name="verticalHeaderMinimumSectionSize">
+                   <attribute name="verticalHeaderDefaultSectionSize">
                     <number>0</number>
                    </attribute>
-                   <attribute name="verticalHeaderDefaultSectionSize">
+                   <attribute name="verticalHeaderMinimumSectionSize">
                     <number>0</number>
                    </attribute>
                    <row/>
@@ -2664,10 +2664,10 @@
                 <attribute name="horizontalHeaderCascadingSectionResizes">
                  <bool>true</bool>
                 </attribute>
-                <attribute name="horizontalHeaderMinimumSectionSize">
+                <attribute name="horizontalHeaderDefaultSectionSize">
                  <number>0</number>
                 </attribute>
-                <attribute name="horizontalHeaderDefaultSectionSize">
+                <attribute name="horizontalHeaderMinimumSectionSize">
                  <number>0</number>
                 </attribute>
                 <attribute name="horizontalHeaderStretchLastSection">
@@ -2740,7 +2740,7 @@
      <x>0</x>
      <y>0</y>
      <width>1567</width>
-     <height>27</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="contextMenuPolicy">
@@ -2787,10 +2787,20 @@
     <addaction name="actionIncrease_Font_Size"/>
     <addaction name="actionDecrease_Font_Size"/>
     <addaction name="actionToggle_Dark_Mode_2"/>
+    <addaction name="separator"/>
+    <addaction name="actionReset_Sizes"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionDocumentation"/>
+    <addaction name="actionZOIA_Resources"/>
    </widget>
    <addaction name="menuFiel"/>
    <addaction name="menuSort"/>
    <addaction name="menuOptions"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionSpecify_SD_Card_Location">
@@ -2800,7 +2810,7 @@
    <property name="shortcut">
     <string>Alt+S</string>
    </property>
-   <property name="shortcutVisibleInContextMenu">
+   <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>
    </property>
   </action>
@@ -2811,7 +2821,7 @@
    <property name="shortcut">
     <string>Ctrl+Q</string>
    </property>
-   <property name="shortcutVisibleInContextMenu">
+   <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>
    </property>
   </action>
@@ -2822,7 +2832,7 @@
    <property name="shortcut">
     <string>Ctrl+1</string>
    </property>
-   <property name="shortcutVisibleInContextMenu">
+   <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>
    </property>
   </action>
@@ -2833,7 +2843,7 @@
    <property name="shortcut">
     <string>Ctrl+2</string>
    </property>
-   <property name="shortcutVisibleInContextMenu">
+   <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>
    </property>
   </action>
@@ -2847,7 +2857,7 @@
    <property name="shortcutContext">
     <enum>Qt::WindowShortcut</enum>
    </property>
-   <property name="shortcutVisibleInContextMenu">
+   <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>
    </property>
   </action>
@@ -2858,7 +2868,7 @@
    <property name="shortcut">
     <string>Ctrl+4</string>
    </property>
-   <property name="shortcutVisibleInContextMenu">
+   <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>
    </property>
   </action>
@@ -2869,7 +2879,7 @@
    <property name="shortcut">
     <string>Ctrl+5</string>
    </property>
-   <property name="shortcutVisibleInContextMenu">
+   <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>
    </property>
   </action>
@@ -2880,7 +2890,7 @@
    <property name="shortcut">
     <string>Ctrl+6</string>
    </property>
-   <property name="shortcutVisibleInContextMenu">
+   <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>
    </property>
   </action>
@@ -2891,7 +2901,7 @@
    <property name="shortcut">
     <string>Ctrl+7</string>
    </property>
-   <property name="shortcutVisibleInContextMenu">
+   <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>
    </property>
   </action>
@@ -2902,7 +2912,7 @@
    <property name="shortcut">
     <string>Ctrl+8</string>
    </property>
-   <property name="shortcutVisibleInContextMenu">
+   <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>
    </property>
   </action>
@@ -2913,7 +2923,7 @@
    <property name="shortcut">
     <string>Ctrl+9</string>
    </property>
-   <property name="shortcutVisibleInContextMenu">
+   <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>
    </property>
   </action>
@@ -2924,7 +2934,7 @@
    <property name="shortcut">
     <string>Ctrl+0</string>
    </property>
-   <property name="shortcutVisibleInContextMenu">
+   <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>
    </property>
   </action>
@@ -2940,7 +2950,7 @@
    <property name="shortcut">
     <string>Ctrl+R</string>
    </property>
-   <property name="shortcutVisibleInContextMenu">
+   <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>
    </property>
   </action>
@@ -2951,7 +2961,7 @@
    <property name="shortcut">
     <string>Ctrl+I</string>
    </property>
-   <property name="shortcutVisibleInContextMenu">
+   <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>
    </property>
   </action>
@@ -2967,7 +2977,7 @@
    <property name="shortcut">
     <string>Alt+I</string>
    </property>
-   <property name="shortcutVisibleInContextMenu">
+   <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>
    </property>
   </action>
@@ -3120,7 +3130,7 @@
    <property name="shortcut">
     <string>Ctrl+Shift+=</string>
    </property>
-   <property name="shortcutVisibleInContextMenu">
+   <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>
    </property>
   </action>
@@ -3131,7 +3141,7 @@
    <property name="shortcut">
     <string>Ctrl+Shift+-</string>
    </property>
-   <property name="shortcutVisibleInContextMenu">
+   <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>
    </property>
   </action>
@@ -3142,7 +3152,7 @@
    <property name="shortcut">
     <string>Alt+F</string>
    </property>
-   <property name="shortcutVisibleInContextMenu">
+   <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>
    </property>
   </action>
@@ -3153,7 +3163,7 @@
    <property name="shortcut">
     <string>Alt+V</string>
    </property>
-   <property name="shortcutVisibleInContextMenu">
+   <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>
    </property>
   </action>
@@ -3163,6 +3173,30 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="actionReset_Sizes">
+   <property name="text">
+    <string>Reset Sizes</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+R</string>
+   </property>
+  </action>
+  <action name="actionDocumentation">
+   <property name="text">
+    <string>Documentation</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+D</string>
+   </property>
+  </action>
+  <action name="actionZOIA_Resources">
+   <property name="text">
+    <string>ZOIA Resources</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+Z</string>
    </property>
   </action>
  </widget>
