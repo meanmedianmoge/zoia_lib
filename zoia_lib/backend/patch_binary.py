@@ -292,19 +292,50 @@ class PatchBinary(Patch):
         return: Module object.
         """
 
-        in_type = None
-        out_type = None
-        midi = None
-        for mod in modules:
-            if mod["type"] == "Audio Input":
-                in_type = mod["options"]["channels"].title()
-            if mod["type"] == "Audio Output":
-                out_type = mod["options"]["channels"].title()
-            if "midi" in mod["type"].lower():
+        type_dict = {k["number"]: k["type"] for k in modules}
+        counter = list(type_dict.values())
+        in_count = counter.count("Audio Input")
+        out_count = counter.count("Audio Output")
+        midi_count = sum('midi' in s.lower() for s in counter)
+
+        if in_count == 0:
+            in_type = None
+        elif in_count > 1:
+            in_type = []
+        if out_count == 0:
+            out_type = None
+        elif out_count > 1:
+            out_type = []
+        if midi_count == 0:
+            midi = None
+        elif midi_count > 1:
+            midi = []
+
+        for k, v in type_dict.items():
+            if v == "Audio Input":
+                if in_count == 1:
+                    in_type = modules[k]["options"]["channels"].title()
+                elif in_count > 1:
+                    in_type.append(modules[k]["options"]["channels"].title())
+            if v == "Audio Output":
+                if out_count == 1:
+                    out_type = modules[k]["options"]["channels"].title()
+                elif out_count > 1:
+                    out_type.append(modules[k]["options"]["channels"].title())
+            if "midi" in v.lower():
                 try:
-                    midi = mod["options"]["midi_channel"]
+                    if midi_count == 1:
+                        midi = modules[k]["options"]["midi_channel"]
+                    elif midi_count > 1:
+                        midi.append(modules[k]["options"]["midi_channel"])
                 except KeyError:
-                    midi = None
+                    if midi_count == 1:
+                        midi = None
+
+        if midi_count > 1:
+            midi = list(set(midi))
+            if len(midi) == 1:
+                midi = midi[0]
 
         return {"inputs": in_type,
                 "outputs": out_type,

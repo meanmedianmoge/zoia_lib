@@ -476,7 +476,7 @@ class ZOIALibrarianLocal(QMainWindow):
             Number of Starred Params: {} <br>
             Inputs: {} <br>
             Outputs: {} <br>
-            MIDI Channel: {}
+            MIDI Channels: {}
             </html>""".format(
                 viz["meta"]["name"],
                 viz["meta"]["cpu"],
@@ -529,7 +529,7 @@ class ZOIALibrarianLocal(QMainWindow):
             Number of Starred Params: {} <br>
             Inputs: {} <br>
             Outputs: {} <br>
-            MIDI Channel: {}
+            MIDI Channels: {}
             </html>""".format(
                 self.curr_viz["meta"]["name"],
                 self.curr_viz["meta"]["cpu"],
