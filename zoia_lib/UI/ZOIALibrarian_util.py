@@ -318,7 +318,7 @@ class ZOIALibrarianUtil:
         """ Passes firmware changelog to front-end PS tab.
         """
 
-        with open("documentation/Resources/changelogs.html", "r") as f:
+        with open("documentation/Resources/changelog.html", "r") as f:
             logs = f.read()
 
         self.ui.text_browser_PS.setText("""
