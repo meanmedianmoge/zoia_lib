@@ -2794,8 +2794,17 @@
     <property name="title">
      <string>Help</string>
     </property>
+    <widget class="QMenu" name="menuZOIA_Resources">
+     <property name="title">
+      <string>ZOIA Resources</string>
+     </property>
+     <addaction name="actionFAQ"/>
+     <addaction name="actionFirmware_Files"/>
+     <addaction name="actionModule_Index"/>
+     <addaction name="actionTips_Tricks"/>
+    </widget>
     <addaction name="actionDocumentation"/>
-    <addaction name="actionZOIA_Resources"/>
+    <addaction name="menuZOIA_Resources"/>
    </widget>
    <addaction name="menuFiel"/>
    <addaction name="menuSort"/>
@@ -3191,12 +3200,24 @@
     <string>Alt+D</string>
    </property>
   </action>
-  <action name="actionZOIA_Resources">
+  <action name="actionFAQ">
    <property name="text">
-    <string>ZOIA Resources</string>
+    <string>FAQ</string>
    </property>
-   <property name="shortcut">
-    <string>Alt+Z</string>
+  </action>
+  <action name="actionModule_Index">
+   <property name="text">
+    <string>Module Index</string>
+   </property>
+  </action>
+  <action name="actionTips_Tricks">
+   <property name="text">
+    <string>Tips and Tricks</string>
+   </property>
+  </action>
+  <action name="actionFirmware_Files">
+   <property name="text">
+    <string>Firmware Files</string>
    </property>
   </action>
  </widget>

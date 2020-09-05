@@ -233,6 +233,11 @@ class ZOIALibrarianMain(QMainWindow):
             self.local.update_patch_notes)
         self.ui.actionImport_A_Patch.triggered.connect(self.import_patch)
         self.ui.actionReset_Sizes.triggered.connect(self.reset_ui)
+        self.ui.actionDocumentation.triggered.connect(self.util.documentation)
+        self.ui.actionFAQ.triggered.connect(self.util.faq)
+        self.ui.actionTips_Tricks.triggered.connect(self.util.tips)
+        self.ui.actionModule_Index.triggered.connect(self.util.mod_idx)
+        self.ui.actionFirmware_Files.triggered.connect(self.util.firmware)
         self.ui.table_local.installEventFilter(self)
         self.ui.table_sd_left.installEventFilter(self)
         self.ui.table_sd_right.installEventFilter(self)
@@ -276,14 +281,14 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Modify the display sizes for some widgets.
         if self.ps_sizes is None:
-            self.ui.splitter_PS.setSizes([self.width() * 0.325,
-                                          self.width() * 0.675])
+            self.ui.splitter_PS.setSizes([self.width() * 0.5,
+                                          self.width() * 0.5])
         else:
             self.ui.splitter_PS.setSizes([self.ps_sizes["split_left"],
                                           self.ps_sizes["split_right"]])
         if self.local_sizes is None:
-            self.ui.splitter_local.setSizes([self.width() * 0.6,
-                                             self.width() * 0.4])
+            self.ui.splitter_local.setSizes([self.width() * 0.5,
+                                             self.width() * 0.5])
             self.ui.splitter_local_hori.setSizes([self.width() * 0.5,
                                                   self.width() * 0.5])
         else:
@@ -571,31 +576,48 @@ class ZOIALibrarianMain(QMainWindow):
         Currently triggered via a menu action.
         """
 
-        self.ui.table_sd_left.setColumnWidth(0, self.width() * 0.4)
-        self.ui.table_sd_left.setColumnWidth(1, self.width() * 0.1)
-        self.ui.table_sd_right.setColumnWidth(0, self.width() * 0.4)
-        self.ui.table_sd_right.setColumnWidth(1, self.width() * 0.1)
-        self.ui.table_bank_left.setColumnWidth(0, self.width() * 0.2)
-        self.ui.table_bank_left.setColumnWidth(1, self.width() * 0.1)
-        self.ui.table_bank_right.setColumnWidth(0, self.width() * 0.2)
-        self.ui.table_bank_right.setColumnWidth(1, self.width() * 0.1)
-        self.showMaximized()
+        # Reset PS sizes
+        self.ui.table_PS.resizeColumnsToContents()
+        self.ui.table_PS.setColumnWidth(1, self.width() * 0.1)
+        self.ui.table_PS.setColumnWidth(2, self.width() * 0.1)
+        self.ui.table_PS.setColumnWidth(3, self.width() * 0.1)
+        self.ui.splitter_PS.setSizes([self.width() * 0.5,
+                                      self.width() * 0.5])
 
-        # Modify the display sizes for some widgets.
-        self.ui.splitter_PS.setSizes([self.width() * 0.325,
-                                      self.width() * 0.675])
+        # Reset local sizes
+        self.ui.table_local.resizeColumnsToContents()
+        self.ui.table_local.setColumnWidth(1, self.width() * 0.1)
+        self.ui.table_local.setColumnWidth(2, self.width() * 0.1)
+        self.ui.table_local.setColumnWidth(3, self.width() * 0.1)
+        self.ui.table_local.setColumnWidth(4, self.width() * 0.05)
+        self.ui.table_local.setColumnWidth(5, self.width() * 0.03)
         self.ui.splitter_local.setSizes([self.width() * 0.5,
                                          self.width() * 0.5])
         self.ui.splitter_local_hori.setSizes([self.width() * 0.5,
                                               self.width() * 0.5])
+
+        # Reset SD sizes
+        self.ui.table_sd_left.setColumnWidth(0, self.width() * 0.4)
+        self.ui.table_sd_left.setColumnWidth(1, self.width() * 0.1)
+        self.ui.table_sd_right.setColumnWidth(0, self.width() * 0.4)
+        self.ui.table_sd_right.setColumnWidth(1, self.width() * 0.1)
         self.ui.splitter_sd_hori.setSizes([self.width() * 0.5,
                                            self.width() * 0.5])
         self.ui.splitter_sd_vert.setSizes([self.width() * 0.185,
                                            self.width() * 0.815])
+
+        # Reset bank sizes
+        self.ui.table_bank_local.setColumnWidth(0, self.width() * 0.14)
+        self.ui.table_bank_local.setColumnWidth(1, self.width() * 0.14)
+        self.ui.table_bank_left.setColumnWidth(0, self.width() * 0.2)
+        self.ui.table_bank_left.setColumnWidth(1, self.width() * 0.1)
+        self.ui.table_bank_right.setColumnWidth(0, self.width() * 0.2)
+        self.ui.table_bank_right.setColumnWidth(1, self.width() * 0.1)
         self.ui.splitter_bank_tables.setSizes([self.width() * 0.5,
                                                self.width() * 0.5])
         self.ui.splitter_bank.setSizes([self.width() * 0.5, self.width() *
                                         0.25, self.width() * 0.25])
+        self.showMaximized()
 
     def display_patch_info(self):
         """ Queries the PS API for additional patch information whenever

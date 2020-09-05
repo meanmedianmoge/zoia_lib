@@ -296,7 +296,7 @@ class PatchBinary(Patch):
         counter = list(type_dict.values())
         in_count = counter.count("Audio Input")
         out_count = counter.count("Audio Output")
-        midi_count = sum('midi' in s.lower() for s in counter)
+        midi_count = sum("midi" in s.lower() for s in counter)
 
         if in_count == 0:
             in_type = None
@@ -336,6 +336,8 @@ class PatchBinary(Patch):
             midi = list(set(midi))
             if len(midi) == 1:
                 midi = midi[0]
+        if not midi:
+            midi = None
 
         return {"inputs": in_type,
                 "outputs": out_type,

@@ -270,6 +270,61 @@ class ZOIALibrarianUtil:
         """
         self.font = f
 
+    def documentation(self):
+        """ Passes documentation to the front-end PS tab.
+        """
+
+        with open("documentation/Resources/manual.html", "r") as f:
+            manual = f.read()
+
+        self.ui.text_browser_PS.setText("""
+            {}
+        """.format(manual))
+
+    def faq(self):
+        """ Passes FAQ to the front-end PS tab.
+        """
+
+        with open("documentation/Resources/faq.html", "r") as f:
+            faq = f.read()
+
+        self.ui.text_browser_PS.setText("""
+            {}
+        """.format(faq))
+
+    def tips(self):
+        """ Passes Tips & Tricks to front-end PS tab.
+        """
+
+        with open("documentation/Resources/tips.html", "r") as f:
+            tips = f.read()
+
+        self.ui.text_browser_PS.setText("""
+            {}
+        """.format(tips))
+
+    def mod_idx(self):
+        """ Passes Module Index to front-end PS tab.
+        """
+
+        with open("zoia_lib/common/schemas/ModuleIndex.json", "r") as f:
+            mod = json.load(f)
+
+        self.ui.text_browser_PS.setText("""<html>
+            {}
+        </html>""".format(json.dumps(mod)))
+
+    def firmware(self):
+        """ Passes firmware changelog to front-end PS tab.
+        """
+
+        with open("documentation/Resources/changelogs.html", "r") as f:
+            logs = f.read()
+
+        self.ui.text_browser_PS.setText("""
+            {}
+        """.format(logs))
+
     @staticmethod
     def multi_drag_drop(rows_left, rows_right, table_1, table_2, f1):
         """ Attempts to move multiple rows from one table at the same
