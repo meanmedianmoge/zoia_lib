@@ -3217,7 +3217,7 @@
   </action>
   <action name="actionFirmware_Files">
    <property name="text">
-    <string>Firmware Files</string>
+    <string>Firmware</string>
    </property>
   </action>
  </widget>

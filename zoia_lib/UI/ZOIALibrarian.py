@@ -1565,7 +1565,7 @@ class Ui_MainWindow(object):
         self.actionFAQ.setText(QCoreApplication.translate("MainWindow", u"FAQ", None))
         self.actionModule_Index.setText(QCoreApplication.translate("MainWindow", u"Module Index", None))
         self.actionTips_Tricks.setText(QCoreApplication.translate("MainWindow", u"Tips and Tricks", None))
-        self.actionFirmware_Files.setText(QCoreApplication.translate("MainWindow", u"Firmware Files", None))
+        self.actionFirmware_Files.setText(QCoreApplication.translate("MainWindow", u"Firmware", None))
 #if QT_CONFIG(tooltip)
         self.tabs.setToolTip("")
 #endif // QT_CONFIG(tooltip)

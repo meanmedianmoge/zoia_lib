@@ -307,12 +307,12 @@ class ZOIALibrarianUtil:
         """ Passes Module Index to front-end PS tab.
         """
 
-        with open("zoia_lib/common/schemas/ModuleIndex.json", "r") as f:
-            mod = json.load(f)
+        with open("documentation/Resources/mod.html", "r") as f:
+            mod = f.read()
 
-        self.ui.text_browser_PS.setText("""<html>
+        self.ui.text_browser_PS.setText("""
             {}
-        </html>""".format(json.dumps(mod)))
+        """.format(mod))
 
     def firmware(self):
         """ Passes firmware changelog to front-end PS tab.

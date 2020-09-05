@@ -3211,3 +3211,12 @@ for k, v in list(module_index.items()):
 
 with open("zoia_lib/common/schemas/ModuleIndex.json", "w") as f:
     json.dump(module_index, f)
+
+# import json2table
+# with open("documentation/resources/mod.html", "w") as f:
+#     f.write(json2table.convert(
+#         module_index,
+#         build_direction="LEFT_TO_RIGHT",
+#         table_attributes={"style": "Width:100%"}
+#         )
+#     )
