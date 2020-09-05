@@ -3,9 +3,10 @@
 #   module type: {
 #     name, # default module name
 #     category, # module category
+#     description, # module description
 #     max blocks, # total blocks a module can use
 #     params, # number of adjustable CV jacks
-#     cpu # average amount of CPU (this doesn't factor in matrix DSP, just purely the module itself)
+#     cpu # average amount of CPU (this doesn't factor in matrix DSP)
 #     blocks, # default and optional blocks the module uses on the grid
 #     options, # module options, list of each
 #   }
@@ -15,7 +16,10 @@ import json
 module_index = {
     0: {
         "name": "SV Filter",
-        "category": "audio",
+        "category": "Audio",
+        "description": """
+            The State Variable Filter will resonate and cutoff around a set frequency.
+        """,
         "default_blocks": 4,
         "max_blocks": 6,
         "params": 2,
@@ -60,7 +64,11 @@ module_index = {
     },
     1: {
         "name": "Audio Input",
-        "category": "interface",
+        "category": "Interface",
+        "description": """
+            Connect audio from the outside world into the grid.
+            This could be a guitar, bass, synth module, computer Audio, etc
+        """,
         "default_blocks": 2,
         "max_blocks": 2,
         "params": 0,
@@ -83,7 +91,12 @@ module_index = {
     },
     2: {
         "name": "Audio Output",
-        "category": "interface",
+        "category": "Interface",
+        "description": """
+            Connect audio from your ZOIA into the outside world.
+            Connect to your amplifier, a DI box, your audio interface, etc.
+            An optional gain control lets you tweak the output level.
+        """,
         "default_blocks": 2,
         "max_blocks": 3,
         "params": 1,
@@ -112,7 +125,14 @@ module_index = {
     },
     3: {
         "name": "Aliaser",
-        "category": "audio",
+        "category": "Audio",
+        "description": """
+            Aliaser produces samples of incoming audio and compares them against each other to find imperfections.
+            These imperfections become the outgoing audio.
+            As sample count grows, so too does the thickness of the outgoing sound.
+            This effect is a signal hog so be sure to boost your connection strengths incoming and outgoing.
+            Try connecting a LFO or envelope follower to the alias amount.
+        """,
         "default_blocks": 3,
         "max_blocks": 3,
         "params": 1,
@@ -138,7 +158,12 @@ module_index = {
     },
     4: {
         "name": "Sequencer",
-        "category": "cv",
+        "category": "CV",
+        "description": """
+            The sequencer allows you to create a number of "steps" (1-32) that can be cycled through,
+            and each step can be used to send a CV value out of that tracks output.
+            The sequencer can have up to 8 tracks, each with their own unique output.
+        """,
         "default_blocks": 3,
         "max_blocks": 42,
         "params": 34,
@@ -184,7 +209,16 @@ module_index = {
     },
     5: {
         "name": "LFO",
-        "category": "cv",
+        "category": "CV",
+        "description": """
+            The Low Frequency Oscillator is one of the workhorse modules of the ZOIA.
+            This will generate CV in the waveform and range of your choosing.
+            Connect it to a sequencer to cycle through steps, to an audio effect to
+            swing it's parameters around, or to any outboard piece of gear through a
+            MIDI or CV interface module.
+            The connection strength you enter at the output will determine the maximum
+            sweep of the LFO.
+        """,
         "default_blocks": 2,
         "max_blocks": 5,
         "params": 4,
@@ -228,7 +262,18 @@ module_index = {
     },
     6: {
         "name": "ADSR",
-        "category": "cv",
+        "category": "CV",
+        "description": """
+            The Attack Decay Sustain Release module is what gives a note generated
+            from an oscillator a natural sounding envelope when played from a keyboard.
+            Connect your oscillator or other audio source to the input of a VCA,
+            and connect the CV output of the ADSR to the CV input on the VCA.
+            Connect the keyboard or MIDI note gate out to the CV input of the ADSR
+            and you've got yourself a simple synthesizer!
+            Tweak the values to taste, or connect them to other CV inputs for experimentation.
+            Use the optional retrigger input to restart the envelope around a note
+            that is played before the ADSR is released.
+        """,
         "default_blocks": 6,
         "max_blocks": 10,
         "params": 9,
@@ -297,7 +342,14 @@ module_index = {
     },
     7: {
         "name": "VCA",
-        "category": "audio",
+        "category": "Audio",
+        "description": """
+            The Voltage Controlled Amplifier module will interpret incoming CV at the
+            level control and boost or cut the volume.
+            Connect an ADSR to create a natural sounding envelope for an oscillator passing through.
+            Connect an LFO to create a tremolo effect.
+            Or connect an expression pedal module or MIDI input for an external volume control.
+        """,
         "default_blocks": 3,
         "max_blocks": 5,
         "params": 1,
@@ -335,7 +387,13 @@ module_index = {
     },
     8: {
         "name": "Audio Multiply",
-        "category": "audio",
+        "category": "Audio",
+        "description": """
+            Takes one audio input and mathematically multiplies it with the other.
+            This produces a ring mod/vocoder-like effect.
+            This module likes hot signals to be sure to bump the connection strengths.
+            Remember that silence at any one of the inputs will result in silence at the output!
+        """,
         "default_blocks": 3,
         "max_blocks": 3,
         "params": 0,
@@ -361,7 +419,12 @@ module_index = {
     },
     9: {
         "name": "Bit Crusher",
-        "category": "audio",
+        "category": "Audio",
+        "description": """
+            Bit Crusher produces distortion by reducing audio bandwidth by a set number of bits.
+            Distortion becomes audible around 20 bits reduced.
+            This effect can get noisy so try it with a gate.
+        """,
         "default_blocks": 3,
         "max_blocks": 3,
         "params": 1,
@@ -389,7 +452,13 @@ module_index = {
     },
     10: {
         "name": "Sample & Hold",
-        "category": "cv",
+        "category": "CV",
+        "description": """
+            Sample and Hold will take the CV value at the input and hold it in place
+            at the output until triggered to look again at the input and update the output.
+            Connect a LFO to the trigger to convert smooth changes in CV into stepped changes in CV.
+            The speed of the LFO will determine the perceived resolution of the CV output.
+        """,
         "default_blocks": 3,
         "max_blocks": 3,
         "params": 2,
@@ -415,7 +484,10 @@ module_index = {
     },
     11: {
         "name": "OD and Distortion",
-        "category": "effect",
+        "category": "Effect",
+        "description": """
+            The OD & Distortion module provides classic overdrive and distortion tones.
+        """,
         "default_blocks": 4,
         "max_blocks": 4,
         "params": 2,
@@ -448,7 +520,13 @@ module_index = {
     },
     12: {
         "name": "Env Follower",
-        "category": "analysis",
+        "category": "Analysis",
+        "description": """
+            Envelope Follower will interpret an incoming audio signal as a CV signal
+            based on its signal strength.
+            Use this to trigger filter sweeps, audio effects parameters, LFO rates, etc.
+            The connection strength can act as a sensitivity control.
+        """,
         "default_blocks": 2,
         "max_blocks": 4,
         "params": 2,
@@ -482,7 +560,14 @@ module_index = {
     },
     13: {
         "name": "Delay Line",
-        "category": "audio",
+        "category": "Audio",
+        "description": """
+            The Delay Line is a simple module that takes audio at the input and
+            delays it by a set amount of time.
+            There is no dry signal, there are no repeats.
+            You can create repeats by connecting the output back to the input,
+            using the connection strength to adjust number of repeats.
+        """,
         "default_blocks": 3,
         "max_blocks": 5,
         "params": 3,
@@ -521,7 +606,15 @@ module_index = {
     },
     14: {
         "name": "Oscillator",
-        "category": "audio",
+        "category": "Audio",
+        "description": """
+            Generates an audio signal in the waveform of your choice.
+            Connect a MIDI device, keyboard module, sequencer, pitch detector,
+            LFO, or any CV source to select the frequency or note the oscillator will play.
+            You can modulate the frequency or pulse width with the optional parameters.
+            Negative CV inputs (from -1 to 0) will generate sub-bass frequencies
+            between 0.027Hz and 27.49Hz. Be careful!
+        """,
         "default_blocks": 2,
         "max_blocks": 4,
         "params": 2,
@@ -557,7 +650,12 @@ module_index = {
     },
     15: {
         "name": "Pushbutton",
-        "category": "interface",
+        "category": "Interface",
+        "description": """
+            Turns a grid button into a button you can push to send a CV signal.
+            Tap in a tempo, open up a VCA, trigger a sequencer, or anything else.
+            The grid is your oyster!
+        """,
         "default_blocks": 1,
         "max_blocks": 1,
         "params": 0,
@@ -576,7 +674,12 @@ module_index = {
     },
     16: {
         "name": "Keyboard",
-        "category": "interface",
+        "category": "Interface",
+        "description": """
+            Turns grid buttons into a keyboard you can connect to an oscillator and play.
+            No external MIDI controller necessary!
+            Tune each keyboard button using the knob to have it play your desired note.
+        """,
         "default_blocks": 4,
         "max_blocks": 43,
         "params": 49,
@@ -614,7 +717,16 @@ module_index = {
     },
     17: {
         "name": "CV Filter",
-        "category": "cv",
+        "category": "CV",
+        "description": """
+            CV Filter dictates the length of time a CV output will take to respond
+            to a change in CV input, determined by the time constant.
+            The CV change occurs logarithmically for a nice smooth transition.
+            Use this module in series with a MIDI/keyboard note to add portamento
+            to your synth voice.
+            You can also use this module to vary the shape of an LFO waveform or
+            connect to a stomp switch to produce a long slow change in an audio effect.
+        """,
         "default_blocks": 3,
         "max_blocks": 3,
         "params": 2,
@@ -640,7 +752,13 @@ module_index = {
     },
     18: {
         "name": "Steps",
-        "category": "cv",
+        "category": "CV",
+        "description": """
+            Steps will interpret incoming changes in upward CV as a tempo, split the wave
+            cycle into a set number of steps, and then send the CV present at the input
+            during each step to the output.
+            You can use this to convert a nice smooth LFO and reduce its resolution into steps.
+        """,
         "default_blocks": 3,
         "max_blocks": 3,
         "params": 2,
@@ -666,7 +784,15 @@ module_index = {
     },
     19: {
         "name": "Slew Limiter",
-        "category": "cv",
+        "category": "CV",
+        "description": """
+            Slew Limiter is similar in behaviour to CV Filter except that the rate of
+            change in changes of CV happen linearly instead of logarithmically.
+            This is the classic portamento, and can be used anywhere CV changes occur
+            to give them a different feel.
+            Try using an unlinked Slew Limiter with a stomp switch module to give more
+            expression pedal-like behaviour to your stomp switch.
+        """,
         "default_blocks": 3,
         "max_blocks": 4,
         "params": 2,
@@ -704,7 +830,12 @@ module_index = {
     },
     20: {
         "name": "Midi Notes In",
-        "category": "interface",
+        "category": "Interface",
+        "description": """
+            Connect your MIDI keyboard controller to the ZOIA.
+            Connect the note out to an oscillator to have it play your note,
+            and connect the gate out to an ADSR (connected to a VCA) for a natural envelope. 
+        """,
         "default_blocks": 2,
         "max_blocks": 32,
         "params": 0,
@@ -764,7 +895,11 @@ module_index = {
     },
     21: {
         "name": "Midi CC In",
-        "category": "interface",
+        "category": "Interface",
+        "description": """
+            Connect encoder knobs and sliders on a MIDI interface.
+            Take note of the outgoing CC number of each control and enter it into the controller option.
+        """,
         "default_blocks": 1,
         "max_blocks": 1,
         "params": 0,
@@ -784,7 +919,14 @@ module_index = {
     },
     22: {
         "name": "Multiplier",
-        "category": "cv",
+        "category": "CV",
+        "description": """
+            Multiply will take the CV signal present at each input and multiply
+            them together at the output.
+            In this way you can use one CV source to amplify, tame, or modulate another.
+            Remember that a value of 0 at any input will result in 0 at the output.
+            It's math!
+        """,
         "default_blocks": 3,
         "max_blocks": 10,
         "params": 2,
@@ -817,7 +959,15 @@ module_index = {
     },
     23: {
         "name": "Compressor",
-        "category": "effect",
+        "category": "Effect",
+        "description": """
+            Compression is a vastly useful audio tool that controls your signal level
+            according to changes in input level.
+            You can create natural reductions in gain to help things mix better, help
+            tame or enhance transients in synth or instrument signals, etc.
+            The optional stereo side will trigger the module's functions in unison on both
+            channels, creating true stereo compression.
+        """,
         "default_blocks": 3,
         "max_blocks": 9,
         "params": 4,
@@ -879,7 +1029,11 @@ module_index = {
     },
     24: {
         "name": "Multi Filter",
-        "category": "audio",
+        "category": "Audio",
+        "description": """
+            A general purpose filter with gain, frequency, and Q controls.
+            Configurable as a high pass, low pass, band pass, bell, hi shelf, or low shelf.
+        """,
         "default_blocks": 4,
         "max_blocks": 5,
         "params": 3,
@@ -918,7 +1072,11 @@ module_index = {
     },
     25: {
         "name": "Plate Reverb",
-        "category": "effect",
+        "category": "Effect",
+        "description": """
+            Bask in the ebb and flow of steel molecules as they vibrate with the warm vintage
+            vibe of so many classic recordings.
+        """,
         "default_blocks": 8,
         "max_blocks": 8,
         "params": 4,
@@ -969,7 +1127,12 @@ module_index = {
     },
     26: {
         "name": "Buffer Delay",
-        "category": "audio",
+        "category": "Audio",
+        "description": """
+            Delays internal audio signal by N buffer(s).
+            This module is inaudible, but useful anywhere you need to line up
+            internal parallel audio connections precisely.
+        """,
         "default_blocks": 2,
         "max_blocks": 2,
         "params": 0,
@@ -992,7 +1155,11 @@ module_index = {
     },
     27: {
         "name": "All Pass Filter",
-        "category": "audio",
+        "category": "Audio",
+        "description": """
+            All Pass Filter passes through all frequencies at equal gain,
+            but changes phase relationship between them.
+        """,
         "default_blocks": 3,
         "max_blocks": 3,
         "params": 1,
@@ -1020,7 +1187,10 @@ module_index = {
     },
     28: {
         "name": "Quantizer",
-        "category": "cv",
+        "category": "CV",
+        "description": """
+            Quantizer will interpret incoming CV and send its nearest equivalent note as a CV output.
+        """,
         "default_blocks": 2,
         "max_blocks": 4,
         "params": 3,
@@ -1053,7 +1223,12 @@ module_index = {
     },
     29: {
         "name": "Phaser",
-        "category": "effect",
+        "category": "Effect",
+        "description": """
+            Set to stun, Phaser shifts the phase over a set quantity of stages and
+            sweeps the frequency of these poles at a set rate.
+            An optional stereo channel rounds out the list of features. 
+        """,
         "default_blocks": 6,
         "max_blocks": 8,
         "params": 4,
@@ -1108,7 +1283,12 @@ module_index = {
     },
     30: {
         "name": "Looper",
-        "category": "audio",
+        "category": "Audio",
+        "description": """
+            The Looper module allows you to record, overdub, and play back incoming audio,
+            forwards or backwards, at the speed of your choice (pitch shifted).
+            Get loopy!
+        """,
         "default_blocks": 5,
         "max_blocks": 9,
         "params": 6,
@@ -1173,7 +1353,14 @@ module_index = {
     },
     31: {
         "name": "In Switch",
-        "category": "cv",
+        "category": "CV",
+        "description": """
+            In Switch takes a selected quantity of CV inputs and allows you
+            to switch between them to a single CV output.
+            You can use this to select between LFOs to a CV source, external CV modules,
+            or use in conjunction with the CV out switch to choose between ADSRs
+            or other CV module chains
+        """,
         "default_blocks": 3,
         "max_blocks": 18,
         "params": 17,
@@ -1206,7 +1393,11 @@ module_index = {
     },
     32: {
         "name": "Out Switch",
-        "category": "cv",
+        "category": "CV",
+        "description": """
+            Out Switch takes a CV input and routes it between a set quantity of CV outputs.
+            You can use it to select which sequencers, ADSRs, or tap tempos to send triggers to, etc
+        """,
         "default_blocks": 3,
         "max_blocks": 18,
         "params": 2,
@@ -1239,7 +1430,15 @@ module_index = {
     },
     33: {
         "name": "Audio In Switch",
-        "category": "audio",
+        "category": "Audio",
+        "description": """
+            Audio In Switch takes a selected quantity of audio inputs and allows you
+            to switch between them to a single output.
+            You can use this to select between instruments at your input jacks,
+            use it in conjunction with the Audio Out Switch to select between
+            effects chains, or use it anywhere you'd like to be able to select
+            between incoming audio sources using CV.
+        """,
         "default_blocks": 3,
         "max_blocks": 18,
         "params": 1,
@@ -1273,7 +1472,15 @@ module_index = {
     },
     34: {
         "name": "Audio Out Switch",
-        "category": "audio",
+        "category": "Audio",
+        "description": """
+            Audio Out Switch takes an audio input and routes it between a set
+            quantity of audio outputs.
+            You can use it at your output jacks to select between amplifiers
+            or mixer channels, use it in conjunction with the Audio In Switch to
+            select between effects chains, or use it anywhere you'd like to be able
+            to select an outgoing audio path using CV.
+        """,
         "default_blocks": 3,
         "max_blocks": 18,
         "params": 1,
@@ -1307,7 +1514,12 @@ module_index = {
     },
     35: {
         "name": "Midi Pressure",
-        "category": "interface",
+        "category": "Interface",
+        "description": """
+            Many MIDI keyboards have an aftertouch feature that can be triggered
+            by pressing down on a note after it's fully depressed.
+            You can use after touch to trigger a little extra pizazz in your sound.
+        """,
         "default_blocks": 1,
         "max_blocks": 1,
         "params": 0,
@@ -1325,7 +1537,11 @@ module_index = {
     },
     36: {
         "name": "Onset Detector",
-        "category": "analysis",
+        "category": "Analysis",
+        "description": """
+            Onset Detector looks for incoming audio signal and generates a CV trigger at the peaks.
+            Use a regular audio source to advance a sequencer, tap a tempo, etc
+        """,
         "default_blocks": 2,
         "max_blocks": 3,
         "params": 1,
@@ -1353,7 +1569,11 @@ module_index = {
     },
     37: {
         "name": "Rhythm",
-        "category": "cv",
+        "category": "CV",
+        "description": """
+            Rhythm will take an incoming CV signal, interpret it as a series of triggers,
+            record those triggers and play them back at the output.
+        """,
         "default_blocks": 4,
         "max_blocks": 5,
         "params": 3,
@@ -1391,7 +1611,12 @@ module_index = {
     },
     38: {
         "name": "Noise",
-        "category": "audio",
+        "category": "Audio",
+        "description": """
+            Generates white noise from a single button.
+            Use the strength of your connection as a level control.
+            Helpful in connection with VCAs and ADSRs in creating drum sounds, etc.
+        """,
         "default_blocks": 1,
         "max_blocks": 1,
         "params": 0,
@@ -1407,7 +1632,12 @@ module_index = {
     },
     39: {
         "name": "Random",
-        "category": "cv",
+        "category": "CV",
+        "description": """
+            Random will generate numbers continuously or when triggered with the option trigger in.
+            Connect an LFO to the trigger in to get regularly updated random numbers.
+            Try it with a CV in switch to toggle some randomness into  your life.
+        """,
         "default_blocks": 1,
         "max_blocks": 2,
         "params": 1,
@@ -1431,7 +1661,14 @@ module_index = {
     },
     40: {
         "name": "Gate",
-        "category": "effect",
+        "category": "Effect",
+        "description": """
+            A standard in studio audio tools, gate can also be used as the key ingredient
+            in gated fuzz tones.
+            Use it to filter out noise from an audio source, or to cut the end off
+            of a reverb's decay, thus creating the classic gated reverb sound.
+            Make sure to experiment with the sidechain input!
+        """,
         "default_blocks": 5,
         "max_blocks": 8,
         "params": 3,
@@ -1487,7 +1724,14 @@ module_index = {
     },
     41: {
         "name": "Tremolo",
-        "category": "effect",
+        "category": "Effect",
+        "description": """
+            Up and down, side to side.
+            Tremolo helps your smile get wide.
+            Set speed and depth and tap in a tempo if you like.
+            If you'd like a tremolo effect with more control, try creating one using
+            the VCA or Audio Panner along with LFOs and various other CV tools to get radical!
+        """,
         "default_blocks": 4,
         "max_blocks": 6,
         "params": 2,
@@ -1532,7 +1776,12 @@ module_index = {
     },
     42: {
         "name": "Tone Control",
-        "category": "effect",
+        "category": "Effect",
+        "description": """
+            Tone Control is a 3 or 4 band tone control.
+            Use this in conjunction with Distortion, Delay w/Mod, Reverb, or even
+            a clean sound to fundamentally change its character.
+        """,
         "default_blocks": 6,
         "max_blocks": 10,
         "params": 6,
@@ -1596,7 +1845,19 @@ module_index = {
     },
     43: {
         "name": "Delay w Mod",
-        "category": "effect",
+        "category": "Effect",
+        "description": """
+            Delay is one of the classic delay effects.
+            Delay w/Mod differs from the Delay Line module found in Audio Out in
+            that it runs a dry signal alongside the wet, has a feedback section,
+            and a modulation section.
+            Set the delay time either by tap or rotary/CV input.
+            Optional stereo outputs round out the list of features.
+            You can change the character of the delay effect with the "type"
+            option, and/or by setting your mix to wet only, adding tone control
+            and other effects to the output, and connecting your audio source
+            directly to your output (bypassing the delay module) to act as the dry signal.
+        """,
         "default_blocks": 7,
         "max_blocks": 9,
         "params": 5,
@@ -1658,7 +1919,16 @@ module_index = {
     },
     44: {
         "name": "Stompswitch",
-        "category": "interface",
+        "category": "Interface",
+        "description": """
+            Use this module to connect a stomp switch to other modules.
+            This can be any of ZOIA's 3 stomp switches or an external one.
+            If using an external, remember to set it up in the Config Menu.
+            Once placed, the Scroll and Bypass stomp switches must be "switched to"
+            by holding them both on together for 2 seconds, this will allow them to
+            function in the modules instead of as ZOIA's main user interface.
+            Hold again for 2 seconds to switch back.
+        """,
         "default_blocks": 1,
         "max_blocks": 1,
         "params": 0,
@@ -1678,7 +1948,11 @@ module_index = {
     },
     45: {
         "name": "Value",
-        "category": "cv",
+        "category": "CV",
+        "description": """
+            Value allows you to connect to multiple modules and adjust their
+            parameters simultaneously from one CV adjustment at the input.
+        """,
         "default_blocks": 2,
         "max_blocks": 2,
         "params": 1,
@@ -1701,7 +1975,10 @@ module_index = {
     },
     46: {
         "name": "CV Delay",
-        "category": "cv",
+        "category": "CV",
+        "description": """
+            CV Delay will take incoming CV and delay it in time by a set amount.
+        """,
         "default_blocks": 3,
         "max_blocks": 3,
         "params": 2,
@@ -1727,7 +2004,13 @@ module_index = {
     },
     47: {
         "name": "CV Loop",
-        "category": "cv",
+        "category": "CV",
+        "description": """
+            CV Loop functions similar to an audio looper except records patterns
+            of CV signal instead of audio.
+            You can record and play back snippets of LFOs, sequences, changes in CV
+            or MIDI control etc.
+        """,
         "default_blocks": 6,
         "max_blocks": 8,
         "params": 7,
@@ -1781,7 +2064,16 @@ module_index = {
     },
     48: {
         "name": "CV Filter",
-        "category": "cv",
+        "category": "CV",
+        "description": """
+            CV Filter dictates the length of time a CV output will take to
+            respond to a change in CV input, determined by the time constant.
+            The CV change occurs logarithmically for a nice smooth transition.
+            Use this module in series with a MIDI/keyboard note to add portamento
+            to your synth voice.
+            You can also use this module to vary the shape of an LFO waveform or connect
+            to a stomp switch to produce a long slow change in an audio effect.
+        """,
         "default_blocks": 3,
         "max_blocks": 3,
         "params": 2,
@@ -1807,7 +2099,12 @@ module_index = {
     },
     49: {
         "name": "Clock Divider",
-        "category": "cv",
+        "category": "CV",
+        "description": """
+            Clock Divider module will detect tempo of incoming CV upward changes,
+            divide it by a user determined ratio, and output CV triggers at the resulting tempo.
+            This can be a handy way of getting a tap tempo from a slightly irregular waveform.
+        """,
         "default_blocks": 5,
         "max_blocks": 5,
         "params": 4,
@@ -1845,7 +2142,15 @@ module_index = {
     },
     50: {
         "name": "Comparator",
-        "category": "cv",
+        "category": "CV",
+        "description": """
+            Comparator is a logic module that will switch CV on if positive input
+            is equal to or greater than negative input, and off if positive input is
+            less than negative input.
+            Off can be defined as 0 or -1 by the output range.
+            This can be useful if you'd like to have something happen, but only above
+            a certain threshold.
+        """,
         "default_blocks": 3,
         "max_blocks": 3,
         "params": 2,
@@ -1873,7 +2178,11 @@ module_index = {
     },
     51: {
         "name": "CV Rectify",
-        "category": "cv",
+        "category": "CV",
+        "description": """
+            CV Rectify will interpret incoming CV from -1 to 1 and "flip" the negative
+            values into positive values equidistant from 0.
+        """,
         "default_blocks": 2,
         "max_blocks": 2,
         "params": 1,
@@ -1894,7 +2203,12 @@ module_index = {
     },
     52: {
         "name": "Trigger",
-        "category": "cv",
+        "category": "CV",
+        "description": """
+            Creates a very short CV pulse (value of 1) on detection of upward CV input.
+            This is useful in creating a tap tempos from regular or irregular CV waveforms,
+            triggering sequencers or ADSRs at specific times, etc.
+        """,
         "default_blocks": 2,
         "max_blocks": 2,
         "params": 1,
@@ -1915,7 +2229,12 @@ module_index = {
     },
     53: {
         "name": "Stereo Spread",
-        "category": "audio",
+        "category": "Audio",
+        "description": """
+            Stereo Spread will take one or two channels and enhance their stereo field.
+            This is generally used right before an audio output module but, as always,
+            feel free to experiment!
+        """,
         "default_blocks": 5,
         "max_blocks": 5,
         "params": 1,
@@ -1958,7 +2277,11 @@ module_index = {
     },
     54: {
         "name": "Cport Exp CV In",
-        "category": "interface",
+        "category": "Interface",
+        "description": """
+            Connect your expression pedal or a control voltage signal from an external source.
+            Remember to set CPort to either exp or cv in the Config Menu.
+        """,
         "default_blocks": 1,
         "max_blocks": 1,
         "params": 0,
@@ -1976,7 +2299,12 @@ module_index = {
     },
     55: {
         "name": "Cport CV Out",
-        "category": "interface",
+        "category": "Interface",
+        "description": """
+            This module interprets internal CV and sends it down the ring of a 1/4"
+            TRS connector in the control port as a standard CV signal of 0-5 volts.
+            Remember to set CPort to cv in the Config Menu.
+        """,
         "default_blocks": 1,
         "max_blocks": 1,
         "params": 0,
@@ -1994,7 +2322,38 @@ module_index = {
     },
     56: {
         "name": "UI Button",
-        "category": "interface",
+        "category": "Interface",
+        "description": """
+            UI Button can function in a couple different ways.
+            It can show you a specific colour at a specific brightness based on the
+            setting of or CV sent to the input.
+            It can also act as a pushbutton with output enabled.
+            To use as a visualizing pixel, connect CV and send the following values:
+            EXTENDED RANGE:
+            Red: 0 - 0.049 (max bright 0.0375),
+            Orange: 0.05 - 0.099 (max bright 0.0875),
+            Mango: 0.10 - 0.149 (max bright 0.1375),
+            Yellow: 0.15 - 0.199 (max bright 0.1875),
+            Lime: 0.20 - 0.249 (max bright 0.2375),
+            Green: 0.25 - 0.299 (max bright 0.2875),
+            Surf: 0.30 - 0.349 (max bright 0.3375),
+            Aqua: 0.35 - 0.399 (max bright 0.3875),
+            Sky: 0.40 - 0.449 (max bright 0.4375),
+            Blue: 0.45 - 0.499 (max bright 0.4875), 
+            Purple: 0.50 - 0.549 (max bright 0.5375), 
+            Magenta: 0.55 - 0.599 (max bright 0.5875), 
+            Pink: 0.60 - 0.649 (max bright 0.6375), 
+            Peach: 0.65 - 0.699 (max bright 0.6875), 
+            White: 0.70 - 0.749 (max bright 0.7375).
+            BASIC RANGE:
+            Blue = 0 to 0.099 (0.74 max brightness), 
+            Green = 0.1 to 0.199 (0.174 max brightness), 
+            Red = 0.2 to 0.299 (0.274 max brightness), 
+            Yellow = 0.3 to 0.399 (0.374 max brightness), 
+            Cyan = 0.4 to 0.499 (0.474 max brightness), 
+            Magenta = 0.5 to 0.599 (0.574 max brightness), 
+            White = 0.6 to 0.699 (0.6 to 0.674 brightness).
+        """,
         "default_blocks": 1,
         "max_blocks": 2,
         "params": 1,
@@ -2015,7 +2374,11 @@ module_index = {
     },
     57: {
         "name": "Audio Panner",
-        "category": "audio",
+        "category": "Audio",
+        "description": """
+            Audio Panner takes either one or two input channels and pans them between two outputs.
+            Connect an LFO for a stereo tremolo effect.
+        """,
         "default_blocks": 4,
         "max_blocks": 5,
         "params": 3,
@@ -2054,7 +2417,15 @@ module_index = {
     },
     58: {
         "name": "Pitch Detector",
-        "category": "analysis",
+        "category": "Analysis",
+        "description": """
+            Pitch Detector interprets the pitch of a connected audio signal as a CV note output,
+            which can be sent to an oscillator or quantizer.
+            You can affect the tracking by changing the connection strength between
+            the audio source and the audio input, and transpose which note the oscillator
+            will generate using the connection strength to the oscillator.
+            Click knob to toggle display between frequency in Hz and note.
+        """,
         "default_blocks": 2,
         "max_blocks": 2,
         "params": 0,
@@ -2077,7 +2448,13 @@ module_index = {
     },
     59: {
         "name": "Pitch Shifter",
-        "category": "audio",
+        "category": "Audio",
+        "description": """
+            Pitch Shifter transposes the pitch of incoming audio.
+            Click the knob on the pitch shift parameter to cycle views of
+            CV value, semitones, or cents.
+            Connect an LFO to produce a vibrato effect, or connect whatever you'd like!
+        """,
         "default_blocks": 3,
         "max_blocks": 3,
         "params": 1,
@@ -2103,7 +2480,10 @@ module_index = {
     },
     60: {
         "name": "Midi Note Out",
-        "category": "interface",
+        "category": "Interface",
+        "description": """
+            Send MIDI notes out to external MIDI enabled gear through ZOIA's MIDI outputs.
+        """,
         "default_blocks": 2,
         "max_blocks": 3,
         "params": 3,
@@ -2132,7 +2512,10 @@ module_index = {
     },
     61: {
         "name": "Midi CC Out",
-        "category": "interface",
+        "category": "Interface",
+        "description": """
+            Send Control Change messages to external MIDI enabled gear through ZOIA's MIDI outputs.
+        """,
         "default_blocks": 1,
         "max_blocks": 1,
         "params": 1,
@@ -2150,8 +2533,13 @@ module_index = {
         }
     },
     62: {
-        "name": "midi_pc_out",
-        "category": "interface",
+        "name": "Midi PC Out",
+        "category": "Interface",
+        "description": """
+            Send Program Change messages to external MIDI enabled gear.
+            Select the Program Change value and send a CV signal to trigger
+            in to send message through ZOIA's MIDI outputs.
+        """,
         "default_blocks": 2,
         "max_blocks": 2,
         "params": 2,
@@ -2174,7 +2562,13 @@ module_index = {
     },
     63: {
         "name": "Bit Modulator",
-        "category": "audio",
+        "category": "Audio",
+        "description": """
+            Bit Modulator takes one audio input and compares it against the other,
+            creating an unholy glitchy combination of both sounds at the output.
+            Choose between 3 different logic flavours with the "type" option.
+            When taking audio from an external source, it's recommended to put a gate before the input.
+        """,
         "default_blocks": 3,
         "max_blocks": 3,
         "params": 0,
@@ -2202,7 +2596,11 @@ module_index = {
     },
     64: {
         "name": "Audio Balance",
-        "category": "audio",
+        "category": "Audio",
+        "description": """
+            Audio Balance mixes an output from 2 inputs.
+            You can run this module either mono or stereo.
+        """,
         "default_blocks": 4,
         "max_blocks": 7,
         "params": 1,
@@ -2250,7 +2648,15 @@ module_index = {
     },
     65: {
         "name": "Inverter",
-        "category": "audio",
+        "category": "Audio",
+        "description": """
+            The Inverter module takes incoming audio signal and inverts the
+            sound wave 180 degrees out of phase.
+            This module is inaudible unless you have a phase related problem
+            you are trying to solve, in which case it can be very audible.
+            Be sure to put a 1 Buffer Delay module into your "dry" side to
+            line up the Inverter in time for proper phase cancellation.
+        """,
         "default_blocks": 2,
         "max_blocks": 2,
         "params": 0,
@@ -2271,7 +2677,10 @@ module_index = {
     },
     66: {
         "name": "Fuzz",
-        "category": "effect",
+        "category": "Effect",
+        "description": """
+            The Fuzz module provides gnarly fuzz tones for your sonic enjoyment.
+        """,
         "default_blocks": 4,
         "max_blocks": 4,
         "params": 2,
@@ -2304,7 +2713,11 @@ module_index = {
     },
     67: {
         "name": "Ghostverb",
-        "category": "effect",
+        "category": "Effect",
+        "description": """
+            A spooky, ghostly reverb sound akin to the Ghost mode found in the Empress Reverb.
+            Scare the crap out of all your friends!
+        """,
         "default_blocks": 6,
         "max_blocks": 8,
         "params": 4,
@@ -2357,7 +2770,10 @@ module_index = {
     },
     68: {
         "name": "Cabinet Sim",
-        "category": "effect",
+        "category": "Effect",
+        "description": """
+            A versatile guitar cabinet simulator.
+        """,
         "default_blocks": 2,
         "max_blocks": 4,
         "params": 0,
@@ -2392,7 +2808,12 @@ module_index = {
     },
     69: {
         "name": "Flanger",
-        "category": "effect",
+        "category": "Effect",
+        "description": """
+            ZOIA's Flanger module is borrowed right from the Empress Nebulus.
+            This quite versatile flanger encompasses lots of comb filtering territory,
+            but don't hesitate to build flange tones yourself using LFOs and delay lines!
+        """,
         "default_blocks": 7,
         "max_blocks": 9,
         "params": 5,
@@ -2452,7 +2873,13 @@ module_index = {
     },
     70: {
         "name": "Chorus",
-        "category": "effect",
+        "category": "Effect",
+        "description": """
+            The classic chorus effect.
+            A nice sounding, fairly standard chorus.
+            Get wackier sounds from it by using CV direct, or build
+            your own from LFOs and delay lines!
+        """,
         "default_blocks": 6,
         "max_blocks": 8,
         "params": 4,
@@ -2507,7 +2934,12 @@ module_index = {
     },
     71: {
         "name": "Vibrato",
-        "category": "effect",
+        "category": "Effect",
+        "description": """
+            Vibrato is your typical pitch bending, wet only sound you'd find on
+            such classic units as the Empress Nebulus, just to name one.
+            Get bendy!
+        """,
         "default_blocks": 4,
         "max_blocks": 6,
         "params": 2,
@@ -2552,7 +2984,13 @@ module_index = {
     },
     72: {
         "name": "Env Filter",
-        "category": "effect",
+        "category": "Effect",
+        "description": """
+            Get your quack on!
+            This fully featured envelope filter has everything you
+            need to tune in that perfect envelope filter and get funky.
+            Great on guitar, bass, or anything else!
+        """,
         "default_blocks": 6,
         "max_blocks": 8,
         "params": 4,
@@ -2607,7 +3045,11 @@ module_index = {
     },
     73: {
         "name": "Ring Modulator",
-        "category": "effect",
+        "category": "Effect",
+        "description": """
+            A gnarly ring modulation effect.
+            A robot's nightmare, a tweaker's delight!
+        """,
         "default_blocks": 4,
         "max_blocks": 6,
         "params": 3,
@@ -2653,7 +3095,12 @@ module_index = {
     },
     74: {
         "name": "Hall Reverb",
-        "category": "effect",
+        "category": "Effect",
+        "description": """
+            It's like you're there, looking up at the pulpit, with the warm sun
+            casting in beams of coloured light from the stained glass windows.
+            You're in reverb heaven, now.
+        """,
         "default_blocks": 8,
         "max_blocks": 8,
         "params": 4,
@@ -2704,7 +3151,13 @@ module_index = {
     },
     75: {
         "name": "Ping Pong Delay",
-        "category": "effect",
+        "category": "Effect",
+        "description": """
+            Ping Pong Delay is almost identical to the Delay w/ Mod except for one key aspect:
+            the delay repeats ping pong from left to right across stereo outputs.
+            When stereo inputs are selected, one input will ping while the other pongs,
+            followed by a pong while the other pings into the opposite and then correct outputs.
+        """,
         "default_blocks": 7,
         "max_blocks": 9,
         "params": 5,
@@ -2766,7 +3219,12 @@ module_index = {
     },
     76: {
         "name": "Audio Mixer",
-        "category": "audio",
+        "category": "Audio",
+        "description": """
+            Audio Mixer functions like a stripped down mixing console,
+            where gain is your channel fader and you can place an optional pan control.
+            Mix up to 8 channels, in mono or stereo.
+        """,
         "default_blocks": 5,
         "max_blocks": 26,
         "params": 16,
@@ -2831,7 +3289,14 @@ module_index = {
     },
     77: {
         "name": "CV Flip Flop",
-        "category": "cv",
+        "category": "CV",
+        "description": """
+            This is essentially a latching CV switch with an output of 0 or 1.
+            When the input sees an upward CV change, the flip flop is triggered to
+            change it's output state from 0 to 1 at the next upward change in CV,
+            which must occur after a downward change in CV.
+            So, the flip flop changes from 0 to 1 at every other upward change in CV.
+        """,
         "default_blocks": 2,
         "max_blocks": 2,
         "params": 1,
@@ -2852,7 +3317,12 @@ module_index = {
     },
     78: {
         "name": "Diffuser",
-        "category": "audio",
+        "category": "Audio",
+        "description": """
+            Diffuser spreads your signal across the galaxy like so many shimmering little stars.
+            On it's own it sounds like a modulated slapback delay with no dry signal,
+            but it can be used to construct many a tonal/atonal masterpiece.
+        """,
         "default_blocks": 6,
         "max_blocks": 6,
         "params": 4,
@@ -2893,7 +3363,10 @@ module_index = {
     },
     79: {
         "name": "Reverb Lite",
-        "category": "effect",
+        "category": "Effect",
+        "description": """
+            A straightforward CPU friendly reverb sound to add some smoosh to heavier workload patches.
+        """,
         "default_blocks": 4,
         "max_blocks": 6,
         "params": 2,
@@ -2936,7 +3409,12 @@ module_index = {
     },
     80: {
         "name": "Room Reverb",
-        "category": "effect",
+        "category": "Effect",
+        "description": """
+            Well, you're cooped up in your little room.
+            But that's okay, because you've got some tasty room reverb to swim around in.
+            Don't worry, somebody will come get you out someday.
+        """,
         "default_blocks": 8,
         "max_blocks": 8,
         "params": 4,
@@ -2987,7 +3465,13 @@ module_index = {
     },
     81: {
         "name": "Pixel",
-        "category": "interface",
+        "category": "Interface",
+        "description": """
+            Puts a coloured block on the grid.
+            The brightness can be controlled by a cv signal or an audio signal.
+            Pixel is a simple, elegant way to create a more visually
+            interactive user interface for your patch.
+        """,
         "default_blocks": 1,
         "max_blocks": 1,
         "params": 1,
@@ -3005,7 +3489,10 @@ module_index = {
     },
     82: {
         "name": "Midi Clock In",
-        "category": "interface",
+        "category": "Interface",
+        "description": """
+            Connect MIDI clock to sync your patches to the outside world.
+        """,
         "default_blocks": 1,
         "max_blocks": 4,
         "params": 0,
@@ -3042,7 +3529,14 @@ module_index = {
     },
     83: {
         "name": "Granular",
-        "category": "audio",
+        "category": "Audio",
+        "description": """
+            Granular breaks up incoming audio into tiny little grains and
+            spits them back out in the quantity and shape of your choosing.
+            Go from modest textures to completely unrecognizable oscillations.
+            Granular can also be used as a granular delay by creating a feedback
+            path from the output back to the input...
+        """,
         "default_blocks": 8,
         "max_blocks": 10,
         "params": 6,
@@ -3108,7 +3602,10 @@ module_index = {
     },
     84: {
         "name": "Midi Clock Out",
-        "category": "interface",
+        "category": "Interface",
+        "description": """
+            
+        """,
         "default_blocks": 3,
         "max_blocks": 5,
         "params": 5,
@@ -3154,7 +3651,10 @@ module_index = {
     },
     85: {
         "name": "Tap to CV",
-        "category": "cv",
+        "category": "CV",
+        "description": """
+            
+        """,
         "default_blocks": 2,
         "max_blocks": 4,
         "params": 2,
@@ -3188,7 +3688,10 @@ module_index = {
     },
     86: {
         "name": "Midi Pitch Bend In",
-        "category": "interface",
+        "category": "Interface",
+        "description": """
+            
+        """,
         "default_blocks": 1,
         "max_blocks": 1,
         "params": 0,
