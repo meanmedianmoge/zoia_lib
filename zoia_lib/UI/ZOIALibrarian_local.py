@@ -567,13 +567,17 @@ class ZOIALibrarianLocal(QMainWindow):
                     <b><h2> {} </b></h2>
                     Type: {} <br>
                     {} <br>
+                    {} <br>
+                    {} <br>
                     {}
                     </html>""".format(
                         curr_module["type"] if curr_module["name"] == ""
                             else curr_module["name"],
                         curr_module["type"],
-                        self._parse_dict_for_html(curr_module, "options"),
-                        self._parse_dict_for_html(curr_module, "parameters"),
+                        self._parse_dict_for_html(curr_module["options"]),
+                        self._parse_dict_for_html(curr_module["parameters"]),
+                        self._parse_list_for_html(curr_module["starred"]),
+                        self._parse_list_for_html(curr_module["connections"])
                     )
                 )
 
@@ -748,19 +752,38 @@ class ZOIALibrarianLocal(QMainWindow):
         self.prev_search = data
 
     @staticmethod
-    def _parse_dict_for_html(dct, key):
-        """Parse out items in dictionary into newlines for html.
+    def _parse_dict_for_html(dct):
+        """ Parse out items in dictionary into newlines for html.
 
-        dct: Input dictionary
+        dct: Input dictionary.
 
         return: Parsed html.
         """
 
         return json.dumps(
-            list(dct[key].items())
+            list(dct.items())
         ).replace("[[", "["
                   ).replace("]]", "]"
                             ).replace('",', '":'
+                                      ).replace(", ", "<br>"
+                                                ).replace("[", ""
+                                                          ).replace("]", ""
+                                                                    ).replace('"', "")
+
+    @staticmethod
+    def _parse_list_for_html(lst):
+        """ Parse out items in list into newlines for html.
+
+        lst: Input list.
+
+        return: Parsed html.
+        """
+
+        return json.dumps(
+            lst
+        ).replace("[[", "["
+                  ).replace("]]", "]"
+                            ).replace('",', "<br>"
                                       ).replace(", ", "<br>"
                                                 ).replace("[", ""
                                                           ).replace("]", ""

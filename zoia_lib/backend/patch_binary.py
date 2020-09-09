@@ -80,6 +80,7 @@ class PatchBinary(Patch):
             size = data[curr_step]
             curr_module = {
                 "number": i,
+                "mod_idx": data[curr_step + 1],
                 "name": self._qc_name(pch_data[(curr_step+(size-4))*4:
                                                (curr_step+(size-4))*4+16]),
                 "cpu": self._get_module_data(data[curr_step + 1], "cpu"),
@@ -203,7 +204,7 @@ class PatchBinary(Patch):
 
     @staticmethod
     def _get_module_data(module_id, key):
-        """ Determines metadata about a module
+        """ Determines metadata about a module.
 
         module_id: The id for the module.
         key: Metadata string to return
@@ -212,6 +213,33 @@ class PatchBinary(Patch):
         """
 
         return mod[str(module_id)][key]
+
+    @staticmethod
+    def _get_block_name(module_id, block):
+        """ Determines the name of the block used in connections.
+
+        module_id: The id for the module.
+        block: Block number from the connection data
+
+        return: Block name.
+        """
+
+        block = int(block)
+
+        block_name = ""
+        tmp = {k: v["position"] for k, v in
+               mod[str(module_id)]["blocks"].items()}
+        for key, value in tmp.items():
+            if block > mod[str(module_id)]["max_blocks"]:
+                break
+            if isinstance(value, int):
+                if block == value:
+                    block_name = key
+            if isinstance(value, list):
+                if block in value:
+                    block_name = key
+
+        return "{}.{}".format(mod[str(module_id)]["name"], block_name)
 
     @staticmethod
     def _get_color_name(color_id):
@@ -241,8 +269,7 @@ class PatchBinary(Patch):
 
         return color
 
-    @staticmethod
-    def _add_connections(modules, connections):
+    def _add_connections(self, modules, connections):
         """ Appends all applicable connections to each module.
 
         modules: List of modules in a patch.
@@ -254,18 +281,15 @@ class PatchBinary(Patch):
         for conn in connections:
             out_mod, out_block = conn["source"].split(".")
             in_mod, in_block = conn["destination"].split(".")
-            data = {
-                "out_block": int(out_block),
-                "in_mod": int(in_mod),
-                "in_block": int(in_block),
-                "strength": conn["strength"]
-            }
+            data = "{} -> {}: {}".format(
+                    self._get_block_name(modules[int(out_mod)]["mod_idx"], out_block),
+                    self._get_block_name(modules[int(in_mod)]["mod_idx"], in_block),
+                    conn["strength"])
             modules[int(out_mod)]["connections"].append(data)
 
         return modules
 
-    @staticmethod
-    def _add_starred_param(modules, starred):
+    def _add_starred_param(self, modules, starred):
         """ Appends all applicable starred params to each module.
 
         modules: List of modules in a patch.
@@ -275,10 +299,9 @@ class PatchBinary(Patch):
         """
 
         for star in starred:
-            data = {
-                "block": star["block"],
-                "midi_cc": star["midi_cc"],
-            }
+            data = "{} CC {}".format(self._get_block_name(
+                modules[star["module"]]["mod_idx"], star["block"]),
+                star["midi_cc"])
             modules[star["module"]]["starred"].append(data)
 
         return modules
@@ -287,7 +310,7 @@ class PatchBinary(Patch):
     def _get_io(modules):
         """ Figures out audio and MIDI I/O for a quick-view.
 
-        modules: List of modules in a patch
+        modules: List of modules in a patch.
 
         return: Module object.
         """
