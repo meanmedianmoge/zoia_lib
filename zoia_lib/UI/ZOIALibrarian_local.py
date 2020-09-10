@@ -596,10 +596,7 @@ class ZOIALibrarianLocal(QMainWindow):
                     if btn > 39:
                         break
                     curr_btn = self.get_btn(btn)
-                    try:
-                        color_hex = self._get_color_hex(curr_module["new_color"])
-                    except KeyError:
-                        color_hex = self._get_color_hex(curr_module["old_color"])
+                    color_hex = self._get_color_hex(curr_module["color"])
                     curr_btn.setStyleSheet("QPushButton{background-color:"
                                            + color_hex + ";"
                                            + "border: 1px solid #696969;}"

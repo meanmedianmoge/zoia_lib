@@ -90,6 +90,7 @@ class PatchBinary(Patch):
                     int(data[curr_step + 5]),
                     int(data[curr_step + 5]) + self._get_module_data(
                         data[curr_step + 1], "default_blocks"))],
+                "blocks": self._get_module_data(data[curr_step + 1], 'blocks'),
                 "old_color": self._get_color_name(data[curr_step + 4]),
                 "new_color": "" if skip_real else self._get_color_name(
                     colors[i]),
@@ -106,7 +107,7 @@ class PatchBinary(Patch):
                 "starred": []
             }
 
-            # Select appropriate options from matrix
+            # Select appropriate options from list
             v = 0
             for opt in list(curr_module["options_copy"]):
                 if not opt:
@@ -116,7 +117,13 @@ class PatchBinary(Patch):
                 curr_module["options"][opt] = value
                 v += 1
 
+            # Combine colors into one key
+            curr_module["color"] = curr_module["old_color"] if curr_module["new_color"] == "" \
+                else curr_module["new_color"]
+
             # Remove extra keys from module dict
+            curr_module.pop("new_color", None)
+            curr_module.pop("old_color", None)
             curr_module.pop("options_copy", None)
             curr_module.pop("options_list", None)
 
@@ -215,23 +222,20 @@ class PatchBinary(Patch):
         return mod[str(module_id)][key]
 
     @staticmethod
-    def _get_block_name(module_id, block):
+    def _get_block_name(blocks, number):
         """ Determines the name of the block used in connections.
 
-        module_id: The id for the module.
-        block: Block number from the connection data
+        blocks: Dictionary with block names and positions.
+        number: Numerical index.
 
         return: Block name.
         """
 
-        block = int(block)
+        block = int(number)
+        tmp = {k: v["position"] for k, v in blocks.items()}
 
         block_name = ""
-        tmp = {k: v["position"] for k, v in
-               mod[str(module_id)]["blocks"].items()}
         for key, value in tmp.items():
-            if block > mod[str(module_id)]["max_blocks"]:
-                break
             if isinstance(value, int):
                 if block == value:
                     block_name = key
@@ -239,7 +243,7 @@ class PatchBinary(Patch):
                 if block in value:
                     block_name = key
 
-        return "{}.{}".format(mod[str(module_id)]["name"], block_name)
+        return block_name
 
     @staticmethod
     def _get_color_name(color_id):
@@ -281,9 +285,13 @@ class PatchBinary(Patch):
         for conn in connections:
             out_mod, out_block = conn["source"].split(".")
             in_mod, in_block = conn["destination"].split(".")
-            data = "{} -> {}: {}".format(
-                    self._get_block_name(modules[int(out_mod)]["mod_idx"], out_block),
-                    self._get_block_name(modules[int(in_mod)]["mod_idx"], in_block),
+            data = "{}.{} -> {}.{}: {}".format(
+                    modules[int(out_mod)]["type"] if modules[int(out_mod)]["name"] == ""
+                        else modules[int(out_mod)]["name"],
+                    self._get_block_name(modules[int(out_mod)]["blocks"], out_block),
+                    modules[int(in_mod)]["type"] if modules[int(in_mod)]["name"] == ""
+                        else modules[int(in_mod)]["name"],
+                    self._get_block_name(modules[int(in_mod)]["blocks"], in_block),
                     conn["strength"])
             modules[int(out_mod)]["connections"].append(data)
 
@@ -299,8 +307,10 @@ class PatchBinary(Patch):
         """
 
         for star in starred:
-            data = "{} CC {}".format(self._get_block_name(
-                modules[star["module"]]["mod_idx"], star["block"]),
+            data = "{}.{} CC {}".format(
+                modules[star["module"]]["type"] if modules[star["module"]]["name"] == ""
+                    else modules[star["module"]]["name"],
+                self._get_block_name(modules[star["module"]]["blocks"], star["block"]),
                 star["midi_cc"])
             modules[star["module"]]["starred"].append(data)
 
@@ -365,4 +375,3 @@ class PatchBinary(Patch):
         return {"inputs": in_type,
                 "outputs": out_type,
                 "midi_channel": midi}
-
