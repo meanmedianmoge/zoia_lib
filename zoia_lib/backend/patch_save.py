@@ -395,19 +395,15 @@ class PatchSave(Patch):
                 with open(os.path.join(self.back_path, "data.json"), "r") as f:
                     data = json.loads(f.read())
                 for pch in data:
-                    if pch["title"] == js_data["title"]:
+                    if js_data["title"].lower() in pch["title"].lower():
                         temp = ps.get_patch_meta(pch["id"])
                         js_data = temp
-                        js_data["updated_at"] = \
-                            datetime.datetime.fromtimestamp(
-                                os.path.getmtime(path)).strftime(
-                                '%Y-%m-%dT%H:%M:%S+00:00')
+                        js_data["updated_at"] = "{:%Y-%m-%dT%H:%M:%S+00:00}".format(
+                            datetime.datetime.now())
                         break
             if version:
-                js_data["updated_at"] = \
-                    datetime.datetime.fromtimestamp(
-                        os.path.getmtime(temp_path)).strftime(
-                        '%Y-%m-%dT%H:%M:%S+00:00')
+                js_data["updated_at"] = "{:%Y-%m-%dT%H:%M:%S+00:00}".format(
+                    datetime.datetime.now())
                 js_data["files"][0]["filename"] = os.listdir(path)[i]
 
             # Try to save the patch.
