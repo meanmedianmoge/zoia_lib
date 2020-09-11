@@ -15,9 +15,9 @@ Please familiarize yourself with the various license agreements for each PatchSt
 This software is intended to be free and will be supported by the development team.
 
 ## How to Install
-- Mac OS X: https://github.com/meanmedianmoge/zoia_lib/releases/tag/Beta-3
-- Windows 10: https://github.com/meanmedianmoge/zoia_lib/releases/tag/Beta-3
-- Linux (Ubuntu): https://github.com/meanmedianmoge/zoia_lib/releases/tag/Beta-3
+- Mac OS X: https://github.com/meanmedianmoge/zoia_lib/releases/tag/Beta-4
+- Windows 10: https://github.com/meanmedianmoge/zoia_lib/releases/tag/Beta-4
+- Linux (Ubuntu): https://github.com/meanmedianmoge/zoia_lib/releases/tag/Beta-4
 
 ## User Manual
 - Located in `documentation/User Manuals`, available as PDF or docx
@@ -25,14 +25,15 @@ This software is intended to be free and will be supported by the development te
 ## Features
 - Browse PatchStorage uploads and local patches within the UI
 - Search functionality to locate specific patches, tags, and more
-- Preview patches with the patch visualizer
-- Sort the results by title, date modified, likes, views, or downloads
+- Sort the results by author, title, date modified, likes, views, or downloads
 - Download patches from PatchStorage
 - Import patches from local storage or SD card
+- Version control and local/PS patch merging
+- Preview patches with the patch visualizer
 - View and edit patch notes
 - Customized category and tag labels for all patches
 - Drag & drop patches into bank directories, configured automatically into a ZOIA-readable format
-- Version control and change-detection
+- Help toolbar for app documentation and ZOIA resources
 
 ## Contributing
 - We welcome all contributions! If you want to see something added, 
@@ -44,9 +45,9 @@ This software is intended to be free and will be supported by the development te
   - Python 3.7.X: https://www.python.org/downloads/release/python-379/
 
 ## Authors
+- Mike Moger (app owner, primary dev after Beta 3 release, initial Python implementation)
 - John Breton (primary dev, designer, and documentation creator up to Beta 3 release)
-- Mike Moger (initial Python implementation, Mac testing, app owner)
-- djigneo (C# binary decoder and testing)
+- djigneo/apparent1 (C# binary decoder and testing)
 - Matthew Allen (initial UI frames and app planning)
 - Special thanks to Steve Bragg and the entire Empress Effects team for supporting this work
 - Additional thanks to our beta testers and those who submitted user stories

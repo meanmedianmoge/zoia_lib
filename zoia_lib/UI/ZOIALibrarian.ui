@@ -14,7 +14,7 @@
    <enum>Qt::StrongFocus</enum>
   </property>
   <property name="windowTitle">
-   <string>ZOIA Librarian -  Beta 3</string>
+   <string>ZOIA Librarian -  Beta 4</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
