@@ -277,7 +277,7 @@ class PatchSave(Patch):
 
     def import_to_backend(self, path, version=False):
         """Attempts to import a patch to the backend .ZoiaLibraryApp
-        directory. This method is meant to work  for patches that
+        directory. This method is meant to work for patches that
         originate from a local user's machine, or from a ZOIA formatted
         SD card. It will also import entire directories of patch should
         they exist on an SD card.

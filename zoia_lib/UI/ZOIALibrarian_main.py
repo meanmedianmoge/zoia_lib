@@ -213,6 +213,10 @@ class ZOIALibrarianMain(QMainWindow):
             self.sort_and_set)
         self.ui.actionSort_by_downloads_low_high.triggered.connect(
             self.sort_and_set)
+        self.ui.actionSort_by_author_A_Z.triggered.connect(
+            self.sort_and_set)
+        self.ui.actionSort_by_author_Z_A.triggered.connect(
+            self.sort_and_set)
         self.ui.actionSpecify_SD_Card_Location.triggered.connect(
             lambda: self.sd.sd_path(False, self.width()))
         self.ui.actionImport_Multiple_Patches.triggered.connect(
@@ -733,16 +737,26 @@ class ZOIALibrarianMain(QMainWindow):
             # external sources. Maybe create a cache of images? Not
             # easily implementable without speed hitch.
 
-            curr_browser.setHtml(
-                "<html><h3>" + content["title"]
-                + "</h3><u>Author:</u> " + content["author"]["name"]
-                + "<br/><u>Likes:</u> " + str(content["like_count"])
-                + "<br/><u>Downloads:</u> " + str(content["download_count"])
-                + "<br/><u>Views:</u> " + str(content["view_count"])
-                + "<br/><u>License:</u> " + legal
-                + "<br/><u>Preview:</u> " + content["preview_url"]
-                + "<br/><br/><u>Patch Notes:</u><br/>" + content["content"]
-                + "</html>")
+            curr_browser.setHtml("""<html>
+                <h3> {} </h3>
+                <br/><u> Author:</u> {}
+                <br/><u> Likes:</u> {}
+                <br/><u> Downloads:</u> {}
+                <br/><u> Views:</u> {}
+                <br/><u> License:</u> {}
+                <br/><u> Preview:</u> {}
+                <br/><br/><u> Patch Notes:</u><br/> {}
+            </html>""".format(
+                    content["title"],
+                    content["author"]["name"],
+                    str(content["like_count"]),
+                    str(content["download_count"]),
+                    str(content["view_count"]),
+                    legal,
+                    content["preview_url"],
+                    content["content"]
+                )
+            )
 
     def display_patch_versions(self, context):
         """ Displays the contents of a patch that has multiple versions.
@@ -838,7 +852,9 @@ class ZOIALibrarianMain(QMainWindow):
                 "actionSort_by_views_high_low": (5, True),
                 "actionSort_by_views_low_high": (5, False),
                 "actionSort_by_downloads_high_low": (4, True),
-                "actionSort_by_downloads_low_high": (4, False)
+                "actionSort_by_downloads_low_high": (4, False),
+                "actionSort_by_author_A_Z": (2, False),
+                "actionSort_by_author_Z_A": (2, True),
             }[self.sender().objectName()]
             self.prev_sort = curr_sort
         except KeyError:
@@ -997,6 +1013,8 @@ class ZOIALibrarianMain(QMainWindow):
         """ Initializes a Worker thread to manage the importing of
         patches as individual patches into the backend.
         Currently triggered via a menu action.
+        TODO fix the menu action imports
+        Fatal Python error: This thread state must be current when releasing
         """
 
         self.worker_mass.start()
@@ -1004,7 +1022,7 @@ class ZOIALibrarianMain(QMainWindow):
     def _mass_import_thread_sd(self):
         """ Initializes a Worker thread to manage the importing of
         patches as individual patches into the backend.
-        Currently triggered via a menu action.
+        Currently triggered via a button press.
         """
 
         self.worker_mass_sd.start()
@@ -1047,6 +1065,8 @@ class ZOIALibrarianMain(QMainWindow):
         """ Initializes a Worker thread to manage the importing of
         patches as a version directory into the backend.
         Currently triggered via a menu action.
+        TODO fix the menu-action imports
+        Fatal Python error: This thread state must be current when releasing
         """
 
         self.worker_version.start()
@@ -1054,7 +1074,7 @@ class ZOIALibrarianMain(QMainWindow):
     def _version_import_thread_sd(self):
         """ Initializes a Worker thread to manage the importing of
         patches as a version directory into the backend.
-        Currently triggered via a menu action.
+        Currently triggered via a button press.
         """
 
         self.worker_version_sd.start()

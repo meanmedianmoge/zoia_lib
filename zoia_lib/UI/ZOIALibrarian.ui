@@ -2777,6 +2777,8 @@
     <addaction name="actionSort_by_views_low_high"/>
     <addaction name="actionSort_by_downloads_high_low"/>
     <addaction name="actionSort_by_downloads_low_high"/>
+    <addaction name="actionSort_by_author_A_Z"/>
+    <addaction name="actionSort_by_author_Z_A"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
@@ -3204,20 +3206,48 @@
    <property name="text">
     <string>FAQ</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+Q</string>
+   </property>
   </action>
   <action name="actionModule_Index">
    <property name="text">
     <string>Module Index</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+M</string>
    </property>
   </action>
   <action name="actionTips_Tricks">
    <property name="text">
     <string>Tips and Tricks</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+T</string>
+   </property>
   </action>
   <action name="actionFirmware_Files">
    <property name="text">
     <string>Firmware</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+C</string>
+   </property>
+  </action>
+  <action name="actionSort_by_author_A_Z">
+   <property name="text">
+    <string>Sort by author (A-Z)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+-</string>
+   </property>
+  </action>
+  <action name="actionSort_by_author_Z_A">
+   <property name="text">
+    <string>Sort by author (Z-A)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+=</string>
    </property>
   </action>
  </widget>
