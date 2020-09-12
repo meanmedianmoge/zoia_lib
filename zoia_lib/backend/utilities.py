@@ -1,5 +1,6 @@
 import json
 import os
+import re
 
 from zoia_lib.common import errors
 
@@ -121,6 +122,27 @@ def search_patches(data, query):
             hits.append(curr)
 
     return hits
+
+
+def natural_key(string_):
+    return [int(s) if s.isdigit() else s for s in re.split(r'(\d+)', string_)]
+
+
+def hide_dotted_files(path):
+    """ Removes hidden files from a list of files in a directory.
+
+    directory: List of files.
+
+    return: List of files without hidden files.
+    """
+
+    files = []
+    for item in sorted(os.listdir(path)):
+        if not item.startswith(".") and \
+             os.path.isfile(os.path.join(path, item)):
+            files.append(os.path.join(path, item))
+
+    return files[::-1]
 
 
 def add_test_patch(name, idx, path):

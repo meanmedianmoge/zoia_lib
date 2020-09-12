@@ -10,6 +10,7 @@ import rarfile
 from zoia_lib.backend.patch import Patch
 from zoia_lib.common import errors
 from zoia_lib.backend.api import PatchStorage
+from zoia_lib.backend.utilities import hide_dotted_files, natural_key
 
 ps = PatchStorage()
 
@@ -74,6 +75,7 @@ class PatchSave(Patch):
                             if patch[0] == data:
                                 raise errors.SavingError(patch[1]["title"],
                                                          503)
+
         pch = os.path.join(self.back_path, "{}".format(pch_id))
         # Check to see if a directory needs to be made
         # (new patch, no version control needed yet).
@@ -213,7 +215,9 @@ class PatchSave(Patch):
             elif len(os.listdir(os.path.join(self.back_path, pch))) > 2:
                 # Increment the version number for each file in the directory.
                 try:
-                    for file in reversed(sorted(os.listdir(pch), key=len)):
+                    # for file in sorted(os.listdir(pch), key=len):
+                    for file in sorted(sorted(os.listdir(pch), key=len),
+                                       key=natural_key, reverse=True):
                         ver = int(file.split("v")[1].split(".")[0]) + 1
                         extension = file.split(".")[-1]
                         os.rename(os.path.join(
@@ -223,17 +227,18 @@ class PatchSave(Patch):
                                 pch, "{}_v{}.{}".format(pch_id, str(ver),
                                                         extension)))
                         # Update the revision number in each metadata file
-                        with open(os.path.join(
-                                pch, "{}_v{}.json".format(pch_id, str(ver))),
-                                "r") as f:
-                            jf = json.loads(f.read())
+                        if extension == "json":
+                            with open(os.path.join(
+                                    pch, "{}_v{}.json".format(pch_id, str(ver))),
+                                    "r") as f:
+                                jf = json.loads(f.read())
 
-                        jf["revision"] = ver
+                            jf["revision"] = ver
 
-                        with open(os.path.join(
-                                pch, "{}_v{}.json".format(pch_id, str(ver))),
-                                "w") as f:
-                            json.dump(jf, f)
+                            with open(os.path.join(
+                                    pch, "{}_v{}.json".format(pch_id, str(ver))),
+                                    "w") as f:
+                                json.dump(jf, f)
 
                 except FileNotFoundError or FileExistsError:
                     raise errors.SavingError(patch)
@@ -343,24 +348,24 @@ class PatchSave(Patch):
         # Get a 5-digit patch id for this patch.
         patch_id = self._generate_patch_id(path)
 
-        count = 1 if not os.path.isdir(path) else len(os.listdir(path))
+        if os.path.isdir(path):
+            files = hide_dotted_files(path)
+            count = len(files)
+        else:
+            files = [path]
+            count = 1
+
         for i in range(count):
             if not version:
                 # Since this is not a version, we need a unique id for each
                 # patch.
-                patch_id = self._generate_patch_id(path)
+                patch_id = self._generate_patch_id(files[i])
             # Get the bytes.
-            if not version:
-                if path.split(".")[-1] != "bin":
-                    continue
-                with open(path, "rb") as f:
-                    temp_data = f.read()
-            else:
-                temp_path = os.path.join(path, os.listdir(path)[i])
-                if temp_path.split(".")[-1] != "bin":
-                    continue
-                with open(temp_path, "rb") as f:
-                    temp_data = f.read()
+            temp_path = files[i]
+            if temp_path.split(".")[-1] != "bin":
+                continue
+            with open(temp_path, "rb") as f:
+                temp_data = f.read()
 
             # Prepare the JSON.
             js_data = {
@@ -391,6 +396,7 @@ class PatchSave(Patch):
                     "name": ""
                 }
             }
+
             if os.path.exists(os.path.join(self.back_path, "data.json")):
                 with open(os.path.join(self.back_path, "data.json"), "r") as f:
                     data = json.loads(f.read())
@@ -404,7 +410,7 @@ class PatchSave(Patch):
             if version:
                 js_data["updated_at"] = "{:%Y-%m-%dT%H:%M:%S+00:00}".format(
                     datetime.datetime.now())
-                js_data["files"][0]["filename"] = os.listdir(path)[i]
+                js_data["files"][0]["filename"] = files[i].split("/")[-1]
 
             # Try to save the patch.
             if not version:
@@ -415,6 +421,7 @@ class PatchSave(Patch):
                 except errors.SavingError:
                     fails += 1
                     continue
+
         return fails
 
     def _patch_decompress(self, patch):
