@@ -57,19 +57,43 @@ class ZOIALibrarianUtil:
             ok, start = True, True
         if ok:
             # Change the font for everything (within reason).
+            self.font = f
             new_font = f
             big_font = QFont(f.toString().split(",")[0], f.pointSize() + 6)
 
+            # self.ui.tabs.setFont(new_font)
+
+            # PS tab
             self.ui.table_PS.setFont(new_font)
             self.ui.table_PS.horizontalHeader().setFont(new_font)
+            self.ui.text_browser_PS.setFont(big_font)
+            self.ui.refresh_pch_btn.setFont(new_font)
+            self.ui.btn_dwn_all.setFont(new_font)
+
+            # Local tab
             self.ui.table_local.setFont(new_font)
             self.ui.table_local.horizontalHeader().setFont(new_font)
+            self.ui.text_browser_local.setFont(big_font)
+            self.ui.back_btn_local.setFont(new_font)
+            self.ui.check_for_updates_btn.setFont(new_font)
+            self.ui.update_patch_notes.setFont(new_font)
+            self.ui.page_label.setFont(new_font)
+            self.ui.btn_next_page.setFont(new_font)
+            self.ui.btn_prev_page.setFont(new_font)
+
+            # SD tab
+            self.ui.sd_tree.setFont(new_font)
             self.ui.table_sd_left.setFont(new_font)
             self.ui.table_sd_left.horizontalHeader().setFont(new_font)
             self.ui.table_sd_left.verticalHeader().setFont(new_font)
             self.ui.table_sd_right.setFont(new_font)
             self.ui.table_sd_right.horizontalHeader().setFont(new_font)
             self.ui.table_sd_right.verticalHeader().setFont(new_font)
+            self.ui.delete_folder_sd_btn.setFont(new_font)
+            self.ui.import_all_btn.setFont(new_font)
+            self.ui.import_all_ver_btn.setFont(new_font)
+
+            # Bank tab
             self.ui.table_bank_local.setFont(new_font)
             self.ui.table_bank_local.horizontalHeader().setFont(new_font)
             self.ui.table_bank_left.setFont(new_font)
@@ -79,11 +103,10 @@ class ZOIALibrarianUtil:
             self.ui.table_bank_right.setFont(new_font)
             self.ui.table_bank_right.horizontalHeader().setFont(new_font)
             self.ui.table_bank_right.verticalHeader().setFont(new_font)
-            self.ui.tabs.setFont(new_font)
-            self.ui.sd_tree.setFont(new_font)
-            self.ui.text_browser_PS.setFont(big_font)
-            self.ui.page_label.setFont(new_font)
-            self.ui.text_browser_local.setFont(big_font)
+            self.ui.back_btn_bank.setFont(new_font)
+            self.ui.btn_save_bank.setFont(new_font)
+            self.ui.btn_load_bank.setFont(new_font)
+            self.ui.btn_export_bank.setFont(new_font)
             self.ui.text_browser_bank.setFont(big_font)
 
             if not start:
