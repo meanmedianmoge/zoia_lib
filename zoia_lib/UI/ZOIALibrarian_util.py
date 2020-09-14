@@ -297,7 +297,7 @@ class ZOIALibrarianUtil:
         """ Passes documentation to the front-end PS tab.
         """
 
-        with open("documentation/Resources/manual.html", "r") as f:
+        with open("documentation/Resources/manual.html", "r", errors="ignore") as f:
             manual = f.read()
 
         self.ui.text_browser_PS.setText("""
@@ -308,7 +308,7 @@ class ZOIALibrarianUtil:
         """ Passes FAQ to the front-end PS tab.
         """
 
-        with open("documentation/Resources/faq.html", "r") as f:
+        with open("documentation/Resources/faq.html", "r", errors="ignore") as f:
             faq = f.read()
 
         self.ui.text_browser_PS.setText("""
@@ -319,7 +319,7 @@ class ZOIALibrarianUtil:
         """ Passes Tips & Tricks to front-end PS tab.
         """
 
-        with open("documentation/Resources/tips.html", "r") as f:
+        with open("documentation/Resources/tips.html", "r", errors="ignore") as f:
             tips = f.read()
 
         self.ui.text_browser_PS.setText("""
@@ -330,7 +330,7 @@ class ZOIALibrarianUtil:
         """ Passes Module Index to front-end PS tab.
         """
 
-        with open("documentation/Resources/mod.html", "r") as f:
+        with open("documentation/Resources/mod.html", "r", errors="ignore") as f:
             mod = f.read()
 
         self.ui.text_browser_PS.setText("""
@@ -341,7 +341,7 @@ class ZOIALibrarianUtil:
         """ Passes firmware changelog to front-end PS tab.
         """
 
-        with open("documentation/Resources/changelog.html", "r") as f:
+        with open("documentation/Resources/changelog.html", "r", errors="ignore") as f:
             logs = f.read()
 
         self.ui.text_browser_PS.setText("""
