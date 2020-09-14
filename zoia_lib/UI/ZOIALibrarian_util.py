@@ -406,11 +406,14 @@ class ZOIALibrarianUtil:
                     temp_other is not None and temp_other.text()
                     == first_item_text):
                 # We found the first item!
-                row = sorted(curr_rows)[-1].row()
-                row = int('%d' % row)
+                # row = sorted(curr_rows)[-1].row()
+                # row = int('%d' % row)
+                rows = [int(x.row()) for x in sorted(curr_rows)]
                 if curr_rows == rows_right:
-                    row += 32
-                for j in range(first_item_index, row + 1):
+                    # row += 32
+                    rows = [32+x for x in rows]
+                # for j in range(first_item_index, row + 1):
+                for j in rows:
                     if j == first_item_index:
                         i = i + (j - first_item_index)
                     else:
@@ -437,6 +440,7 @@ class ZOIALibrarianUtil:
                         f1(j, i)
                     elif temp1 is None and temp2 is not None:
                         f1(i, j)
+
         # Delete phantom rows from row insertions.
         table_1.setRowCount(32)
         table_2.setRowCount(32)
