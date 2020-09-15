@@ -330,6 +330,7 @@ class PatchBinary(Patch):
         in_count = counter.count("Audio Input")
         out_count = counter.count("Audio Output")
         midi_count = sum("midi" in s.lower() for s in counter)
+        stomp_count = counter.count("Stompswitch")
 
         if in_count == 0:
             in_type = None
@@ -343,6 +344,10 @@ class PatchBinary(Patch):
             midi = None
         elif midi_count > 1:
             midi = []
+        if stomp_count == 0:
+            stomps = None
+        elif stomp_count > 1:
+            stomps = []
 
         for k, v in type_dict.items():
             if v == "Audio Input":
@@ -364,6 +369,11 @@ class PatchBinary(Patch):
                 except KeyError:
                     if midi_count == 1:
                         midi = None
+            if v == "Stompswitch":
+                if stomp_count == 1:
+                    stomps = modules[k]["options"]["stompswitch"].title()
+                elif stomp_count > 1:
+                    stomps.append(modules[k]["options"]["stompswitch"].title())
 
         if midi_count > 1:
             midi = list(set(midi))
@@ -372,6 +382,15 @@ class PatchBinary(Patch):
         if not midi:
             midi = None
 
+        if stomp_count > 1:
+            stomps = list(set(stomps))
+            if len(stomps) == 1:
+                stomps = stomps[0]
+            else:
+                stomps = sorted(stomps)
+                stomps = json.dumps(stomps).replace('"', "")
+
         return {"inputs": in_type,
                 "outputs": out_type,
-                "midi_channel": midi}
+                "midi_channel": midi,
+                "stompswitches": stomps}

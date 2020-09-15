@@ -470,23 +470,21 @@ class ZOIALibrarianLocal(QMainWindow):
         self.ui.text_browser_viz.setText("""<html>
             <b><h2> {} </b></h2>
             Est CPU: {} <br>
-            Number of Modules: {} <br>
-            Number of Pages: {} <br>
-            Number of Connections: {} <br>
-            Number of Starred Params: {} <br>
             Inputs: {} <br>
             Outputs: {} <br>
-            MIDI Channels: {}
+            Stompswitches: {} <br>
+            MIDI Channels: {} <br>
+            Number of Pages: {} <br>
+            Number of Starred Params: {}
             </html>""".format(
                 viz["meta"]["name"],
                 viz["meta"]["cpu"],
-                viz["meta"]["n_modules"],
-                viz["meta"]["n_pages"],
-                viz["meta"]["n_connections"],
-                viz["meta"]["n_starred"],
                 viz["meta"]["i_o"]["inputs"],
                 viz["meta"]["i_o"]["outputs"],
-                viz["meta"]["i_o"]["midi_channel"]
+                viz["meta"]["i_o"]["stompswitches"],
+                viz["meta"]["i_o"]["midi_channel"],
+                viz["meta"]["n_pages"],
+                viz["meta"]["n_starred"],
             )
         )
 
@@ -523,23 +521,21 @@ class ZOIALibrarianLocal(QMainWindow):
         self.ui.text_browser_viz.setText("""<html>
             <b><h2> {} </b></h2>
             Est CPU: {} <br>
-            Number of Modules: {} <br>
-            Number of Pages: {} <br>
-            Number of Connections: {} <br>
-            Number of Starred Params: {} <br>
             Inputs: {} <br>
             Outputs: {} <br>
-            MIDI Channels: {}
+            Stompswitch: {} <br>
+            MIDI Channels: {} <br>
+            Number of Pages: {} <br>
+            Number of Starred Params: {}
             </html>""".format(
                 self.curr_viz["meta"]["name"],
                 self.curr_viz["meta"]["cpu"],
-                self.curr_viz["meta"]["n_modules"],
-                self.curr_viz["meta"]["n_pages"],
-                self.curr_viz["meta"]["n_connections"],
-                self.curr_viz["meta"]["n_starred"],
                 self.curr_viz["meta"]["i_o"]["inputs"],
                 self.curr_viz["meta"]["i_o"]["outputs"],
-                self.curr_viz["meta"]["i_o"]["midi_channel"]
+                self.curr_viz["meta"]["i_o"]["stompswitches"],
+                self.curr_viz["meta"]["i_o"]["midi_channel"],
+                self.curr_viz["meta"]["n_pages"],
+                self.curr_viz["meta"]["n_starred"],
             )
         )
 
