@@ -320,7 +320,7 @@ class PatchSave(Patch):
             ext = "bin"
         # PySide2 bug where the path separator is incorrect on Windows :')
         if platform.system().lower() == "windows":
-            patch_name = patch_name.split("/")[-1]
+            patch_name = patch_name.split("\\")[-1]
         else:
             patch_name = patch_name.split(os.path.sep)[-1]
 
