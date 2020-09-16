@@ -3,7 +3,7 @@ import os
 import platform
 
 from PySide2.QtCore import QEvent
-from PySide2.QtGui import QIcon
+from PySide2.QtGui import QIcon, QMouseEvent
 from PySide2.QtWidgets import QTableWidgetItem, QPushButton, QFileDialog, \
     QMessageBox, QInputDialog, QTableWidgetSelectionRange, QMainWindow
 
@@ -437,84 +437,91 @@ class ZOIALibrarianBank(QMainWindow):
                 self.ui.table_bank_right.showColumn(1)
 
                 # Get the current row that was dragged.
-                src = self.ui.table_bank_local.currentRow()
-                # We need to find out where we dragged the item to.
+                selected_rows = \
+                    self.ui.table_bank_local.selectionModel().selectedRows()
+
                 drop_index = None
-                for i in range(32):
-                    if self.ui.table_bank_left.item(i, 1) is not None:
-                        drop_index = i
-                        break
-                    if self.ui.table_bank_right.item(i, 1) is not None:
-                        drop_index = i + 32
-                        break
+                for src in selected_rows:
+                    src = src.row()
+                    # src = self.ui.table_bank_local.currentRow()
+                    # We need to find out where we dragged the item to.
+                    if not drop_index:
+                        for i in range(32):
+                            if self.ui.table_bank_left.item(i, 1) is not None:
+                                drop_index = i
+                                break
+                            if self.ui.table_bank_right.item(i, 1) is not None:
+                                drop_index = i + 32
+                                break
 
-                if drop_index is not None:
-                    # We actually dragged it over.
-                    idx = self.ui.table_bank_local.cellWidget(
-                        src, 0).objectName()
-                    if ("_" not in idx and len(os.listdir(os.path.join(
-                            self.path, idx))) == 2) or "_" in idx:
-                        # Not working within a version directory.
-                        # Just a single patch
-                        if self.data_banks is not None:
-                            # Drop the patch we dragged to from the list if
-                            # need be.
-                            for pch in self.data_banks:
-                                if pch["slot"] == drop_index:
-                                    self.data_banks.remove(pch)
-                        else:
-                            # Need to enable the buttons now that there is a
-                            # patch in the tables.
-                            self.data_banks = []
-                            self.ui.btn_save_bank.setEnabled(True)
-                            self.ui.btn_export_bank.setEnabled(True)
-
-                        self.data_banks.append({
-                            "slot": drop_index,
-                            "id": idx
-                        })
-                    else:
-                        # An entire version directory was dragged over.
-                        pch_num = int((len(os.listdir(os.path.join(
-                            self.path, idx))) / 2) - 1)
-                        if drop_index + pch_num > 63:
-                            self._set_data_bank()
-                            self.msg.setWindowTitle("No Space")
-                            self.msg.setIcon(QMessageBox.Information)
-                            self.msg.setText(
-                                "The version directory contain {} "
-                                "patches, so it must be dragged to "
-                                "slot {} or lower.".format(pch_num +
-                                                           1, 63 -
-                                                           pch_num))
-                            self.msg.setStandardButtons(QMessageBox.Ok)
-                            self.msg.exec_()
-                        else:
-                            # Remove all of the patches that are in the way.
-                            if self.data_banks is None:
+                    if drop_index is not None:
+                        # We actually dragged it over.
+                        idx = self.ui.table_bank_local.cellWidget(
+                            src, 0).objectName()
+                        if ("_" not in idx and len(os.listdir(os.path.join(
+                                self.path, idx))) == 2) or "_" in idx:
+                            # Not working within a version directory.
+                            # Just a single patch
+                            if self.data_banks is not None:
+                                # Drop the patch we dragged to from the list if
+                                # need be.
+                                for pch in self.data_banks:
+                                    if pch["slot"] == drop_index:
+                                        self.data_banks.remove(pch)
+                            else:
+                                # Need to enable the buttons now that there is a
+                                # patch in the tables.
                                 self.data_banks = []
                                 self.ui.btn_save_bank.setEnabled(True)
                                 self.ui.btn_export_bank.setEnabled(True)
+
+                            self.data_banks.append({
+                                "slot": drop_index,
+                                "id": idx
+                            })
+                            drop_index += 1
+                        else:
+                            # An entire version directory was dragged over.
+                            pch_num = int((len(os.listdir(os.path.join(
+                                self.path, idx))) / 2) - 1)
+                            if drop_index + pch_num > 63:
+                                self._set_data_bank()
+                                self.msg.setWindowTitle("No Space")
+                                self.msg.setIcon(QMessageBox.Information)
+                                self.msg.setText("""
+                                    The version directory contains {} patches,
+                                    so it must be dragged to slot {} or lower
+                                """.format(pch_num + 1, 63 - pch_num)
+                                )
+                                self.msg.setStandardButtons(QMessageBox.Ok)
+                                self.msg.exec_()
                             else:
-                                for pch in self.data_banks:
-                                    for i in range(drop_index, drop_index
-                                                   + pch_num):
-                                        if pch["slot"] == i:
-                                            self.data_banks.remove(pch)
-                            # Add all of the version patches
-                            for i in range(1, pch_num + 2):
-                                self.data_banks.append({
-                                    "slot": drop_index + i - 1,
-                                    "id": "{}_v{}".format(idx, i)
-                                })
-                    self._set_data_bank()
-                else:
-                    # Delete phantom rows.
-                    self.ui.table_bank_left.setRowCount(32)
-                    self.ui.table_bank_right.setRowCount(32)
-                self._get_bank_data()
-                self.ui.btn_save_bank.setEnabled(len(self.data_banks) > 0)
-                self.ui.btn_export_bank.setEnabled(len(self.data_banks) > 0)
+                                # Remove all of the patches that are in the way.
+                                if self.data_banks is None:
+                                    self.data_banks = []
+                                    self.ui.btn_save_bank.setEnabled(True)
+                                    self.ui.btn_export_bank.setEnabled(True)
+                                else:
+                                    for pch in self.data_banks:
+                                        for i in range(drop_index, drop_index
+                                                       + pch_num):
+                                            if pch["slot"] == i:
+                                                self.data_banks.remove(pch)
+                                # Add all of the version patches
+                                for i in range(1, pch_num + 2):
+                                    self.data_banks.append({
+                                        "slot": drop_index + i - 1,
+                                        "id": "{}_v{}".format(idx, i)
+                                    })
+                                drop_index += pch_num + 1
+                        self._set_data_bank()
+                    else:
+                        # Delete phantom rows.
+                        self.ui.table_bank_left.setRowCount(32)
+                        self.ui.table_bank_right.setRowCount(32)
+                    self._get_bank_data()
+                    self.ui.btn_save_bank.setEnabled(len(self.data_banks) > 0)
+                    self.ui.btn_export_bank.setEnabled(len(self.data_banks) > 0)
         else:
             if e.type() == QEvent.FocusAboutToChange:
                 if o.objectName() == "table_bank_left":
@@ -565,8 +572,7 @@ class ZOIALibrarianBank(QMainWindow):
                         for i in range(64):
                             if i < 32:
                                 temp = self.ui.table_bank_left.item(i, 0)
-                                temp2 = self.ui.table_bank_left.cellWidget(i,
-                                                                           1)
+                                temp2 = self.ui.table_bank_left.cellWidget(i, 1)
                             else:
                                 temp = self.ui.table_bank_right.item(i - 32, 0)
                                 temp2 = self.ui.table_bank_right.cellWidget(
