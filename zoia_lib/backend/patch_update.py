@@ -50,7 +50,7 @@ class PatchUpdate(Patch):
         with open(os.path.join(self.back_path, idx, "{}.json".format(pch)),
                   "r") as f:
             temp = json.loads(f.read())
-        #if mode == 4:
+        # if mode == 4:
         #    temp[index]["name"] = data
         temp[index] = data
         with open(os.path.join(self.back_path, idx, "{}.json".format(pch)),

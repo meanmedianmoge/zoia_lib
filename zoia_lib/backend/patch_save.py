@@ -10,8 +10,10 @@ import rarfile
 from zoia_lib.backend.patch import Patch
 from zoia_lib.common import errors
 from zoia_lib.backend.api import PatchStorage
+from zoia_lib.backend.patch_binary import PatchBinary
 from zoia_lib.backend.utilities import hide_dotted_files, natural_key
 
+pb = PatchBinary()
 ps = PatchStorage()
 
 
@@ -306,8 +308,6 @@ class PatchSave(Patch):
         if path is None:
             raise errors.SavingError(None)
 
-        # TODO Add a binary check to ensure this is a ZOIA patch.
-
         # Get the file extension for the patch that is being imported.
         if not version and "." not in path:
             raise errors.SavingError(path)
@@ -366,6 +366,12 @@ class PatchSave(Patch):
                 continue
             with open(temp_path, "rb") as f:
                 temp_data = f.read()
+
+            # Check if the patch is a valid ZOIA binary
+            try:
+                pb.parse_data(temp_data)
+            except errors.BinaryError:
+                continue
 
             # Prepare the JSON.
             js_data = {

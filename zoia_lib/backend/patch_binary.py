@@ -2,6 +2,8 @@ import json
 import struct
 
 from zoia_lib.backend.patch import Patch
+from zoia_lib.common import errors
+
 with open("zoia_lib/common/schemas/ModuleIndex.json", "r") as f:
     mod = json.load(f)
 
@@ -52,6 +54,9 @@ class PatchBinary(Patch):
 
         # Massive credit to apparent1 for figuring this stuff out.
         # They did all the heavy lifting.
+
+        if pch_data is None:
+            raise errors.BinaryError(None)
 
         # Extract the string name of the patch.
         name = self._qc_name(pch_data[4:])
@@ -108,14 +113,17 @@ class PatchBinary(Patch):
             }
 
             # Select appropriate options from list
-            v = 0
-            for opt in list(curr_module["options_copy"]):
-                if not opt:
-                    continue
-                option = curr_module["options_list"][v]
-                value = curr_module["options_copy"][opt][option]
-                curr_module["options"][opt] = value
-                v += 1
+            try:
+                v = 0
+                for opt in list(curr_module["options_copy"]):
+                    if not opt:
+                        continue
+                    option = curr_module["options_list"][v]
+                    value = curr_module["options_copy"][opt][option]
+                    curr_module["options"][opt] = value
+                    v += 1
+            except IndexError:
+                raise errors.BinaryError(pch_data[:10], 101)
 
             # Combine colors into one key
             curr_module["color"] = curr_module["old_color"] if curr_module["new_color"] == "" \

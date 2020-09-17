@@ -4,6 +4,28 @@ class ZoiaLibError(Exception):
     pass
 
 
+class BinaryError(ZoiaLibError):
+    """Class raised when the binary could not be decoded.
+
+    Possible error codes:
+    - 101: Patch binary could not be read properly.
+    """
+
+    def __init__(self, patch, error_code_zoia=0):
+        if patch is None:
+            error_msg = f'Expected a patch object but got None instead.'
+        else:
+            try:
+                error_msg = {
+                    101: f'Patch {patch} contains a file extension, which is '
+                         f'not valid when a patch directory is being deleted.',
+                }[error_code_zoia]
+            except KeyError:
+                error_msg = f'Could not decode the binary file {patch} due ' \
+                            f'to an unexpected error.'
+        print(error_msg)
+
+
 class BadPathError(ZoiaLibError):
     """Class raised when the file path is not valid.
 
