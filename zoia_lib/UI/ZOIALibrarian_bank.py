@@ -48,7 +48,7 @@ class ZOIALibrarianBank(QMainWindow):
         add.setObjectName(idx)
         add.setFont(self.ui.table_bank_local.horizontalHeader().font())
         add.clicked.connect(self.click_to_add)
-        # if idx in os.listdir(self.ui.table_bank_left):
+        # if idx in self.data_bank:
         #     add.setEnabled(False)
         #     add.setText("Already in bank!")
         self.ui.table_bank_local.setCellWidget(i, 3, add)
