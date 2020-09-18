@@ -34,7 +34,24 @@ class ZOIALibrarianBank(QMainWindow):
         self.data_banks = []
         self.rows_left = []
         self.rows_right = []
-        # self.ui.table_bank_local.doubleClicked.connect(self.events)
+
+    def create_add_btn(self, i, idx):
+        """ Creates an add button for patches on the Bank
+        tab's Local Storage table.
+
+        i: The row for which the button will be inserted into.
+        idx: The id for the patch the button is being created for.
+        """
+
+        # Prepare the button.
+        add = QPushButton("Click me to\n add to bank!", self)
+        add.setObjectName(idx)
+        add.setFont(self.ui.table_bank_local.horizontalHeader().font())
+        add.clicked.connect(self.click_to_add)
+        # if idx in os.listdir(self.ui.table_bank_left):
+        #     add.setEnabled(False)
+        #     add.setText("Already in bank!")
+        self.ui.table_bank_local.setCellWidget(i, 3, add)
 
     def _set_data_bank(self):
         """ Populates the bank export tables with data.
@@ -133,6 +150,7 @@ class ZOIALibrarianBank(QMainWindow):
         self.ui.btn_export_bank.setEnabled(False)
         self.ui.btn_save_bank.setEnabled(False)
         self.ui.btn_clear_bank.setEnabled(False)
+        self._get_bank_data()
 
     def load_bank(self):
         """ Loads a Bank file that was previously saved to the
@@ -440,6 +458,73 @@ class ZOIALibrarianBank(QMainWindow):
         self.ui.btn_export_bank.setEnabled(len(self.data_banks) > 0)
         self.ui.btn_clear_bank.setEnabled(len(self.data_banks) > 0)
 
+    def click_to_add(self):
+        """ Used when manually adding patches to the Bank table.
+        Currently triggered by a button press.
+        """
+
+        # Get the patch which we're moving over
+        src = self.ui.table_bank_local.indexAt(self.sender().pos()).row()
+        idx = self.ui.table_bank_local.cellWidget(src, 0).objectName()
+
+        # Find the first open slot in the bank
+        if self.data_banks:
+            for pch in self.data_banks:
+                drop_index = pch["slot"] + 1
+        else:
+            drop_index = 0
+            # Need to enable the buttons now that there is a
+            # patch in the tables.
+            self.data_banks = []
+            self.ui.btn_save_bank.setEnabled(True)
+            self.ui.btn_export_bank.setEnabled(True)
+            self.ui.btn_clear_bank.setEnabled(True)
+
+        if ("_" not in idx and len(os.listdir(os.path.join(
+                self.path, idx))) == 2) or "_" in idx:
+            # Not working within a version directory.
+            # Just a single patch
+            self.data_banks.append({
+                "slot": drop_index,
+                "id": idx
+            })
+
+        else:
+            # An entire version directory was selected.
+            pch_num = int((len(os.listdir(os.path.join(
+                self.path, idx))) / 2) - 1)
+            if drop_index + pch_num > 63:
+                self._set_data_bank()
+                self.msg.setWindowTitle("No Space")
+                self.msg.setIcon(QMessageBox.Information)
+                self.msg.setText("""
+                    The version directory contains {} patches,
+                    so it must be dragged to slot {} or lower
+                """.format(pch_num + 1, 63 - pch_num)
+                                 )
+                self.msg.setStandardButtons(QMessageBox.Ok)
+                self.msg.exec_()
+            else:
+                # Remove all of the patches that are in the way.
+                if self.data_banks is None:
+                    self.data_banks = []
+                    self.ui.btn_save_bank.setEnabled(True)
+                    self.ui.btn_export_bank.setEnabled(True)
+                    self.ui.btn_clear_bank.setEnabled(True)
+                else:
+                    for pch in self.data_banks:
+                        for i in range(drop_index, drop_index + pch_num):
+                            if pch["slot"] == i:
+                                self.data_banks.remove(pch)
+                # Add all of the version patches
+                for i in range(1, pch_num + 2):
+                    self.data_banks.append({
+                        "slot": drop_index + i - 1,
+                        "id": "{}_v{}".format(idx, i)
+                    })
+
+        self._set_data_bank()
+
     def events(self, o, e):
         """ Handles events that relate to dragging and dropping entries
         to/from the tables that are populated to contain the patches
@@ -454,31 +539,6 @@ class ZOIALibrarianBank(QMainWindow):
                 # Hide the columns the user can't drop patches into.
                 self.ui.table_bank_left.hideColumn(1)
                 self.ui.table_bank_right.hideColumn(1)
-            elif e.type() == QEvent.MouseButtonDblClick:
-                # TODO add a UI button in the local_table_bank rows to serve as the event
-                # Get the patch which we're moving over
-                src = self.ui.table_bank_local.currentRow()
-                idx = self.ui.table_bank_local.cellWidget(
-                    src, 0).objectName()
-
-                # Find the first open slot in the bank
-                if self.data_banks:
-                    for pch in self.data_banks:
-                        drop_index = pch["slot"] + 1
-                else:
-                    drop_index = 0
-                    # Need to enable the buttons now that there is a
-                    # patch in the tables.
-                    self.data_banks = []
-                    self.ui.btn_save_bank.setEnabled(True)
-                    self.ui.btn_export_bank.setEnabled(True)
-                    self.ui.btn_clear_bank.setEnabled(True)
-
-                self.data_banks.append({
-                    "slot": drop_index,
-                    "id": idx
-                })
-                self._set_data_bank()
             elif e.type() == QEvent.ChildRemoved:
                 # Once the item has been dropped we can show the columns again.
                 self.ui.table_bank_left.showColumn(1)

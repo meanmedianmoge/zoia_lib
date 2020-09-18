@@ -505,10 +505,11 @@ class ZOIALibrarianMain(QMainWindow):
                 curr_table.setItem(i, j + 1, text_item)
 
             # Text for the header "Date Modified"
-            date = QTableWidgetItem(data[i]["updated_at"][:10])
-            date.setTextAlignment(Qt.AlignCenter)
-            date.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            curr_table.setItem(i, 3, date)
+            if table_index == 0 or table_index == 1:
+                date = QTableWidgetItem(data[i]["updated_at"][:10])
+                date.setTextAlignment(Qt.AlignCenter)
+                date.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                curr_table.setItem(i, 3, date)
 
             # If we are on tab index 0, we need a "Download" header item.
             if table_index == 0:
@@ -519,6 +520,10 @@ class ZOIALibrarianMain(QMainWindow):
             elif table_index == 1:
                 self.local.create_expt_and_del_btns(
                     btn_title, i, idx, str(data[i]["revision"]))
+
+            # If we are on tab index 2, we need an "Add to Bank" header item.
+            elif table_index == 3:
+                self.bank.create_add_btn(i, idx)
 
         # Also set the title size and resize the columns.
         # Only use defaults if pref.json doesn't exist.

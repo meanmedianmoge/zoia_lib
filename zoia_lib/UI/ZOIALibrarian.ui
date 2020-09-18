@@ -2725,9 +2725,14 @@
                 </column>
                 <column>
                  <property name="text">
-                  <string>Date Modified</string>
+                  <string>Add to Bank</string>
                  </property>
                 </column>
+                <item row="0" column="3">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </item>
                </widget>
               </item>
              </layout>

@@ -1364,6 +1364,8 @@ class Ui_MainWindow(object):
         self.table_bank_local.setHorizontalHeaderItem(3, __qtablewidgetitem152)
         if (self.table_bank_local.rowCount() < 1):
             self.table_bank_local.setRowCount(1)
+        __qtablewidgetitem153 = QTableWidgetItem()
+        self.table_bank_local.setItem(0, 3, __qtablewidgetitem153)
         self.table_bank_local.setObjectName(u"table_bank_local")
         self.table_bank_local.setStyleSheet(u"")
         self.table_bank_local.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
@@ -2244,7 +2246,12 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem151 = self.table_bank_local.horizontalHeaderItem(2)
         ___qtablewidgetitem151.setText(QCoreApplication.translate("MainWindow", u"Categories", None));
         ___qtablewidgetitem152 = self.table_bank_local.horizontalHeaderItem(3)
-        ___qtablewidgetitem152.setText(QCoreApplication.translate("MainWindow", u"Date Modified", None));
+        ___qtablewidgetitem152.setText(QCoreApplication.translate("MainWindow", u"Add to Bank", None));
+
+        __sortingEnabled = self.table_bank_local.isSortingEnabled()
+        self.table_bank_local.setSortingEnabled(False)
+        self.table_bank_local.setSortingEnabled(__sortingEnabled)
+
 #if QT_CONFIG(tooltip)
         self.table_bank_local.setToolTip("")
 #endif // QT_CONFIG(tooltip)
