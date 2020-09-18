@@ -14,7 +14,7 @@
    <enum>Qt::StrongFocus</enum>
   </property>
   <property name="windowTitle">
-   <string>ZOIA Librarian -  Beta 4</string>
+   <string>ZOIA Librarian - Version 1.0</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -2080,6 +2080,34 @@
                   </property>
                   <property name="text">
                    <string>Export Bank</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="btn_clear_bank">
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="mouseTracking">
+                   <bool>true</bool>
+                  </property>
+                  <property name="toolTip">
+                   <string>Click here to clear the bank</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Click here to clear the bank</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Clear Bank button</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>When clicked, will clear the current bank table without saving or exporting it.</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
+                  <property name="text">
+                   <string>Clear Bank</string>
                   </property>
                  </widget>
                 </item>

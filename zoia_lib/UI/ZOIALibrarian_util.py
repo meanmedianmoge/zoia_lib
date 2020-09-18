@@ -106,6 +106,7 @@ class ZOIALibrarianUtil:
             self.ui.back_btn_bank.setFont(new_font)
             self.ui.btn_save_bank.setFont(new_font)
             self.ui.btn_load_bank.setFont(new_font)
+            self.ui.btn_clear_bank.setFont(new_font)
             self.ui.btn_export_bank.setFont(new_font)
             self.ui.text_browser_bank.setFont(big_font)
 

@@ -3,7 +3,7 @@ import os
 import platform
 
 from PySide2.QtCore import QEvent
-from PySide2.QtGui import QIcon, QMouseEvent
+from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QTableWidgetItem, QPushButton, QFileDialog, \
     QMessageBox, QInputDialog, QTableWidgetSelectionRange, QMainWindow
 
@@ -34,6 +34,7 @@ class ZOIALibrarianBank(QMainWindow):
         self.data_banks = []
         self.rows_left = []
         self.rows_right = []
+        # self.ui.table_bank_local.doubleClicked.connect(self.events)
 
     def _set_data_bank(self):
         """ Populates the bank export tables with data.
@@ -113,6 +114,26 @@ class ZOIALibrarianBank(QMainWindow):
                 self.ui.table_bank_right.setCellWidget(
                     slot - 32, 1, rmv_btn)
 
+    def clear_bank(self):
+        """ Clears the bank tables for a clean slate.
+        Currently triggered via a button press.
+        """
+
+        # Cleanup the tables
+        for i in range(32):
+            self.ui.table_bank_left.setItem(i, 0, QTableWidgetItem(None))
+            self.ui.table_bank_left.setCellWidget(i, 1, None)
+            self.ui.table_bank_right.setItem(i, 0, QTableWidgetItem(None))
+            self.ui.table_bank_right.setCellWidget(i, 1, None)
+
+        # PyQt tables make zero sense, so this clear is needed as well.
+        self.ui.table_bank_left.clearContents()
+        self.ui.table_bank_right.clearContents()
+
+        self.ui.btn_export_bank.setEnabled(False)
+        self.ui.btn_save_bank.setEnabled(False)
+        self.ui.btn_clear_bank.setEnabled(False)
+
     def load_bank(self):
         """ Loads a Bank file that was previously saved to the
         backend directory.
@@ -186,6 +207,7 @@ class ZOIALibrarianBank(QMainWindow):
         self._set_data_bank()
         self.ui.btn_export_bank.setEnabled(True)
         self.ui.btn_save_bank.setEnabled(True)
+        self.ui.btn_clear_bank.setEnabled(True)
 
     def save_bank(self, window):
         """ Saves a Bank to the backend application directory.
@@ -416,6 +438,7 @@ class ZOIALibrarianBank(QMainWindow):
         self._get_bank_data()
         self.ui.btn_save_bank.setEnabled(len(self.data_banks) > 0)
         self.ui.btn_export_bank.setEnabled(len(self.data_banks) > 0)
+        self.ui.btn_clear_bank.setEnabled(len(self.data_banks) > 0)
 
     def events(self, o, e):
         """ Handles events that relate to dragging and dropping entries
@@ -431,6 +454,31 @@ class ZOIALibrarianBank(QMainWindow):
                 # Hide the columns the user can't drop patches into.
                 self.ui.table_bank_left.hideColumn(1)
                 self.ui.table_bank_right.hideColumn(1)
+            elif e.type() == QEvent.MouseButtonDblClick:
+                # TODO add a UI button in the local_table_bank rows to serve as the event
+                # Get the patch which we're moving over
+                src = self.ui.table_bank_local.currentRow()
+                idx = self.ui.table_bank_local.cellWidget(
+                    src, 0).objectName()
+
+                # Find the first open slot in the bank
+                if self.data_banks:
+                    for pch in self.data_banks:
+                        drop_index = pch["slot"] + 1
+                else:
+                    drop_index = 0
+                    # Need to enable the buttons now that there is a
+                    # patch in the tables.
+                    self.data_banks = []
+                    self.ui.btn_save_bank.setEnabled(True)
+                    self.ui.btn_export_bank.setEnabled(True)
+                    self.ui.btn_clear_bank.setEnabled(True)
+
+                self.data_banks.append({
+                    "slot": drop_index,
+                    "id": idx
+                })
+                self._set_data_bank()
             elif e.type() == QEvent.ChildRemoved:
                 # Once the item has been dropped we can show the columns again.
                 self.ui.table_bank_left.showColumn(1)
@@ -474,6 +522,7 @@ class ZOIALibrarianBank(QMainWindow):
                                 self.data_banks = []
                                 self.ui.btn_save_bank.setEnabled(True)
                                 self.ui.btn_export_bank.setEnabled(True)
+                                self.ui.btn_clear_bank.setEnabled(True)
 
                             self.data_banks.append({
                                 "slot": drop_index,
@@ -501,6 +550,7 @@ class ZOIALibrarianBank(QMainWindow):
                                     self.data_banks = []
                                     self.ui.btn_save_bank.setEnabled(True)
                                     self.ui.btn_export_bank.setEnabled(True)
+                                    self.ui.btn_clear_bank.setEnabled(True)
                                 else:
                                     for pch in self.data_banks:
                                         for i in range(drop_index, drop_index
@@ -522,6 +572,7 @@ class ZOIALibrarianBank(QMainWindow):
                     self._get_bank_data()
                     self.ui.btn_save_bank.setEnabled(len(self.data_banks) > 0)
                     self.ui.btn_export_bank.setEnabled(len(self.data_banks) > 0)
+                    self.ui.btn_clear_bank.setEnabled(len(self.data_banks) > 0)
         else:
             if e.type() == QEvent.FocusAboutToChange:
                 if o.objectName() == "table_bank_left":
@@ -642,6 +693,7 @@ class ZOIALibrarianBank(QMainWindow):
         item = self._has_item()
         self.ui.btn_export_bank.setEnabled(item)
         self.ui.btn_save_bank.setEnabled(item)
+        self.ui.btn_clear_bank.setEnabled(item)
         self._get_bank_data()
 
     def _has_item(self):

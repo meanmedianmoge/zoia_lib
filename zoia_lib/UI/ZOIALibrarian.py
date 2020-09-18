@@ -1128,6 +1128,14 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_3.addWidget(self.btn_export_bank)
 
+        self.btn_clear_bank = QPushButton(self.layoutWidget_6)
+        self.btn_clear_bank.setObjectName(u"btn_clear_bank")
+        self.btn_clear_bank.setCursor(QCursor(Qt.PointingHandCursor))
+        self.btn_clear_bank.setMouseTracking(True)
+        self.btn_clear_bank.setStyleSheet(u"")
+
+        self.horizontalLayout_3.addWidget(self.btn_clear_bank)
+
 
         self.verticalLayout.addLayout(self.horizontalLayout_3)
 
@@ -1463,7 +1471,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"ZOIA Librarian -  Beta 4", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"ZOIA Librarian - Version 1.0", None))
         self.actionSpecify_SD_Card_Location.setText(QCoreApplication.translate("MainWindow", u"Specify SD Card Location", None))
 #if QT_CONFIG(shortcut)
         self.actionSpecify_SD_Card_Location.setShortcut(QCoreApplication.translate("MainWindow", u"Alt+S", None))
@@ -2027,6 +2035,19 @@ class Ui_MainWindow(object):
         self.btn_export_bank.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"When clicked, will open a popup asking for a Bank name, which will then be saved such that it can be exported to an SD card, should it have been specified previously.", None))
 #endif // QT_CONFIG(accessibility)
         self.btn_export_bank.setText(QCoreApplication.translate("MainWindow", u"Export Bank", None))
+#if QT_CONFIG(tooltip)
+        self.btn_clear_bank.setToolTip(QCoreApplication.translate("MainWindow", u"Click here to clear the bank", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.btn_clear_bank.setStatusTip(QCoreApplication.translate("MainWindow", u"Click here to clear the bank", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(accessibility)
+        self.btn_clear_bank.setAccessibleName(QCoreApplication.translate("MainWindow", u"Clear Bank button", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.btn_clear_bank.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"When clicked, will clear the current bank table without saving or exporting it.", None))
+#endif // QT_CONFIG(accessibility)
+        self.btn_clear_bank.setText(QCoreApplication.translate("MainWindow", u"Clear Bank", None))
         ___qtablewidgetitem81 = self.table_bank_left.horizontalHeaderItem(0)
         ___qtablewidgetitem81.setText(QCoreApplication.translate("MainWindow", u"Patch", None));
         ___qtablewidgetitem82 = self.table_bank_left.horizontalHeaderItem(1)

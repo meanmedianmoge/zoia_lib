@@ -123,6 +123,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.back_btn_local.setEnabled(False)
         self.ui.back_btn_bank.setEnabled(False)
         self.ui.btn_save_bank.setEnabled(False)
+        self.ui.btn_clear_bank.setEnabled(False)
         self.ui.btn_export_bank.setEnabled(False)
         self.ui.delete_folder_sd_btn.setEnabled(False)
         self.ui.btn_load_bank.setEnabled(
@@ -261,8 +262,8 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.back_btn_local.clicked.connect(self.local.go_back)
         self.ui.back_btn_bank.clicked.connect(self.local.go_back)
         self.ui.btn_load_bank.clicked.connect(self.bank.load_bank)
-        self.ui.btn_save_bank.clicked.connect(
-            lambda: self.bank.save_bank(self))
+        self.ui.btn_save_bank.clicked.connect(lambda: self.bank.save_bank(self))
+        self.ui.btn_clear_bank.clicked.connect(self.bank.clear_bank)
         self.ui.btn_export_bank.clicked.connect(
             lambda: self.bank.export_bank(self.sd, export, self))
         self.ui.delete_folder_sd_btn.clicked.connect(self.sd.delete_sd_item)
