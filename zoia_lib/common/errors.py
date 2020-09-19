@@ -17,8 +17,7 @@ class BinaryError(ZoiaLibError):
         else:
             try:
                 error_msg = {
-                    101: f'Patch {patch} contains a file extension, which is '
-                         f'not valid when a patch directory is being deleted.',
+                    101: f'Patch {patch} could not be decoded properly.',
                 }[error_code_zoia]
             except KeyError:
                 error_msg = f'Could not decode the binary file {patch} due ' \

@@ -220,8 +220,6 @@ class ZOIALibrarianMain(QMainWindow):
             self.sort_and_set)
         self.ui.actionSpecify_SD_Card_Location.triggered.connect(
             lambda: self.sd.sd_path(False, self.width()))
-        self.ui.actionImport_Multiple_Patches.triggered.connect(
-            self._mass_import_thread)
         self.ui.actionFont.triggered.connect(
             lambda: self.util.change_font(""))
         self.ui.actionIncrease_Font_Size.triggered.connect(
@@ -231,8 +229,14 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.actionQuit.triggered.connect(self._try_quit)
         self.ui.check_for_updates_btn.clicked.connect(
             self.local.update_local_patches_thread)
+        # self.ui.actionImport_Multiple_Patches.triggered.connect(
+        #     self._mass_import_thread)
+        self.ui.actionImport_Multiple_Patches.triggered.connect(
+            self.import_multiple_menu)
+        # self.ui.actionImport_Version_History_directory.triggered.connect(
+        #     self._version_import_thread)
         self.ui.actionImport_Version_History_directory.triggered.connect(
-            self._version_import_thread)
+            self.import_version_menu)
         self.ui.refresh_pch_btn.clicked.connect(self.ps.reload_ps_thread)
         self.ui.update_patch_notes.clicked.connect(
             self.local.update_patch_notes)
@@ -1163,6 +1167,29 @@ class ZOIALibrarianMain(QMainWindow):
         elif o.objectName() == "table_local":
             self.local.events(e)
         return False
+
+    def import_multiple_menu(self):
+        imp_cnt = 0
+        fail_cnt = 0
+
+        input_dir = self.directory_select()
+
+        for pch in os.listdir(input_dir):
+            if pch.split(".")[1] == "bin":
+                # Try to save the binary.
+                try:
+                    save.import_to_backend(os.path.join(input_dir, pch))
+                    imp_cnt += 1
+                except errors.SavingError:
+                    fail_cnt += 1
+
+        return self._mass_import_done(imp_cnt, fail_cnt)
+
+    def import_version_menu(self):
+        input_dir = self.directory_select()
+        fail_cnt = save.import_to_backend(input_dir, True)
+
+        return self._version_import_done(fail_cnt)
 
     def closeEvent(self, event):
         """ Override the default close operation so certain application

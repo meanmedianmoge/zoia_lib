@@ -112,6 +112,7 @@ class PatchBinary(Patch):
                 "starred": []
             }
 
+            # TODO edit behavior of the options selector, since modules are versioned
             # Select appropriate options from list
             try:
                 v = 0
@@ -126,8 +127,8 @@ class PatchBinary(Patch):
                 raise errors.BinaryError(pch_data[:10], 101)
 
             # Combine colors into one key
-            curr_module["color"] = curr_module["old_color"] if curr_module["new_color"] == "" \
-                else curr_module["new_color"]
+            curr_module["color"] = curr_module["old_color"] if \
+                curr_module["new_color"] == "" else curr_module["new_color"]
 
             # Remove extra keys from module dict
             curr_module.pop("new_color", None)

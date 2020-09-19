@@ -368,10 +368,11 @@ class PatchSave(Patch):
                 temp_data = f.read()
 
             # Check if the patch is a valid ZOIA binary
-            try:
-                pb.parse_data(temp_data)
-            except errors.BinaryError:
-                continue
+            # try:
+            #     pb.parse_data(temp_data)
+            # except errors.BinaryError:
+            #     fails += 1
+            #     continue
 
             # Prepare the JSON.
             js_data = {
