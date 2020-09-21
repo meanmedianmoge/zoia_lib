@@ -251,7 +251,7 @@ class ZOIALibrarianUtil:
             ("linux", True): "light.css",
             ("darwin", False): "osx-dark.css",
             ("windows", False): "dark.css",
-            ("linux", True): "dark.css"
+            ("linux", False): "dark.css"
         }[(platform.system().lower(), self.dark)]
 
         with open(os.path.join("zoia_lib", "UI", "resources",
