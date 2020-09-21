@@ -24,6 +24,7 @@ class ZOIALibrarianUtil:
         self.window = window
 
         self.dark = False
+        self.row_inversion = False
         self.font = QFont("Verdana", 10)
 
     def change_font(self, name):
@@ -232,11 +233,15 @@ class ZOIALibrarianUtil:
         dark_mode = {
             "enabled": not self.dark
         }
+        row_invert = {
+            "enabled": not self.row_inversion
+        }
 
         # Write the data to pref.json for subsequent launches.
         with open(os.path.join(path, "pref.json"), "w") as f:
             f.write(json.dumps([window, ps_sizes, local_sizes,
-                                sd_sizes, bank_sizes, dark_mode]))
+                                sd_sizes, bank_sizes, dark_mode,
+                                row_invert]))
 
     def toggle_dark(self):
         """ Toggles the theme for the application.
@@ -268,21 +273,29 @@ class ZOIALibrarianUtil:
         Currently triggered via a menu action.
         """
 
-        # Set the property for all tables in the UI.
-        self.ui.table_PS.setAlternatingRowColors(
-            not self.ui.table_PS.alternatingRowColors())
-        self.ui.table_local.setAlternatingRowColors(
-            not self.ui.table_local.alternatingRowColors())
-        self.ui.table_sd_left.setAlternatingRowColors(
-            not self.ui.table_sd_left.alternatingRowColors())
-        self.ui.table_sd_right.setAlternatingRowColors(
-            not self.ui.table_sd_right.alternatingRowColors())
-        self.ui.table_bank_local.setAlternatingRowColors(
-            not self.ui.table_bank_local.alternatingRowColors())
-        self.ui.table_bank_left.setAlternatingRowColors(
-            not self.ui.table_bank_left.alternatingRowColors())
-        self.ui.table_bank_right.setAlternatingRowColors(
-            not self.ui.table_bank_right.alternatingRowColors())
+        if self.row_inversion:
+            self.ui.table_PS.setAlternatingRowColors(True)
+            self.ui.table_local.setAlternatingRowColors(True)
+            self.ui.table_sd_left.setAlternatingRowColors(True)
+            self.ui.table_sd_right.setAlternatingRowColors(True)
+            self.ui.table_bank_local.setAlternatingRowColors(True)
+            self.ui.table_bank_left.setAlternatingRowColors(True)
+            self.ui.table_bank_right.setAlternatingRowColors(True)
+        else:
+            self.ui.table_PS.setAlternatingRowColors(False)
+            self.ui.table_local.setAlternatingRowColors(False)
+            self.ui.table_sd_left.setAlternatingRowColors(False)
+            self.ui.table_sd_right.setAlternatingRowColors(False)
+            self.ui.table_bank_local.setAlternatingRowColors(False)
+            self.ui.table_bank_left.setAlternatingRowColors(False)
+            self.ui.table_bank_right.setAlternatingRowColors(False)
+
+        self.row_inversion = not self.row_inversion
+
+    def set_row_inversion(self, value):
+        """ Setter method to specify whether alternating rows is enabled.
+        """
+        self.row_inversion = value
 
     def set_dark(self, value):
         """ Setter method to specify whether dark mode is enabled.

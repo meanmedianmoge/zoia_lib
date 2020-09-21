@@ -181,6 +181,7 @@ class ZOIALibrarianMain(QMainWindow):
                                                     self.bank_sizes["col_4"])
 
             self.util.set_dark(data[5]["enabled"])
+            self.util.set_row_inversion(data[6]["enabled"])
 
         else:
             # No pref.json, use default values.
@@ -282,6 +283,9 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Set the theme.
         self.util.toggle_dark()
+
+        # Set the rows
+        self.util.row_invert()
 
         # Font consistency.
         self.util.change_font(QFont("Verdana", 10) if self.font is None else
