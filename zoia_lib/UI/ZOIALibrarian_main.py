@@ -129,6 +129,16 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.btn_load_bank.setEnabled(
             not len(os.listdir(os.path.join(self.path, "Banks"))) == 0)
 
+        # set sorting for the first column in each table
+        self.ui.table_PS.horizontalHeader().setSortIndicatorShown(True)
+        self.ui.table_PS.sortByColumn(0, QtCore.Qt.DescendingOrder)
+
+        self.ui.table_local.horizontalHeader().setSortIndicatorShown(True)
+        self.ui.table_local.sortByColumn(0, QtCore.Qt.DescendingOrder)
+
+        self.ui.table_bank_local.horizontalHeader().setSortIndicatorShown(True)
+        self.ui.table_bank_local.sortByColumn(0, QtCore.Qt.DescendingOrder)
+
         # Load preferences from previous sessions (if they exist)
         if os.path.exists(os.path.join(self.path, "pref.json")):
             # SD Card previously specified.
@@ -552,18 +562,42 @@ class ZOIALibrarianMain(QMainWindow):
             curr_table.setColumnWidth(2, self.width() * 0.1)
             curr_table.setColumnWidth(3, self.width() * 0.1)
             curr_table.setColumnWidth(4, self.width() * 0.05)
-            curr_table.setColumnWidth(5, self.width() * 0.03)
+            # curr_table.setColumnWidth(5, self.width() * 0.03)
             self.ui.splitter_local.setSizes([self.width() * 0.6,
                                              self.width() * 0.4])
+            self.ui.splitter_local_hori.setSizes([self.width() * 0.5,
+                                                  self.width() * 0.5])
             self.local_sizes = {
                 "col_0": curr_table.columnWidth(0),
                 "col_1": curr_table.columnWidth(1),
                 "col_2": curr_table.columnWidth(2),
                 "col_3": curr_table.columnWidth(3),
                 "col_4": curr_table.columnWidth(4),
-                "col_5": curr_table.columnWidth(5),
+                # "col_5": curr_table.columnWidth(5),
                 "split_left": self.ui.splitter_local.sizes()[0],
-                "split_right": self.ui.splitter_local.sizes()[1]
+                "split_right": self.ui.splitter_local.sizes()[1],
+                "split_top": self.ui.splitter_local_hori.sizes()[0],
+                "split_bottom": self.ui.splitter_local_hori.sizes()[1]
+            }
+        elif table_index == 2 and self.sd_sizes is None:
+            curr_table.resizeColumnsToContents()
+            curr_table.setColumnWidth(1, self.width() * 0.14)
+            curr_table.setColumnWidth(2, self.width() * 0.14)
+            curr_table.setColumnWidth(3, self.width() * 0.14)
+            self.ui.splitter_sd_hori.setSizes([self.width() * 0.4,
+                                               self.width() * 0.6])
+            self.ui.splitter_sd_vert.setSizes([self.width() * 0.5,
+                                               self.width() * 0.5])
+
+            self.sd_sizes = {
+                "col_0": curr_table.columnWidth(0),
+                "col_1": curr_table.columnWidth(1),
+                "col_2": curr_table.columnWidth(2),
+                "col_3": curr_table.columnWidth(3),
+                "split_top": self.ui.splitter_sd_hori.sizes()[0],
+                "split_bottom": self.ui.splitter_sd_hori.sizes()[1],
+                "split_left": self.ui.splitter_sd_vert.sizes()[0],
+                "split_right": self.ui.splitter_sd_vert.sizes()[1],
             }
         elif table_index == 3 and self.bank_sizes is None:
             curr_table.resizeColumnsToContents()
