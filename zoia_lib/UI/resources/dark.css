@@ -132,7 +132,7 @@ QMenuBar::item:pressed {
 
 QSplitter::handle {
     background-color: #444851;
-    border: .1ex dashed #76797c;
+    border: .1ex #76797c;
 }
 
 QMenuBar {

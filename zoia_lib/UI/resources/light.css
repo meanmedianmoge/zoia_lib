@@ -35,13 +35,7 @@ QInputDialog {
 }
 
 QTabBar::tab:selected {
-    background-color: qlineargradient(spread:pad,
-    x1: 0,
-    y1: 0,
-    x2: 1,
-    y2: 0,
-    stop: 0 rgba(140, 224, 241, 255),
-    stop: 1 rgba(121, 243, 145, 255));
+    background-color: #a4bddb;
     border-bottom: 0;
     border-top-left-radius: 10px 5px;
     border-top-right-radius: 10px 5px;
@@ -167,13 +161,7 @@ QPushButton:disabled {
 }
 
 QTabBar::tab:!selected {
-    background-color: qlineargradient(spread:pad,
-    x1: 0,
-    y1: 0,
-    x2: 1,
-    y2: 1,
-    stop: 0.289773 rgba(137, 141, 218, 255),
-    stop: 1 rgba(82, 90, 105, 255));
+    background-color: #808080;
     border-bottom: 0;
     border-top-left-radius: 10px 5px;
     border-top-right-radius: 10px 5px;
@@ -190,13 +178,7 @@ QLineEdit {
 }
 
 QTabBar::tab:!selected:hover {
-    background-color: qlineargradient(spread:pad,
-    x1: 0,
-    y1: 0,
-    x2: 1,
-    y2: 0,
-    stop: 0 rgba(123, 129, 236, 255),
-    stop: 1 rgba(59, 209, 211, 255));
+    background-color: #808080;
 }
 
 QTabWidget::tab-bar {
@@ -236,11 +218,5 @@ QMenuBar, QHeaderView::section {
 
 QSplitter, QSplitter::handle, QWidget#widget_9,
 QWidget#tab_ps, QWidget#tab_sd, QWidget#tab_bank {
-    background-color: qlineargradient(spread:pad,
-    x1: 0,
-    y1: 0,
-    x2: 1,
-    y2: 0,
-    stop: 0 rgba(140, 224, 241, 255),
-    stop: 1 rgba(121, 243, 145, 255));
+    background-color: #a4bddb;
 }

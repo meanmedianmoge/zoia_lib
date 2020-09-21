@@ -2092,10 +2092,10 @@
                    <bool>true</bool>
                   </property>
                   <property name="toolTip">
-                   <string>Click here to clear the bank</string>
+                   <string>Click here to clear the bank.</string>
                   </property>
                   <property name="statusTip">
-                   <string>Click here to clear the bank</string>
+                   <string>Click here to clear the bank.</string>
                   </property>
                   <property name="accessibleName">
                    <string>Clear Bank button</string>
