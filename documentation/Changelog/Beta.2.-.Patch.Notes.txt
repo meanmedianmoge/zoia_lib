@@ -1,0 +1,60 @@
+ZOIA Librarian - Beta 2
+
+**** PATCH NOTES ****
+
+New Features
+- The ZOIA Librarian will now save application settings on close. Did you hate having to resize the tables constantly?
+  Probably. Now you just need to resize once and be done with it! Additional settings that are saved include the size
+  of the window, the font and font size, the SD card (should it have been specified) and whether dark mode is enabled.
+- Speaking of font saving, you can now change the font and font size used throughout the application. Check it out in
+  the options menu.
+- Also speaking of dark mode, yup, there's a dark mode now. Check it out in the options menu. 
+  (What do you mean nobody asked for this?) 
+- Added early support for imported directories to be treated as versions in the ZOIA Librarian. 
+  More features surrounding this will be included in Beta 3.
+- Added some styling to the application to make it less bland.
+- Added keyboard shortcuts to all menu items.
+- Added the ability to delete items off of an SD card from within the ZOIA Librarian. 
+- Added a check that will try to detect if a patch you are importing is currently hosted on PatchStorage. If it is,
+  the tags, categories, and patch notes will be retrieved when the patch is imported (Thanks Ch3ryl)!
+  (note this won't work 100% of the time, the patch must be named the same as the entry on PatchStorage).
+- Added the ability to drag/drop multiple patches in the SD card tables and bank tables. Now, organizing banks/sd 
+  card folders can be done faster than ever!
+- Added accessibility text throughout the application.
+
+Fixes
+- The "Load Bank" button will not be enabled if there are no banks saved once the user launches the application.
+- Fixed the issue where updating the patch notes added a blank line at the start. The update patch notes button 
+  is sorry. (It's okay update patch notes button, we forgive you).
+- Fixed the case where loading/exporting a bank that had a patch that was deleted from the ZOIA Librarian caused 
+  a crash. Now, a message box will inform the user of such occurances, and in the case of exporting, 
+  will also specify which patches failed to export.
+- Fixed some message boxes failing to display the application logo.
+- Fixed the layout of the Bank tab so that the user does not need to drag a patch as far as before to add it to a 
+  Bank.
+- Fixed a bug with the Banks tables where if a user dragged patch and released it between two rows the table would 
+  occasionally make new phantom rows.
+- Fixed an issue with importing where the ### prefix would be imported in the _zoia_ prefix was missing from a patch 
+  (Thanks markcrosbie!)
+- Fixed an issue where if a bank had multiple of the same patch and a user tried to delete the one that occured later 
+  in the slot list, the wrong patch would be deleted from the bank (currently a Windows only fix).
+- Fixed an issue with file names that contained "." in their name before the extension.
+- Fixed importing failing if the directory contained any "."s in its name (thanks chmjacques!)
+- Fixed an issue where views would be counted multiple times in one session.
+- Fixed an error that would "allow" a patch to be exporting even if an SD card was not inserted into the computer.
+- Addressed the case where a user deletes the second to last patch in a Version History such that they are now sent 
+  back to the main local patch overview (thanks meanmedianmoge)!
+- Added multiple new popups to confirm when actions have finished processing.
+
+Plans for Beta 3
+- Making the application feel a lot more responsive (no more freezing while trying to look for patch updates).
+- Adding a patch visualizer (very hush hush right now, please stay tuned).
+- Improving the patch preview to have it include images and generally style it more like a website rather than
+  a wall of text.
+- Some low-level optimizations to make it so the application starts faster.
+
+
+As always, we welcome any feedback you may have. Thanks for being awesome :)
+- John B.
+  Empress Effects Inc.
+

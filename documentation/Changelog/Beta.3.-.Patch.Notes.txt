@@ -1,0 +1,47 @@
+ZOIA Librarian - Beta 3
+
+**** PATCH NOTES ****
+
+New Features
+- Added an early implementation of a patch visualizer. Massive thanks to apparent1 for the initial C#
+  implementation, and special thanks to chmjacques and meanmedianmoge for helping with the binary 
+  analysis. This is a feature that will grow in the future and may eventually turn into a full patch
+  editor (absolutely zero promises there).
+- The application now works offline! However, you won't be able to access the PatchStorage View tab while
+  offline. May require a restart to detect an internet connection.
+- Added the ability to download all patches from PatchStorage (via a suggestion from Steve, thanks Steve!)
+- Added threading support to processes that would stall the application (such as importing, checking for
+  updates, and refreshing the PatchStorage patch list).
+- Added some more style tweaks to the Windows version of Beta 3. 
+- Optimizations to have the Librarian run smoother and better than Beta 2. Take that Beta 2! 
+  Nobody downloaded you anyway.
+- Added the ability to download patches that use the .rar compression algorithm. This will only work if
+  you have WinRAR installed on your computer. 
+
+Fixes
+- Fixed a error that occured when trying to import a version history that contained more than 10 patches 
+  (thanks chmjacques and meanmedianmoge!)
+- Fixed an exporting error that would result in a popup saying an export was successful even if the user
+  cancelled out of the export. 
+- Fixed an isue when the application is launched for the first time and tables would not retain their
+  specified sizes. 
+- Fixed sorting order not being maintained after a search.
+- Fixed an issue with Bank saving (it actually works now). 
+- Remade the logo and splash screen using a clearer ZOIA logo.
+
+Futrue Plans
+- Expanding on the patch visualizer with more info, having the length of modules be correctly represented,
+  and the ability to view connections between modules. 
+- Improving the patch preview widget to make it look nicer and not like a giant wall of text. 
+- Anything else the community wants to see implemented!
+
+
+As always, we welcome any feedback you may have. Thanks for being awesome :)
+
+As an aside, with the release of Beta 3, my time working on the ZOIA Librarian has come to an end. I'm really
+proud of the current state of the ZOIA Librarian and had a blast working on it. 
+I hope you all enjoy using it and that it continues to grow with new features to help out the ZOIA community. 
+
+- John B.
+  Empress Effects Inc.
+

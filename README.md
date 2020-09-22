@@ -15,9 +15,9 @@ Please familiarize yourself with the various license agreements for each PatchSt
 This software is intended to be free and will be supported by the development team.
 
 ## How to Install
-- Mac OS X: https://github.com/meanmedianmoge/zoia_lib/releases/tag/Beta-4
-- Windows 10: https://github.com/meanmedianmoge/zoia_lib/releases/tag/Beta-4
-- Linux (Ubuntu): https://github.com/meanmedianmoge/zoia_lib/releases/tag/Beta-4
+- Mac OS X: https://github.com/meanmedianmoge/zoia_lib/releases/tag/Version1.0
+- Windows 10: https://github.com/meanmedianmoge/zoia_lib/releases/tag/Version1.0
+- Linux (Ubuntu): https://github.com/meanmedianmoge/zoia_lib/releases/tag/Version1.0
 
 ## User Manual
 - Located in `documentation/User Manuals`, available as PDF or docx
