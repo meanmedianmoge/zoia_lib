@@ -1845,9 +1845,9 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem11 = self.table_sd_left.horizontalHeaderItem(0)
         ___qtablewidgetitem11.setText(QCoreApplication.translate("MainWindow", u"Patch", None));
         ___qtablewidgetitem12 = self.table_sd_left.horizontalHeaderItem(1)
-        ___qtablewidgetitem12.setText(QCoreApplication.translate("MainWindow", u"Remove", None));
+        ___qtablewidgetitem12.setText(QCoreApplication.translate("MainWindow", u"Import", None));
         ___qtablewidgetitem13 = self.table_sd_left.horizontalHeaderItem(2)
-        ___qtablewidgetitem13.setText(QCoreApplication.translate("MainWindow", u"Import", None));
+        ___qtablewidgetitem13.setText(QCoreApplication.translate("MainWindow", u"Remove", None));
         ___qtablewidgetitem14 = self.table_sd_left.verticalHeaderItem(0)
         ___qtablewidgetitem14.setText(QCoreApplication.translate("MainWindow", u"0", None));
         ___qtablewidgetitem15 = self.table_sd_left.verticalHeaderItem(1)
@@ -1921,9 +1921,9 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem46 = self.table_sd_right.horizontalHeaderItem(0)
         ___qtablewidgetitem46.setText(QCoreApplication.translate("MainWindow", u"Patch", None));
         ___qtablewidgetitem47 = self.table_sd_right.horizontalHeaderItem(1)
-        ___qtablewidgetitem47.setText(QCoreApplication.translate("MainWindow", u"Remove", None));
+        ___qtablewidgetitem47.setText(QCoreApplication.translate("MainWindow", u"Import", None));
         ___qtablewidgetitem48 = self.table_sd_right.horizontalHeaderItem(2)
-        ___qtablewidgetitem48.setText(QCoreApplication.translate("MainWindow", u"Import", None));
+        ___qtablewidgetitem48.setText(QCoreApplication.translate("MainWindow", u"Remove", None));
         ___qtablewidgetitem49 = self.table_sd_right.verticalHeaderItem(0)
         ___qtablewidgetitem49.setText(QCoreApplication.translate("MainWindow", u"32", None));
         ___qtablewidgetitem50 = self.table_sd_right.verticalHeaderItem(1)

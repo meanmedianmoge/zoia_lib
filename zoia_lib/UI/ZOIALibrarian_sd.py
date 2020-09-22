@@ -147,29 +147,29 @@ class ZOIALibrarianSD(QMainWindow):
                 # Get the useful int index.
                 index = int(index[1:3])
 
-                rmv_btn = QPushButton("X", self)
-                rmv_btn.setObjectName(str(index))
-                rmv_btn.setFont(self.ui.table_PS.horizontalHeader().font())
-                rmv_btn.clicked.connect(self._remove_sd)
                 import_btn = QPushButton("Click me to import!", self)
                 import_btn.setObjectName(str(index))
                 import_btn.setFont(self.ui.table_PS.horizontalHeader().font())
                 import_btn.clicked.connect(self._import_patch_sd)
+                rmv_btn = QPushButton("X", self)
+                rmv_btn.setObjectName(str(index))
+                rmv_btn.setFont(self.ui.table_PS.horizontalHeader().font())
+                rmv_btn.clicked.connect(self._remove_sd)
 
                 if index < 32:
                     # Left sd table.
                     self.ui.table_sd_left.setItem(index, 0, QTableWidgetItem(
                         pch))
-                    self.ui.table_sd_left.setCellWidget(index, 1, rmv_btn)
-                    self.ui.table_sd_left.setCellWidget(index, 2, import_btn)
+                    self.ui.table_sd_left.setCellWidget(index, 1, import_btn)
+                    self.ui.table_sd_left.setCellWidget(index, 2, rmv_btn)
                 else:
                     # Right sd table.
                     self.ui.table_sd_right.setItem(index - 32, 0,
                                                    QTableWidgetItem(pch))
                     self.ui.table_sd_right.setCellWidget(index - 32, 1,
-                                                         rmv_btn)
-                    self.ui.table_sd_right.setCellWidget(index - 32, 2,
                                                          import_btn)
+                    self.ui.table_sd_right.setCellWidget(index - 32, 2,
+                                                         rmv_btn)
 
     def _import_patch_sd(self):
         """ Imports a single patch from an SD card into the Librarian.

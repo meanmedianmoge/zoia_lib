@@ -202,7 +202,6 @@ class ZOIALibrarianUtil:
             "col_2": self.ui.table_local.columnWidth(2),
             "col_3": self.ui.table_local.columnWidth(3),
             "col_4": self.ui.table_local.columnWidth(4),
-            # "col_5": self.ui.table_local.columnWidth(5),
             "split_left": self.ui.splitter_local.sizes()[0],
             "split_right": self.ui.splitter_local.sizes()[1],
             "split_top": self.ui.splitter_local_hori.sizes()[0],
@@ -276,11 +275,11 @@ class ZOIALibrarianUtil:
         if self.row_inversion:
             self.ui.table_PS.setAlternatingRowColors(True)
             self.ui.table_local.setAlternatingRowColors(True)
-            self.ui.table_sd_left.setAlternatingRowColors(True)
-            self.ui.table_sd_right.setAlternatingRowColors(True)
-            self.ui.table_bank_local.setAlternatingRowColors(True)
-            self.ui.table_bank_left.setAlternatingRowColors(True)
-            self.ui.table_bank_right.setAlternatingRowColors(True)
+            self.ui.table_sd_left.setAlternatingRowColors(False)
+            self.ui.table_sd_right.setAlternatingRowColors(False)
+            self.ui.table_bank_local.setAlternatingRowColors(False)
+            self.ui.table_bank_left.setAlternatingRowColors(False)
+            self.ui.table_bank_right.setAlternatingRowColors(False)
         else:
             self.ui.table_PS.setAlternatingRowColors(False)
             self.ui.table_local.setAlternatingRowColors(False)

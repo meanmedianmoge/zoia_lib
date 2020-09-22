@@ -13,9 +13,9 @@ import zoia_lib.backend.utilities as util
 import zoia_lib.common.errors as errors
 from zoia_lib.UI.ZOIALibrarian_bank import ZOIALibrarianBank
 from zoia_lib.UI.ZOIALibrarian_local import ZOIALibrarianLocal
-from zoia_lib.UI.ZOIALibrarian_util import ZOIALibrarianUtil
-from zoia_lib.UI.ZOIALibrarian_sd import ZOIALibrarianSD
 from zoia_lib.UI.ZOIALibrarian_ps import ZOIALibrarianPS
+from zoia_lib.UI.ZOIALibrarian_sd import ZOIALibrarianSD
+from zoia_lib.UI.ZOIALibrarian_util import ZOIALibrarianUtil
 from zoia_lib.backend.api import PatchStorage
 from zoia_lib.backend.patch_binary import PatchBinary
 from zoia_lib.backend.patch_delete import PatchDelete
@@ -77,8 +77,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.ps = ZOIALibrarianPS(self.ui, api, self.path, self.msg, save,
                                   self.sort_and_set)
         self.local = ZOIALibrarianLocal(self.ui, self.path, self.sd, self.msg,
-                                        self, export, delete,
-                                        self.sort_and_set)
+                                        self, export, delete, self.sort_and_set)
 
         # Instance variables.
         self.patch_cache = []

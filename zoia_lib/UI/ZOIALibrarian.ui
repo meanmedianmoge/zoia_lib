@@ -1734,12 +1734,12 @@
                  </column>
                  <column>
                   <property name="text">
-                   <string>Remove</string>
+                   <string>Import</string>
                   </property>
                  </column>
                  <column>
                   <property name="text">
-                   <string>Import</string>
+                   <string>Remove</string>
                   </property>
                  </column>
                 </widget>
@@ -1953,12 +1953,12 @@
                  </column>
                  <column>
                   <property name="text">
-                   <string>Remove</string>
+                   <string>Import</string>
                   </property>
                  </column>
                  <column>
                   <property name="text">
-                   <string>Import</string>
+                   <string>Remove</string>
                   </property>
                  </column>
                 </widget>
