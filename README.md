@@ -14,6 +14,7 @@ This software is distributed under GNU General Public License 3.0.
 Please familiarize yourself with the Terms & Conditions of copyleft licenses like GPL (and others) here:
 https://www.gnu.org/licenses/gpl-3.0.en.html.
 ZOIA and its patch binary format are a trademark of Empress Effects, Inc. and are used with permission.
+
 Neither the developers nor Empress Effects, Inc. are liable for any issues caused or raised by the use or
 modification of this application. By using the application you agree to these terms.
 
@@ -22,11 +23,12 @@ If you've used an earlier version of the application, you'll have to delete the 
 See here for details on each platform:
 - On Windows, delete `C:\Users\user\AppData\Roaming\.ZoiaLibraryApp\pref.json` (if it exists)
 - On Mac, delete `/Users/user/.Library\Application Support/.ZoiaLibraryApp/pref.json` (if it exists)
-- On Linux, delete `/home/.local/share/.ZoiaLibraryApp/pref.json` (if it exists.. I'd be very surprised if it existed since this is the first Linux build)
+- On Linux, delete `/home/.local/share/.ZoiaLibraryApp/pref.json` (if it exists.. I'd be very surprised if it
+existed since this is the first Linux build)
 
 Application can be installed in one of two ways:
 - Build from source (preferred), requires Python 3.7+
-```bash
+```
 # Download source code from Github (either directly from the site or cloning the repo)
 git clone https://github.com/meanmedianmoge/zoia_lib.git
 # Make sure you're in the right directory
@@ -44,6 +46,7 @@ Note that these releases are quite large in size (roughly 150MB compressed), sin
 runtime to work properly. The actual source code is merely 6MB.
 
 ## Documentation
+- Overview video and tutorial: https://www.youtube.com/watch?v=JLOUrWtG1Pk
 - Includes all collected forms of documentation about using, building, and maintaining the application: see `documentation`
 - User Manuals for all versions thus far are in `/User Manuals`
 - Changelog of the various improvements, bug fixes, and known issues are in `/Changelog`
