@@ -18,6 +18,12 @@ Neither the developers nor Empress Effects, Inc. are liable for any issues cause
 modification of this application. By using the application you agree to these terms.
 
 ## How to Install
+If you've used an earlier version of the application, you'll have to delete the saved preferences file from the local backend.
+See here for details on each platform:
+- On Windows, delete `C:\Users\user\AppData\Roaming\.ZoiaLibraryApp\pref.json` (if it exists)
+- On Mac, delete `/Users/user/.Library\Application Support/.ZoiaLibraryApp/pref.json` (if it exists)
+- On Linux, delete `/home/.local/share/.ZoiaLibraryApp/pref.json` (if it exists.. I'd be very surprised if it existed since this is the first Linux build)
+
 Application can be installed in one of two ways:
 - Build from source (preferred), requires Python 3.7+
 ```bash
