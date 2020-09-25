@@ -10,21 +10,44 @@ Thank you for your support!
 
 This project depends heavily on the PatchStorage API, developed by Blokas: https://patchstorage.com/docs/
 
-Use of this software is subject to GPL 3.0.
-Please familiarize yourself with the various license agreements for each PatchStorage patch.
-This software is intended to be free and will be supported by the development team.
+This software is distributed under GNU General Public License 3.0.
+Please familiarize yourself with the Terms & Conditions of copyleft licenses like GPL (and others) here:
+https://www.gnu.org/licenses/gpl-3.0.en.html.
+ZOIA and its patch binary format are a trademark of Empress Effects, Inc. and are used with permission.
+Neither the developers nor Empress Effects, Inc. are liable for any issues caused or raised by the use or
+modification of this application. By using the application you agree to these terms.
 
 ## How to Install
-- Mac OS X: https://github.com/meanmedianmoge/zoia_lib/releases/tag/Version1.0
-- Windows 10: https://github.com/meanmedianmoge/zoia_lib/releases/tag/Version1.0
-- Linux (Ubuntu): https://github.com/meanmedianmoge/zoia_lib/releases/tag/Version1.0
+Application can be installed in one of two ways:
+- Build from source (preferred), requires Python 3.7+
+```bash
+# Download source code from Github (either directly from the site or cloning the repo)
+git clone https://github.com/meanmedianmoge/zoia_lib.git
+# Make sure you're in the right directory
+cd Downloads/zoia_lib
+# Install Python 3.7+, make sure you have pip
+pip help
+# Install the dependencies that allow the app to run
+pip install -r requirements.txt
+# Load the application
+python -m zoia_lib.backend.startup
+```
+- Use the pre-bundled build, available on Windows, Mac, and Linux (Ubuntu) here:
+https://github.com/meanmedianmoge/zoia_lib/releases/tag/v1.0.
+Note that these releases are quite large in size (roughly 150MB compressed), since they require an entire Python
+runtime to work properly. The actual source code is merely 6MB.
 
-## User Manual
-- Located in `documentation/User Manuals`, available as PDF or docx
+## Documentation
+- Includes all collected forms of documentation about using, building, and maintaining the application: see `documentation`
+- User Manuals for all versions thus far are in `/User Manuals`
+- Changelog of the various improvements, bug fixes, and known issues are in `/Changelog`
+- Initial app frameworks and discussions among the dev team and Empress can be found in `/Backend Implementation`, 
+`/Design Document`, and `/Testing Plan`
+- HTML versions of the featured documentation (available in the Help toolbar) are in `/Resources`
 
 ## Features
 - Browse PatchStorage uploads and local patches within the UI
-- Search functionality to locate specific patches, tags, and more
+- Search for specific patches, authors, tags, and more
 - Sort the results by author, title, date modified, likes, views, or downloads
 - Download patches from PatchStorage
 - Import patches from local storage or SD card
@@ -32,8 +55,10 @@ This software is intended to be free and will be supported by the development te
 - Preview patches with the patch visualizer
 - View and edit patch notes
 - Customized category and tag labels for all patches
+- Manage your SD card folders quickly
 - Drag & drop patches into bank directories, configured automatically into a ZOIA-readable format
 - Help toolbar for app documentation and ZOIA resources
+- Dark and light themes
 
 ## Contributing
 - We welcome all contributions! If you want to see something added, 

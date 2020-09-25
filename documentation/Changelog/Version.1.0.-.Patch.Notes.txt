@@ -16,7 +16,7 @@ New Features
 - Added a Clear Bank button to wipe the bank tables clean.
 - Added a new Help toolbar which allows users to access documentation and useful ZOIA resources. These will display in the PS tab browser panel. You can also search for different commands/shortcuts.
 - Added a Reset UI menu option in the event that users mangle the UI panels or tables.
-- The application will now start in dark mode by default. Also changed the light theme colors.
+- Updated the light theme colors to give it a more muted look.
 - Alternating row colors is now a saved preference. It will save whatever is the current setting upon closing the application.
 - Added a step-by-step guide for how to compile the application from source for developers, contributors or users who were unable to open the beta builds.
 - Added our first Linux build! We aim to support the latest stable version of Ubuntu going forward. If you are a Linux user who prefers other distributions, please contact me.
