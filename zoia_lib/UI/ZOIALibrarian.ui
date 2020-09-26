@@ -435,7 +435,16 @@
                 <number>10</number>
                </property>
                <widget class="QWidget" name="layoutWidget">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <layout class="QVBoxLayout" name="verticalLayout_7">
+                 <property name="sizeConstraint">
+                  <enum>QLayout::SetMaximumSize</enum>
+                 </property>
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_12">
                    <item>
@@ -615,8 +624,17 @@
                  </item>
                 </layout>
                </widget>
-               <widget class="QWidget" name="layoutWidget_7">
+               <widget class="QWidget" name="layoutWidget_7" native="true">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <layout class="QVBoxLayout" name="verticalLayout_22">
+                 <property name="sizeConstraint">
+                  <enum>QLayout::SetMinimumSize</enum>
+                 </property>
                  <item>
                   <widget class="QPushButton" name="update_patch_notes">
                    <property name="cursor">

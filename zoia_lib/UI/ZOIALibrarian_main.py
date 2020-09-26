@@ -552,15 +552,12 @@ class ZOIALibrarianMain(QMainWindow):
 
         elif table_index == 1 and self.local_sizes is None:
             curr_table.resizeColumnsToContents()
-            curr_table.setColumnWidth(1, self.width() * 0.1)
-            curr_table.setColumnWidth(2, self.width() * 0.1)
-            curr_table.setColumnWidth(3, self.width() * 0.1)
+
+            curr_table.setColumnWidth(1, self.width() * 0.09)
+            curr_table.setColumnWidth(2, self.width() * 0.09)
+            curr_table.setColumnWidth(3, self.width() * 0.07)
             curr_table.setColumnWidth(4, self.width() * 0.05)
-            # curr_table.setColumnWidth(5, self.width() * 0.03)
-            self.ui.splitter_local.setSizes([self.width() * 0.6,
-                                             self.width() * 0.4])
-            self.ui.splitter_local_hori.setSizes([self.width() * 0.5,
-                                                  self.width() * 0.5])
+            curr_table.setColumnWidth(5, self.width() * 0.03)
             self.local_sizes = {
                 "col_0": curr_table.columnWidth(0),
                 "col_1": curr_table.columnWidth(1),
@@ -597,8 +594,8 @@ class ZOIALibrarianMain(QMainWindow):
 
         elif table_index == 3 and self.bank_sizes is None:
             curr_table.resizeColumnsToContents()
-            curr_table.setColumnWidth(1, self.width() * 0.14)
-            curr_table.setColumnWidth(2, self.width() * 0.14)
+            curr_table.setColumnWidth(0, self.width() * 0.05)
+            curr_table.setColumnWidth(1, self.width() * 0.05)
 
             self.bank_sizes = {
                 "col_0": curr_table.columnWidth(0),
@@ -638,25 +635,25 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.table_local.setColumnWidth(5, self.width() * 0.03)
         self.ui.splitter_local.setSizes([self.width() * 0.5,
                                          self.width() * 0.5])
-        self.ui.splitter_local_hori.setSizes([self.width() * 0.5,
-                                              self.width() * 0.5])
+        self.ui.splitter_local_hori.setSizes([self.height() * 0.5,
+                                              self.height() * 0.5])
 
         # Reset SD sizes
-        self.ui.table_sd_left.setColumnWidth(0, self.width() * 0.4)
+        self.ui.table_sd_left.setColumnWidth(0, self.width() * 0.25)
         self.ui.table_sd_left.setColumnWidth(1, self.width() * 0.1)
-        self.ui.table_sd_right.setColumnWidth(0, self.width() * 0.4)
+        self.ui.table_sd_right.setColumnWidth(0, self.width() * 0.25)
         self.ui.table_sd_right.setColumnWidth(1, self.width() * 0.1)
         self.ui.splitter_sd_hori.setSizes([self.width() * 0.5,
                                            self.width() * 0.5])
-        self.ui.splitter_sd_vert.setSizes([self.width() * 0.185,
-                                           self.width() * 0.815])
+        self.ui.splitter_sd_vert.setSizes([self.height() * 0.185,
+                                           self.height() * 0.815])
 
         # Reset bank sizes
         self.ui.table_bank_local.setColumnWidth(0, self.width() * 0.14)
-        self.ui.table_bank_local.setColumnWidth(1, self.width() * 0.14)
-        self.ui.table_bank_left.setColumnWidth(0, self.width() * 0.2)
+        self.ui.table_bank_local.setColumnWidth(1, self.width() * 0.1)
+        self.ui.table_bank_left.setColumnWidth(0, self.width() * 0.14)
         self.ui.table_bank_left.setColumnWidth(1, self.width() * 0.1)
-        self.ui.table_bank_right.setColumnWidth(0, self.width() * 0.2)
+        self.ui.table_bank_right.setColumnWidth(0, self.width() * 0.14)
         self.ui.table_bank_right.setColumnWidth(1, self.width() * 0.1)
         self.ui.splitter_bank_tables.setSizes([self.width() * 0.5,
                                                self.width() * 0.5])
