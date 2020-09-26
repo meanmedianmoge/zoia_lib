@@ -378,7 +378,9 @@ class ZOIALibrarianMain(QMainWindow):
                 self.msg.exec_()
                 self.msg.setInformativeText(None)
                 self.sd.sd_path(False, self.width())
-                self.ui.tabs.setCurrentIndex(1)
+                if self.sd.get_sd_root() is None:
+                    # user cancelled without providing a path
+                    self.ui.tabs.setCurrentIndex(1)
         elif self.ui.tabs.currentIndex() == 0 \
             and self.ui.table_PS.rowCount() == 1:
             # We started the app with no internet, need to check if there
