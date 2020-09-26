@@ -22,7 +22,7 @@ modification of this application. By using the application you agree to these te
 If you've used an earlier version of the application, you'll have to delete the saved preferences file from the local backend.
 See here for details on each platform:
 - On Windows, delete `C:\Users\user\AppData\Roaming\.ZoiaLibraryApp\pref.json` (if it exists)
-- On Mac, delete `/Users/user/.Library\Application Support/.ZoiaLibraryApp/pref.json` (if it exists)
+- On Mac, delete `/Users/user/.Library/Application Support/.ZoiaLibraryApp/pref.json` (if it exists)
 - On Linux, delete `/home/.local/share/.ZoiaLibraryApp/pref.json` (if it exists.. I'd be very surprised if it
 existed since this is the first Linux build)
 
