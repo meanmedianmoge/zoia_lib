@@ -184,15 +184,7 @@ class ZOIALibrarianMain(QMainWindow):
 
         else:
             # No pref.json, use default values.
-            self.ui.table_sd_left.setColumnWidth(0, self.width() * 0.4)
-            self.ui.table_sd_left.setColumnWidth(1, self.width() * 0.1)
-            self.ui.table_sd_right.setColumnWidth(0, self.width() * 0.4)
-            self.ui.table_sd_right.setColumnWidth(1, self.width() * 0.1)
-            self.ui.table_bank_left.setColumnWidth(0, self.width() * 0.2)
-            self.ui.table_bank_left.setColumnWidth(1, self.width() * 0.1)
-            self.ui.table_bank_right.setColumnWidth(0, self.width() * 0.2)
-            self.ui.table_bank_right.setColumnWidth(1, self.width() * 0.1)
-            self.showMaximized()
+            self.reset_ui()
 
         # Connect buttons and items to methods.
         self.ui.tabs.currentChanged.connect(self.tab_switch)
