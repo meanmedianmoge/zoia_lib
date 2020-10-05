@@ -461,7 +461,8 @@ class PatchSave(Patch):
             # Ditch the zip
             os.remove(name_zip)
             to_delete = None
-        elif patch[1]["files"][0]["filename"].split(".")[-1] == "rar":
+        elif patch[1]["files"][0]["filename"].split(".")[-1] == "rar" \
+                and platform.system().lower() != "darwin":
             # .rar files
             name_rar = os.path.join(pch, "{}.rar".format(patch_id))
             with open(name_rar, "wb") as f:
@@ -474,6 +475,13 @@ class PatchSave(Patch):
                 # Ditch the rar
                 os.remove(name_rar)
                 to_delete = None
+            except rarfile.BadRarFile:
+                print("File is not properly compressed in the RAR format")
+                try:
+                    shutil.rmtree(pch)
+                except FileNotFoundError:
+                    pass
+                raise errors.SavingError(patch[1]["title"], 506)
             except rarfile.RarCannotExec:
                 print("As .rar compression is a commercial product, you must "
                       "download external software to download this patch "

@@ -89,6 +89,8 @@ class SavingError(ZoiaLibError):
      - 504: A file extension was expected but none was encountered.
      - 505: A directory was requested to be created, yet it already
             existed.
+     - 506: Tried to download a compressed file that was not properly
+            compressed in the format presented.
     """
 
     def __init__(self, patch, error_code_zoia=0):
@@ -107,7 +109,9 @@ class SavingError(ZoiaLibError):
                     504: f'Could not save the file {patch} because it lacked '
                          f'a file extension.',
                     505: f'Could not create a directory with id {patch} '
-                         f'because it already existed.'
+                         f'because it already existed.',
+                    506: f'Could not save the file {patch} because the compression '
+                         f'method was not executed properly.'
                 }[error_code_zoia]
             except KeyError:
                 error_msg = f'Could not save the file {patch} from the ' \
