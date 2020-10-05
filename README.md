@@ -19,7 +19,7 @@ Neither the developers nor Empress Effects, Inc. are liable for any issues cause
 modification of this application. By using the application you agree to these terms.
 
 ## How to Install
-If you've used an earlier version of the application, you'll have to delete the saved preferences file from the local backend.
+If you've used a beta version of the application, you'll have to delete the saved preferences file from the local backend.
 See here for details on each platform:
 - On Windows, delete `C:\Users\user\AppData\Roaming\.ZoiaLibraryApp\pref.json` (if it exists)
 - On Mac, delete `/Users/user/.Library/Application Support/.ZoiaLibraryApp/pref.json` (if it exists)
@@ -27,7 +27,12 @@ See here for details on each platform:
 existed since this is the first Linux build)
 
 Application can be installed in one of two ways:
-- Build from source (preferred), requires Python 3.7+
+- (For general users) Use the pre-bundled build, available on Windows, Mac, and Linux (Ubuntu) here:
+https://github.com/meanmedianmoge/zoia_lib/releases/tag/v1.0.
+Note that these releases are quite large in size (roughly 100MB compressed), since they require an entire Python
+runtime to work properly. The actual source code is merely 6MB.
+
+- (For developers/contributors) Build from source, requires Python 3.7+
 ```
 # Download source code from Github (either directly from the site or cloning the repo)
 git clone https://github.com/meanmedianmoge/zoia_lib.git
@@ -40,10 +45,6 @@ pip install -r requirements.txt
 # Load the application
 python -m zoia_lib.backend.startup
 ```
-- Use the pre-bundled build, available on Windows, Mac, and Linux (Ubuntu) here:
-https://github.com/meanmedianmoge/zoia_lib/releases/tag/v1.0.
-Note that these releases are quite large in size (roughly 150MB compressed), since they require an entire Python
-runtime to work properly. The actual source code is merely 6MB.
 
 ## Documentation
 - Overview video and tutorial: https://www.youtube.com/watch?v=JLOUrWtG1Pk

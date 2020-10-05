@@ -184,15 +184,7 @@ class ZOIALibrarianMain(QMainWindow):
 
         else:
             # No pref.json, use default values.
-            self.ui.table_sd_left.setColumnWidth(0, self.width() * 0.4)
-            self.ui.table_sd_left.setColumnWidth(1, self.width() * 0.1)
-            self.ui.table_sd_right.setColumnWidth(0, self.width() * 0.4)
-            self.ui.table_sd_right.setColumnWidth(1, self.width() * 0.1)
-            self.ui.table_bank_left.setColumnWidth(0, self.width() * 0.2)
-            self.ui.table_bank_left.setColumnWidth(1, self.width() * 0.1)
-            self.ui.table_bank_right.setColumnWidth(0, self.width() * 0.2)
-            self.ui.table_bank_right.setColumnWidth(1, self.width() * 0.1)
-            self.showMaximized()
+            self.reset_ui()
 
         # Connect buttons and items to methods.
         self.ui.tabs.currentChanged.connect(self.tab_switch)
@@ -386,7 +378,9 @@ class ZOIALibrarianMain(QMainWindow):
                 self.msg.exec_()
                 self.msg.setInformativeText(None)
                 self.sd.sd_path(False, self.width())
-                self.ui.tabs.setCurrentIndex(1)
+                if self.sd.get_sd_root() is None:
+                    # user cancelled without providing a path
+                    self.ui.tabs.setCurrentIndex(1)
         elif self.ui.tabs.currentIndex() == 0 \
             and self.ui.table_PS.rowCount() == 1:
             # We started the app with no internet, need to check if there
