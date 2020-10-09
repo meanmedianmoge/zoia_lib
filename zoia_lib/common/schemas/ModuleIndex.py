@@ -3604,7 +3604,8 @@ module_index = {
         "name": "Midi Clock Out",
         "category": "Interface",
         "description": """
-            
+            Generate MIDI clock to sync outside devices to your ZOIA.
+            Clock sends directly to ZOIA's MIDI output.
         """,
         "default_blocks": 3,
         "max_blocks": 5,
@@ -3653,12 +3654,12 @@ module_index = {
         "name": "Tap to CV",
         "category": "CV",
         "description": """
-            
+            Outputs a CV value proportional to the tap tempo input.	
         """,
         "default_blocks": 2,
         "max_blocks": 4,
         "params": 2,
-        "cpu": 0.1,
+        "cpu": 0.12,
         "blocks": {
             "tap_input": {
                 "isDefault": True,
@@ -3690,7 +3691,9 @@ module_index = {
         "name": "Midi Pitch Bend In",
         "category": "Interface",
         "description": """
-            
+            Collects MIDI data from pitch bend wheel on keyboards,
+            can be applied to oscillator frequency in parallel with MIDI note data,
+            or used in other ways.	
         """,
         "default_blocks": 1,
         "max_blocks": 1,
