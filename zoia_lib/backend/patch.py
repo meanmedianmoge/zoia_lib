@@ -35,6 +35,9 @@ class Patch:
         # Create the backend directories if needed.
         self._create_backend_directories()
 
+        # Library version
+        self._version = 1.1
+
     def _create_backend_directories(self):
         """ Creates the necessary directories that will store
         patch files, bank files, and metadata files.

@@ -1,3 +1,4 @@
+import glob
 import json
 import os
 
@@ -69,6 +70,29 @@ class ZOIALibrarianLocal(QMainWindow):
         self.ui.btn_prev_page.setEnabled(False)
         self.viz_disable()
 
+    def metadata_init(self):
+        """ Upon startup, check if patch metadata includes a rating.
+        If not, add it to all patches with a default value of 0.
+        """
+
+        for patch in os.listdir(self.path):
+            if os.path.isdir(os.path.join(self.path, patch)) \
+                    and len(
+                os.listdir(os.path.join(self.path, patch))) >= 2 \
+                    and patch != "Banks" and patch != ".DS_Store":
+                # Need to update all versions
+                for version in glob.glob(os.path.join(self.path,
+                                                      patch, '*json')):
+                    with open(version, "r") as f:
+                        temp = json.loads(f.read())
+                        if "rating" in temp:
+                            continue
+                        else:
+                            # Overwrite existing json if no rating key
+                            temp["rating"] = 0
+                            with open(version, "w") as f_new:
+                                json.dump(temp, f_new)
+
     def create_expt_and_del_btns(self, btn, i, idx, ver):
         """ Creates the export and delete buttons that are displayed on
         the Local Storage View tab's QTableView. Each button is mapped
@@ -126,7 +150,8 @@ class ZOIALibrarianLocal(QMainWindow):
         for patches in os.listdir(self.path):
             # Look for patch directories in the backend.
             if patches != "Banks" and patches != "data.json" and \
-                    patches != '.DS_Store' and patches != "pref.json":
+                    patches != '.DS_Store' and patches != "pref.json" and \
+                    patches != "temp" and patches != "temp.zip":
                 for pch in os.listdir(os.path.join(self.path, patches)):
                     # Read the metadata so that we can set up the tables.
                     if pch.split(".")[-1] == "json":
@@ -523,7 +548,7 @@ class ZOIALibrarianLocal(QMainWindow):
             Est CPU: {} <br>
             Inputs: {} <br>
             Outputs: {} <br>
-            Stompswitch: {} <br>
+            Stompswitches: {} <br>
             MIDI Channels: {} <br>
             Number of Pages: {} <br>
             Number of Starred Params: {}

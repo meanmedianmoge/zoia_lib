@@ -31,6 +31,7 @@ class PatchUpdate(Patch):
               - 3 -> Modify the patch notes
               - 4 -> Modify the author
               - 5 -> Modify the patch title
+              - 6 -> Modify the rating
         """
 
         # Lookup the right term to use.
@@ -39,7 +40,8 @@ class PatchUpdate(Patch):
             2: "categories",
             3: "content",
             4: "author",
-            5: "title"
+            5: "title",
+            6: "rating",
         }[mode]
 
         # Get the patch name and id.

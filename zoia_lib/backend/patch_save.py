@@ -278,6 +278,7 @@ class PatchSave(Patch):
         # Update the revision number if need be.
         if version > 0:
             metadata["revision"] = version
+        metadata["rating"] = 0
 
         with open(name_json, "w") as jf:
             json.dump(metadata, jf)
@@ -384,6 +385,7 @@ class PatchSave(Patch):
                 "title": title,
                 "revision": "1",
                 "preview_url": "",
+                "rating": 0,
                 "like_count": 0,
                 "download_count": 0,
                 "view_count": 0,
