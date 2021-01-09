@@ -10,12 +10,13 @@ def sort_metadata(mode, data, rev):
 
     mode: The method in which the data will be sorted. Valid modes are:
           - 1 -> Sort by title
-          - 2 -> Sort by author
+          - 2 -> Sort by author (local and bank tabs only)
           - 3 -> Sort by like count
           - 4 -> Sort by download count
           - 5 -> Sort by view count
-          - 6 -> Sort by date modified (updated_at attribute)
+          - 6 -> Sort by date modified
           - 7 -> Sort by revision
+          - 8 -> Sort by rating (local and bank tabs only)
     data: An array of metadata that is to be sorted.
     inc: True if the data should be sorted in reverse,
          false otherwise.
@@ -29,7 +30,7 @@ def sort_metadata(mode, data, rev):
     # Input checking.
     if mode is None or data is None or rev is None:
         raise errors.SortingError(mode, 903)
-    if mode < 1 or mode > 7:
+    if mode < 1 or mode > 8:
         raise errors.SortingError(mode, 901)
     if not isinstance(data, list):
         raise errors.SortingError(data, 902)
@@ -59,6 +60,10 @@ def sort_metadata(mode, data, rev):
     elif mode == 7:
         # Sort by revision #
         data.sort(key=lambda x: x["revision"] if "revision" in x else 0,
+                  reverse=rev)
+    elif mode == 8:
+        # Sort by rating (local and bank tabs only)
+        data.sort(key=lambda x: x["rating"] if "rating" in x else 0,
                   reverse=rev)
 
 

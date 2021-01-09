@@ -111,6 +111,9 @@ class ZOIALibrarianMain(QMainWindow):
         # Get the data necessary for the PS tab.
         self.ps.metadata_init()
 
+        # Update local patches if necessary
+        # self.local.metadata_init()
+
         # Set the window icon
         self.setWindowIcon(QIcon(self.icon))
 
@@ -511,6 +514,25 @@ class ZOIALibrarianMain(QMainWindow):
                 date.setTextAlignment(Qt.AlignCenter)
                 date.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 curr_table.setItem(i, 3, date)
+
+            # Numerical rating for "Rating" header
+            # if table_index == 1:
+            #     index = "rating"
+            #     try:
+            #         if data[i][index] < 0 or data[i][index] > 5:
+            #             raise errors.SortingError(data[i][index], 901)
+            #         text = "{} / 5".format(data[i][index])
+            #     except KeyError:
+            #         text = ""
+            #
+            #     text_item = QTableWidgetItem(text)
+            #     text_item.setTextAlignment(Qt.AlignCenter)
+            #     # Can only edit tags/cats in Local Storage View.
+            #     if self.ui.back_btn_local.isEnabled() and \
+            #             len(os.listdir(os.path.join(self.path, idx))) > 2:
+            #         text_item.setFlags(
+            #             Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            #     curr_table.setItem(i, 4, text_item)
 
             # If we are on tab index 0, we need a "Download" header item.
             if table_index == 0:
@@ -1197,7 +1219,7 @@ class ZOIALibrarianMain(QMainWindow):
         input_dir = self.directory_select()
 
         for pch in os.listdir(input_dir):
-            if pch.split(".")[1] == "bin":
+            if pch.split(".")[-1] == "bin":
                 # Try to save the binary.
                 try:
                     save.import_to_backend(os.path.join(input_dir, pch))
