@@ -716,20 +716,16 @@ module_index = {
         }
     },
     17: {
-        "name": "CV Filter",
+        "name": "CV Invert",
         "category": "CV",
         "description": """
-            CV Filter dictates the length of time a CV output will take to respond
-            to a change in CV input, determined by the time constant.
-            The CV change occurs logarithmically for a nice smooth transition.
-            Use this module in series with a MIDI/keyboard note to add portamento
-            to your synth voice.
-            You can also use this module to vary the shape of an LFO waveform or
-            connect to a stomp switch to produce a long slow change in an audio effect.
+            Inverts the incoming CV.
+            For example, a CV input of 1 will output as -1.
+            An input of 0.2 will output as -0.2. 	
         """,
-        "default_blocks": 3,
-        "max_blocks": 3,
-        "params": 2,
+        "default_blocks": 2,
+        "max_blocks": 2,
+        "params": 1,
         "cpu": 0.02,
         "blocks": {
             "cv_input": {
@@ -737,15 +733,10 @@ module_index = {
                 "isParam": True,
                 "position": 0
             },
-            "time_constant": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
             "cv_output": {
                 "isDefault": True,
                 "isParam": False,
-                "position": 2
+                "position": 1
             }
         },
         "options": {}
