@@ -79,7 +79,7 @@ class ZOIALibrarianLocal(QMainWindow):
             if os.path.isdir(os.path.join(self.path, patch)) \
                     and len(
                 os.listdir(os.path.join(self.path, patch))) >= 2 \
-                    and patch != "Banks" and patch != ".DS_Store":
+                    and patch != "Banks" and patch != "temp":
                 # Need to update all versions
                 for version in glob.glob(os.path.join(self.path,
                                                       patch, '*json')):
