@@ -108,10 +108,10 @@ class ZOIALibrarianLocal(QMainWindow):
 
         # Only enable exporting if there is a single version on the main page.
         if "[Multiple Versions]" in btn.text():
-            ext_btn = QPushButton("See Version\nHistory to\nexport!", self)
-            ext_btn.setEnabled(False)
+            ext_btn = QPushButton("Export \n patches", self)
+            ext_btn.setEnabled(True)
         else:
-            ext_btn = QPushButton("Click me\nto export!", self)
+            ext_btn = QPushButton("Export \n patch", self)
 
         del_btn = QPushButton("X", self)
 
@@ -128,11 +128,11 @@ class ZOIALibrarianLocal(QMainWindow):
         # Connect the buttons and put them in the table.
         ext_btn.setFont(self.ui.table_PS.horizontalHeader().font())
         ext_btn.clicked.connect(self.initiate_export)
-        self.ui.table_local.setCellWidget(i, 4, ext_btn)
+        self.ui.table_local.setCellWidget(i, 5, ext_btn)
 
         del_btn.setFont(self.ui.table_PS.horizontalHeader().font())
         del_btn.clicked.connect(self.initiate_delete)
-        self.ui.table_local.setCellWidget(i, 5, del_btn)
+        self.ui.table_local.setCellWidget(i, 6, del_btn)
 
     def get_local_patches(self):
         """ Retrieves the metadata for patches that a user has previously
@@ -218,7 +218,7 @@ class ZOIALibrarianLocal(QMainWindow):
             # No SD path.
             self.msg.setWindowTitle("No SD Path")
             self.msg.setIcon(QMessageBox.Information)
-            self.msg.setText("Please specify your SD card path!")
+            self.msg.setText("Please specify your SD card path.")
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
             self.sd.sd_path(False, self.window.width())
@@ -226,41 +226,114 @@ class ZOIALibrarianLocal(QMainWindow):
         else:
             if "to_zoia" not in os.listdir(self.sd.get_sd_root()):
                 os.mkdir(os.path.join(self.sd.get_sd_root(), "to_zoia"))
+
+            # Get the patch(es) which we're exporting
+            idx = self.sender().objectName()
+
+            # Find the first open slot in the export dir
+            if len(os.listdir(os.path.join(self.sd.get_sd_root(),
+                                           "to_zoia"))) > 0:
+                for pch in sorted(os.listdir(os.path.join(
+                        self.sd.get_sd_root(), "to_zoia"))):
+                    first_open_slot = int(pch[1:3]) + 1
+            else:
+                first_open_slot = 0
+
             while True:
                 # Ask for a slot
                 slot, ok = QInputDialog().getInt(
-                    self.window, "Patch Export", "Slot number:", minValue=0,
-                    maxValue=63)
+                    self.window, "Patch Export", "Slot number:",
+                    first_open_slot, minValue=0, maxValue=63)
                 if ok:
-                    self.ui.statusbar.showMessage("Patch be movin",
-                                                  timeout=5000)
+                    self.ui.statusbar.showMessage("Patches be movin'", timeout=5000)
                     # Got a slot and the user hit "OK"
-                    try:
-                        self.export.export_patch_bin(
-                            self.sender().objectName(), os.path.join(
+                    if ("_" not in idx and len(os.listdir(os.path.join(
+                            self.path, idx))) == 2) or "_" in idx:
+                        # Not working within a version directory.
+                        # Just a single patch
+                        try:
+                            self.export.export_patch_bin(idx, os.path.join(
                                 self.sd.get_sd_root(), "to_zoia"), slot)
-                        self.ui.statusbar.showMessage("Export complete!",
-                                                      timeout=5000)
-                        break
-                    except errors.ExportingError:
-                        # There was already a patch in that slot.
-                        self.msg.setWindowTitle("Slot Exists")
-                        self.msg.setIcon(QMessageBox.Information)
-                        self.msg.setText(
-                            "That slot is occupied by another patch. "
-                            "Would you like to overwrite it?")
-                        self.msg.setStandardButtons(QMessageBox.Yes |
-                                                    QMessageBox.No)
-                        value = self.msg.exec_()
-                        if value == QMessageBox.Yes:
-                            # Overwrite the other patch.
-                            self.export.export_patch_bin(
-                                self.sender().objectName(),
-                                os.path.join(self.sd.get_sd_root(),
-                                             "to_zoia"), slot, True)
-                            self.ui.statusbar.showMessage(
-                                "Export complete!", timeout=5000)
+                            self.ui.statusbar.showMessage("Export complete.",
+                                                          timeout=5000)
                             break
+                        except errors.ExportingError:
+                            # There was already a patch in that slot.
+                            # Find its name and display to the user to confirm.
+                            for pch in sorted(os.listdir(os.path.join(
+                                    self.sd.get_sd_root(), "to_zoia"))):
+                                if pch[:3] == "00{}".format(slot) or \
+                                        pch[:3] == "0{}".format(slot):
+                                    name = pch[9:].split('.')[0].replace(
+                                        '_', ' ').title()
+                                else:
+                                    name = "another patch"
+                            self.msg.setWindowTitle("Slot Exists")
+                            self.msg.setIcon(QMessageBox.Information)
+                            self.msg.setText(
+                                "That slot is occupied by {}. "
+                                "Would you like to overwrite it?".format(name))
+                            self.msg.setStandardButtons(QMessageBox.Yes |
+                                                        QMessageBox.No)
+                            value = self.msg.exec_()
+                            if value == QMessageBox.Yes:
+                                # Overwrite the other patch.
+                                self.export.export_patch_bin(idx, os.path.join(
+                                    self.sd.get_sd_root(), "to_zoia"), slot, True)
+                                self.ui.statusbar.showMessage(
+                                    "Export complete.", timeout=5000)
+                                break
+
+                    else:
+                        # An entire version directory was selected.
+                        pch_num = int((len(os.listdir(os.path.join(
+                            self.path, idx))) / 2) - 1)
+                        if slot + pch_num > 63:
+                            self.msg.setWindowTitle("No Space")
+                            self.msg.setIcon(QMessageBox.Information)
+                            self.msg.setText(
+                                "The version directory contains {} patches, "
+                                "so it must be exported to slot {} or lower.".format(
+                                    pch_num + 1, 63 - pch_num))
+                            self.msg.setStandardButtons(QMessageBox.Ok)
+                            self.msg.exec_()
+                        else:
+                            # Need to see how many slots are being replaced.
+                            count = 0
+                            for slot_check in range(slot, slot + pch_num + 1):
+                                for pch in sorted(os.listdir(os.path.join(
+                                        self.sd.get_sd_root(), "to_zoia"))):
+                                    if pch[:3] == "00{}".format(slot_check) or \
+                                            pch[:3] == "0{}".format(slot_check):
+                                        count += 1
+                            if count > 0:
+                                # Remove all of the patches that are in the way.
+                                self.msg.setWindowTitle("Slot Exists")
+                                self.msg.setIcon(QMessageBox.Information)
+                                self.msg.setText(
+                                    "Those slots are occupied by {} patches. "
+                                    "Would you like to overwrite them?".format(count))
+                                self.msg.setStandardButtons(QMessageBox.Yes |
+                                                            QMessageBox.No)
+                                value = self.msg.exec_()
+                                if value == QMessageBox.Yes:
+                                    # Overwrite the other patches.
+                                    for ver in sorted(os.listdir(os.path.join(self.path, idx))):
+                                        if ver.endswith('.bin'):
+                                            self.export.export_patch_bin(ver, os.path.join(
+                                                self.sd.get_sd_root(), "to_zoia"), slot, True)
+                                            self.ui.statusbar.showMessage(
+                                                "Export complete.", timeout=5000)
+                                            slot += 1
+                                    break
+                            else:
+                                for ver in sorted(os.listdir(os.path.join(self.path, idx))):
+                                    if ver.endswith('.bin'):
+                                        self.export.export_patch_bin(ver, os.path.join(
+                                            self.sd.get_sd_root(), "to_zoia"), slot)
+                                        self.ui.statusbar.showMessage(
+                                            "Export complete.", timeout=5000)
+                                        slot += 1
                 # Operation was aborted.
                 break
 
@@ -328,7 +401,7 @@ class ZOIALibrarianLocal(QMainWindow):
             self.msg.setWindowTitle("No Updates")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText("All of the patches you have downloaded are "
-                             "the latest version!")
+                             "the latest version.")
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
         else:

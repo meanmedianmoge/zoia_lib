@@ -112,7 +112,7 @@ class ZOIALibrarianPS(QMainWindow):
         self.sort_and_set()
         self.ui.btn_dwn_all.setEnabled(True)
         self.ui.refresh_pch_btn.setEnabled(True)
-        self.ui.statusbar.showMessage("Patch list refreshed!", timeout=5000)
+        self.ui.statusbar.showMessage("Patch list refreshed", timeout=5000)
         self.msg.setWindowTitle("Patches Refreshed")
         self.msg.setText("The PatchStorage patch list has been refreshed.")
         self.msg.setIcon(QMessageBox.Information)
@@ -193,8 +193,8 @@ class ZOIALibrarianPS(QMainWindow):
             self.save.save_to_backend(self.api.download(str(
                 self.sender().objectName())))
             self.sender().setEnabled(False)
-            self.sender().setText("Downloaded!")
-            self.ui.statusbar.showMessage("Download complete!", timeout=5000)
+            self.sender().setText("Downloaded")
+            self.ui.statusbar.showMessage("Download complete.", timeout=5000)
         except errors.SavingError:
             # .py or .rar and the user doesn't have WinRAR installed.
             self.msg.setWindowTitle("Invalid File Type")
@@ -226,14 +226,14 @@ class ZOIALibrarianPS(QMainWindow):
         """
 
         # Prepare the button.
-        dwn = QPushButton("Click me\nto download!", self)
+        dwn = QPushButton("Download \n patch", self)
         dwn.setObjectName(idx)
         dwn.setFont(self.ui.table_PS.horizontalHeader().font())
         dwn.clicked.connect(self.initiate_download)
         # Only enable it if we haven't already downloaded the patch.
         if idx in os.listdir(self.path):
             dwn.setEnabled(False)
-            dwn.setText("Downloaded!")
+            dwn.setText("Downloaded")
         self.ui.table_PS.setCellWidget(i, 4, dwn)
 
     def get_data_ps(self):
@@ -289,7 +289,7 @@ class DownloadAllWorker(QThread):
                         self.save.save_to_backend(self.api.download(
                             btn.objectName()))
                         btn.setEnabled(False)
-                        btn.setText("Downloaded!")
+                        btn.setText("Downloaded")
                         self.cnt += 1
                     except errors.SavingError:
                         self.fails += 1

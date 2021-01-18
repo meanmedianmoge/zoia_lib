@@ -153,34 +153,46 @@ class ZOIALibrarianMain(QMainWindow):
             self.bank_sizes = data[4]
 
             # PS Table
+            # self.ui.splitter_PS.setSizes([self.ps_sizes["split_left"],
+            #                               self.ps_sizes["split_right"]])
             self.ui.table_PS.setColumnWidth(0, self.ps_sizes["col_0"])
             self.ui.table_PS.setColumnWidth(1, self.ps_sizes["col_1"])
             self.ui.table_PS.setColumnWidth(2, self.ps_sizes["col_2"])
             self.ui.table_PS.setColumnWidth(3, self.ps_sizes["col_3"])
 
             # Local Table
+            # self.ui.splitter_local.setSizes([self.local_sizes["split_left"],
+            #                                  self.local_sizes["split_right"]])
+            # self.ui.splitter_local_hori.setSizes([self.local_sizes["split_top"],
+            #                                       self.local_sizes["split_bottom"]])
             self.ui.table_local.setColumnWidth(0, self.local_sizes["col_0"])
             self.ui.table_local.setColumnWidth(1, self.local_sizes["col_1"])
             self.ui.table_local.setColumnWidth(2, self.local_sizes["col_2"])
             self.ui.table_local.setColumnWidth(3, self.local_sizes["col_3"])
             self.ui.table_local.setColumnWidth(4, self.local_sizes["col_4"])
+            self.ui.table_local.setColumnWidth(5, self.local_sizes["col_5"])
 
             # SD Tables
+            # self.ui.splitter_sd_vert.setSizes([self.sd_sizes["split_top"],
+            #                                    self.sd_sizes["split_bottom"]])
+            # self.ui.splitter_sd_hori.setSizes([self.sd_sizes["split_left"],
+            #                                    self.sd_sizes["split_right"]])
             self.ui.table_sd_left.setColumnWidth(0, self.sd_sizes["col_0"])
             self.ui.table_sd_left.setColumnWidth(1, self.sd_sizes["col_1"])
             self.ui.table_sd_right.setColumnWidth(0, self.sd_sizes["col_2"])
             self.ui.table_sd_right.setColumnWidth(1, self.sd_sizes["col_3"])
 
             # Bank Tables
+            # self.ui.splitter_bank_tables.setSizes([self.bank_sizes["split_bank_left"],
+            #                                        self.bank_sizes["split_bank_right"]])
+            # self.ui.splitter_bank.setSizes([self.bank_sizes["split_left"],
+            #                                 self.bank_sizes["split_middle"],
+            #                                 self.bank_sizes["split_right"]])
             self.ui.table_bank_left.setColumnWidth(0, self.bank_sizes["col_0"])
-            self.ui.table_bank_right.setColumnWidth(0,
-                                                    self.bank_sizes["col_1"])
-            self.ui.table_bank_local.setColumnWidth(0,
-                                                    self.bank_sizes["col_2"])
-            self.ui.table_bank_local.setColumnWidth(1,
-                                                    self.bank_sizes["col_3"])
-            self.ui.table_bank_local.setColumnWidth(2,
-                                                    self.bank_sizes["col_4"])
+            self.ui.table_bank_right.setColumnWidth(0, self.bank_sizes["col_1"])
+            self.ui.table_bank_local.setColumnWidth(0, self.bank_sizes["col_2"])
+            self.ui.table_bank_local.setColumnWidth(1, self.bank_sizes["col_3"])
+            self.ui.table_bank_local.setColumnWidth(2, self.bank_sizes["col_4"])
 
             self.util.set_dark(data[5]["enabled"])
             self.util.set_row_inversion(data[6]["enabled"])
@@ -212,6 +224,10 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.actionSort_by_author_A_Z.triggered.connect(
             self.sort_and_set)
         self.ui.actionSort_by_author_Z_A.triggered.connect(
+            self.sort_and_set)
+        self.ui.actionSort_by_rating_high_low.triggered.connect(
+            self.sort_and_set)
+        self.ui.actionSort_by_rating_low_high.triggered.connect(
             self.sort_and_set)
         self.ui.actionSpecify_SD_Card_Location.triggered.connect(
             lambda: self.sd.sd_path(False, self.width()))
@@ -288,48 +304,43 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Modify the display sizes for some widgets.
         if self.ps_sizes is None:
-            self.ui.splitter_PS.setSizes([self.width() * 0.5,
-                                          self.width() * 0.5])
+            self.ui.splitter_PS.setSizes([self.width() * 0.55,
+                                          self.width() * 0.45])
         else:
             self.ui.splitter_PS.setSizes([self.ps_sizes["split_left"],
                                           self.ps_sizes["split_right"]])
         if self.local_sizes is None:
-            self.ui.splitter_local.setSizes([self.width() * 0.5,
-                                             self.width() * 0.5])
-            self.ui.splitter_local_hori.setSizes([self.width() * 0.5,
-                                                  self.width() * 0.5])
+            self.ui.splitter_local.setSizes([self.width() * 0.6,
+                                             self.width() * 0.4])
+            self.ui.splitter_local_hori.setSizes([self.height() * 0.55,
+                                                  self.height() * 0.45])
         else:
             self.ui.splitter_local.setSizes([self.local_sizes["split_left"],
                                              self.local_sizes["split_right"]])
-            try:
-                self.ui.splitter_local_hori.setSizes(
-                    [self.local_sizes["split_top"],
-                     self.local_sizes["split_bottom"]])
-            except KeyError:
-                self.ui.splitter_local_hori.setSizes([self.width() * 0.5,
-                                                      self.width() * 0.5])
+            self.ui.splitter_local_hori.setSizes([self.local_sizes["split_top"],
+                                                  self.local_sizes["split_bottom"]])
         if self.sd_sizes is None:
             self.ui.splitter_sd_hori.setSizes([self.width() * 0.5,
                                                self.width() * 0.5])
-            self.ui.splitter_sd_vert.setSizes([self.width() * 0.185,
-                                               self.width() * 0.815])
+            self.ui.splitter_sd_vert.setSizes([self.height() * 0.35,
+                                               self.height() * 0.65])
         else:
             self.ui.splitter_sd_vert.setSizes([self.sd_sizes["split_top"],
                                                self.sd_sizes["split_bottom"]])
             self.ui.splitter_sd_hori.setSizes([self.sd_sizes["split_left"],
                                                self.sd_sizes["split_right"]])
         if self.bank_sizes is None:
+            self.ui.splitter_bank.setSizes([self.width() * 0.55,
+                                            self.width() * 0.45,
+                                            self.width() * 0])
             self.ui.splitter_bank_tables.setSizes([self.width() * 0.5,
                                                    self.width() * 0.5])
-            self.ui.splitter_bank.setSizes([self.width() * 0.5, self.width() *
-                                            0.25, self.width() * 0.25])
         else:
-            self.ui.splitter_bank_tables.setSizes(
-                [self.bank_sizes["split_bank_left"],
-                 self.bank_sizes["split_bank_right"]])
             self.ui.splitter_bank.setSizes([self.bank_sizes["split_left"],
                                             self.bank_sizes["split_middle"],
                                             self.bank_sizes["split_right"]])
+            self.ui.splitter_bank_tables.setSizes([self.bank_sizes["split_bank_left"],
+                                                   self.bank_sizes["split_bank_right"]])
 
         # Sort and set the data.
         self.sort_and_set()
@@ -376,7 +387,7 @@ class ZOIALibrarianMain(QMainWindow):
             if self.sd.get_sd_root() is None:
                 self.msg.setWindowTitle("No SD Path")
                 self.msg.setIcon(QMessageBox.Information)
-                self.msg.setText("Please specify your SD card path!")
+                self.msg.setText("Please specify your SD card path.")
                 self.msg.setStandardButtons(QMessageBox.Ok)
                 self.msg.exec_()
                 self.msg.setInformativeText(None)
@@ -516,23 +527,24 @@ class ZOIALibrarianMain(QMainWindow):
                 curr_table.setItem(i, 3, date)
 
             # Numerical rating for "Rating" header
-            # if table_index == 1:
-            #     index = "rating"
-            #     try:
-            #         if data[i][index] < 0 or data[i][index] > 5:
-            #             raise errors.SortingError(data[i][index], 901)
-            #         text = "{} / 5".format(data[i][index])
-            #     except KeyError:
-            #         text = ""
-            #
-            #     text_item = QTableWidgetItem(text)
-            #     text_item.setTextAlignment(Qt.AlignCenter)
-            #     # Can only edit tags/cats in Local Storage View.
-            #     if self.ui.back_btn_local.isEnabled() and \
-            #             len(os.listdir(os.path.join(self.path, idx))) > 2:
-            #         text_item.setFlags(
-            #             Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            #     curr_table.setItem(i, 4, text_item)
+            if table_index == 1:
+                index = "rating"
+                try:
+                    if data[i][index] < 0 or data[i][index] > 3:
+                        raise errors.SortingError(data[i][index], 901)
+                    text = "{} / 3".format(data[i][index])
+                except KeyError:
+                    text = ""
+
+                text_item = QTableWidgetItem(text)
+                text_item.setTextAlignment(Qt.AlignCenter)
+
+                # Edit rating.
+                if self.ui.back_btn_local.isEnabled() and \
+                        len(os.listdir(os.path.join(self.path, idx))) > 2:
+                    text_item.setFlags(
+                        Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                curr_table.setItem(i, 4, text_item)
 
             # If we are on tab index 0, we need a "Download" header item.
             if table_index == 0:
@@ -544,36 +556,37 @@ class ZOIALibrarianMain(QMainWindow):
                 self.local.create_expt_and_del_btns(
                     btn_title, i, idx, str(data[i]["revision"]))
 
-            # If we are on tab index 2, we need an "Add to Bank" header item.
+            # If we are on tab index 3, we need an "Add to Bank" header item.
             elif table_index == 3:
-                self.bank.create_add_btn(i, idx)
+                self.bank.create_add_btn(btn_title, i, idx)
 
         # Also set the title size and resize the columns.
         # Only use defaults if pref.json doesn't exist.
         if table_index == 0 and self.ps_sizes is None:
             curr_table.resizeColumnsToContents()
-            curr_table.setColumnWidth(1, self.width() * 0.1)
-            curr_table.setColumnWidth(2, self.width() * 0.1)
-            curr_table.setColumnWidth(3, self.width() * 0.1)
-            self.ui.splitter_PS.setSizes([self.width() * 0.6,
-                                          self.width() * 0.4])
+            curr_table.setColumnWidth(0, self.width() * 0.165)
+            curr_table.setColumnWidth(1, self.width() * 0.135)
+            curr_table.setColumnWidth(2, self.width() * 0.075)
+            curr_table.setColumnWidth(3, self.width() * 0.075)
+            self.ui.splitter_PS.setSizes([self.width() * 0.55,
+                                          self.width() * 0.45])
             self.ps_sizes = {
                 "col_0": curr_table.columnWidth(0),
                 "col_1": curr_table.columnWidth(1),
                 "col_2": curr_table.columnWidth(2),
                 "col_3": curr_table.columnWidth(3),
-                "split_left": self.width() * 0.6,
-                "split_right": self.width() * 0.4
+                "split_left": self.ui.splitter_PS.sizes()[0],
+                "split_right": self.ui.splitter_PS.sizes()[1]
             }
 
         elif table_index == 1 and self.local_sizes is None:
             curr_table.resizeColumnsToContents()
-
-            curr_table.setColumnWidth(1, self.width() * 0.09)
-            curr_table.setColumnWidth(2, self.width() * 0.09)
-            curr_table.setColumnWidth(3, self.width() * 0.07)
-            curr_table.setColumnWidth(4, self.width() * 0.05)
-            curr_table.setColumnWidth(5, self.width() * 0.03)
+            curr_table.setColumnWidth(0, self.width() * 0.165)
+            curr_table.setColumnWidth(1, self.width() * 0.125)
+            curr_table.setColumnWidth(2, self.width() * 0.065)
+            curr_table.setColumnWidth(3, self.width() * 0.075)
+            curr_table.setColumnWidth(4, self.width() * 0.045)
+            curr_table.setColumnWidth(5, self.width() * 0.065)
             self.local_sizes = {
                 "col_0": curr_table.columnWidth(0),
                 "col_1": curr_table.columnWidth(1),
@@ -589,9 +602,10 @@ class ZOIALibrarianMain(QMainWindow):
 
         elif table_index == 2 and self.sd_sizes is None:
             curr_table.resizeColumnsToContents()
-            curr_table.setColumnWidth(1, self.width() * 0.14)
-            curr_table.setColumnWidth(2, self.width() * 0.14)
-            curr_table.setColumnWidth(3, self.width() * 0.14)
+            curr_table.setColumnWidth(0, self.width() * 0.25)
+            curr_table.setColumnWidth(1, self.width() * 0.1)
+            curr_table.setColumnWidth(2, self.width() * 0.25)
+            curr_table.setColumnWidth(3, self.width() * 0.1)
             self.ui.splitter_sd_hori.setSizes([self.width() * 0.4,
                                                self.width() * 0.6])
             self.ui.splitter_sd_vert.setSizes([self.width() * 0.5,
@@ -610,8 +624,14 @@ class ZOIALibrarianMain(QMainWindow):
 
         elif table_index == 3 and self.bank_sizes is None:
             curr_table.resizeColumnsToContents()
-            curr_table.setColumnWidth(0, self.width() * 0.05)
-            curr_table.setColumnWidth(1, self.width() * 0.05)
+            curr_table.setColumnWidth(0, self.width() * 0.165)
+            curr_table.setColumnWidth(1, self.width() * 0.125)
+            curr_table.setColumnWidth(2, self.width() * 0.0625)
+            self.ui.splitter_bank.setSizes([self.width() * 0.55,
+                                            self.width() * 0.45,
+                                            self.width() * 0])
+            self.ui.splitter_bank_tables.setSizes([self.width() * 0.5,
+                                                   self.width() * 0.5])
 
             self.bank_sizes = {
                 "col_0": curr_table.columnWidth(0),
@@ -635,46 +655,49 @@ class ZOIALibrarianMain(QMainWindow):
         """
 
         # Reset PS sizes
+        self.ui.splitter_PS.setSizes([self.width() * 0.55,
+                                      self.width() * 0.45])
         self.ui.table_PS.resizeColumnsToContents()
-        self.ui.table_PS.setColumnWidth(1, self.width() * 0.1)
-        self.ui.table_PS.setColumnWidth(2, self.width() * 0.1)
-        self.ui.table_PS.setColumnWidth(3, self.width() * 0.1)
-        self.ui.splitter_PS.setSizes([self.width() * 0.5,
-                                      self.width() * 0.5])
+        self.ui.table_PS.setColumnWidth(0, self.width() * 0.165)
+        self.ui.table_PS.setColumnWidth(1, self.width() * 0.135)
+        self.ui.table_PS.setColumnWidth(2, self.width() * 0.075)
+        self.ui.table_PS.setColumnWidth(3, self.width() * 0.075)
 
         # Reset local sizes
+        self.ui.splitter_local.setSizes([self.width() * 0.6,
+                                         self.width() * 0.4])
+        self.ui.splitter_local_hori.setSizes([self.height() * 0.55,
+                                              self.height() * 0.45])
         self.ui.table_local.resizeColumnsToContents()
-        self.ui.table_local.setColumnWidth(1, self.width() * 0.1)
-        self.ui.table_local.setColumnWidth(2, self.width() * 0.1)
-        self.ui.table_local.setColumnWidth(3, self.width() * 0.1)
-        self.ui.table_local.setColumnWidth(4, self.width() * 0.05)
-        self.ui.table_local.setColumnWidth(5, self.width() * 0.03)
-        self.ui.splitter_local.setSizes([self.width() * 0.5,
-                                         self.width() * 0.5])
-        self.ui.splitter_local_hori.setSizes([self.height() * 0.5,
-                                              self.height() * 0.5])
+        self.ui.table_local.setColumnWidth(0, self.width() * 0.165)
+        self.ui.table_local.setColumnWidth(1, self.width() * 0.125)
+        self.ui.table_local.setColumnWidth(2, self.width() * 0.065)
+        self.ui.table_local.setColumnWidth(3, self.width() * 0.075)
+        self.ui.table_local.setColumnWidth(4, self.width() * 0.045)
+        self.ui.table_local.setColumnWidth(5, self.width() * 0.065)
 
         # Reset SD sizes
+        self.ui.splitter_sd_hori.setSizes([self.width() * 0.5,
+                                           self.width() * 0.5])
+        self.ui.splitter_sd_vert.setSizes([self.height() * 0.35,
+                                           self.height() * 0.65])
         self.ui.table_sd_left.setColumnWidth(0, self.width() * 0.25)
         self.ui.table_sd_left.setColumnWidth(1, self.width() * 0.1)
         self.ui.table_sd_right.setColumnWidth(0, self.width() * 0.25)
         self.ui.table_sd_right.setColumnWidth(1, self.width() * 0.1)
-        self.ui.splitter_sd_hori.setSizes([self.width() * 0.5,
-                                           self.width() * 0.5])
-        self.ui.splitter_sd_vert.setSizes([self.height() * 0.185,
-                                           self.height() * 0.815])
 
         # Reset bank sizes
-        self.ui.table_bank_local.setColumnWidth(0, self.width() * 0.14)
-        self.ui.table_bank_local.setColumnWidth(1, self.width() * 0.1)
-        self.ui.table_bank_left.setColumnWidth(0, self.width() * 0.14)
-        self.ui.table_bank_left.setColumnWidth(1, self.width() * 0.1)
-        self.ui.table_bank_right.setColumnWidth(0, self.width() * 0.14)
-        self.ui.table_bank_right.setColumnWidth(1, self.width() * 0.1)
+        self.ui.splitter_bank.setSizes([self.width() * 0.55,
+                                        self.width() * 0.45,
+                                        self.width() * 0])
         self.ui.splitter_bank_tables.setSizes([self.width() * 0.5,
                                                self.width() * 0.5])
-        self.ui.splitter_bank.setSizes([self.width() * 0.5, self.width() *
-                                        0.25, self.width() * 0.25])
+        self.ui.table_bank_left.setColumnWidth(0, self.width() * 0.14)
+        self.ui.table_bank_right.setColumnWidth(0, self.width() * 0.14)
+        self.ui.table_bank_local.setColumnWidth(0, self.width() * 0.165)
+        self.ui.table_bank_local.setColumnWidth(1, self.width() * 0.125)
+        self.ui.table_bank_local.setColumnWidth(2, self.width() * 0.0625)
+
         self.showMaximized()
 
     def display_patch_info(self):
@@ -909,6 +932,8 @@ class ZOIALibrarianMain(QMainWindow):
                 "actionSort_by_downloads_low_high": (4, False),
                 "actionSort_by_author_A_Z": (2, False),
                 "actionSort_by_author_Z_A": (2, True),
+                "actionSort_by_rating_high_low": (8, True),
+                "actionSort_by_rating_low_high": (8, False),
             }[self.sender().objectName()]
             self.prev_sort = curr_sort
         except KeyError:
@@ -1025,9 +1050,9 @@ class ZOIALibrarianMain(QMainWindow):
             return
         try:
             save.import_to_backend(pch)
-            self.ui.statusbar.showMessage("Import complete!")
+            self.ui.statusbar.showMessage("Import complete.")
             self.msg.setWindowTitle("Import Complete")
-            self.msg.setText("The patch has been successfully imported!")
+            self.msg.setText("The patch has been successfully imported.")
             self.msg.exec_()
             # Reload the tables if we are currently displaying them.
             if (self.ui.tabs.currentIndex() == 1 and not

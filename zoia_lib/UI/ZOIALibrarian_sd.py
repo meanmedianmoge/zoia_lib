@@ -147,7 +147,7 @@ class ZOIALibrarianSD(QMainWindow):
                 # Get the useful int index.
                 index = int(index[1:3])
 
-                import_btn = QPushButton("Click me to import!", self)
+                import_btn = QPushButton("Import patch", self)
                 import_btn.setObjectName(str(index))
                 import_btn.setFont(self.ui.table_PS.horizontalHeader().font())
                 import_btn.clicked.connect(self._import_patch_sd)
@@ -191,11 +191,11 @@ class ZOIALibrarianSD(QMainWindow):
                     try:
                         self.save.import_to_backend(
                             os.path.join(self.sd_path_full, sd_pch))
-                        self.ui.statusbar.showMessage("Import complete!")
+                        self.ui.statusbar.showMessage("Import complete.")
                         self.msg.setIcon(QMessageBox.Information)
                         self.msg.setWindowTitle("Import Complete")
                         self.msg.setText(
-                            "The patch has been successfully imported!")
+                            "The patch has been successfully imported.")
                         self.msg.exec_()
                         return
                     except errors.SavingError:

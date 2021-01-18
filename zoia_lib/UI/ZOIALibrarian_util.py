@@ -202,6 +202,7 @@ class ZOIALibrarianUtil:
             "col_2": self.ui.table_local.columnWidth(2),
             "col_3": self.ui.table_local.columnWidth(3),
             "col_4": self.ui.table_local.columnWidth(4),
+            "col_5": self.ui.table_local.columnWidth(5),
             "split_left": self.ui.splitter_local.sizes()[0],
             "split_right": self.ui.splitter_local.sizes()[1],
             "split_top": self.ui.splitter_local_hori.sizes()[0],

@@ -14,7 +14,7 @@
    <enum>Qt::StrongFocus</enum>
   </property>
   <property name="windowTitle">
-   <string>ZOIA Librarian - Version 1.0</string>
+   <string>ZOIA Librarian - Version 1.1</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -274,6 +274,9 @@
                          <property name="mouseTracking">
                           <bool>false</bool>
                          </property>
+                         <property name="statusTip">
+                          <string>View list of Patchstorage uploads.</string>
+                         </property>
                          <property name="accessibleName">
                           <string>PatchStorage Table</string>
                          </property>
@@ -363,7 +366,7 @@
                      </widget>
                      <widget class="QTextBrowser" name="text_browser_PS">
                       <property name="statusTip">
-                       <string/>
+                       <string>Click on a patch to view its metadata.</string>
                       </property>
                       <property name="accessibleName">
                        <string>Additional Patch Notes Display</string>
@@ -541,6 +544,9 @@
                    <property name="mouseTracking">
                     <bool>false</bool>
                    </property>
+                   <property name="statusTip">
+                    <string>View list of local patches.</string>
+                   </property>
                    <property name="accessibleName">
                     <string>Local Storage View table</string>
                    </property>
@@ -566,7 +572,7 @@
                     <number>1</number>
                    </property>
                    <property name="columnCount">
-                    <number>6</number>
+                    <number>7</number>
                    </property>
                    <attribute name="horizontalHeaderCascadingSectionResizes">
                     <bool>true</bool>
@@ -608,6 +614,11 @@
                    <column>
                     <property name="text">
                      <string>Date Modified</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Rating</string>
                     </property>
                    </column>
                    <column>
@@ -672,6 +683,9 @@
                     <number>10</number>
                    </property>
                    <widget class="QTextBrowser" name="text_browser_local">
+                    <property name="statusTip">
+                     <string>Click on a patch to view its metadata.</string>
+                    </property>
                     <property name="accessibleName">
                      <string>Additional Patch Notes Display</string>
                     </property>
@@ -727,6 +741,15 @@
                              <verstretch>0</verstretch>
                             </sizepolicy>
                            </property>
+                           <property name="statusTip">
+                            <string>Click on a patch to visualize its routing.</string>
+                           </property>
+                           <property name="accessibleName">
+                            <string>Visualizer text display</string>
+                           </property>
+                           <property name="accessibleDescription">
+                            <string>Displays information about the selected patch, either in patch view or module view.</string>
+                           </property>
                           </widget>
                          </item>
                          <item>
@@ -736,6 +759,18 @@
                              <horstretch>0</horstretch>
                              <verstretch>0</verstretch>
                             </sizepolicy>
+                           </property>
+                           <property name="toolTip">
+                            <string>Click here to view the next page in the selected patch.</string>
+                           </property>
+                           <property name="statusTip">
+                            <string>Click here to view the next page in the selected patch.</string>
+                           </property>
+                           <property name="accessibleName">
+                            <string>Next viz page Local Storage View</string>
+                           </property>
+                           <property name="accessibleDescription">
+                            <string>Navigates to the next page in the visualizer for the selected patch.</string>
                            </property>
                            <property name="text">
                             <string>Next Page -&gt;</string>
@@ -749,6 +784,18 @@
                              <horstretch>0</horstretch>
                              <verstretch>0</verstretch>
                             </sizepolicy>
+                           </property>
+                           <property name="toolTip">
+                            <string>Click here to view the previous page in the selected patch.</string>
+                           </property>
+                           <property name="statusTip">
+                            <string>Click here to view the previous page in the selected patch.</string>
+                           </property>
+                           <property name="accessibleName">
+                            <string>Previous viz page Local Storage View</string>
+                           </property>
+                           <property name="accessibleDescription">
+                            <string>Navigates to the previous page in the visualizer for the selected patch.</string>
                            </property>
                            <property name="text">
                             <string>&lt;- Prev. Page</string>
@@ -1399,6 +1446,9 @@
              <number>10</number>
             </property>
             <widget class="QTreeView" name="sd_tree">
+             <property name="statusTip">
+              <string>Browse through the SD card directories.</string>
+             </property>
              <property name="accessibleName">
               <string>SD Card Viewer</string>
              </property>
@@ -1514,11 +1564,23 @@
                 <property name="cursor">
                  <cursorShape>PointingHandCursor</cursorShape>
                 </property>
+                <property name="toolTip">
+                 <string>Click here to import all patches listed below as a version history.</string>
+                </property>
+                <property name="statusTip">
+                 <string>Click here to import all patches listed below as a version history.</string>
+                </property>
+                <property name="accessibleName">
+                 <string>Import All Patches as Bank button</string>
+                </property>
+                <property name="accessibleDescription">
+                 <string>Attempts to import all of the patches listed in the tables below (SD card table left and SD card table right) into the ZOIA Librarian as a version history. This requires that a folder is selected from the SD Card Viewer above that contains patches.</string>
+                </property>
                 <property name="styleSheet">
                  <string notr="true"/>
                 </property>
                 <property name="text">
-                 <string>Import All Listed Patches Below As A Version History</string>
+                 <string>Import All Listed Patches Below as a Version History</string>
                 </property>
                </widget>
               </item>
@@ -1539,6 +1601,9 @@
                  </property>
                  <property name="acceptDrops">
                   <bool>true</bool>
+                 </property>
+                 <property name="statusTip">
+                  <string>Drag and drop to move patches around.</string>
                  </property>
                  <property name="accessibleName">
                   <string>SD Card Table left</string>
@@ -1767,6 +1832,9 @@
                  </property>
                  <property name="acceptDrops">
                   <bool>true</bool>
+                 </property>
+                 <property name="statusTip">
+                  <string>Drag and drop to move patches around.</string>
                  </property>
                  <property name="accessibleName">
                   <string>SD Card Table right</string>
@@ -2156,7 +2224,7 @@
                   <string/>
                  </property>
                  <property name="statusTip">
-                  <string>Drag and drop a patch here!</string>
+                  <string>Drag and drop a patch here.</string>
                  </property>
                  <property name="accessibleName">
                   <string>Bank Table left</string>
@@ -2379,7 +2447,7 @@
                   <string/>
                  </property>
                  <property name="statusTip">
-                  <string>Drag and drop a patch here!</string>
+                  <string>Drag and drop a patch here.</string>
                  </property>
                  <property name="accessibleName">
                   <string>Bank table right</string>
@@ -2666,7 +2734,7 @@
                  <string/>
                 </property>
                 <property name="statusTip">
-                 <string>Drag a patch to one of the tables on the left!</string>
+                 <string>Drag a patch to one of the tables on the left.</string>
                 </property>
                 <property name="accessibleName">
                  <string>Banks table</string>
@@ -2756,6 +2824,9 @@
              </layout>
             </widget>
             <widget class="QTextBrowser" name="text_browser_bank">
+             <property name="statusTip">
+              <string>Click on a patch to view its metadata.</string>
+             </property>
              <property name="accessibleName">
               <string>Additional Patch Notes Display</string>
              </property>
@@ -2803,7 +2874,7 @@
    <property name="nativeMenuBar">
     <bool>true</bool>
    </property>
-   <widget class="QMenu" name="menuFiel">
+   <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
@@ -2830,6 +2901,8 @@
     <addaction name="actionSort_by_downloads_low_high"/>
     <addaction name="actionSort_by_author_A_Z"/>
     <addaction name="actionSort_by_author_Z_A"/>
+    <addaction name="actionSort_by_rating_high_low"/>
+    <addaction name="actionSort_by_rating_low_high"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
@@ -2847,19 +2920,13 @@
     <property name="title">
      <string>Help</string>
     </property>
-    <widget class="QMenu" name="menuZOIA_Resources">
-     <property name="title">
-      <string>ZOIA Resources</string>
-     </property>
-     <addaction name="actionFAQ"/>
-     <addaction name="actionFirmware_Files"/>
-     <addaction name="actionModule_Index"/>
-     <addaction name="actionTips_Tricks"/>
-    </widget>
     <addaction name="actionDocumentation"/>
-    <addaction name="menuZOIA_Resources"/>
+    <addaction name="actionFAQ"/>
+    <addaction name="actionFirmware_Files"/>
+    <addaction name="actionModule_Index"/>
+    <addaction name="actionTips_Tricks"/>
    </widget>
-   <addaction name="menuFiel"/>
+   <addaction name="menuFile"/>
    <addaction name="menuSort"/>
    <addaction name="menuOptions"/>
    <addaction name="menuHelp"/>
@@ -2870,7 +2937,7 @@
     <string>Specify SD Card Location</string>
    </property>
    <property name="shortcut">
-    <string>Alt+S</string>
+    <string>Ctrl+S</string>
    </property>
    <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>
@@ -3018,7 +3085,7 @@
   </action>
   <action name="actionImport_A_Patch">
    <property name="text">
-    <string>Import A Patch (.bin)</string>
+    <string>Import a Patch (.bin)</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+I</string>
@@ -3037,7 +3104,7 @@
     <string>Import Multiple Patches (directory)</string>
    </property>
    <property name="shortcut">
-    <string>Alt+I</string>
+    <string>Ctrl+M</string>
    </property>
    <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>
@@ -3212,7 +3279,7 @@
     <string>Change Font</string>
    </property>
    <property name="shortcut">
-    <string>Alt+F</string>
+    <string>Ctrl+F</string>
    </property>
    <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>
@@ -3223,7 +3290,7 @@
     <string>Import Version History (directory)</string>
    </property>
    <property name="shortcut">
-    <string>Alt+V</string>
+    <string>Ctrl+B</string>
    </property>
    <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>
@@ -3239,10 +3306,10 @@
   </action>
   <action name="actionReset_Sizes">
    <property name="text">
-    <string>Reset Sizes</string>
+    <string>Reset UI</string>
    </property>
    <property name="shortcut">
-    <string>Alt+R</string>
+    <string>Ctrl+U</string>
    </property>
   </action>
   <action name="actionDocumentation">
@@ -3279,7 +3346,7 @@
   </action>
   <action name="actionFirmware_Files">
    <property name="text">
-    <string>Firmware</string>
+    <string>Changelog</string>
    </property>
    <property name="shortcut">
     <string>Alt+C</string>
@@ -3299,6 +3366,22 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+=</string>
+   </property>
+  </action>
+  <action name="actionSort_by_rating_high_low">
+   <property name="text">
+    <string>Sort by rating (high-low)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+[</string>
+   </property>
+  </action>
+  <action name="actionSort_by_rating_low_high">
+   <property name="text">
+    <string>Sort by rating (low-high)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+]</string>
    </property>
   </action>
  </widget>

@@ -35,23 +35,30 @@ class ZOIALibrarianBank(QMainWindow):
         self.rows_left = []
         self.rows_right = []
 
-    def create_add_btn(self, i, idx):
+    def create_add_btn(self, btn, i, idx):
         """ Creates an add button for patches on the Bank
         tab's Local Storage table.
 
-        i: The row for which the button will be inserted into.
-        idx: The id for the patch the button is being created for.
+        btn: A reference to the QRadioButton associated with the current
+             table row.
+        i: The current row the buttons are being created for.
+        idx: The id number associated with this row.
         """
 
         # Prepare the button.
-        add = QPushButton("Click me to\n add to bank!", self)
-        add.setObjectName(idx)
-        add.setFont(self.ui.table_bank_local.horizontalHeader().font())
-        add.clicked.connect(self.click_to_add)
+        if "[Multiple Versions]" in btn.text():
+            mv_btn = QPushButton("Move patches \n to bank", self)
+            mv_btn.setEnabled(True)
+        else:
+            mv_btn = QPushButton("Move patch \n to bank", self)
+
+        mv_btn.setObjectName(idx)
+        mv_btn.setFont(self.ui.table_bank_local.horizontalHeader().font())
+        mv_btn.clicked.connect(self.click_to_add)
         # if idx in self.data_bank:
         #     add.setEnabled(False)
-        #     add.setText("Already in bank!")
-        self.ui.table_bank_local.setCellWidget(i, 3, add)
+        #     add.setText("Already in bank")
+        self.ui.table_bank_local.setCellWidget(i, 3, mv_btn)
 
     def _set_data_bank(self):
         """ Populates the bank export tables with data.
@@ -88,7 +95,7 @@ class ZOIALibrarianBank(QMainWindow):
 
             # Prep the remove button.
             name = temp["files"][0]["filename"]
-            rmv_btn = QPushButton("Remove")
+            rmv_btn = QPushButton("X")
             idx = str(temp["id"])
             rmv_btn.setObjectName(idx)
             rmv_btn.setFont(self.ui.table_PS.horizontalHeader().font())
@@ -275,7 +282,7 @@ class ZOIALibrarianBank(QMainWindow):
         if sd.get_sd_root() is None:
             self.msg.setWindowTitle("No SD Path")
             self.msg.setIcon(QMessageBox.Information)
-            self.msg.setText("Please specify your SD card path!")
+            self.msg.setText("Please specify your SD card path.")
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
             self.sd.sd_path(False, self.ui.table_sd_left.width() * 2)
@@ -314,7 +321,7 @@ class ZOIALibrarianBank(QMainWindow):
             self.msg.setInformativeText("")
             if len(fails) == 0:
                 # No failed exports, let the user know.
-                self.msg.setWindowTitle("Success!")
+                self.msg.setWindowTitle("Success")
                 self.msg.setIcon(QMessageBox.Information)
                 self.msg.setText("The Bank has been successfully exported "
                                  "to the root of your SD card.")
@@ -463,7 +470,7 @@ class ZOIALibrarianBank(QMainWindow):
         Currently triggered by a button press.
         """
 
-        # Get the patch which we're moving over
+        # Get the patch(es) which we're moving over
         src = self.ui.table_bank_local.indexAt(self.sender().pos()).row()
         idx = self.ui.table_bank_local.cellWidget(src, 0).objectName()
 
