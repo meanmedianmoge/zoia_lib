@@ -5,7 +5,7 @@ import os
 from PySide2 import QtCore
 from PySide2.QtCore import QEvent, QThread
 from PySide2.QtWidgets import QMainWindow, QMessageBox, QInputDialog, \
-    QPushButton
+    QPushButton, QSpinBox
 
 from zoia_lib.backend.patch_update import PatchUpdate
 from zoia_lib.common import errors
@@ -92,6 +92,27 @@ class ZOIALibrarianLocal(QMainWindow):
                             temp["rating"] = 0
                             with open(version, "w") as f_new:
                                 json.dump(temp, f_new)
+
+    def create_rating_ticker(self, i, rating):
+        """ Creates the rating ticker that is displayed on the Local Storage
+        View tab's QTableView. Each QSpinBox is mapped to a row, representing
+        the rating of the patch.
+
+        i: The current row the buttons are being created for.
+        rating: The current rating associated with the selected patch.
+        """
+
+        if rating < 0 or rating > 5:
+            raise errors.SortingError(rating, 901)
+
+        rate_tkr = QSpinBox()
+        rate_tkr.setValue(rating)
+        rate_tkr.setRange(0, 5)
+        rate_tkr.setSingleStep(1)
+        rate_tkr.valueChanged.connect(self.update_rating)
+
+        rate_tkr.setFont(self.ui.table_PS.horizontalHeader().font())
+        self.ui.table_local.setCellWidget(i, 4, rate_tkr)
 
     def create_expt_and_del_btns(self, btn, i, idx, ver):
         """ Creates the export and delete buttons that are displayed on
@@ -446,6 +467,23 @@ class ZOIALibrarianLocal(QMainWindow):
         # Sort and display the data.
         self.sort_and_set()
 
+    def update_rating(self, value):
+        """ Updates the rating for a locally downloaded patch.
+        Currently triggered via a valueChanged event from a QSpinBox.
+
+        value: The value the rating was changed to.
+        """
+
+        src = self.ui.table_local.indexAt(self.sender().pos()).row()
+        idx = self.ui.table_local.cellWidget(src, 0).objectName()
+
+        try:
+            update.update_data(idx, value, 6)
+        except FileNotFoundError:
+            for ver in sorted(os.listdir(os.path.join(self.path, idx))):
+                if ver.endswith('.json'):
+                    update.update_data(ver.split('.')[0], value, 6)
+
     def update_patch_notes(self):
         """ Updates the patch notes for a patch that has been previously
         locally saved to a user's machine.
@@ -528,14 +566,17 @@ class ZOIALibrarianLocal(QMainWindow):
                 # Get the next text and if it differs, update the metadata.
                 new_text = self.ui.table_local.item(
                     self.prev_tag_cat[0], self.prev_tag_cat[1]).text()
+                # Check if there was no change or we're in columns that
+                # shouldn't be updated via a FocusIn//doubleClick.
                 if new_text == self.prev_tag_cat[2] \
-                        or self.ui.table_local.currentColumn() == 3:
+                        or self.ui.table_local.currentColumn() == 3 \
+                        or self.ui.table_local.currentColumn() == 4:
                     return
                 else:
                     self.update_tags_cats(new_text, self.prev_tag_cat[1] == 1,
                                           self.ui.table_local.cellWidget(
                                               self.ui.table_local.currentRow(),
-                                              4).objectName())
+                                              0).objectName())
                     return
         elif e.type() == QEvent.FocusOut:
             try:

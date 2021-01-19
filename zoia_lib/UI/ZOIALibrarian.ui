@@ -2773,7 +2773,7 @@
                  <number>1</number>
                 </property>
                 <property name="columnCount">
-                 <number>4</number>
+                 <number>5</number>
                 </property>
                 <attribute name="horizontalHeaderCascadingSectionResizes">
                  <bool>true</bool>
@@ -2811,10 +2811,15 @@
                 </column>
                 <column>
                  <property name="text">
+                  <string>Rating</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
                   <string>Add to Bank</string>
                  </property>
                 </column>
-                <item row="0" column="3">
+                <item row="0" column="4">
                  <property name="text">
                   <string/>
                  </property>

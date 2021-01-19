@@ -224,6 +224,7 @@ class ZOIALibrarianUtil:
             "col_2": self.ui.table_bank_local.columnWidth(0),
             "col_3": self.ui.table_bank_local.columnWidth(1),
             "col_4": self.ui.table_bank_local.columnWidth(2),
+            "col_5": self.ui.table_bank_local.columnWidth(3),
             "split_left": self.ui.splitter_bank.sizes()[0],
             "split_middle": self.ui.splitter_bank.sizes()[1],
             "split_right": self.ui.splitter_bank.sizes()[2],

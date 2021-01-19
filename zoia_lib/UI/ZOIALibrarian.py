@@ -1366,8 +1366,8 @@ class Ui_MainWindow(object):
         self.verticalLayout_9.addLayout(self.horizontalLayout_11)
 
         self.table_bank_local = QTableWidget(self.layoutWidget_5)
-        if (self.table_bank_local.columnCount() < 4):
-            self.table_bank_local.setColumnCount(4)
+        if (self.table_bank_local.columnCount() < 5):
+            self.table_bank_local.setColumnCount(5)
         __qtablewidgetitem150 = QTableWidgetItem()
         self.table_bank_local.setHorizontalHeaderItem(0, __qtablewidgetitem150)
         __qtablewidgetitem151 = QTableWidgetItem()
@@ -1376,10 +1376,12 @@ class Ui_MainWindow(object):
         self.table_bank_local.setHorizontalHeaderItem(2, __qtablewidgetitem152)
         __qtablewidgetitem153 = QTableWidgetItem()
         self.table_bank_local.setHorizontalHeaderItem(3, __qtablewidgetitem153)
+        __qtablewidgetitem154 = QTableWidgetItem()
+        self.table_bank_local.setHorizontalHeaderItem(4, __qtablewidgetitem154)
         if (self.table_bank_local.rowCount() < 1):
             self.table_bank_local.setRowCount(1)
-        __qtablewidgetitem154 = QTableWidgetItem()
-        self.table_bank_local.setItem(0, 3, __qtablewidgetitem154)
+        __qtablewidgetitem155 = QTableWidgetItem()
+        self.table_bank_local.setItem(0, 4, __qtablewidgetitem155)
         self.table_bank_local.setObjectName(u"table_bank_local")
         self.table_bank_local.setStyleSheet(u"")
         self.table_bank_local.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
@@ -1391,7 +1393,7 @@ class Ui_MainWindow(object):
         self.table_bank_local.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table_bank_local.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.table_bank_local.setRowCount(1)
-        self.table_bank_local.setColumnCount(4)
+        self.table_bank_local.setColumnCount(5)
         self.table_bank_local.horizontalHeader().setCascadingSectionResizes(True)
         self.table_bank_local.horizontalHeader().setMinimumSectionSize(0)
         self.table_bank_local.horizontalHeader().setDefaultSectionSize(0)
@@ -2332,7 +2334,9 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem152 = self.table_bank_local.horizontalHeaderItem(2)
         ___qtablewidgetitem152.setText(QCoreApplication.translate("MainWindow", u"Categories", None));
         ___qtablewidgetitem153 = self.table_bank_local.horizontalHeaderItem(3)
-        ___qtablewidgetitem153.setText(QCoreApplication.translate("MainWindow", u"Add to Bank", None));
+        ___qtablewidgetitem153.setText(QCoreApplication.translate("MainWindow", u"Rating", None));
+        ___qtablewidgetitem154 = self.table_bank_local.horizontalHeaderItem(4)
+        ___qtablewidgetitem154.setText(QCoreApplication.translate("MainWindow", u"Add to Bank", None));
 
         __sortingEnabled = self.table_bank_local.isSortingEnabled()
         self.table_bank_local.setSortingEnabled(False)

@@ -193,6 +193,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.ui.table_bank_local.setColumnWidth(0, self.bank_sizes["col_2"])
             self.ui.table_bank_local.setColumnWidth(1, self.bank_sizes["col_3"])
             self.ui.table_bank_local.setColumnWidth(2, self.bank_sizes["col_4"])
+            self.ui.table_bank_local.setColumnWidth(3, self.bank_sizes["col_5"])
 
             self.util.set_dark(data[5]["enabled"])
             self.util.set_row_inversion(data[6]["enabled"])
@@ -330,8 +331,8 @@ class ZOIALibrarianMain(QMainWindow):
             self.ui.splitter_sd_hori.setSizes([self.sd_sizes["split_left"],
                                                self.sd_sizes["split_right"]])
         if self.bank_sizes is None:
-            self.ui.splitter_bank.setSizes([self.width() * 0.55,
-                                            self.width() * 0.45,
+            self.ui.splitter_bank.setSizes([self.width() * 0.535,
+                                            self.width() * 0.465,
                                             self.width() * 0])
             self.ui.splitter_bank_tables.setSizes([self.width() * 0.5,
                                                    self.width() * 0.5])
@@ -526,38 +527,34 @@ class ZOIALibrarianMain(QMainWindow):
                 date.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 curr_table.setItem(i, 3, date)
 
-            # Numerical rating for "Rating" header
+            # If we are on tab index 0, we need a "Download" header item.
+            if table_index == 0:
+                self.ps.create_dwn_btn(i, idx)
+
+            # If we are on tab index 1, we need "Rating", "Export",
+            # and "Delete" header items.
             if table_index == 1:
+                self.local.create_rating_ticker(i, data[i]["rating"])
+                self.local.create_expt_and_del_btns(
+                    btn_title, i, idx, str(data[i]["revision"]))
+
+            # Numerical rating for "Rating" header, which is
+            # different in the Bank tab (non-editable).
+            if table_index == 3:
                 index = "rating"
                 try:
-                    if data[i][index] < 0 or data[i][index] > 3:
+                    if data[i][index] < 0 or data[i][index] > 5:
                         raise errors.SortingError(data[i][index], 901)
-                    text = "{} / 3".format(data[i][index])
+                    text = "{}".format(data[i][index])
                 except KeyError:
                     text = ""
 
                 text_item = QTableWidgetItem(text)
                 text_item.setTextAlignment(Qt.AlignCenter)
+                text_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                curr_table.setItem(i, 3, text_item)
 
-                # Edit rating.
-                if self.ui.back_btn_local.isEnabled() and \
-                        len(os.listdir(os.path.join(self.path, idx))) > 2:
-                    text_item.setFlags(
-                        Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                curr_table.setItem(i, 4, text_item)
-
-            # If we are on tab index 0, we need a "Download" header item.
-            if table_index == 0:
-                self.ps.create_dwn_btn(i, idx)
-
-            # If we are on tab index 1, we need "Export" and "Delete"
-            # header items.
-            elif table_index == 1:
-                self.local.create_expt_and_del_btns(
-                    btn_title, i, idx, str(data[i]["revision"]))
-
-            # If we are on tab index 3, we need an "Add to Bank" header item.
-            elif table_index == 3:
+                # Also need a "Add to Bank" header item.
                 self.bank.create_add_btn(btn_title, i, idx)
 
         # Also set the title size and resize the columns.
@@ -624,11 +621,12 @@ class ZOIALibrarianMain(QMainWindow):
 
         elif table_index == 3 and self.bank_sizes is None:
             curr_table.resizeColumnsToContents()
-            curr_table.setColumnWidth(0, self.width() * 0.165)
-            curr_table.setColumnWidth(1, self.width() * 0.125)
+            curr_table.setColumnWidth(0, self.width() * 0.16)
+            curr_table.setColumnWidth(1, self.width() * 0.11)
             curr_table.setColumnWidth(2, self.width() * 0.0625)
-            self.ui.splitter_bank.setSizes([self.width() * 0.55,
-                                            self.width() * 0.45,
+            curr_table.setColumnWidth(3, self.width() * 0.035)
+            self.ui.splitter_bank.setSizes([self.width() * 0.535,
+                                            self.width() * 0.465,
                                             self.width() * 0])
             self.ui.splitter_bank_tables.setSizes([self.width() * 0.5,
                                                    self.width() * 0.5])
@@ -639,6 +637,7 @@ class ZOIALibrarianMain(QMainWindow):
                 "col_2": curr_table.columnWidth(2),
                 "col_3": curr_table.columnWidth(3),
                 "col_4": curr_table.columnWidth(4),
+                "col_5": curr_table.columnWidth(5),
                 "split_left": self.ui.splitter_bank.sizes()[0],
                 "split_middle": self.ui.splitter_bank.sizes()[1],
                 "split_right": self.ui.splitter_bank.sizes()[2],
@@ -687,16 +686,17 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.table_sd_right.setColumnWidth(1, self.width() * 0.1)
 
         # Reset bank sizes
-        self.ui.splitter_bank.setSizes([self.width() * 0.55,
-                                        self.width() * 0.45,
+        self.ui.splitter_bank.setSizes([self.width() * 0.535,
+                                        self.width() * 0.465,
                                         self.width() * 0])
         self.ui.splitter_bank_tables.setSizes([self.width() * 0.5,
                                                self.width() * 0.5])
         self.ui.table_bank_left.setColumnWidth(0, self.width() * 0.14)
         self.ui.table_bank_right.setColumnWidth(0, self.width() * 0.14)
-        self.ui.table_bank_local.setColumnWidth(0, self.width() * 0.165)
-        self.ui.table_bank_local.setColumnWidth(1, self.width() * 0.125)
+        self.ui.table_bank_local.setColumnWidth(0, self.width() * 0.16)
+        self.ui.table_bank_local.setColumnWidth(1, self.width() * 0.11)
         self.ui.table_bank_local.setColumnWidth(2, self.width() * 0.0625)
+        self.ui.table_bank_local.setColumnWidth(3, self.width() * 0.035)
 
         self.showMaximized()
 
