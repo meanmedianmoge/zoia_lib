@@ -25,6 +25,24 @@ class BinaryError(ZoiaLibError):
         print(error_msg)
 
 
+class UpdateError(ZoiaLibError):
+    """Class raised when a patch could not be updated.
+
+    Possible error codes:
+    - 201: The patch index has multiple versions.
+    """
+
+    def __init__(self, idx, error_code_zoia=0):
+        if idx is None:
+            print(f'Expected a patch index but got None instead.')
+        elif error_code_zoia == 201:
+            print(f'Patch {idx} has multiple versions.')
+        else:
+            # Default case. We do not want to get here.
+            print(f'Could not update the patch {idx} correctly '
+                  f'due to an unexpected error.')
+
+
 class BadPathError(ZoiaLibError):
     """Class raised when the file path is not valid.
 

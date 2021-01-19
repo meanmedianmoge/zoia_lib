@@ -58,7 +58,7 @@ class ZOIALibrarianBank(QMainWindow):
         # if idx in self.data_bank:
         #     add.setEnabled(False)
         #     add.setText("Already in bank")
-        self.ui.table_bank_local.setCellWidget(i, 3, mv_btn)
+        self.ui.table_bank_local.setCellWidget(i, 4, mv_btn)
 
     def _set_data_bank(self):
         """ Populates the bank export tables with data.
