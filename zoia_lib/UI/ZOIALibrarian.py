@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'ZOIALibrarian.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.1
+## Created by: Qt User Interface Compiler version 5.15.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -474,22 +474,20 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_24.addWidget(self.text_browser_viz)
 
-        self.btn_next_page = QPushButton(self.layoutWidget_8)
-        self.btn_next_page.setObjectName(u"btn_next_page")
-        sizePolicy5 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
-        sizePolicy5.setHorizontalStretch(0)
-        sizePolicy5.setVerticalStretch(0)
-        sizePolicy5.setHeightForWidth(self.btn_next_page.sizePolicy().hasHeightForWidth())
-        self.btn_next_page.setSizePolicy(sizePolicy5)
-
-        self.verticalLayout_24.addWidget(self.btn_next_page)
-
+        self.horizontalLayout_19 = QHBoxLayout()
+        self.horizontalLayout_19.setObjectName(u"horizontalLayout_19")
         self.btn_prev_page = QPushButton(self.layoutWidget_8)
         self.btn_prev_page.setObjectName(u"btn_prev_page")
-        sizePolicy5.setHeightForWidth(self.btn_prev_page.sizePolicy().hasHeightForWidth())
-        self.btn_prev_page.setSizePolicy(sizePolicy5)
 
-        self.verticalLayout_24.addWidget(self.btn_prev_page)
+        self.horizontalLayout_19.addWidget(self.btn_prev_page)
+
+        self.btn_next_page = QPushButton(self.layoutWidget_8)
+        self.btn_next_page.setObjectName(u"btn_next_page")
+
+        self.horizontalLayout_19.addWidget(self.btn_next_page)
+
+
+        self.verticalLayout_24.addLayout(self.horizontalLayout_19)
 
 
         self.horizontalLayout_13.addLayout(self.verticalLayout_24)
@@ -839,6 +837,11 @@ class Ui_MainWindow(object):
         self.splitter_local_hori.addWidget(self.layoutWidget_8)
 
         self.verticalLayout_22.addWidget(self.splitter_local_hori)
+
+        self.back_btn = QPushButton(self.layoutWidget_7)
+        self.back_btn.setObjectName(u"back_btn")
+
+        self.verticalLayout_22.addWidget(self.back_btn)
 
         self.splitter_local.addWidget(self.layoutWidget_7)
 
@@ -1807,6 +1810,19 @@ class Ui_MainWindow(object):
         self.text_browser_viz.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Displays information about the selected patch, either in patch view or module view.", None))
 #endif // QT_CONFIG(accessibility)
 #if QT_CONFIG(tooltip)
+        self.btn_prev_page.setToolTip(QCoreApplication.translate("MainWindow", u"Click here to view the previous page in the selected patch.", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.btn_prev_page.setStatusTip(QCoreApplication.translate("MainWindow", u"Click here to view the previous page in the selected patch.", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(whatsthis)
+        self.btn_prev_page.setWhatsThis(QCoreApplication.translate("MainWindow", u"Previous viz page Local Storage View", None))
+#endif // QT_CONFIG(whatsthis)
+#if QT_CONFIG(accessibility)
+        self.btn_prev_page.setAccessibleName(QCoreApplication.translate("MainWindow", u"Navigates to the previous page in the visualizer for the selected patch.", None))
+#endif // QT_CONFIG(accessibility)
+        self.btn_prev_page.setText(QCoreApplication.translate("MainWindow", u"Page -", None))
+#if QT_CONFIG(tooltip)
         self.btn_next_page.setToolTip(QCoreApplication.translate("MainWindow", u"Click here to view the next page in the selected patch.", None))
 #endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(statustip)
@@ -1818,20 +1834,7 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(accessibility)
         self.btn_next_page.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Navigates to the next page in the visualizer for the selected patch.", None))
 #endif // QT_CONFIG(accessibility)
-        self.btn_next_page.setText(QCoreApplication.translate("MainWindow", u"Next Page ->", None))
-#if QT_CONFIG(tooltip)
-        self.btn_prev_page.setToolTip(QCoreApplication.translate("MainWindow", u"Click here to view the previous page in the selected patch.", None))
-#endif // QT_CONFIG(tooltip)
-#if QT_CONFIG(statustip)
-        self.btn_prev_page.setStatusTip(QCoreApplication.translate("MainWindow", u"Click here to view the previous page in the selected patch.", None))
-#endif // QT_CONFIG(statustip)
-#if QT_CONFIG(accessibility)
-        self.btn_prev_page.setAccessibleName(QCoreApplication.translate("MainWindow", u"Previous viz page Local Storage View", None))
-#endif // QT_CONFIG(accessibility)
-#if QT_CONFIG(accessibility)
-        self.btn_prev_page.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Navigates to the previous page in the visualizer for the selected patch.", None))
-#endif // QT_CONFIG(accessibility)
-        self.btn_prev_page.setText(QCoreApplication.translate("MainWindow", u"<- Prev. Page", None))
+        self.btn_next_page.setText(QCoreApplication.translate("MainWindow", u"Page +", None))
         self.btn_0.setText("")
         self.btn_8.setText("")
         self.btn_16.setText("")
@@ -1872,6 +1875,19 @@ class Ui_MainWindow(object):
         self.btn_23.setText("")
         self.btn_31.setText("")
         self.btn_39.setText("")
+#if QT_CONFIG(tooltip)
+        self.back_btn.setToolTip(QCoreApplication.translate("MainWindow", u"Click here to view the patch-level details.", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.back_btn.setStatusTip(QCoreApplication.translate("MainWindow", u"Click here to view the patch-level details.", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(accessibility)
+        self.back_btn.setAccessibleName(QCoreApplication.translate("MainWindow", u"Back button viz Local Storage View", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.back_btn.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Navigates the display back to the patch-level details if you are within a module.", None))
+#endif // QT_CONFIG(accessibility)
+        self.back_btn.setText(QCoreApplication.translate("MainWindow", u"Reset", None))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_ls), QCoreApplication.translate("MainWindow", u"Local Storage View", None))
 #if QT_CONFIG(tooltip)
         self.tabs.setTabToolTip(self.tabs.indexOf(self.tab_ls), QCoreApplication.translate("MainWindow", u"Switch to your locally saved patches", None))

@@ -66,6 +66,7 @@ class ZOIALibrarianLocal(QMainWindow):
         self.worker_updates.signal.connect(self.update_local_patches_done)
 
         # Disable the viz buttons
+        self.ui.back_btn.setEnabled(False)
         self.ui.btn_next_page.setEnabled(False)
         self.ui.btn_prev_page.setEnabled(False)
         self.viz_disable()
@@ -392,6 +393,7 @@ class ZOIALibrarianLocal(QMainWindow):
 
         # Reload the table.
         self.ui.update_patch_notes.setEnabled(not context)
+        self.ui.text_browser_viz.setText("")
         self.sort_and_set()
 
     def update_local_patches_thread(self):
@@ -455,6 +457,7 @@ class ZOIALibrarianLocal(QMainWindow):
             self.ui.searchbar_local.setText(self.prev_search)
             self.ui.text_browser_local.setText("")
             self.ui.page_label.setText("")
+            self.ui.text_browser_viz.setText("")
             self.ui.back_btn_local.setEnabled(False)
             self.ui.update_patch_notes.setEnabled(False)
             self.ui.btn_prev_page.setEnabled(False)
@@ -599,6 +602,7 @@ class ZOIALibrarianLocal(QMainWindow):
         viz: The parsed binary data that will be used in the visualizer.
         """
 
+        self.ui.back_btn.setEnabled(False)
         self.ui.btn_next_page.setEnabled(True)
         self.ui.btn_prev_page.setEnabled(False)
 
@@ -687,12 +691,42 @@ class ZOIALibrarianLocal(QMainWindow):
             )
         )
 
+    def viz_reset(self):
+        """ Resets the display text to show the patch-level details.
+        Only works if you are zoomed into a module-level block.
+        Currently triggered via a button press.
+        """
+
+        self.ui.text_browser_viz.setText("""<html>
+            <b><h2> {} </b></h2>
+            Est CPU: {} <br>
+            Inputs: {} <br>
+            Outputs: {} <br>
+            Stompswitches: {} <br>
+            MIDI Channels: {} <br>
+            Number of Pages: {} <br>
+            Number of Starred Params: {}
+            </html>""".format(
+                self.curr_viz["meta"]["name"],
+                self.curr_viz["meta"]["cpu"],
+                self.curr_viz["meta"]["i_o"]["inputs"],
+                self.curr_viz["meta"]["i_o"]["outputs"],
+                self.curr_viz["meta"]["i_o"]["stompswitches"],
+                self.curr_viz["meta"]["i_o"]["midi_channel"],
+                self.curr_viz["meta"]["n_pages"],
+                self.curr_viz["meta"]["n_starred"],
+            )
+        )
+
+        self.ui.back_btn.setEnabled(False)
+
     def viz_display(self):
         """ Displays additional information about a module that appears
         on the visualizer.
         Currently triggered via a button press.
         """
 
+        self.ui.back_btn.setEnabled(True)
         btn_num = int(self.sender().objectName().split("_")[-1])
         for curr_module in self.curr_viz["modules"]:
             if curr_module["page"] == self.curr_page_viz and \

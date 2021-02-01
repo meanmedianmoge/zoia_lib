@@ -286,6 +286,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.actionToggle_Dark_Mode_2.triggered.connect(
             self.util.toggle_dark)
         self.ui.btn_dwn_all.clicked.connect(self.ps.download_all_thread)
+        self.ui.back_btn.clicked.connect(self.local.viz_reset)
         self.ui.btn_next_page.clicked.connect(self.local.viz_page)
         self.ui.btn_prev_page.clicked.connect(self.local.viz_page)
         for i in range(40):
@@ -850,6 +851,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.ui.searchbar_local.setText("")
             self.ui.update_patch_notes.setEnabled(False)
             self.ui.back_btn_local.setEnabled(True)
+            self.ui.back_btn.setEnabled(False)
             self.ui.btn_prev_page.setEnabled(False)
             self.ui.btn_next_page.setEnabled(False)
             self.local.viz_disable()
