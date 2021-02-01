@@ -541,16 +541,14 @@ class PatchBinary(Patch):
                 blocks.append(d[3])
             blocks.append(d[4])
         elif idx == 20:
-            blocks = d
-            # blocks = []
-            # for i in range(1, opt[1][1] + 1):
-            #     blocks.append(d[i - 1])
-            #     blocks.append(d[0])
-            #     blocks.append(d[1])
-            #     if opt[4][1] == 'on':
-            #         blocks.append(d[2])
-            #     if opt[7][1] == 'on':
-            #         blocks.append(d[3])
+            blocks = []
+            for i in range(1, opt[1][1] + 1):
+                blocks.append(d[4*(i-1)])
+                blocks.append(d[4*(i-1)+1])
+                if opt[4][1] == 'on':
+                    blocks.append(d[4*(i-1)+2])
+                if opt[7][1] == 'on':
+                    blocks.append(d[4*(i-1)+3])
         elif idx == 22:
             blocks = [d[0], d[1]]
             for i in range(0, opt[0][1] + 1):
@@ -806,8 +804,19 @@ class PatchBinary(Patch):
             else:
                 blocks = d
         elif idx == 76:
-            blocks = d
-            # mixer is difficult..
+            blocks = []
+            for i in range(1, opt[0][1]+1):
+                blocks.append(d[2*(i-1)])
+                if opt[1][1] == 'stereo':
+                    blocks.append(d[2*(i-1)+1])
+            for i in range(1, opt[0][1]+1):
+                blocks.append(d[i+15])
+            if opt[2][1] == 'on':
+                for i in range(1, opt[0][1]+1):
+                    blocks.append(d[i+23])
+            blocks.append(d[32])
+            if opt[1][1] == 'stereo':
+                blocks.append(d[33])
         elif idx == 79:
             blocks = [d[0]]
             if opt[0][1] == 'stereo':
