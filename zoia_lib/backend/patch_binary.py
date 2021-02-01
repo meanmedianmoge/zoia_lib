@@ -94,8 +94,7 @@ class PatchBinary(Patch):
                 "position": [x for x in range(
                     int(data[curr_step + 5]),
                     int(data[curr_step + 5]) + self._get_module_data(
-                        data[curr_step + 1], "default_blocks"))],
-                "blocks": self._get_module_data(data[curr_step + 1], 'blocks'),
+                        data[curr_step + 1], "min_blocks"))],
                 "old_color": self._get_color_name(data[curr_step + 4]),
                 "new_color": "" if skip_real else self._get_color_name(
                     colors[i]),
@@ -106,8 +105,9 @@ class PatchBinary(Patch):
                     bytearray(pch_data[(curr_step+9)*4:(curr_step+9)*4+4])),
                 "parameters": dict(zip(
                     ["param_{}".format(str(x)) for x in range(data[curr_step + 6])],
-                    [data[curr_step + x + 10] for x in range(data[curr_step + 6])]
+                    [round(data[curr_step + x + 10] / 64560, 2) for x in range(data[curr_step + 6])]
                 )),
+                "blocks": [],
                 "connections": [],
                 "starred": []
             }
@@ -184,6 +184,13 @@ class PatchBinary(Patch):
             colours.append(curr_color)
             curr_step += 1
 
+        # Block information
+        for module in modules:
+            module['blocks'] = self._calc_blocks(module)
+            module['position'] = [x for x in range(
+                module['position'][0], module['position'][0] + len(module['blocks']))]
+            self._rename_param_dict(module)
+
         # Append data to module list
         modules = self._add_connections(modules, connections)
         modules = self._add_starred_param(modules, starred)
@@ -229,6 +236,20 @@ class PatchBinary(Patch):
         """
 
         return mod[str(module_id)][key]
+
+    @staticmethod
+    def _rename_param_dict(module):
+        """ Rewrites the param dict to use block names.
+
+        module: Module dict object.
+
+        return: Updated param dict.
+        """
+
+        tmp = {k: v["isParam"] for k, v in module['blocks'].items() if v["isParam"]}
+        for param, n in zip(tmp.keys(), range(0, len(tmp))):
+            module['parameters'][param] = \
+                module['parameters'].pop('param_{}'.format(n), None)
 
     @staticmethod
     def _get_block_name(blocks, number):
@@ -294,14 +315,15 @@ class PatchBinary(Patch):
         for conn in connections:
             out_mod, out_block = conn["source"].split(".")
             in_mod, in_block = conn["destination"].split(".")
-            data = "{}.{} -> {}.{}: {}".format(
-                    modules[int(out_mod)]["type"] if modules[int(out_mod)]["name"] == ""
-                        else modules[int(out_mod)]["name"],
-                    self._get_block_name(modules[int(out_mod)]["blocks"], out_block),
-                    modules[int(in_mod)]["type"] if modules[int(in_mod)]["name"] == ""
-                        else modules[int(in_mod)]["name"],
-                    self._get_block_name(modules[int(in_mod)]["blocks"], in_block),
-                    conn["strength"])
+            data = "{}.{} > {}% > {}.{}".format(
+                modules[int(out_mod)]["type"] if modules[int(out_mod)]["name"] == ""
+                    else modules[int(out_mod)]["name"],
+                self._get_block_name(modules[int(out_mod)]["blocks"], out_block),
+                conn["strength"],
+                modules[int(in_mod)]["type"] if modules[int(in_mod)]["name"] == ""
+                    else modules[int(in_mod)]["name"],
+                self._get_block_name(modules[int(in_mod)]["blocks"], in_block)
+            )
             modules[int(out_mod)]["connections"].append(data)
 
         return modules
@@ -403,3 +425,449 @@ class PatchBinary(Patch):
                 "outputs": out_type,
                 "midi_channel": midi,
                 "stompswitches": stomps}
+
+    def _calc_blocks(self, module):
+        """ Calculates the number of blocks used for a given module,
+        based on the current version in the module index and options
+        selected.
+
+        module: Module object.
+
+        return: Block dict to overwrite blank.
+        """
+
+        idx = module['mod_idx']
+        start = self._get_module_data(idx, 'min_blocks')
+        stop = self._get_module_data(idx, 'max_blocks')
+        opt = list(module['options'].items())
+        d = list(self._get_module_data(idx, 'blocks').items())
+
+        if idx == 0:
+            blocks = [d[0], d[1], d[2]]
+            for i, j in zip(opt, range(3, 6)):
+                if i[1] == 'on':
+                    blocks.append(d[j])
+        elif idx == 1:
+            if opt[0][1] == 'left':
+                blocks = [d[0]]
+            elif opt[0][1] == 'right':
+                blocks = [d[1]]
+            else:
+                blocks = [d[0], d[1]]
+        elif idx == 2:
+            if opt[1][1] == 'left':
+                blocks = [d[0]]
+            elif opt[1][1] == 'right':
+                blocks = [d[1]]
+            else:
+                blocks = [d[0], d[1]]
+            if opt[0][1] == 'on':
+                blocks.append(d[2])
+        elif idx == 4:
+            blocks = d
+            # blocks = []
+            # for i in range(1, opt[0][1] + 1):
+            #     blocks.append(d[i - 1])
+            # blocks.append(d[2])
+            # if opt[2][1] == 'on':
+            #     blocks.append(d[3])
+            # for i in range(1, opt[1][1] + 1):
+            #     blocks.append(d[3])
+        elif idx == 5:
+            blocks = [d[0]]
+            if opt[1][1] == 'on':
+                blocks.append(d[1])
+            if opt[4][1] == 'on':
+                blocks.append(d[2])
+            if opt[5][1] == 'on':
+                blocks.append(d[3])
+            blocks.append(d[4])
+        elif idx == 6:
+            blocks = [d[0]]
+            if opt[0][1] == 'on':
+                blocks.append(d[1])
+            if opt[1][1] == 'on':
+                blocks.append(d[2])
+            blocks.append(d[3])
+            if opt[2][1] == 'on':
+                blocks.append(d[4])
+            blocks.append(d[5])
+            blocks.append(d[6])
+            if opt[4][1] == 'on':
+                blocks.append(d[7])
+            blocks.append(d[8])
+            blocks.append(d[9])
+        elif idx == 7:
+            blocks = [d[0]]
+            if opt[0][1] == 'stereo':
+                blocks.append(d[1])
+            blocks.append(d[2])
+            blocks.append(d[3])
+            if opt[0][1] == 'stereo':
+                blocks.append(d[4])
+        elif idx == 12:
+            blocks = [d[0]]
+            if opt[0][1] == 'on':
+                blocks.append(d[1])
+                blocks.append(d[2])
+            blocks.append(d[3])
+        elif idx == 13:
+            blocks = [d[0]]
+            if opt[1][1] == 'yes':
+                blocks.append(d[2])
+                blocks.append(d[3])
+            else:
+                blocks.append(d[1])
+            blocks.append(d[4])
+        elif idx == 14:
+            blocks = [d[0]]
+            if opt[1][1] == 'on':
+                blocks.append(d[1])
+            if opt[2][1] == 'on':
+                blocks.append(d[2])
+            blocks.append(d[3])
+        elif idx == 16:
+            blocks = d
+            # blocks = []
+            # for i in range(1, opt[0][1] + 1):
+            #     blocks.append(d[i - 1])
+            # blocks.append(d[1])
+            # blocks.append(d[2])
+            # blocks.append(d[3])
+        elif idx == 19:
+            blocks = [d[0]]
+            if opt[0][1] == 'linked':
+                blocks.append(d[1])
+            else:
+                blocks.append(d[2])
+                blocks.append(d[3])
+            blocks.append(d[4])
+        elif idx == 20:
+            blocks = d
+            # blocks = []
+            # for i in range(1, opt[1][1] + 1):
+            #     blocks.append(d[i - 1])
+            #     blocks.append(d[0])
+            #     blocks.append(d[1])
+            #     if opt[4][1] == 'on':
+            #         blocks.append(d[2])
+            #     if opt[7][1] == 'on':
+            #         blocks.append(d[3])
+        elif idx == 22:
+            blocks = [d[0], d[1]]
+            for i in range(0, opt[0][1] + 1):
+                blocks.append(d[2])
+            blocks.append(d[3])
+        elif idx == 23:
+            blocks = [d[0]]
+            if opt[3][1] == 'stereo':
+                blocks.append(d[1])
+            blocks.append(d[2])
+            if opt[0][1] == 'on':
+                blocks.append(d[3])
+            if opt[1][1] == 'on':
+                blocks.append(d[4])
+            if opt[2][1] == 'on':
+                blocks.append(d[5])
+            if opt[4][1] == 'external':
+                blocks.append(d[6])
+            blocks.append(d[7])
+            if opt[3][1] == 'stereo':
+                blocks.append(d[8])
+        elif idx == 24:
+            blocks = [d[0]]
+            if opt[0] in ['bell', 'hi_shelf', 'low_shelf']:
+                blocks.append(d[1])
+            blocks.append(d[2])
+            blocks.append(d[3])
+            blocks.append(d[4])
+        elif idx == 28:
+            blocks = [d[0]]
+            if opt[0] == 'yes':
+                blocks.append(d[1])
+                blocks.append(d[2])
+            blocks.append(d[3])
+        elif idx == 29:
+            blocks = [d[0]]
+            if opt[0] == '2in->2out':
+                blocks.append(d[1])
+            blocks.append(d[2])
+            blocks.append(d[3])
+            blocks.append(d[4])
+            blocks.append(d[5])
+            blocks.append(d[6])
+            if opt[0][1] != '1in->1out':
+                blocks.append(d[7])
+        elif idx == 30:
+            blocks = [d[0], d[1], d[2]]
+            if opt[7][1] == 'yes':
+                blocks.append(d[3])
+            blocks.append(d[4])
+            if opt[1][1] == 'on':
+                blocks.append(d[5])
+                blocks.append(d[6])
+            if opt[5][1] == 'yes':
+                blocks.append(d[7])
+            blocks.append(d[8])
+        elif idx == 31:
+            blocks = d
+            # blocks = []
+            # for i in range(1, opt[0][1] + 1):
+            #     blocks.append(d[i - 1])
+            # blocks.append(d[1])
+            # blocks.append(d[2])
+        elif idx == 32:
+            blocks = d
+            # blocks = [d[0], d[1]]
+            # for i in range(1, opt[0][1] + 1):
+            #     blocks.append(d[i - 1])
+        elif idx == 33:
+            blocks = d
+            # blocks = []
+            # for i in range(1, opt[0][1] + 1):
+            #     blocks.append(d[i - 1])
+            # blocks.append(d[1])
+            # blocks.append(d[2])
+        elif idx == 34:
+            blocks = d
+            # blocks = [d[0], d[1]]
+            # for i in range(1, opt[0][1] + 1):
+            #     blocks.append(d[i - 1])
+        elif idx == 36:
+            blocks = [d[0]]
+            if opt[0][1] == 'on':
+                blocks.append(d[1])
+            blocks.append(d[2])
+        elif idx == 37:
+            blocks = [d[0], d[1]]
+            if opt[0][1] == 'on':
+                blocks.append(d[2])
+            blocks.append(d[3])
+        elif idx == 39:
+            blocks = []
+            if opt[1][1] == 'on':
+                blocks.append(d[0])
+            blocks.append(d[1])
+        elif idx == 40:
+            blocks = [d[0]]
+            if opt[2][1] == '2in-2out':
+                blocks.append(d[1])
+            blocks.append(d[2])
+            if opt[0][1] == 'on':
+                blocks.append(d[3])
+            if opt[1][1] == 'on':
+                blocks.append(d[4])
+            if opt[3][1] == 'external':
+                blocks.append(d[5])
+            blocks.append(d[6])
+            if opt[2][1] != '1in->1out':
+                blocks.append(d[7])
+        elif idx == 41:
+            blocks = [d[0]]
+            if opt[0][1] == '2in->2out':
+                blocks.append(d[1])
+            blocks.append(d[2])
+            blocks.append(d[3])
+            blocks.append(d[4])
+            if opt[0][1] != '1in-1out':
+                blocks.append(d[5])
+        elif idx == 42:
+            blocks = [d[0]]
+            if opt[0][1] == '2in->2out':
+                blocks.append(d[1])
+            blocks.append(d[2])
+            blocks.append(d[3])
+            blocks.append(d[4])
+            if opt[1][1] == 2:
+                blocks.append(d[5])
+                blocks.append(d[6])
+            blocks.append(d[7])
+            blocks.append(d[8])
+            if opt[0][1] != '1in->1out':
+                blocks.append(d[9])
+        elif idx == 43:
+            blocks = [d[0]]
+            if opt[0][1] == '2in->2out':
+                blocks.append(d[1])
+            blocks.append(d[2])
+            blocks.append(d[3])
+            blocks.append(d[4])
+            blocks.append(d[5])
+            blocks.append(d[6])
+            blocks.append(d[7])
+            if opt[0][1] != '1in->1out':
+                blocks.append(d[8])
+        elif idx == 47:
+            blocks = [d[0], d[1], d[2], d[3]]
+            if opt[1][1] == 'on':
+                blocks.append(d[4])
+                blocks.append(d[5])
+            blocks.append(d[6])
+            blocks.append(d[7])
+        elif idx == 48:
+            blocks = [d[0]]
+            if opt[0][1] == 'linked':
+                blocks.append(d[1])
+            else:
+                blocks.append(d[2])
+                blocks.append(d[3])
+            blocks.append(d[4])
+        elif idx == 53:
+            if opt[0][1] == 'haas':
+                blocks = [d[0], d[3], d[4], d[5]]
+            else:
+                blocks = [d[0], d[1], d[2], d[4], d[5]]
+        elif idx == 56:
+            blocks = [d[0]]
+            if opt[0][1] == 'enabled':
+                blocks.append(d[1])
+        elif idx == 57:
+            blocks = [d[0]]
+            if opt[0][1] == '2in->2out':
+                blocks.append(d[1])
+            blocks.append(d[2])
+            blocks.append(d[3])
+            blocks.append(d[4])
+        elif idx == 60:
+            blocks = [d[0], d[1]]
+            if opt[1][1] == 'on':
+                blocks.append(d[2])
+        elif idx == 64:
+            if opt[0][1] == 'mono':
+                blocks = [d[0], d[2], d[4], d[5]]
+            else:
+                blocks = d
+        elif idx == 67:
+            blocks = [d[0]]
+            if opt[0][1] == 'stereo':
+                blocks.append(d[1])
+            blocks.append(d[2])
+            blocks.append(d[3])
+            blocks.append(d[4])
+            blocks.append(d[5])
+            blocks.append(d[6])
+            if opt[0][1] != '1in>1out':
+                blocks.append(d[7])
+        elif idx == 68:
+            if opt[0][1] == 'mono':
+                blocks = [d[0], d[2]]
+            else:
+                blocks = d
+        elif idx == 69:
+            blocks = [d[0]]
+            if opt[0][1] == 'stereo':
+                blocks.append(d[1])
+            blocks.append(d[2])
+            blocks.append(d[3])
+            blocks.append(d[4])
+            blocks.append(d[5])
+            blocks.append(d[6])
+            blocks.append(d[7])
+            if opt[0][1] != '1in>1out':
+                blocks.append(d[8])
+        elif idx == 70:
+            blocks = [d[0]]
+            if opt[0][1] == 'stereo':
+                blocks.append(d[1])
+            blocks.append(d[2])
+            blocks.append(d[3])
+            blocks.append(d[4])
+            blocks.append(d[5])
+            blocks.append(d[6])
+            if opt[0][1] != '1in>1out':
+                blocks.append(d[7])
+        elif idx == 71:
+            blocks = [d[0]]
+            if opt[0][1] == 'stereo':
+                blocks.append(d[1])
+            blocks.append(d[2])
+            blocks.append(d[3])
+            blocks.append(d[4])
+            if opt[0][1] != '1in>1out':
+                blocks.append(d[5])
+        elif idx == 72:
+            blocks = [d[0]]
+            if opt[0][1] == 'stereo':
+                blocks.append(d[1])
+            blocks.append(d[2])
+            blocks.append(d[3])
+            blocks.append(d[4])
+            blocks.append(d[5])
+            blocks.append(d[6])
+            if opt[0][1] != '1in>1out':
+                blocks.append(d[7])
+        elif idx == 73:
+            blocks = [d[0]]
+            if opt[1][1] == 'off':
+                blocks.append(d[1])
+            else:
+                blocks.append(d[2])
+            if opt[2][1] == 'on':
+                blocks.append(d[3])
+            blocks.append(d[4])
+            blocks.append(d[5])
+        elif idx == 75:
+            if opt[0][1] == '1in->1out':
+                blocks = [d[0], d[2], d[3], d[4], d[5], d[6], d[7]]
+            else:
+                blocks = d
+        elif idx == 76:
+            blocks = d
+            # mixer is difficult..
+        elif idx == 79:
+            blocks = [d[0]]
+            if opt[0][1] == 'stereo':
+                blocks.append(d[1])
+            blocks.append(d[2])
+            blocks.append(d[3])
+            blocks.append(d[4])
+            if opt[0][1] != '1in->1out':
+                blocks.append(d[5])
+        elif idx == 82:
+            blocks = [d[0]]
+            for i, j in zip(opt, range(1, 4)):
+                if i[1] == 'enabled':
+                    blocks.append(d[j])
+        elif idx == 83:
+            if opt[1][0] == 'mono':
+                blocks = [d[0], d[2], d[3], d[4], d[5], d[6], d[7], d[8]]
+            else:
+                blocks = d
+        elif idx == 84:
+            blocks = [d[0], d[1]]
+            for i, j in zip(opt, range(1, 5)):
+                if i[0] == 'input':
+                    continue
+                if i[1] == 'enabled':
+                    blocks.append(d[j])
+        elif idx == 85:
+            blocks = [d[0]]
+            if opt[0][1] == 'on':
+                blocks.append(d[1])
+                blocks.append(d[2])
+            blocks.append(d[3])
+        elif idx == 87:
+            blocks = [d[0]]
+            if opt[0][1] == 'enabled':
+                blocks.append(d[1])
+            blocks.append(d[2])
+            blocks.append(d[3])
+            blocks.append(d[4])
+            blocks.append(d[5])
+            if opt[2][1] == 'on':
+                blocks.append(d[6])
+            blocks.append(d[7])
+        elif idx in [3, 8, 9, 10, 11, 15, 17, 18, 21, 25,
+                     26, 27, 35, 38, 44, 45, 46, 49, 50,
+                     51, 52, 54, 55, 58, 59, 61, 62, 63,
+                     65, 66, 74, 76, 77, 78, 80, 81, 86]:
+            blocks = d
+        else:
+            raise ValueError('No module found')
+
+        if len(blocks) < start:
+            raise ValueError('Block count cannot be below the minimum')
+        elif len(blocks) > stop:
+            raise ValueError('Block count cannot be above the maximum')
+        else:
+            return dict(blocks)

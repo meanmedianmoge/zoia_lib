@@ -79,6 +79,7 @@ class ZOIALibrarianUtil:
             self.ui.check_for_updates_btn.setFont(new_font)
             self.ui.update_patch_notes.setFont(new_font)
             self.ui.page_label.setFont(new_font)
+            self.ui.back_btn.setFont(new_font)
             self.ui.btn_next_page.setFont(new_font)
             self.ui.btn_prev_page.setFont(new_font)
 
@@ -362,6 +363,17 @@ class ZOIALibrarianUtil:
         self.ui.text_browser_PS.setText("""
             {}
         """.format(logs))
+
+    def expander(self):
+        """ Testing patch expander.
+        """
+
+        with open("src/exp.html", "r", errors="ignore") as f:
+            exp = f.read()
+
+        self.ui.text_browser_PS.setText("""
+            {}
+        """.format(exp))
 
     @staticmethod
     def multi_drag_drop(rows_left, rows_right, table_1, table_2, f1):
