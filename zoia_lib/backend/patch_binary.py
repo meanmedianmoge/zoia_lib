@@ -464,15 +464,14 @@ class PatchBinary(Patch):
             if opt[0][1] == 'on':
                 blocks.append(d[2])
         elif idx == 4:
-            blocks = d
-            # blocks = []
-            # for i in range(1, opt[0][1] + 1):
-            #     blocks.append(d[i - 1])
-            # blocks.append(d[2])
-            # if opt[2][1] == 'on':
-            #     blocks.append(d[3])
-            # for i in range(1, opt[1][1] + 1):
-            #     blocks.append(d[3])
+            blocks = []
+            for i in range(1, opt[0][1] + 1):
+                blocks.append(d[i-1])
+            blocks.append(d[32])
+            if opt[2][1] == 'on':
+                blocks.append(d[33])
+            for i in range(1, opt[1][1] + 1):
+                blocks.append(d[i+33])
         elif idx == 5:
             blocks = [d[0]]
             if opt[1][1] == 'on':
@@ -527,13 +526,12 @@ class PatchBinary(Patch):
                 blocks.append(d[2])
             blocks.append(d[3])
         elif idx == 16:
-            blocks = d
-            # blocks = []
-            # for i in range(1, opt[0][1] + 1):
-            #     blocks.append(d[i - 1])
-            # blocks.append(d[1])
-            # blocks.append(d[2])
-            # blocks.append(d[3])
+            blocks = []
+            for i in range(1, opt[0][1] + 1):
+                blocks.append(d[i-1])
+            blocks.append(d[40])
+            blocks.append(d[41])
+            blocks.append(d[42])
         elif idx == 19:
             blocks = [d[0]]
             if opt[0][1] == 'linked':
@@ -610,29 +608,25 @@ class PatchBinary(Patch):
                 blocks.append(d[7])
             blocks.append(d[8])
         elif idx == 31:
-            blocks = d
-            # blocks = []
-            # for i in range(1, opt[0][1] + 1):
-            #     blocks.append(d[i - 1])
-            # blocks.append(d[1])
-            # blocks.append(d[2])
+            blocks = []
+            for i in range(1, opt[0][1] + 1):
+                blocks.append(d[i-1])
+            blocks.append(d[16])
+            blocks.append(d[17])
         elif idx == 32:
-            blocks = d
-            # blocks = [d[0], d[1]]
-            # for i in range(1, opt[0][1] + 1):
-            #     blocks.append(d[i - 1])
+            blocks = [d[0], d[1]]
+            for i in range(1, opt[0][1] + 1):
+                blocks.append(d[i+1])
         elif idx == 33:
-            blocks = d
-            # blocks = []
-            # for i in range(1, opt[0][1] + 1):
-            #     blocks.append(d[i - 1])
-            # blocks.append(d[1])
-            # blocks.append(d[2])
+            blocks = []
+            for i in range(1, opt[0][1] + 1):
+                blocks.append(d[i-1])
+            blocks.append(d[16])
+            blocks.append(d[17])
         elif idx == 34:
-            blocks = d
-            # blocks = [d[0], d[1]]
-            # for i in range(1, opt[0][1] + 1):
-            #     blocks.append(d[i - 1])
+            blocks = [d[0], d[1]]
+            for i in range(1, opt[0][1] + 1):
+                blocks.append(d[i+1])
         elif idx == 36:
             blocks = [d[0]]
             if opt[0][1] == 'on':

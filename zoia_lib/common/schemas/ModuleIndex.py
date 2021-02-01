@@ -174,15 +174,165 @@ module_index = {
         "params": 34,
         "cpu": 2,
         "blocks": {
-            "steps": {
+            "step_1": {
                 "isDefault": True,
                 "isParam": True,
-                "position": list(range(0, 32))
+                "position": 0
             },
-            "step_n": {
+            "step_2": {
                 "isDefault": False,
                 "isParam": True,
-                "position": list(range(1, 32))
+                "position": 1
+            },
+            "step_3": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 2
+            },
+            "step_4": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 3
+            },
+            "step_5": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 4
+            },
+            "step_6": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 5
+            },
+            "step_7": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 6
+            },
+            "step_8": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 7
+            },
+            "step_9": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 8
+            },
+            "step_10": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 9
+            },
+            "step_11": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 10
+            },
+            "step_12": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 11
+            },
+            "step_13": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 12
+            },
+            "step_14": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 13
+            },
+            "step_15": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 14
+            },
+            "step_16": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 15
+            },
+            "step_17": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 16
+            },
+            "step_18": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 17
+            },
+            "step_19": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 18
+            },
+            "step_20": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 19
+            },
+            "step_21": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 20
+            },
+            "step_22": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 21
+            },
+            "step_23": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 22
+            },
+            "step_24": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 23
+            },
+            "step_25": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 24
+            },
+            "step_26": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 25
+            },
+            "step_27": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 26
+            },
+            "step_28": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 27
+            },
+            "step_29": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 28
+            },
+            "step_30": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 29
+            },
+            "step_31": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 30
+            },
+            "step_32": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 31
             },
             "gate_in": {
                 "isDefault": True,
@@ -199,11 +349,41 @@ module_index = {
                 "isParam": False,
                 "position": 34,
             },
-            "out_track_n": {
+            "out_track_2": {
                 "isDefault": False,
                 "isParam": False,
-                "position": list(range(35, 42))
-            }
+                "position": 35,
+            },
+            "out_track_3": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 36,
+            },
+            "out_track_4": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 37,
+            },
+            "out_track_5": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 38,
+            },
+            "out_track_6": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 39,
+            },
+            "out_track_7": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 40,
+            },
+            "out_track_8": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 41,
+            },
         },
         "options": {
             "number_of_steps": list(range(1, 33)),
@@ -711,25 +891,215 @@ module_index = {
                 "isParam": True,
                 "position": 0
             },
-            "note_n": {
+            "note_2": {
                 "isDefault": False,
                 "isParam": True,
-                "position": list(range(1, 40))
+                "position": 1
+            },
+            "note_3": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 2
+            },
+            "note_4": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 3
+            },
+            "note_5": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 4
+            },
+            "note_6": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 5
+            },
+            "note_7": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 6
+            },
+            "note_8": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 7
+            },
+            "note_9": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 8
+            },
+            "note_10": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 9
+            },
+            "note_11": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 10
+            },
+            "note_12": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 11
+            },
+            "note_13": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 12
+            },
+            "note_14": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 13
+            },
+            "note_15": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 14
+            },
+            "note_16": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 15
+            },
+            "note_17": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 16
+            },
+            "note_18": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 17
+            },
+            "note_19": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 18
+            },
+            "note_20": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 19
+            },
+            "note_21": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 20
+            },
+            "note_22": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 21
+            },
+            "note_23": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 22
+            },
+            "note_24": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 23
+            },
+            "note_25": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 24
+            },
+            "note_26": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 25
+            },
+            "note_27": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 26
+            },
+            "note_28": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 27
+            },
+            "note_29": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 28
+            },
+            "note_30": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 29
+            },
+            "note_31": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 30
+            },
+            "note_32": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 31
+            },
+            "note_33": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 32
+            },
+            "note_34": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 33
+            },
+            "note_35": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 34
+            },
+            "note_36": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 35
+            },
+            "note_37": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 36
+            },
+            "note_38": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 37
+            },
+            "note_39": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 38
+            },
+            "note_40": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 39
             },
             "note_out": {
                 "isDefault": True,
                 "isParam": False,
-                "position": 41
+                "position": 40
             },
             "gate_out": {
                 "isDefault": True,
                 "isParam": False,
-                "position": 42
+                "position": 41
             },
             "trigger_out": {
                 "isDefault": True,
                 "isParam": False,
-                "position": 43
+                "position": 42
             }
         },
         "options": {
@@ -1398,10 +1768,80 @@ module_index = {
                 "isParam": True,
                 "position": 0
             },
-            "cv_input_n": {
+            "cv_input_2": {
                 "isDefault": False,
                 "isParam": True,
-                "position": list(range(1, 16))
+                "position": 1
+            },
+            "cv_input_3": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 2
+            },
+            "cv_input_4": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 3
+            },
+            "cv_input_5": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 4
+            },
+            "cv_input_6": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 5
+            },
+            "cv_input_7": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 6
+            },
+            "cv_input_8": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 7
+            },
+            "cv_input_9": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 8
+            },
+            "cv_input_10": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 9
+            },
+            "cv_input_11": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 10
+            },
+            "cv_input_12": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 11
+            },
+            "cv_input_13": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 12
+            },
+            "cv_input_14": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 13
+            },
+            "cv_input_15": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 14
+            },
+            "cv_input_16": {
+                "isDefault": False,
+                "isParam": True,
+                "position": 15
             },
             "in_select": {
                 "isDefault": True,
@@ -1446,10 +1886,80 @@ module_index = {
                 "isParam": False,
                 "position": 2
             },
-            "cv_output_n": {
+            "cv_output_2": {
                 "isDefault": False,
                 "isParam": False,
-                "position": list(range(3, 18))
+                "position": 3
+            },
+            "cv_output_3": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 4
+            },
+            "cv_output_4": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 5
+            },
+            "cv_output_5": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 6
+            },
+            "cv_output_6": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 7
+            },
+            "cv_output_7": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 8
+            },
+            "cv_output_8": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 9
+            },
+            "cv_output_9": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 10
+            },
+            "cv_output_10": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 11
+            },
+            "cv_output_11": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 12
+            },
+            "cv_output_12": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 13
+            },
+            "cv_output_13": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 14
+            },
+            "cv_output_14": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 15
+            },
+            "cv_output_15": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 16
+            },
+            "cv_output_16": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 17
             }
         },
         "options": {
@@ -1478,10 +1988,80 @@ module_index = {
                 "isParam": False,
                 "position": 0
             },
-            "audio_input_n": {
+            "audio_input_2": {
                 "isDefault": False,
                 "isParam": False,
-                "position": list(range(1, 16))
+                "position": 1
+            },
+            "audio_input_3": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 2
+            },
+            "audio_input_4": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 3
+            },
+            "audio_input_5": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 4
+            },
+            "audio_input_6": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 5
+            },
+            "audio_input_7": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 6
+            },
+            "audio_input_8": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 7
+            },
+            "audio_input_9": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 10
+            },
+            "audio_input_10": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 11
+            },
+            "audio_input_11": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 12
+            },
+            "audio_input_12": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 13
+            },
+            "audio_input_13": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 14
+            },
+            "audio_input_14": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 15
+            },
+            "audio_input_15": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 14
+            },
+            "audio_input_16": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 15
             },
             "in_select": {
                 "isDefault": True,
@@ -1531,10 +2111,80 @@ module_index = {
                 "isParam": False,
                 "position": 2
             },
-            "audio_output_n": {
+            "audio_output_2": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 3
+            },
+            "audio_output_3": {
                 "isDefault": True,
                 "isParam": False,
-                "position": list(range(3, 18))
+                "position": 4
+            },
+            "audio_output_4": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 5
+            },
+            "audio_output_5": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 6
+            },
+            "audio_output_6": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 7
+            },
+            "audio_output_7": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 8
+            },
+            "audio_output_8": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 9
+            },
+            "audio_output_9": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 10
+            },
+            "audio_output_10": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 11
+            },
+            "audio_output_11": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 12
+            },
+            "audio_output_12": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 13
+            },
+            "audio_output_13": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 14
+            },
+            "audio_output_14": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 15
+            },
+            "audio_output_15": {
+                "isDefault": True,
+                "isParam": False,
+                "position": 16
+            },
+            "audio_output_16": {
+                "isDefault": False,
+                "isParam": False,
+                "position": 17
             }
         },
         "options": {
