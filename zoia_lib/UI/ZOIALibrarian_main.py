@@ -96,6 +96,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.bank_sizes = None
         self.font = None
         self.local_pch_count = -1
+        self.add_rating = None
 
         # Threads
         self.worker_mass = ImportMassWorker(self)
@@ -110,9 +111,6 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Get the data necessary for the PS tab.
         self.ps.metadata_init()
-
-        # Update local patches if necessary
-        # self.local.metadata_init()
 
         # Set the window icon
         self.setWindowIcon(QIcon(self.icon))
@@ -132,7 +130,7 @@ class ZOIALibrarianMain(QMainWindow):
             not len(os.listdir(os.path.join(self.path, "Banks"))) == 0)
 
         # Load preferences from previous sessions (if they exist)
-        if os.path.exists(os.path.join(self.path, "pref.json")):
+        while os.path.exists(os.path.join(self.path, "pref.json")):
             # SD Card previously specified.
             with open(os.path.join(self.path, "pref.json"), "r") as f:
                 data = json.loads(f.read())
@@ -151,6 +149,13 @@ class ZOIALibrarianMain(QMainWindow):
             self.local_sizes = data[2]
             self.sd_sizes = data[3]
             self.bank_sizes = data[4]
+
+            # Version check
+            if "col_5" not in self.local_sizes or "col_5" not in self.bank_sizes:
+                os.remove(os.path.join(self.path, "pref.json"))
+                self.add_rating = True
+                self.reset_ui()
+                break
 
             # PS Table
             # self.ui.splitter_PS.setSizes([self.ps_sizes["split_left"],
@@ -197,10 +202,15 @@ class ZOIALibrarianMain(QMainWindow):
 
             self.util.set_dark(data[5]["enabled"])
             self.util.set_row_inversion(data[6]["enabled"])
-
+            break
         else:
             # No pref.json, use default values.
+            self.add_rating = True
             self.reset_ui()
+
+        # Update local patches if necessary
+        if self.add_rating:
+            self.local.metadata_init()
 
         # Connect buttons and items to methods.
         self.ui.tabs.currentChanged.connect(self.tab_switch)
