@@ -2,7 +2,6 @@ import unittest
 
 
 class TestMetadata(unittest.TestCase):
-
     def setUp(self):
         pass
 

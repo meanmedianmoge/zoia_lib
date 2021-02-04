@@ -176,6 +176,8 @@ class Ui_MainWindow(object):
         self.actionSort_by_rating_high_low.setObjectName(u"actionSort_by_rating_high_low")
         self.actionSort_by_rating_low_high = QAction(MainWindow)
         self.actionSort_by_rating_low_high.setObjectName(u"actionSort_by_rating_low_high")
+        self.actionSpecify_Default_Export_Directory = QAction(MainWindow)
+        self.actionSpecify_Default_Export_Directory.setObjectName(u"actionSpecify_Default_Export_Directory")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.centralwidget.setStyleSheet(u"")
@@ -256,6 +258,8 @@ class Ui_MainWindow(object):
 
         self.btn_dwn_all = QPushButton(self.layoutWidget_4)
         self.btn_dwn_all.setObjectName(u"btn_dwn_all")
+        self.btn_dwn_all.setCursor(QCursor(Qt.PointingHandCursor))
+        self.btn_dwn_all.setMouseTracking(True)
 
         self.verticalLayout_8.addWidget(self.btn_dwn_all)
 
@@ -478,11 +482,15 @@ class Ui_MainWindow(object):
         self.horizontalLayout_19.setObjectName(u"horizontalLayout_19")
         self.btn_prev_page = QPushButton(self.layoutWidget_8)
         self.btn_prev_page.setObjectName(u"btn_prev_page")
+        self.btn_prev_page.setCursor(QCursor(Qt.PointingHandCursor))
+        self.btn_prev_page.setMouseTracking(True)
 
         self.horizontalLayout_19.addWidget(self.btn_prev_page)
 
         self.btn_next_page = QPushButton(self.layoutWidget_8)
         self.btn_next_page.setObjectName(u"btn_next_page")
+        self.btn_next_page.setCursor(QCursor(Qt.PointingHandCursor))
+        self.btn_next_page.setMouseTracking(True)
 
         self.horizontalLayout_19.addWidget(self.btn_next_page)
 
@@ -840,6 +848,8 @@ class Ui_MainWindow(object):
 
         self.back_btn = QPushButton(self.layoutWidget_7)
         self.back_btn.setObjectName(u"back_btn")
+        self.back_btn.setCursor(QCursor(Qt.PointingHandCursor))
+        self.back_btn.setMouseTracking(True)
 
         self.verticalLayout_22.addWidget(self.back_btn)
 
@@ -886,13 +896,22 @@ class Ui_MainWindow(object):
         self.verticalLayout_11 = QVBoxLayout(self.layoutWidget_3)
         self.verticalLayout_11.setObjectName(u"verticalLayout_11")
         self.verticalLayout_11.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_17 = QHBoxLayout()
+        self.horizontalLayout_17.setObjectName(u"horizontalLayout_17")
         self.delete_folder_sd_btn = QPushButton(self.layoutWidget_3)
         self.delete_folder_sd_btn.setObjectName(u"delete_folder_sd_btn")
         self.delete_folder_sd_btn.setCursor(QCursor(Qt.PointingHandCursor))
         self.delete_folder_sd_btn.setMouseTracking(True)
         self.delete_folder_sd_btn.setStyleSheet(u"")
 
-        self.verticalLayout_11.addWidget(self.delete_folder_sd_btn)
+        self.horizontalLayout_17.addWidget(self.delete_folder_sd_btn)
+
+        self.set_export_dir_btn = QPushButton(self.layoutWidget_3)
+        self.set_export_dir_btn.setObjectName(u"set_export_dir_btn")
+        self.set_export_dir_btn.setCursor(QCursor(Qt.PointingHandCursor))
+        self.set_export_dir_btn.setMouseTracking(True)
+
+        self.horizontalLayout_17.addWidget(self.set_export_dir_btn)
 
         self.import_all_btn = QPushButton(self.layoutWidget_3)
         self.import_all_btn.setObjectName(u"import_all_btn")
@@ -900,14 +919,17 @@ class Ui_MainWindow(object):
         self.import_all_btn.setMouseTracking(True)
         self.import_all_btn.setStyleSheet(u"")
 
-        self.verticalLayout_11.addWidget(self.import_all_btn)
+        self.horizontalLayout_17.addWidget(self.import_all_btn)
 
         self.import_all_ver_btn = QPushButton(self.layoutWidget_3)
         self.import_all_ver_btn.setObjectName(u"import_all_ver_btn")
         self.import_all_ver_btn.setCursor(QCursor(Qt.PointingHandCursor))
         self.import_all_ver_btn.setStyleSheet(u"")
 
-        self.verticalLayout_11.addWidget(self.import_all_ver_btn)
+        self.horizontalLayout_17.addWidget(self.import_all_ver_btn)
+
+
+        self.verticalLayout_11.addLayout(self.horizontalLayout_17)
 
         self.splitter_sd_hori = QSplitter(self.layoutWidget_3)
         self.splitter_sd_hori.setObjectName(u"splitter_sd_hori")
@@ -1628,6 +1650,7 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(shortcut)
         self.actionSort_by_rating_low_high.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+]", None))
 #endif // QT_CONFIG(shortcut)
+        self.actionSpecify_Default_Export_Directory.setText(QCoreApplication.translate("MainWindow", u"Specify Default Export Directory", None))
 #if QT_CONFIG(tooltip)
         self.tabs.setToolTip("")
 #endif // QT_CONFIG(tooltip)
@@ -1914,6 +1937,19 @@ class Ui_MainWindow(object):
         self.delete_folder_sd_btn.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Will attempt to delete the currently selected item in the SD tree view above from your SD card. Will create a popup if the currently selected item is a folder, at which point a warning will indicate that deletion will delete everything contained within. The options are yes to continue with the deletion and no to abort. ", None))
 #endif // QT_CONFIG(accessibility)
         self.delete_folder_sd_btn.setText(QCoreApplication.translate("MainWindow", u"Delete Selected Item Above", None))
+#if QT_CONFIG(tooltip)
+        self.set_export_dir_btn.setToolTip(QCoreApplication.translate("MainWindow", u"Click here to set the export directory.", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.set_export_dir_btn.setStatusTip(QCoreApplication.translate("MainWindow", u"Click here to set the export directory.", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(accessibility)
+        self.set_export_dir_btn.setAccessibleName(QCoreApplication.translate("MainWindow", u"Set Export Directory button", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.set_export_dir_btn.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Allows the user to set the export directory instead of defaulting to \"to_zoia\".", None))
+#endif // QT_CONFIG(accessibility)
+        self.set_export_dir_btn.setText(QCoreApplication.translate("MainWindow", u"Set Export Directory", None))
 #if QT_CONFIG(tooltip)
         self.import_all_btn.setToolTip(QCoreApplication.translate("MainWindow", u"Click here to import all patches currently listed below.", None))
 #endif // QT_CONFIG(tooltip)

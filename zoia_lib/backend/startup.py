@@ -23,7 +23,8 @@ if __name__ == "__main__":
 
     # Create and display the splash screen
     img = QPixmap(
-        os.path.join(os.getcwd(), "zoia_lib", "UI", "resources", "splash.png"))
+        os.path.join(os.getcwd(), "zoia_lib", "UI", "resources", "splash.png")
+    )
     splash = QSplashScreen(img, Qt.WindowStaysOnTopHint)
     splash.show()
 

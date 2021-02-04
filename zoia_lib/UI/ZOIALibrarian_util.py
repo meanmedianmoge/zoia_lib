@@ -7,13 +7,13 @@ import json
 
 
 class ZOIALibrarianUtil:
-    """ The ZOIALibrarianUTIL class is responsible for all
+    """The ZOIALibrarianUTIL class is responsible for all
     auxiliary activities that may be required by other ZOIALibrarian
     classes.
     """
 
     def __init__(self, ui, window):
-        """ Initializes the class with the required parameters.
+        """Initializes the class with the required parameters.
 
         ui: The UI component of ZOIALibrarianMain
         window: A reference to the main UI window for icon consistency.
@@ -28,7 +28,7 @@ class ZOIALibrarianUtil:
         self.font = QFont("Verdana", 10)
 
     def change_font(self, name):
-        """ Changes the font used throughout the application.
+        """Changes the font used throughout the application.
         Currently triggered via a menu action.
 
         name: Used to specify whether the font should be resized or
@@ -92,6 +92,7 @@ class ZOIALibrarianUtil:
             self.ui.table_sd_right.horizontalHeader().setFont(new_font)
             self.ui.table_sd_right.verticalHeader().setFont(new_font)
             self.ui.delete_folder_sd_btn.setFont(new_font)
+            self.ui.set_export_dir_btn.setFont(new_font)
             self.ui.import_all_btn.setFont(new_font)
             self.ui.import_all_ver_btn.setFont(new_font)
 
@@ -125,52 +126,43 @@ class ZOIALibrarianUtil:
                     # Need trys here in case the table does not have a
                     # cell widget there yet.
                     try:
-                        self.ui.table_sd_left.cellWidget(i, 1).setFont(
-                            new_font)
+                        self.ui.table_sd_left.cellWidget(i, 1).setFont(new_font)
                     except AttributeError:
                         pass
                     try:
-                        self.ui.table_sd_left.cellWidget(i, 2).setFont(
-                            new_font)
+                        self.ui.table_sd_left.cellWidget(i, 2).setFont(new_font)
                     except AttributeError:
                         pass
                     try:
-                        self.ui.table_sd_right.cellWidget(i, 1).setFont(
-                            new_font)
+                        self.ui.table_sd_right.cellWidget(i, 1).setFont(new_font)
                     except AttributeError:
                         pass
                     try:
-                        self.ui.table_sd_right.cellWidget(i, 2).setFont(
-                            new_font)
+                        self.ui.table_sd_right.cellWidget(i, 2).setFont(new_font)
                     except AttributeError:
                         pass
                     try:
-                        self.ui.table_bank_left.cellWidget(i, 1).setFont(
-                            new_font)
+                        self.ui.table_bank_left.cellWidget(i, 1).setFont(new_font)
                     except AttributeError:
                         pass
                     try:
-                        self.ui.table_bank_left.cellWidget(i, 2).setFont(
-                            new_font)
+                        self.ui.table_bank_left.cellWidget(i, 2).setFont(new_font)
                     except AttributeError:
                         pass
                     try:
-                        self.ui.table_bank_right.cellWidget(i, 1).setFont(
-                            new_font)
+                        self.ui.table_bank_right.cellWidget(i, 1).setFont(new_font)
                     except AttributeError:
                         pass
                     try:
-                        self.ui.table_bank_right.cellWidget(i, 2).setFont(
-                            new_font)
+                        self.ui.table_bank_right.cellWidget(i, 2).setFont(new_font)
                     except AttributeError:
                         pass
                 if self.ui.table_bank_local.cellWidget(0, 0) is not None:
                     for i in range(self.ui.table_bank_local.rowCount()):
-                        self.ui.table_bank_local.cellWidget(i, 0).setFont(
-                            new_font)
+                        self.ui.table_bank_local.cellWidget(i, 0).setFont(new_font)
 
     def save_pref(self, w, h, sd, path):
-        """ Saves and writes the state of a UI window to pref.json
+        """Saves and writes the state of a UI window to pref.json
 
         w: The width of the main window.
         h: The height of the main window.
@@ -182,12 +174,9 @@ class ZOIALibrarianUtil:
         window = {
             "width": w,
             "height": h,
-            "font":
-                self.ui.table_PS.horizontalHeader().font().toString().split(
-                    ",")[0],
-            "font_size":
-                self.ui.table_PS.horizontalHeader().font().pointSize(),
-            "sd_root": "" if sd is None else sd
+            "font": self.ui.table_PS.horizontalHeader().font().toString().split(",")[0],
+            "font_size": self.ui.table_PS.horizontalHeader().font().pointSize(),
+            "sd_root": "" if sd is None else sd,
         }
         ps_sizes = {
             "col_0": self.ui.table_PS.columnWidth(0),
@@ -195,7 +184,7 @@ class ZOIALibrarianUtil:
             "col_2": self.ui.table_PS.columnWidth(2),
             "col_3": self.ui.table_PS.columnWidth(3),
             "split_left": self.ui.splitter_PS.sizes()[0],
-            "split_right": self.ui.splitter_PS.sizes()[1]
+            "split_right": self.ui.splitter_PS.sizes()[1],
         }
         local_sizes = {
             "col_0": self.ui.table_local.columnWidth(0),
@@ -207,7 +196,7 @@ class ZOIALibrarianUtil:
             "split_left": self.ui.splitter_local.sizes()[0],
             "split_right": self.ui.splitter_local.sizes()[1],
             "split_top": self.ui.splitter_local_hori.sizes()[0],
-            "split_bottom": self.ui.splitter_local_hori.sizes()[1]
+            "split_bottom": self.ui.splitter_local_hori.sizes()[1],
         }
         sd_sizes = {
             "col_0": self.ui.table_sd_left.columnWidth(0),
@@ -217,7 +206,7 @@ class ZOIALibrarianUtil:
             "split_top": self.ui.splitter_sd_vert.sizes()[0],
             "split_bottom": self.ui.splitter_sd_vert.sizes()[1],
             "split_left": self.ui.splitter_sd_hori.sizes()[0],
-            "split_right": self.ui.splitter_sd_hori.sizes()[1]
+            "split_right": self.ui.splitter_sd_hori.sizes()[1],
         }
         bank_sizes = {
             "col_0": self.ui.table_bank_left.columnWidth(0),
@@ -230,23 +219,29 @@ class ZOIALibrarianUtil:
             "split_middle": self.ui.splitter_bank.sizes()[1],
             "split_right": self.ui.splitter_bank.sizes()[2],
             "split_bank_left": self.ui.splitter_bank_tables.sizes()[0],
-            "split_bank_right": self.ui.splitter_bank_tables.sizes()[1]
+            "split_bank_right": self.ui.splitter_bank_tables.sizes()[1],
         }
-        dark_mode = {
-            "enabled": not self.dark
-        }
-        row_invert = {
-            "enabled": not self.row_inversion
-        }
+        dark_mode = {"enabled": not self.dark}
+        row_invert = {"enabled": not self.row_inversion}
 
         # Write the data to pref.json for subsequent launches.
         with open(os.path.join(path, "pref.json"), "w") as f:
-            f.write(json.dumps([window, ps_sizes, local_sizes,
-                                sd_sizes, bank_sizes, dark_mode,
-                                row_invert]))
+            f.write(
+                json.dumps(
+                    [
+                        window,
+                        ps_sizes,
+                        local_sizes,
+                        sd_sizes,
+                        bank_sizes,
+                        dark_mode,
+                        row_invert,
+                    ]
+                )
+            )
 
     def toggle_dark(self):
-        """ Toggles the theme for the application.
+        """Toggles the theme for the application.
         Currently triggered via a menu action.
         """
 
@@ -258,11 +253,10 @@ class ZOIALibrarianUtil:
             ("linux", True): "light.css",
             ("darwin", False): "osx-dark.css",
             ("windows", False): "dark.css",
-            ("linux", False): "dark.css"
+            ("linux", False): "dark.css",
         }[(platform.system().lower(), self.dark)]
 
-        with open(os.path.join("zoia_lib", "UI", "resources",
-                               sheet), "r") as f:
+        with open(os.path.join("zoia_lib", "UI", "resources", sheet), "r") as f:
             data = f.read()
 
         self.dark = not self.dark
@@ -270,7 +264,7 @@ class ZOIALibrarianUtil:
         self.change_font(self.font)
 
     def row_invert(self):
-        """ Either enables of disables alternating row colours for
+        """Either enables of disables alternating row colours for
         tables depending on the previous state of the tables.
         Currently triggered via a menu action.
         """
@@ -295,89 +289,104 @@ class ZOIALibrarianUtil:
         self.row_inversion = not self.row_inversion
 
     def set_row_inversion(self, value):
-        """ Setter method to specify whether alternating rows is enabled.
-        """
+        """Setter method to specify whether alternating rows is enabled."""
         self.row_inversion = value
 
     def set_dark(self, value):
-        """ Setter method to specify whether dark mode is enabled.
-        """
+        """Setter method to specify whether dark mode is enabled."""
         self.dark = value
 
     def set_font(self, f):
-        """ Setter method to specify the font to be used for the app.
-        """
+        """Setter method to specify the font to be used for the app."""
         self.font = f
 
     def documentation(self):
-        """ Passes documentation to the front-end PS tab.
-        """
+        """Passes documentation to the front-end PS tab."""
 
         with open("documentation/Resources/manual.html", "r", errors="ignore") as f:
             manual = f.read()
 
-        self.ui.text_browser_PS.setText("""
+        self.ui.text_browser_PS.setText(
+            """
             {}
-        """.format(manual))
+        """.format(
+                manual
+            )
+        )
 
     def faq(self):
-        """ Passes FAQ to the front-end PS tab.
-        """
+        """Passes FAQ to the front-end PS tab."""
 
         with open("documentation/Resources/faq.html", "r", errors="ignore") as f:
             faq = f.read()
 
-        self.ui.text_browser_PS.setText("""
+        self.ui.text_browser_PS.setText(
+            """
             {}
-        """.format(faq))
+        """.format(
+                faq
+            )
+        )
 
     def tips(self):
-        """ Passes Tips & Tricks to front-end PS tab.
-        """
+        """Passes Tips & Tricks to front-end PS tab."""
 
         with open("documentation/Resources/tips.html", "r", errors="ignore") as f:
             tips = f.read()
 
-        self.ui.text_browser_PS.setText("""
+        self.ui.text_browser_PS.setText(
+            """
             {}
-        """.format(tips))
+        """.format(
+                tips
+            )
+        )
 
     def mod_idx(self):
-        """ Passes Module Index to front-end PS tab.
-        """
+        """Passes Module Index to front-end PS tab."""
 
         with open("documentation/Resources/mod.html", "r", errors="ignore") as f:
             mod = f.read()
 
-        self.ui.text_browser_PS.setText("""
+        self.ui.text_browser_PS.setText(
+            """
             {}
-        """.format(mod))
+        """.format(
+                mod
+            )
+        )
 
     def firmware(self):
-        """ Passes firmware changelog to front-end PS tab.
-        """
+        """Passes firmware changelog to front-end PS tab."""
 
         with open("documentation/Resources/changelog.html", "r", errors="ignore") as f:
             logs = f.read()
 
-        self.ui.text_browser_PS.setText("""
+        self.ui.text_browser_PS.setText(
+            """
             {}
-        """.format(logs))
+        """.format(
+                logs
+            )
+        )
 
     def expander(self):
-        """ Testing patch expander.
-        """
+        """Testing patch expander."""
 
         with open("src/exp.html", "r", errors="ignore") as f:
             exp = f.read()
 
-        self.ui.text_browser_PS.setText("""
+        self.ui.text_browser_PS.setText(
+            """
             {}
-        """.format(exp))
+        """.format(
+                exp
+            )
+        )
 
     @staticmethod
     def multi_drag_drop(rows_left, rows_right, table_1, table_2, f1):
-        """ Attempts to move multiple rows from one table at the same
+        """Attempts to move multiple rows from one table at the same
         time. This can be within the same table or to a companion table.
 
         rows_left: An array containing the rows currently stored in the
@@ -406,7 +415,7 @@ class ZOIALibrarianUtil:
         # Find the first entry for the current set of rows.
         for i in sorted(curr_rows):
             i = i.row()
-            i = int('%d' % i)
+            i = int("%d" % i)
             temp = main_table.item(i, 0)
             if temp is not None and temp.text() != "":
                 first_item = temp
@@ -428,17 +437,18 @@ class ZOIALibrarianUtil:
             else:
                 temp_main = temp_right
                 temp_other = temp_left
-            if (temp_main is not None and i != first_item_index
-                and temp_main.text() == first_item_text) or (
-                    temp_other is not None and temp_other.text()
-                    == first_item_text):
+            if (
+                temp_main is not None
+                and i != first_item_index
+                and temp_main.text() == first_item_text
+            ) or (temp_other is not None and temp_other.text() == first_item_text):
                 # We found the first item!
                 # row = sorted(curr_rows)[-1].row()
                 # row = int('%d' % row)
                 rows = [int(x.row()) for x in sorted(curr_rows)]
                 if curr_rows == rows_right:
                     # row += 32
-                    rows = [32+x for x in rows]
+                    rows = [32 + x for x in rows]
                 # for j in range(first_item_index, row + 1):
                 for j in rows:
                     if j == first_item_index:
@@ -461,9 +471,12 @@ class ZOIALibrarianUtil:
                         continue
                     elif temp1 is None and temp2 is not None:
                         f1(i, j)
-                    elif temp1 is not None and temp2 is None or \
-                            temp1 is not None and temp2 is not \
-                            None:
+                    elif (
+                        temp1 is not None
+                        and temp2 is None
+                        or temp1 is not None
+                        and temp2 is not None
+                    ):
                         f1(j, i)
                     elif temp1 is None and temp2 is not None:
                         f1(i, j)

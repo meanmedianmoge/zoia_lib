@@ -1,0 +1,61 @@
+Version 1.1 (February 2021)
+
+New Features
+- The visualizer panel has received a few organizational tweaks, including:
+    Calculated and displayed the correct number of blocks per module.
+    Listed the actual parameter names (with their values scaled from 0 to 1).
+    Adjusted the connection text.
+    Included a reset button to zoom out of the module-view.
+- Local patches can now be rated on a scale of 0-5 stars.
+    This also includes a new sorting and filtering method, found in the Sort toolbar.
+    The first time you load v1.1 may take a bit longer than usual, since each patch downloaded or imported needs a rating field.
+    If you haven't used the app before v1.1, load time will also be a bit long (on first startup) due to setting the local backend.
+- Smoothed out transitions between app versions so that you no longer need to delete pref.json before running.
+- Version histories can now be exported as a group using the "Export Patches" button.
+    The original functionality (individual exports of versions) still exists in the version history view.
+- Added the ability to set the directory where patches are exported from the Local Storage tab.
+    The default directory is still "to_zoia" if you do not wish to change it.
+    This option is set by a new button the SD tab (also the buttons here were adjusted slightly).
+- The export patch dialog will default to the next-available open slot in the directory chosen.
+    Also, if you attempt to overwrite a slot, it will display the name of the patch currently in that slot.
+- Extended the search functionality to peek into version histories.
+    Results that meet the query will display the version name, not the patch name.
+- Updated the pop-up window that occurs if patches fail to import.
+    It displays the name of the version history / patch so you can inspect it in Local Storage.
+- Updated the module index and binary decoder to fw 1.14 spec.
+- You can now sort by author in the PS tab.
+    Unfortunately, PS-tab author search is not available.
+- Adjusted the status and tool tip display text and keymap for shortcuts.
+- Updated the default UI panel and table sizes to be more functional at startup.
+- Changed some of the button names and style.
+- Applied an autoformatter to the codebase to make it more readable and writable.
+- Mac build is now confirmed to work with the .app file.
+    No more needing to run from terminal! (credit: smithrobs)
+
+Fixes
+- Fixed an issue where BigSur dependency issues were causing the app to not load (Mac).
+- Fixed an issue where choosing a SD card from the SD tab would cause the UI to snap to the Local Storage tab.
+    (credit: smithrobs)
+- Fixed an issue with the Local Storage splitter loading to a value other than the default or saved preferences (Mac).
+- Fixed an issue with temp directories being created would override the patch list in the Local Storage tab.
+- Replaced duplicate CV Filter module in mod index and viz code; CV Inverts should appear now.
+
+Known Issues
+- RAR-compressed files cannot be downloaded on Mac (as of this writing, this affects 1 patch - ZoiaMurf v2).
+    Due to RAR's licensing, we cannot include a version of the RAR compression algorithm, nor can we verify that the user's machine has the algo installed.
+    A workaround for this is to download the patch(es) separately on the PS site, and then import the binary file to the app.
+    Sorry for any inconvenience this may cause.
+- Occassionally, drag-and-drop will cease to work if you have an SD card location selected.
+    Resetting the SD location and/or rebooting the app should mitigate the issue.
+    It is being looked into (it's quite a tricky bug to diagnose...).
+
+Future Plans
+- Continue working on a Patch Expander tab.
+    It was originally slotted for release in v1.1, but is now pushed to v1.2 due to complexity.
+    The intent is to allow users to see the full audio and CV routings for a given patch as a whole.
+- Official app store support for macOS and iPadOS versions.
+    These specific versions will not be released under the GPL license, nor be made open-source due to Apple's development terms.
+    However, the application in general will remain open-source and continue to be hosted on GitHub.
+
+As always, we welcome any feedback you may have. Thanks for being awesome :)
+- Mike M.

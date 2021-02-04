@@ -13,6 +13,7 @@
 # }
 
 import json
+
 module_index = {
     0: {
         "name": "SV Filter",
@@ -26,42 +27,18 @@ module_index = {
         "params": 2,
         "cpu": 3,
         "blocks": {
-            "audio_in": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "frequency": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "resonance": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "lowpass_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 3
-            },
-            "hipass_output": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 4
-            },
-            "bandpass_output": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 5
-            }
+            "audio_in": {"isDefault": True, "isParam": False, "position": 0},
+            "frequency": {"isDefault": True, "isParam": True, "position": 1},
+            "resonance": {"isDefault": True, "isParam": True, "position": 2},
+            "lowpass_output": {"isDefault": True, "isParam": False, "position": 3},
+            "hipass_output": {"isDefault": False, "isParam": False, "position": 4},
+            "bandpass_output": {"isDefault": False, "isParam": False, "position": 5},
         },
         "options": {
             "lowpass_output": ["on", "off"],
             "hipass_output": ["off", "on"],
-            "bandpass_output": ["off", "on"]
-        }
+            "bandpass_output": ["off", "on"],
+        },
     },
     1: {
         "name": "Audio Input",
@@ -76,20 +53,10 @@ module_index = {
         "params": 0,
         "cpu": 0.4,
         "blocks": {
-            "input_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "input_R": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 1
-            }
+            "input_L": {"isDefault": True, "isParam": False, "position": 0},
+            "input_R": {"isDefault": True, "isParam": False, "position": 1},
         },
-        "options": {
-            "channels": ["stereo", "left", "right"]
-        }
+        "options": {"channels": ["stereo", "left", "right"]},
     },
     2: {
         "name": "Audio Output",
@@ -105,26 +72,14 @@ module_index = {
         "params": 1,
         "cpu": 1.7,
         "blocks": {
-            "input_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "input_R": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 1
-            },
-            "gain": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 2
-            }
+            "input_L": {"isDefault": True, "isParam": False, "position": 0},
+            "input_R": {"isDefault": True, "isParam": False, "position": 1},
+            "gain": {"isDefault": False, "isParam": True, "position": 2},
         },
         "options": {
             "gain_control": ["off", "on"],
-            "channels": ["stereo", "left", "right"]
-        }
+            "channels": ["stereo", "left", "right"],
+        },
     },
     3: {
         "name": "Aliaser",
@@ -142,23 +97,11 @@ module_index = {
         "params": 1,
         "cpu": 0.7,
         "blocks": {
-            "audio_in": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "#_of_samples": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "audio_out": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 2
-            }
+            "audio_in": {"isDefault": True, "isParam": False, "position": 0},
+            "#_of_samples": {"isDefault": True, "isParam": True, "position": 1},
+            "audio_out": {"isDefault": True, "isParam": False, "position": 2},
         },
-        "options": {}
+        "options": {},
     },
     4: {
         "name": "Sequencer",
@@ -174,223 +117,55 @@ module_index = {
         "params": 34,
         "cpu": 2,
         "blocks": {
-            "step_1": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "step_2": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 1
-            },
-            "step_3": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 2
-            },
-            "step_4": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 3
-            },
-            "step_5": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 4
-            },
-            "step_6": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 5
-            },
-            "step_7": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 6
-            },
-            "step_8": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 7
-            },
-            "step_9": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 8
-            },
-            "step_10": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 9
-            },
-            "step_11": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 10
-            },
-            "step_12": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 11
-            },
-            "step_13": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 12
-            },
-            "step_14": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 13
-            },
-            "step_15": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 14
-            },
-            "step_16": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 15
-            },
-            "step_17": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 16
-            },
-            "step_18": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 17
-            },
-            "step_19": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 18
-            },
-            "step_20": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 19
-            },
-            "step_21": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 20
-            },
-            "step_22": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 21
-            },
-            "step_23": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 22
-            },
-            "step_24": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 23
-            },
-            "step_25": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 24
-            },
-            "step_26": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 25
-            },
-            "step_27": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 26
-            },
-            "step_28": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 27
-            },
-            "step_29": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 28
-            },
-            "step_30": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 29
-            },
-            "step_31": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 30
-            },
-            "step_32": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 31
-            },
-            "gate_in": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 32
-            },
-            "queue_start": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 33
-            },
-            "out_track_1": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 34,
-            },
-            "out_track_2": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 35,
-            },
-            "out_track_3": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 36,
-            },
-            "out_track_4": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 37,
-            },
-            "out_track_5": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 38,
-            },
-            "out_track_6": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 39,
-            },
-            "out_track_7": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 40,
-            },
-            "out_track_8": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 41,
-            },
+            "step_1": {"isDefault": True, "isParam": True, "position": 0},
+            "step_2": {"isDefault": False, "isParam": True, "position": 1},
+            "step_3": {"isDefault": False, "isParam": True, "position": 2},
+            "step_4": {"isDefault": False, "isParam": True, "position": 3},
+            "step_5": {"isDefault": False, "isParam": True, "position": 4},
+            "step_6": {"isDefault": False, "isParam": True, "position": 5},
+            "step_7": {"isDefault": False, "isParam": True, "position": 6},
+            "step_8": {"isDefault": False, "isParam": True, "position": 7},
+            "step_9": {"isDefault": False, "isParam": True, "position": 8},
+            "step_10": {"isDefault": False, "isParam": True, "position": 9},
+            "step_11": {"isDefault": False, "isParam": True, "position": 10},
+            "step_12": {"isDefault": False, "isParam": True, "position": 11},
+            "step_13": {"isDefault": False, "isParam": True, "position": 12},
+            "step_14": {"isDefault": False, "isParam": True, "position": 13},
+            "step_15": {"isDefault": False, "isParam": True, "position": 14},
+            "step_16": {"isDefault": False, "isParam": True, "position": 15},
+            "step_17": {"isDefault": False, "isParam": True, "position": 16},
+            "step_18": {"isDefault": False, "isParam": True, "position": 17},
+            "step_19": {"isDefault": False, "isParam": True, "position": 18},
+            "step_20": {"isDefault": False, "isParam": True, "position": 19},
+            "step_21": {"isDefault": False, "isParam": True, "position": 20},
+            "step_22": {"isDefault": False, "isParam": True, "position": 21},
+            "step_23": {"isDefault": False, "isParam": True, "position": 22},
+            "step_24": {"isDefault": False, "isParam": True, "position": 23},
+            "step_25": {"isDefault": False, "isParam": True, "position": 24},
+            "step_26": {"isDefault": False, "isParam": True, "position": 25},
+            "step_27": {"isDefault": False, "isParam": True, "position": 26},
+            "step_28": {"isDefault": False, "isParam": True, "position": 27},
+            "step_29": {"isDefault": False, "isParam": True, "position": 28},
+            "step_30": {"isDefault": False, "isParam": True, "position": 29},
+            "step_31": {"isDefault": False, "isParam": True, "position": 30},
+            "step_32": {"isDefault": False, "isParam": True, "position": 31},
+            "gate_in": {"isDefault": True, "isParam": True, "position": 32},
+            "queue_start": {"isDefault": False, "isParam": True, "position": 33},
+            "out_track_1": {"isDefault": True, "isParam": False, "position": 34},
+            "out_track_2": {"isDefault": False, "isParam": False, "position": 35},
+            "out_track_3": {"isDefault": False, "isParam": False, "position": 36},
+            "out_track_4": {"isDefault": False, "isParam": False, "position": 37},
+            "out_track_5": {"isDefault": False, "isParam": False, "position": 38},
+            "out_track_6": {"isDefault": False, "isParam": False, "position": 39},
+            "out_track_7": {"isDefault": False, "isParam": False, "position": 40},
+            "out_track_8": {"isDefault": False, "isParam": False, "position": 41},
         },
         "options": {
             "number_of_steps": list(range(1, 33)),
             "num_of_tracks": list(range(1, 9)),
             "restart_jack": ["off", "on"],
-            "behavior": ["loop", "once"]
-        }
+            "behavior": ["loop", "once"],
+        },
     },
     5: {
         "name": "LFO",
@@ -410,41 +185,20 @@ module_index = {
         "params": 4,
         "cpu": 0.3,
         "blocks": {
-            "frequency": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "swing_amount": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 1
-            },
-            "phase_input": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 2
-            },
-            "phase_reset": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 3
-            },
-            "output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 4
-            }
+            "frequency": {"isDefault": True, "isParam": True, "position": 0},
+            "swing_amount": {"isDefault": False, "isParam": True, "position": 1},
+            "phase_input": {"isDefault": False, "isParam": False, "position": 2},
+            "phase_reset": {"isDefault": False, "isParam": True, "position": 3},
+            "output": {"isDefault": True, "isParam": False, "position": 4},
         },
         "options": {
-            "waveform": ["square", "sine", "triangle",
-                         "sawtooth", "ramp", "random"],
+            "waveform": ["square", "sine", "triangle", "sawtooth", "ramp", "random"],
             "swing_control": ["off", "on"],
             "output": ["0 to 1", "-1 to 1"],
             "input": ["cv", "tap", "linear_cv"],
             "phase_input": ["off", "on"],
-            "phase_reset": ["off", "on"]
-        }
+            "phase_reset": ["off", "on"],
+        },
     },
     6: {
         "name": "ADSR",
@@ -466,56 +220,16 @@ module_index = {
         "params": 9,
         "cpu": 0.07,
         "blocks": {
-            "cv_input": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "retrigger": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 1
-            },
-            "delay": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 2
-            },
-            "attack": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 3
-            },
-            "hold_attack_decay": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 4
-            },
-            "decay": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 5
-            },
-            "sustain": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 6
-            },
-            "hold_sustain_release": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 7
-            },
-            "release": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 8
-            },
-            "cv_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 9
-            }
+            "cv_input": {"isDefault": True, "isParam": True, "position": 0},
+            "retrigger": {"isDefault": False, "isParam": True, "position": 1},
+            "delay": {"isDefault": False, "isParam": True, "position": 2},
+            "attack": {"isDefault": True, "isParam": True, "position": 3},
+            "hold_attack_decay": {"isDefault": False, "isParam": True, "position": 4},
+            "decay": {"isDefault": True, "isParam": True, "position": 5},
+            "sustain": {"isDefault": True, "isParam": True, "position": 6},
+            "hold_sustain_release": {"isDefault": False, "isParam": True, "position": 7},
+            "release": {"isDefault": True, "isParam": True, "position": 8},
+            "cv_output": {"isDefault": True, "isParam": False, "position": 9},
         },
         "options": {
             "retrigger_input": ["off", "on"],
@@ -524,8 +238,8 @@ module_index = {
             "str": ["on", "off"],
             "immediate_release": ["on", "off"],
             "hold_sustain_release": ["off", "on"],
-            "time_scale": ["exponent", "linear"]
-        }
+            "time_scale": ["exponent", "linear"],
+        },
     },
     7: {
         "name": "VCA",
@@ -543,35 +257,13 @@ module_index = {
         "params": 1,
         "cpu": 0.7,
         "blocks": {
-            "audio_in_1": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_2": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "level_control": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "audio_out_1": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 3
-            },
-            "audio_out_2": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 4
-            }
+            "audio_in_1": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_2": {"isDefault": False, "isParam": False, "position": 1},
+            "level_control": {"isDefault": True, "isParam": True, "position": 2},
+            "audio_out_1": {"isDefault": True, "isParam": False, "position": 3},
+            "audio_out_2": {"isDefault": False, "isParam": False, "position": 4},
         },
-        "options": {
-            "channels": ["1in->1out", "stereo"]
-        }
+        "options": {"channels": ["1in->1out", "stereo"]},
     },
     8: {
         "name": "Audio Multiply",
@@ -588,23 +280,11 @@ module_index = {
         "params": 0,
         "cpu": 0.4,
         "blocks": {
-            "audio_in_1": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_2": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 1
-            },
-            "audio_out": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 2
-            }
+            "audio_in_1": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_2": {"isDefault": True, "isParam": False, "position": 1},
+            "audio_out": {"isDefault": True, "isParam": False, "position": 2},
         },
-        "options": {}
+        "options": {},
     },
     9: {
         "name": "Bit Crusher",
@@ -620,25 +300,11 @@ module_index = {
         "params": 1,
         "cpu": 1,
         "blocks": {
-            "audio_in": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "crushed_bits": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "audio_out": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 2
-            }
+            "audio_in": {"isDefault": True, "isParam": False, "position": 0},
+            "crushed_bits": {"isDefault": True, "isParam": True, "position": 1},
+            "audio_out": {"isDefault": True, "isParam": False, "position": 2},
         },
-        "options": {
-            "fractions": ["off", "on"]
-        }
+        "options": {"fractions": ["off", "on"]},
     },
     10: {
         "name": "Sample and Hold",
@@ -655,25 +321,11 @@ module_index = {
         "params": 2,
         "cpu": 0.1,
         "blocks": {
-            "cv_input": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "trigger": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "cv_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 2
-            }
+            "cv_input": {"isDefault": True, "isParam": True, "position": 0},
+            "trigger": {"isDefault": True, "isParam": True, "position": 1},
+            "cv_output": {"isDefault": True, "isParam": False, "position": 2},
         },
-        "options": {
-            "track & hold": ["off", "on"]
-        }
+        "options": {"track & hold": ["off", "on"]},
     },
     11: {
         "name": "OD and Distortion",
@@ -687,30 +339,12 @@ module_index = {
         "params": 2,
         "cpu": 17,
         "blocks": {
-            "audio_in": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "input_gain": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "output_gain": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "audio_out": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 3
-            }
+            "audio_in": {"isDefault": True, "isParam": False, "position": 0},
+            "input_gain": {"isDefault": True, "isParam": True, "position": 1},
+            "output_gain": {"isDefault": True, "isParam": True, "position": 2},
+            "audio_out": {"isDefault": True, "isParam": False, "position": 3},
         },
-        "options": {
-            "model": ["plexi", "germ", "classic", "pushed"]
-        }
+        "options": {"model": ["plexi", "germ", "classic", "pushed"]},
     },
     12: {
         "name": "Env Follower",
@@ -727,31 +361,12 @@ module_index = {
         "params": 2,
         "cpu": 5,
         "blocks": {
-            "audio_in": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "rise_time": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 1
-            },
-            "fall_time": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 2
-            },
-            "cv_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 3
-            }
+            "audio_in": {"isDefault": True, "isParam": False, "position": 0},
+            "rise_time": {"isDefault": False, "isParam": True, "position": 1},
+            "fall_time": {"isDefault": False, "isParam": True, "position": 2},
+            "cv_output": {"isDefault": True, "isParam": False, "position": 3},
         },
-        "options": {
-            "rise_fall_time": ["off", "on"],
-            "output_scale": ["log", "linear"]
-        }
+        "options": {"rise_fall_time": ["off", "on"], "output_scale": ["log", "linear"]},
     },
     13: {
         "name": "Delay Line",
@@ -769,38 +384,18 @@ module_index = {
         "params": 3,
         "cpu": 3,
         "blocks": {
-            "audio_in": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "delay_time": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "modulation_in": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 2
-            },
-            "tap_tempo_in": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 3
-            },
-            "audio_out": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 4
-            }
+            "audio_in": {"isDefault": True, "isParam": False, "position": 0},
+            "delay_time": {"isDefault": True, "isParam": True, "position": 1},
+            "modulation_in": {"isDefault": False, "isParam": True, "position": 2},
+            "tap_tempo_in": {"isDefault": False, "isParam": True, "position": 3},
+            "audio_out": {"isDefault": True, "isParam": False, "position": 4},
         },
         "options": {
             "max_time": ["1s", "2s", "4s", "8s", "16s", "100ms"],
             "tap_tempo_in": ["no", "yes"],
             "interpolation": ["on", "off"],
-            "CV Input": ["exponent", "linear"]
-        }
+            "CV Input": ["exponent", "linear"],
+        },
     },
     14: {
         "name": "Oscillator",
@@ -819,33 +414,17 @@ module_index = {
         "params": 2,
         "cpu": 10,
         "blocks": {
-            "frequency": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "fm_input": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "duty_cycle": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 2
-            },
-            "audio_out": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 3
-            }
+            "frequency": {"isDefault": True, "isParam": True, "position": 0},
+            "fm_input": {"isDefault": False, "isParam": False, "position": 1},
+            "duty_cycle": {"isDefault": False, "isParam": True, "position": 2},
+            "audio_out": {"isDefault": True, "isParam": False, "position": 3},
         },
         "options": {
             "waveform": ["sine", "square", "triangle", "sawtooth"],
             "fm_in": ["off", "on"],
             "duty_cycle": ["off", "on"],
-            "upsampling": ["none", "2x"]
-        }
+            "upsampling": ["none", "2x"],
+        },
     },
     15: {
         "name": "Pushbutton",
@@ -860,17 +439,8 @@ module_index = {
         "max_blocks": 1,
         "params": 0,
         "cpu": 0.02,
-        "blocks": {
-            "switch": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            }
-        },
-        "options": {
-            "action": ["momentary", "latching"],
-            "normally": ["zero", "one"]
-        }
+        "blocks": {"switch": {"isDefault": True, "isParam": False, "position": 0}},
+        "options": {"action": ["momentary", "latching"], "normally": ["zero", "one"]},
     },
     16: {
         "name": "Keyboard",
@@ -886,225 +456,51 @@ module_index = {
         "params": 49,
         "cpu": 0.1,
         "blocks": {
-            "note_1": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "note_2": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 1
-            },
-            "note_3": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 2
-            },
-            "note_4": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 3
-            },
-            "note_5": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 4
-            },
-            "note_6": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 5
-            },
-            "note_7": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 6
-            },
-            "note_8": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 7
-            },
-            "note_9": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 8
-            },
-            "note_10": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 9
-            },
-            "note_11": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 10
-            },
-            "note_12": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 11
-            },
-            "note_13": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 12
-            },
-            "note_14": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 13
-            },
-            "note_15": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 14
-            },
-            "note_16": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 15
-            },
-            "note_17": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 16
-            },
-            "note_18": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 17
-            },
-            "note_19": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 18
-            },
-            "note_20": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 19
-            },
-            "note_21": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 20
-            },
-            "note_22": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 21
-            },
-            "note_23": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 22
-            },
-            "note_24": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 23
-            },
-            "note_25": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 24
-            },
-            "note_26": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 25
-            },
-            "note_27": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 26
-            },
-            "note_28": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 27
-            },
-            "note_29": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 28
-            },
-            "note_30": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 29
-            },
-            "note_31": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 30
-            },
-            "note_32": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 31
-            },
-            "note_33": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 32
-            },
-            "note_34": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 33
-            },
-            "note_35": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 34
-            },
-            "note_36": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 35
-            },
-            "note_37": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 36
-            },
-            "note_38": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 37
-            },
-            "note_39": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 38
-            },
-            "note_40": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 39
-            },
-            "note_out": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 40
-            },
-            "gate_out": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 41
-            },
-            "trigger_out": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 42
-            }
+            "note_1": {"isDefault": True, "isParam": True, "position": 0},
+            "note_2": {"isDefault": False, "isParam": True, "position": 1},
+            "note_3": {"isDefault": False, "isParam": True, "position": 2},
+            "note_4": {"isDefault": False, "isParam": True, "position": 3},
+            "note_5": {"isDefault": False, "isParam": True, "position": 4},
+            "note_6": {"isDefault": False, "isParam": True, "position": 5},
+            "note_7": {"isDefault": False, "isParam": True, "position": 6},
+            "note_8": {"isDefault": False, "isParam": True, "position": 7},
+            "note_9": {"isDefault": False, "isParam": True, "position": 8},
+            "note_10": {"isDefault": False, "isParam": True, "position": 9},
+            "note_11": {"isDefault": False, "isParam": True, "position": 10},
+            "note_12": {"isDefault": False, "isParam": True, "position": 11},
+            "note_13": {"isDefault": False, "isParam": True, "position": 12},
+            "note_14": {"isDefault": False, "isParam": True, "position": 13},
+            "note_15": {"isDefault": False, "isParam": True, "position": 14},
+            "note_16": {"isDefault": False, "isParam": True, "position": 15},
+            "note_17": {"isDefault": False, "isParam": True, "position": 16},
+            "note_18": {"isDefault": False, "isParam": True, "position": 17},
+            "note_19": {"isDefault": False, "isParam": True, "position": 18},
+            "note_20": {"isDefault": False, "isParam": True, "position": 19},
+            "note_21": {"isDefault": False, "isParam": True, "position": 20},
+            "note_22": {"isDefault": False, "isParam": True, "position": 21},
+            "note_23": {"isDefault": False, "isParam": True, "position": 22},
+            "note_24": {"isDefault": False, "isParam": True, "position": 23},
+            "note_25": {"isDefault": False, "isParam": True, "position": 24},
+            "note_26": {"isDefault": False, "isParam": True, "position": 25},
+            "note_27": {"isDefault": False, "isParam": True, "position": 26},
+            "note_28": {"isDefault": False, "isParam": True, "position": 27},
+            "note_29": {"isDefault": False, "isParam": True, "position": 28},
+            "note_30": {"isDefault": False, "isParam": True, "position": 29},
+            "note_31": {"isDefault": False, "isParam": True, "position": 30},
+            "note_32": {"isDefault": False, "isParam": True, "position": 31},
+            "note_33": {"isDefault": False, "isParam": True, "position": 32},
+            "note_34": {"isDefault": False, "isParam": True, "position": 33},
+            "note_35": {"isDefault": False, "isParam": True, "position": 34},
+            "note_36": {"isDefault": False, "isParam": True, "position": 35},
+            "note_37": {"isDefault": False, "isParam": True, "position": 36},
+            "note_38": {"isDefault": False, "isParam": True, "position": 37},
+            "note_39": {"isDefault": False, "isParam": True, "position": 38},
+            "note_40": {"isDefault": False, "isParam": True, "position": 39},
+            "note_out": {"isDefault": True, "isParam": False, "position": 40},
+            "gate_out": {"isDefault": True, "isParam": False, "position": 41},
+            "trigger_out": {"isDefault": True, "isParam": False, "position": 42},
         },
-        "options": {
-            "#_of_notes": list(range(1, 41))
-        }
+        "options": {"#_of_notes": list(range(1, 41))},
     },
     17: {
         "name": "CV Invert",
@@ -1120,18 +516,10 @@ module_index = {
         "params": 1,
         "cpu": 0.02,
         "blocks": {
-            "cv_input": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "cv_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 1
-            }
+            "cv_input": {"isDefault": True, "isParam": True, "position": 0},
+            "cv_output": {"isDefault": True, "isParam": False, "position": 1},
         },
-        "options": {}
+        "options": {},
     },
     18: {
         "name": "Steps",
@@ -1148,23 +536,11 @@ module_index = {
         "params": 2,
         "cpu": 0.7,
         "blocks": {
-            "cv_input": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "quant_steps": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "cv_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 2
-            }
+            "cv_input": {"isDefault": True, "isParam": True, "position": 0},
+            "quant_steps": {"isDefault": True, "isParam": True, "position": 1},
+            "cv_output": {"isDefault": True, "isParam": False, "position": 2},
         },
-        "options": {}
+        "options": {},
     },
     19: {
         "name": "Slew Limiter",
@@ -1183,35 +559,15 @@ module_index = {
         "params": 2,
         "cpu": 0.2,
         "blocks": {
-            "cv_input": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "slew_rate": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "rising_lag": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 2
-            },
-            "falling_lag": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 3
-            },
-            "cv_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 4
-            }
+            "cv_input": {"isDefault": True, "isParam": True, "position": 0},
+            "slew_rate": {"isDefault": True, "isParam": True, "position": 1},
+            "rising_lag": {"isDefault": False, "isParam": True, "position": 2},
+            "falling_lag": {"isDefault": False, "isParam": True, "position": 3},
+            "cv_output": {"isDefault": True, "isParam": False, "position": 4},
         },
         "options": {
             "control": ["linked", "separate"],
-        }
+        },
     },
     20: {
         "name": "Midi Notes In",
@@ -1227,166 +583,38 @@ module_index = {
         "params": 0,
         "cpu": 0.3,
         "blocks": {
-            "note_out_1": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "gate_out_1": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 1
-            },
-            "velocity_out_1": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 2
-            },
-            "trigger_out_1": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 3
-            },
-            "note_out_2": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 4
-            },
-            "gate_out_2": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 5
-            },
-            "velocity_out_2": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 6
-            },
-            "trigger_out_2": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 7
-            },
-            "note_out_3": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 8
-            },
-            "gate_out_3": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 9
-            },
-            "velocity_out_3": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 10
-            },
-            "trigger_out_3": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 11
-            },
-            "note_out_4": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 12
-            },
-            "gate_out_4": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 13
-            },
-            "velocity_out_4": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 14
-            },
-            "trigger_out_4": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 15
-            },
-            "note_out_5": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 16
-            },
-            "gate_out_5": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 17
-            },
-            "velocity_out_5": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 18
-            },
-            "trigger_out_5": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 19
-            },
-            "note_out_6": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 20
-            },
-            "gate_out_6": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 21
-            },
-            "velocity_out_6": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 22
-            },
-            "trigger_out_6": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 23
-            },
-            "note_out_7": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 24
-            },
-            "gate_out_7": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 25
-            },
-            "velocity_out_7": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 26
-            },
-            "trigger_out_7": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 27
-            },
-            "note_out_8": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 28
-            },
-            "gate_out_8": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 29
-            },
-            "velocity_out_8": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 30
-            },
-            "trigger_out_8": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 31
-            },
+            "note_out_1": {"isDefault": True, "isParam": False, "position": 0},
+            "gate_out_1": {"isDefault": True, "isParam": False, "position": 1},
+            "velocity_out_1": {"isDefault": False, "isParam": False, "position": 2},
+            "trigger_out_1": {"isDefault": False, "isParam": False, "position": 3},
+            "note_out_2": {"isDefault": False, "isParam": False, "position": 4},
+            "gate_out_2": {"isDefault": False, "isParam": False, "position": 5},
+            "velocity_out_2": {"isDefault": False, "isParam": False, "position": 6},
+            "trigger_out_2": {"isDefault": False, "isParam": False, "position": 7},
+            "note_out_3": {"isDefault": False, "isParam": False, "position": 8},
+            "gate_out_3": {"isDefault": False, "isParam": False, "position": 9},
+            "velocity_out_3": {"isDefault": False, "isParam": False, "position": 10},
+            "trigger_out_3": {"isDefault": False, "isParam": False, "position": 11},
+            "note_out_4": {"isDefault": False, "isParam": False, "position": 12},
+            "gate_out_4": {"isDefault": False, "isParam": False, "position": 13},
+            "velocity_out_4": {"isDefault": False, "isParam": False, "position": 14},
+            "trigger_out_4": {"isDefault": False, "isParam": False, "position": 15},
+            "note_out_5": {"isDefault": False, "isParam": False, "position": 16},
+            "gate_out_5": {"isDefault": False, "isParam": False, "position": 17},
+            "velocity_out_5": {"isDefault": False, "isParam": False, "position": 18},
+            "trigger_out_5": {"isDefault": False, "isParam": False, "position": 19},
+            "note_out_6": {"isDefault": False, "isParam": False, "position": 20},
+            "gate_out_6": {"isDefault": False, "isParam": False, "position": 21},
+            "velocity_out_6": {"isDefault": False, "isParam": False, "position": 22},
+            "trigger_out_6": {"isDefault": False, "isParam": False, "position": 23},
+            "note_out_7": {"isDefault": False, "isParam": False, "position": 24},
+            "gate_out_7": {"isDefault": False, "isParam": False, "position": 25},
+            "velocity_out_7": {"isDefault": False, "isParam": False, "position": 26},
+            "trigger_out_7": {"isDefault": False, "isParam": False, "position": 27},
+            "note_out_8": {"isDefault": False, "isParam": False, "position": 28},
+            "gate_out_8": {"isDefault": False, "isParam": False, "position": 29},
+            "velocity_out_8": {"isDefault": False, "isParam": False, "position": 30},
+            "trigger_out_8": {"isDefault": False, "isParam": False, "position": 31},
         },
         "options": {
             "midi_channel": list(range(1, 17)),
@@ -1396,8 +624,8 @@ module_index = {
             "velocity_output": ["off", "on"],
             "low_note": list(range(0, 128)),
             "high_note": list(range(0, 128))[::-1],
-            "trigger_pulse": ["off", "on"]
-        }
+            "trigger_pulse": ["off", "on"],
+        },
     },
     21: {
         "name": "Midi CC In",
@@ -1411,18 +639,12 @@ module_index = {
         "max_blocks": 1,
         "params": 0,
         "cpu": 0.1,
-        "blocks": {
-            "cc_value": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            }
-        },
+        "blocks": {"cc_value": {"isDefault": True, "isParam": False, "position": 0}},
         "options": {
             "midi_channel": list(range(1, 17)),
             "controller": list(range(0, 128)),
-            "output_range": ["0 to 1", "-1 to 1"]
-        }
+            "output_range": ["0 to 1", "-1 to 1"],
+        },
     },
     22: {
         "name": "Multiplier",
@@ -1436,34 +658,21 @@ module_index = {
         """,
         "default_blocks": 3,
         "min_blocks": 3,
-        "max_blocks": 10,
+        "max_blocks": 9,
         "params": 2,
         "cpu": 0.2,
         "blocks": {
-            "cv_input_1": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "cv_input_2": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "cv_input_n": {
-                "isDefault": False,
-                "isParam": True,
-                "position": list(range(2, 9))
-            },
-            "cv_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 9
-            }
+            "cv_input_1": {"isDefault": True, "isParam": True, "position": 0},
+            "cv_input_2": {"isDefault": True, "isParam": True, "position": 1},
+            "cv_input_3": {"isDefault": False, "isParam": True, "position": 2},
+            "cv_input_4": {"isDefault": False, "isParam": True, "position": 3},
+            "cv_input_5": {"isDefault": False, "isParam": True, "position": 4},
+            "cv_input_6": {"isDefault": False, "isParam": True, "position": 5},
+            "cv_input_7": {"isDefault": False, "isParam": True, "position": 6},
+            "cv_input_8": {"isDefault": False, "isParam": True, "position": 7},
+            "cv_output": {"isDefault": True, "isParam": False, "position": 8},
         },
-        "options": {
-            "num_inputs": list(range(2, 9))
-        }
+        "options": {"num_inputs": list(range(2, 9))},
     },
     23: {
         "name": "Compressor",
@@ -1482,59 +691,23 @@ module_index = {
         "params": 4,
         "cpu": 3,
         "blocks": {
-            "audio_in_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "threshold": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "attack": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 3
-            },
-            "release": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 4
-            },
-            "ratio": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 5
-            },
-            "sidechain_in": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 6
-            },
-            "audio_out_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 7
-            },
-            "audio_out_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 8
-            }
+            "audio_in_L": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_R": {"isDefault": False, "isParam": False, "position": 1},
+            "threshold": {"isDefault": True, "isParam": True, "position": 2},
+            "attack": {"isDefault": False, "isParam": True, "position": 3},
+            "release": {"isDefault": False, "isParam": True, "position": 4},
+            "ratio": {"isDefault": False, "isParam": True, "position": 5},
+            "sidechain_in": {"isDefault": False, "isParam": False, "position": 6},
+            "audio_out_L": {"isDefault": True, "isParam": False, "position": 7},
+            "audio_out_R": {"isDefault": False, "isParam": False, "position": 8},
         },
         "options": {
             "attack_ctrl": ["off", "on"],
             "release_ctrl": ["off", "on"],
             "ratio_ctrl": ["off", "on"],
             "channels": ["1in->1out", "stereo"],
-            "sidechain": ["internal", "external"]
-        }
+            "sidechain": ["internal", "external"],
+        },
     },
     24: {
         "name": "Multi Filter",
@@ -1549,36 +722,22 @@ module_index = {
         "params": 3,
         "cpu": 0.8,
         "blocks": {
-            "audio_in": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "gain": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 1
-            },
-            "frequency": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "q": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 3
-            },
-            "audio_out": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 4
-            }
+            "audio_in": {"isDefault": True, "isParam": False, "position": 0},
+            "gain": {"isDefault": False, "isParam": True, "position": 1},
+            "frequency": {"isDefault": True, "isParam": True, "position": 2},
+            "q": {"isDefault": True, "isParam": True, "position": 3},
+            "audio_out": {"isDefault": True, "isParam": False, "position": 4},
         },
         "options": {
-            "filter_shape": ["lowpass", "highpass", "bandpass",
-                             "bell", "hi_shelf", "low_shelf"],
-        }
+            "filter_shape": [
+                "lowpass",
+                "highpass",
+                "bandpass",
+                "bell",
+                "hi_shelf",
+                "low_shelf",
+            ],
+        },
     },
     25: {
         "name": "Plate Reverb",
@@ -1593,48 +752,16 @@ module_index = {
         "params": 4,
         "cpu": 22,
         "blocks": {
-            "audio_in_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_R": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 1
-            },
-            "decay_time": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "low_eq": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 3
-            },
-            "high_eq": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 4
-            },
-            "mix": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 5
-            },
-            "audio_out_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 6
-            },
-            "audio_out_R": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 7
-            }
+            "audio_in_L": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_R": {"isDefault": True, "isParam": False, "position": 1},
+            "decay_time": {"isDefault": True, "isParam": True, "position": 2},
+            "low_eq": {"isDefault": True, "isParam": True, "position": 3},
+            "high_eq": {"isDefault": True, "isParam": True, "position": 4},
+            "mix": {"isDefault": True, "isParam": True, "position": 5},
+            "audio_out_L": {"isDefault": True, "isParam": False, "position": 6},
+            "audio_out_R": {"isDefault": True, "isParam": False, "position": 7},
         },
-        "options": {}
+        "options": {},
     },
     26: {
         "name": "Buffer Delay",
@@ -1650,20 +777,10 @@ module_index = {
         "params": 0,
         "cpu": 0.2,
         "blocks": {
-            "audio_in": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_out": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 1
-            }
+            "audio_in": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_out": {"isDefault": True, "isParam": False, "position": 1},
         },
-        "options": {
-            "buffer_length": list(range(0, 17))
-        }
+        "options": {"buffer_length": list(range(0, 17))},
     },
     27: {
         "name": "All Pass Filter",
@@ -1678,25 +795,11 @@ module_index = {
         "params": 1,
         "cpu": 5,
         "blocks": {
-            "audio_in": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "filter_gain": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "audio_out": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 2
-            }
+            "audio_in": {"isDefault": True, "isParam": False, "position": 0},
+            "filter_gain": {"isDefault": True, "isParam": True, "position": 1},
+            "audio_out": {"isDefault": True, "isParam": False, "position": 2},
         },
-        "options": {
-            "#_of_poles": list(range(1, 9))
-        }
+        "options": {"#_of_poles": list(range(1, 9))},
     },
     28: {
         "name": "Quantizer",
@@ -1710,30 +813,12 @@ module_index = {
         "params": 3,
         "cpu": 1,
         "blocks": {
-            "cv_input": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "key": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 1
-            },
-            "scale": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 2
-            },
-            "cv_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 3
-            }
+            "cv_input": {"isDefault": True, "isParam": True, "position": 0},
+            "key": {"isDefault": False, "isParam": True, "position": 1},
+            "scale": {"isDefault": False, "isParam": True, "position": 2},
+            "cv_output": {"isDefault": True, "isParam": False, "position": 3},
         },
-        "options": {
-            "key_scale_jacks": ["no", "yes"]
-        }
+        "options": {"key_scale_jacks": ["no", "yes"]},
     },
     29: {
         "name": "Phaser",
@@ -1749,52 +834,20 @@ module_index = {
         "params": 4,
         "cpu": 15,
         "blocks": {
-            "audio_in_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "control_in": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "resonance": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 3
-            },
-            "width": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 4
-            },
-            "mix": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 5
-            },
-            "audio_out_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 6
-            },
-            "audio_out_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 7
-            }
+            "audio_in_L": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_R": {"isDefault": False, "isParam": False, "position": 1},
+            "control_in": {"isDefault": True, "isParam": True, "position": 2},
+            "resonance": {"isDefault": True, "isParam": True, "position": 3},
+            "width": {"isDefault": True, "isParam": True, "position": 4},
+            "mix": {"isDefault": True, "isParam": True, "position": 5},
+            "audio_out_L": {"isDefault": True, "isParam": False, "position": 6},
+            "audio_out_R": {"isDefault": False, "isParam": False, "position": 7},
         },
         "options": {
             "channels": ["1in->1out", "1in->2out", "2in->2out"],
             "control": ["rate", "tap_tempo", "cv_direct"],
-            "number_of_stages": [4, 2, 1, 3, 6, 8]
-        }
+            "number_of_stages": [4, 2, 1, 3, 6, 8],
+        },
     },
     30: {
         "name": "Looper",
@@ -1810,51 +863,15 @@ module_index = {
         "params": 6,
         "cpu": 3,
         "blocks": {
-            "audio_in": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "record": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "restart_playback": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 2
-            },
-            "stop_play": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 3
-            },
-            "speed_pitch": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 4
-            },
-            "start_position": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 5
-            },
-            "loop_length": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 6
-            },
-            "reverse_playback": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 7
-            },
-            "audio_out": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 8
-            }
+            "audio_in": {"isDefault": True, "isParam": False, "position": 0},
+            "record": {"isDefault": True, "isParam": True, "position": 1},
+            "restart_playback": {"isDefault": True, "isParam": False, "position": 2},
+            "stop_play": {"isDefault": False, "isParam": True, "position": 3},
+            "speed_pitch": {"isDefault": True, "isParam": True, "position": 4},
+            "start_position": {"isDefault": False, "isParam": True, "position": 5},
+            "loop_length": {"isDefault": False, "isParam": False, "position": 6},
+            "reverse_playback": {"isDefault": False, "isParam": True, "position": 7},
+            "audio_out": {"isDefault": True, "isParam": False, "position": 8},
         },
         "options": {
             "max_rec_time": ["1s", "2s", "4s", "8s", "16s", "32s"],
@@ -1864,8 +881,8 @@ module_index = {
             "hear_while_rec": ["no", "yes"],
             "play_reverse": ["no", "yes"],
             "overdub": ["no", "yes"],
-            "stop_play_button": ["no", "yes"]
-        }
+            "stop_play_button": ["no", "yes"],
+        },
     },
     31: {
         "name": "In Switch",
@@ -1883,100 +900,26 @@ module_index = {
         "params": 17,
         "cpu": 0.2,
         "blocks": {
-            "cv_input_1": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "cv_input_2": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 1
-            },
-            "cv_input_3": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 2
-            },
-            "cv_input_4": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 3
-            },
-            "cv_input_5": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 4
-            },
-            "cv_input_6": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 5
-            },
-            "cv_input_7": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 6
-            },
-            "cv_input_8": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 7
-            },
-            "cv_input_9": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 8
-            },
-            "cv_input_10": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 9
-            },
-            "cv_input_11": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 10
-            },
-            "cv_input_12": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 11
-            },
-            "cv_input_13": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 12
-            },
-            "cv_input_14": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 13
-            },
-            "cv_input_15": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 14
-            },
-            "cv_input_16": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 15
-            },
-            "in_select": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 16
-            },
-            "cv_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 17
-            }
+            "cv_input_1": {"isDefault": True, "isParam": True, "position": 0},
+            "cv_input_2": {"isDefault": False, "isParam": True, "position": 1},
+            "cv_input_3": {"isDefault": False, "isParam": True, "position": 2},
+            "cv_input_4": {"isDefault": False, "isParam": True, "position": 3},
+            "cv_input_5": {"isDefault": False, "isParam": True, "position": 4},
+            "cv_input_6": {"isDefault": False, "isParam": True, "position": 5},
+            "cv_input_7": {"isDefault": False, "isParam": True, "position": 6},
+            "cv_input_8": {"isDefault": False, "isParam": True, "position": 7},
+            "cv_input_9": {"isDefault": False, "isParam": True, "position": 8},
+            "cv_input_10": {"isDefault": False, "isParam": True, "position": 9},
+            "cv_input_11": {"isDefault": False, "isParam": True, "position": 10},
+            "cv_input_12": {"isDefault": False, "isParam": True, "position": 11},
+            "cv_input_13": {"isDefault": False, "isParam": True, "position": 12},
+            "cv_input_14": {"isDefault": False, "isParam": True, "position": 13},
+            "cv_input_15": {"isDefault": False, "isParam": True, "position": 14},
+            "cv_input_16": {"isDefault": False, "isParam": True, "position": 15},
+            "in_select": {"isDefault": True, "isParam": True, "position": 16},
+            "cv_output": {"isDefault": True, "isParam": False, "position": 17},
         },
-        "options": {
-            "num_inputs": list(range(1, 17))
-        }
+        "options": {"num_inputs": list(range(1, 17))},
     },
     32: {
         "name": "Out Switch",
@@ -1991,100 +934,26 @@ module_index = {
         "params": 2,
         "cpu": 0.2,
         "blocks": {
-            "cv_input": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "out_select": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "cv_output_1": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 2
-            },
-            "cv_output_2": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 3
-            },
-            "cv_output_3": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 4
-            },
-            "cv_output_4": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 5
-            },
-            "cv_output_5": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 6
-            },
-            "cv_output_6": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 7
-            },
-            "cv_output_7": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 8
-            },
-            "cv_output_8": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 9
-            },
-            "cv_output_9": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 10
-            },
-            "cv_output_10": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 11
-            },
-            "cv_output_11": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 12
-            },
-            "cv_output_12": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 13
-            },
-            "cv_output_13": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 14
-            },
-            "cv_output_14": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 15
-            },
-            "cv_output_15": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 16
-            },
-            "cv_output_16": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 17
-            }
+            "cv_input": {"isDefault": True, "isParam": True, "position": 0},
+            "out_select": {"isDefault": True, "isParam": True, "position": 1},
+            "cv_output_1": {"isDefault": True, "isParam": False, "position": 2},
+            "cv_output_2": {"isDefault": False, "isParam": False, "position": 3},
+            "cv_output_3": {"isDefault": False, "isParam": False, "position": 4},
+            "cv_output_4": {"isDefault": False, "isParam": False, "position": 5},
+            "cv_output_5": {"isDefault": False, "isParam": False, "position": 6},
+            "cv_output_6": {"isDefault": False, "isParam": False, "position": 7},
+            "cv_output_7": {"isDefault": False, "isParam": False, "position": 8},
+            "cv_output_8": {"isDefault": False, "isParam": False, "position": 9},
+            "cv_output_9": {"isDefault": False, "isParam": False, "position": 10},
+            "cv_output_10": {"isDefault": False, "isParam": False, "position": 11},
+            "cv_output_11": {"isDefault": False, "isParam": False, "position": 12},
+            "cv_output_12": {"isDefault": False, "isParam": False, "position": 13},
+            "cv_output_13": {"isDefault": False, "isParam": False, "position": 14},
+            "cv_output_14": {"isDefault": False, "isParam": False, "position": 15},
+            "cv_output_15": {"isDefault": False, "isParam": False, "position": 16},
+            "cv_output_16": {"isDefault": False, "isParam": False, "position": 17},
         },
-        "options": {
-            "num_outputs": list(range(1, 17))
-        }
+        "options": {"num_outputs": list(range(1, 17))},
     },
     33: {
         "name": "Audio In Switch",
@@ -2103,101 +972,26 @@ module_index = {
         "params": 1,
         "cpu": 0.8,
         "blocks": {
-            "audio_input_1": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_input_2": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "audio_input_3": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 2
-            },
-            "audio_input_4": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 3
-            },
-            "audio_input_5": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 4
-            },
-            "audio_input_6": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 5
-            },
-            "audio_input_7": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 6
-            },
-            "audio_input_8": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 7
-            },
-            "audio_input_9": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 10
-            },
-            "audio_input_10": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 11
-            },
-            "audio_input_11": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 12
-            },
-            "audio_input_12": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 13
-            },
-            "audio_input_13": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 14
-            },
-            "audio_input_14": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 15
-            },
-            "audio_input_15": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 14
-            },
-            "audio_input_16": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 15
-            },
-            "in_select": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 16
-            },
-            "audio_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 17
-            }
+            "audio_input_1": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_input_2": {"isDefault": False, "isParam": False, "position": 1},
+            "audio_input_3": {"isDefault": False, "isParam": False, "position": 2},
+            "audio_input_4": {"isDefault": False, "isParam": False, "position": 3},
+            "audio_input_5": {"isDefault": False, "isParam": False, "position": 4},
+            "audio_input_6": {"isDefault": False, "isParam": False, "position": 5},
+            "audio_input_7": {"isDefault": False, "isParam": False, "position": 6},
+            "audio_input_8": {"isDefault": False, "isParam": False, "position": 7},
+            "audio_input_9": {"isDefault": False, "isParam": False, "position": 10},
+            "audio_input_10": {"isDefault": False, "isParam": False, "position": 11},
+            "audio_input_11": {"isDefault": False, "isParam": False, "position": 12},
+            "audio_input_12": {"isDefault": False, "isParam": False, "position": 13},
+            "audio_input_13": {"isDefault": False, "isParam": False, "position": 14},
+            "audio_input_14": {"isDefault": False, "isParam": False, "position": 15},
+            "audio_input_15": {"isDefault": False, "isParam": False, "position": 14},
+            "audio_input_16": {"isDefault": False, "isParam": False, "position": 15},
+            "in_select": {"isDefault": True, "isParam": True, "position": 16},
+            "audio_output": {"isDefault": True, "isParam": False, "position": 17},
         },
-        "options": {
-            "num_inputs": list(range(1, 17)),
-            "fades": ["on", "off"]
-        }
+        "options": {"num_inputs": list(range(1, 17)), "fades": ["on", "off"]},
     },
     34: {
         "name": "Audio Out Switch",
@@ -2216,101 +1010,26 @@ module_index = {
         "params": 1,
         "cpu": 0.7,
         "blocks": {
-            "audio_input": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "in_select": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "audio_output_1": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 2
-            },
-            "audio_output_2": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 3
-            },
-            "audio_output_3": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 4
-            },
-            "audio_output_4": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 5
-            },
-            "audio_output_5": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 6
-            },
-            "audio_output_6": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 7
-            },
-            "audio_output_7": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 8
-            },
-            "audio_output_8": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 9
-            },
-            "audio_output_9": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 10
-            },
-            "audio_output_10": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 11
-            },
-            "audio_output_11": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 12
-            },
-            "audio_output_12": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 13
-            },
-            "audio_output_13": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 14
-            },
-            "audio_output_14": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 15
-            },
-            "audio_output_15": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 16
-            },
-            "audio_output_16": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 17
-            }
+            "audio_input": {"isDefault": True, "isParam": False, "position": 0},
+            "in_select": {"isDefault": True, "isParam": True, "position": 1},
+            "audio_output_1": {"isDefault": True, "isParam": False, "position": 2},
+            "audio_output_2": {"isDefault": False, "isParam": False, "position": 3},
+            "audio_output_3": {"isDefault": True, "isParam": False, "position": 4},
+            "audio_output_4": {"isDefault": False, "isParam": False, "position": 5},
+            "audio_output_5": {"isDefault": True, "isParam": False, "position": 6},
+            "audio_output_6": {"isDefault": False, "isParam": False, "position": 7},
+            "audio_output_7": {"isDefault": True, "isParam": False, "position": 8},
+            "audio_output_8": {"isDefault": False, "isParam": False, "position": 9},
+            "audio_output_9": {"isDefault": True, "isParam": False, "position": 10},
+            "audio_output_10": {"isDefault": False, "isParam": False, "position": 11},
+            "audio_output_11": {"isDefault": True, "isParam": False, "position": 12},
+            "audio_output_12": {"isDefault": False, "isParam": False, "position": 13},
+            "audio_output_13": {"isDefault": True, "isParam": False, "position": 14},
+            "audio_output_14": {"isDefault": False, "isParam": False, "position": 15},
+            "audio_output_15": {"isDefault": True, "isParam": False, "position": 16},
+            "audio_output_16": {"isDefault": False, "isParam": False, "position": 17},
         },
-        "options": {
-            "num_outputs": list(range(1, 17)),
-            "fades": ["on", "off"]
-        }
+        "options": {"num_outputs": list(range(1, 17)), "fades": ["on", "off"]},
     },
     35: {
         "name": "Midi Pressure",
@@ -2326,15 +1045,9 @@ module_index = {
         "params": 0,
         "cpu": 0.03,
         "blocks": {
-            "channel_pressure": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            }
+            "channel_pressure": {"isDefault": True, "isParam": False, "position": 0}
         },
-        "options": {
-            "midi_channel": list(range(1, 17))
-        }
+        "options": {"midi_channel": list(range(1, 17))},
     },
     36: {
         "name": "Onset Detector",
@@ -2349,25 +1062,11 @@ module_index = {
         "params": 1,
         "cpu": 0.7,
         "blocks": {
-            "audio_in": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "sensitivity": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 1
-            },
-            "audio_out": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 2
-            }
+            "audio_in": {"isDefault": True, "isParam": False, "position": 0},
+            "sensitivity": {"isDefault": False, "isParam": True, "position": 1},
+            "audio_out": {"isDefault": True, "isParam": False, "position": 2},
         },
-        "options": {
-            "sensitivity": ["off", "on"]
-        }
+        "options": {"sensitivity": ["off", "on"]},
     },
     37: {
         "name": "Rhythm",
@@ -2382,35 +1081,15 @@ module_index = {
         "params": 3,
         "cpu": 0.5,
         "blocks": {
-            "rec_start_stop": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "rhythm_in": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "play": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "play_done": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 3
-            },
-            "rhythm_out": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 4
-            }
+            "rec_start_stop": {"isDefault": True, "isParam": True, "position": 0},
+            "rhythm_in": {"isDefault": True, "isParam": True, "position": 1},
+            "play": {"isDefault": True, "isParam": True, "position": 2},
+            "play_done": {"isDefault": False, "isParam": False, "position": 3},
+            "rhythm_out": {"isDefault": True, "isParam": False, "position": 4},
         },
         "options": {
             "done_ctrl": ["off", "on"],
-        }
+        },
     },
     38: {
         "name": "Noise",
@@ -2425,14 +1104,8 @@ module_index = {
         "max_blocks": 1,
         "params": 0,
         "cpu": 0.4,
-        "blocks": {
-            "audio_out": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            }
-        },
-        "options": {}
+        "blocks": {"audio_out": {"isDefault": True, "isParam": False, "position": 0}},
+        "options": {},
     },
     39: {
         "name": "Random",
@@ -2448,21 +1121,10 @@ module_index = {
         "params": 1,
         "cpu": 0.1,
         "blocks": {
-            "trigger_in": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 0
-            },
-            "cv_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 1
-            }
+            "trigger_in": {"isDefault": False, "isParam": True, "position": 0},
+            "cv_output": {"isDefault": True, "isParam": False, "position": 1},
         },
-        "options": {
-            "output": ["0 to 1", "-1 to 1"],
-            "new_val_on_trig": ["off", "on"]
-        }
+        "options": {"output": ["0 to 1", "-1 to 1"], "new_val_on_trig": ["off", "on"]},
     },
     40: {
         "name": "Gate",
@@ -2480,53 +1142,21 @@ module_index = {
         "params": 3,
         "cpu": 3,
         "blocks": {
-            "audio_in_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "threshold": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "attack": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 3
-            },
-            "release": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 4
-            },
-            "sidechain_in": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 5
-            },
-            "audio_out_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 6
-            },
-            "audio_out_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 7
-            }
+            "audio_in_L": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_R": {"isDefault": False, "isParam": False, "position": 1},
+            "threshold": {"isDefault": True, "isParam": True, "position": 2},
+            "attack": {"isDefault": False, "isParam": True, "position": 3},
+            "release": {"isDefault": False, "isParam": True, "position": 4},
+            "sidechain_in": {"isDefault": False, "isParam": False, "position": 5},
+            "audio_out_L": {"isDefault": True, "isParam": False, "position": 6},
+            "audio_out_R": {"isDefault": False, "isParam": False, "position": 7},
         },
         "options": {
             "attack_ctrl": ["off", "on"],
             "release_ctrl": ["off", "on"],
             "channels": ["1in->1out", "1in->2out", "2in->2out"],
-            "sidechain": ["internal", "external"]
-        }
+            "sidechain": ["internal", "external"],
+        },
     },
     41: {
         "name": "Tremolo",
@@ -2544,42 +1174,18 @@ module_index = {
         "params": 2,
         "cpu": 2,
         "blocks": {
-            "audio_in_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "control_in": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "depth": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 3
-            },
-            "audio_out_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 4
-            },
-            "audio_out_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 5
-            }
+            "audio_in_L": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_R": {"isDefault": False, "isParam": False, "position": 1},
+            "control_in": {"isDefault": True, "isParam": True, "position": 2},
+            "depth": {"isDefault": True, "isParam": True, "position": 3},
+            "audio_out_L": {"isDefault": True, "isParam": False, "position": 4},
+            "audio_out_R": {"isDefault": False, "isParam": False, "position": 5},
         },
         "options": {
             "channels": ["1in->1out", "1in->2out", "2in->2out"],
             "control": ["rate", "tap_tempo", "cv_direct"],
-            "waveform": ["fender-ish", "vox-ish", "triangle", "sine", "square"]
-        }
+            "waveform": ["fender-ish", "vox-ish", "triangle", "sine", "square"],
+        },
     },
     42: {
         "name": "Tone Control",
@@ -2595,61 +1201,21 @@ module_index = {
         "params": 6,
         "cpu": 5,
         "blocks": {
-            "audio_in_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "low_shelf": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "mid_gain_1": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 3
-            },
-            "mid_freq_1": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 4
-            },
-            "mid_gain_2": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 5
-            },
-            "mid_freq_2": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 6
-            },
-            "high_shelf": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 7
-            },
-            "audio_out_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 8
-            },
-            "audio_out_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 9
-            }
+            "audio_in_L": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_R": {"isDefault": False, "isParam": False, "position": 1},
+            "low_shelf": {"isDefault": True, "isParam": True, "position": 2},
+            "mid_gain_1": {"isDefault": True, "isParam": True, "position": 3},
+            "mid_freq_1": {"isDefault": True, "isParam": True, "position": 4},
+            "mid_gain_2": {"isDefault": False, "isParam": True, "position": 5},
+            "mid_freq_2": {"isDefault": False, "isParam": True, "position": 6},
+            "high_shelf": {"isDefault": True, "isParam": True, "position": 7},
+            "audio_out_L": {"isDefault": True, "isParam": False, "position": 8},
+            "audio_out_R": {"isDefault": False, "isParam": False, "position": 9},
         },
         "options": {
             "channels": ["1in->1out", "1in->2out", "2in->2out"],
-            "num_mid_bands": [1, 2]
-        }
+            "num_mid_bands": [1, 2],
+        },
     },
     43: {
         "name": "Delay w Mod",
@@ -2672,59 +1238,33 @@ module_index = {
         "params": 5,
         "cpu": 18,
         "blocks": {
-            "audio_in_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "delay_time": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "feedback": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 3
-            },
-            "mod_rate": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 4
-            },
-            "mod_depth": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 5
-            },
-            "mix": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 6
-            },
-            "audio_out_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 7
-            },
-            "audio_out_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 8
-            }
+            "audio_in_L": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_R": {"isDefault": False, "isParam": False, "position": 1},
+            "delay_time": {"isDefault": True, "isParam": True, "position": 2},
+            "feedback": {"isDefault": True, "isParam": True, "position": 3},
+            "mod_rate": {"isDefault": True, "isParam": True, "position": 4},
+            "mod_depth": {"isDefault": True, "isParam": True, "position": 5},
+            "mix": {"isDefault": True, "isParam": True, "position": 6},
+            "audio_out_L": {"isDefault": True, "isParam": False, "position": 7},
+            "audio_out_R": {"isDefault": False, "isParam": False, "position": 8},
         },
         "options": {
             "channels": ["1in->1out", "1in->2out", "2in->2out"],
             "control": ["rate", "tap_tempo"],
             "type": ["clean", "tape", "old_tape", "bbd"],
-            "tap_ratio": ["1:1", "2:3", "1:2", "1:3", "3:8", "1:4",
-                          "3:16", "1:8", "1:16", "1:32"]
-        }
+            "tap_ratio": [
+                "1:1",
+                "2:3",
+                "1:2",
+                "1:3",
+                "3:8",
+                "1:4",
+                "3:16",
+                "1:8",
+                "1:16",
+                "1:32",
+            ],
+        },
     },
     44: {
         "name": "Stompswitch",
@@ -2743,18 +1283,12 @@ module_index = {
         "max_blocks": 1,
         "params": 0,
         "cpu": 0.1,
-        "blocks": {
-            "cv_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            }
-        },
+        "blocks": {"cv_output": {"isDefault": True, "isParam": False, "position": 0}},
         "options": {
             "stompswitch": ["left", "middle", "right", "ext"],
             "action": ["momentary", "latching"],
-            "normally": ["zero", "one"]
-        }
+            "normally": ["zero", "one"],
+        },
     },
     45: {
         "name": "Value",
@@ -2769,20 +1303,10 @@ module_index = {
         "params": 1,
         "cpu": 0.15,
         "blocks": {
-            "value": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "cv_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 1
-            }
+            "value": {"isDefault": True, "isParam": True, "position": 0},
+            "cv_output": {"isDefault": True, "isParam": False, "position": 1},
         },
-        "options": {
-            "output": ["0 to 1", "-1 to 1"]
-        }
+        "options": {"output": ["0 to 1", "-1 to 1"]},
     },
     46: {
         "name": "CV Delay",
@@ -2796,23 +1320,11 @@ module_index = {
         "params": 2,
         "cpu": 1.5,
         "blocks": {
-            "cv_input": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "delay_time": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "cv_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 2
-            }
+            "cv_input": {"isDefault": True, "isParam": True, "position": 0},
+            "delay_time": {"isDefault": True, "isParam": True, "position": 1},
+            "cv_output": {"isDefault": True, "isParam": False, "position": 2},
         },
-        "options": {}
+        "options": {},
     },
     47: {
         "name": "CV Loop",
@@ -2829,51 +1341,16 @@ module_index = {
         "params": 7,
         "cpu": 0.1,
         "blocks": {
-            "cv_input": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "record": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "play": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "playback_speed": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 3
-            },
-            "start_position": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 4
-            },
-            "stop_position": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 5
-            },
-            "restart_loop": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 6
-            },
-            "cv_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 7
-            }
+            "cv_input": {"isDefault": True, "isParam": True, "position": 0},
+            "record": {"isDefault": True, "isParam": True, "position": 1},
+            "play": {"isDefault": True, "isParam": True, "position": 2},
+            "playback_speed": {"isDefault": True, "isParam": True, "position": 3},
+            "start_position": {"isDefault": False, "isParam": True, "position": 4},
+            "stop_position": {"isDefault": False, "isParam": True, "position": 5},
+            "restart_loop": {"isDefault": True, "isParam": True, "position": 6},
+            "cv_output": {"isDefault": True, "isParam": False, "position": 7},
         },
-        "options": {
-            "max_rec_time": list(range(1, 17)),
-            "length_edit": ["off", "on"]
-        }
+        "options": {"max_rec_time": list(range(1, 17)), "length_edit": ["off", "on"]},
     },
     48: {
         "name": "CV Filter",
@@ -2893,35 +1370,13 @@ module_index = {
         "params": 2,
         "cpu": 0.1,
         "blocks": {
-            "cv_input": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "time_constant": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "rise_constant": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 2
-            },
-            "fall_constant": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 3
-            },
-            "cv_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 4
-            }
+            "cv_input": {"isDefault": True, "isParam": True, "position": 0},
+            "time_constant": {"isDefault": True, "isParam": True, "position": 1},
+            "rise_constant": {"isDefault": False, "isParam": True, "position": 2},
+            "fall_constant": {"isDefault": False, "isParam": True, "position": 3},
+            "cv_output": {"isDefault": True, "isParam": False, "position": 4},
         },
-        "options": {
-            "control": ["linked", "separate"]
-        }
+        "options": {"control": ["linked", "separate"]},
     },
     49: {
         "name": "Clock Divider",
@@ -2937,35 +1392,13 @@ module_index = {
         "params": 4,
         "cpu": 0.4,
         "blocks": {
-            "cv_input": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "reset_switch": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "dividend": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "divisor": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 3
-            },
-            "cv_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 4
-            }
+            "cv_input": {"isDefault": True, "isParam": True, "position": 0},
+            "reset_switch": {"isDefault": True, "isParam": True, "position": 1},
+            "dividend": {"isDefault": True, "isParam": True, "position": 2},
+            "divisor": {"isDefault": True, "isParam": True, "position": 3},
+            "cv_output": {"isDefault": True, "isParam": False, "position": 4},
         },
-        "options": {
-            "input": ["tap", "cv_control"]
-        }
+        "options": {"input": ["tap", "cv_control"]},
     },
     50: {
         "name": "Comparator",
@@ -2984,25 +1417,11 @@ module_index = {
         "params": 2,
         "cpu": 0.04,
         "blocks": {
-            "cv_positive_input": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "cv_negative_input": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "cv_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 2
-            }
+            "cv_positive_input": {"isDefault": True, "isParam": True, "position": 0},
+            "cv_negative_input": {"isDefault": True, "isParam": True, "position": 1},
+            "cv_output": {"isDefault": True, "isParam": False, "position": 2},
         },
-        "options": {
-            "output": ["0 to 1", "-1 to 1"]
-        }
+        "options": {"output": ["0 to 1", "-1 to 1"]},
     },
     51: {
         "name": "CV Rectify",
@@ -3017,18 +1436,10 @@ module_index = {
         "params": 1,
         "cpu": 0.02,
         "blocks": {
-            "cv_input": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "cv_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 1
-            }
+            "cv_input": {"isDefault": True, "isParam": True, "position": 0},
+            "cv_output": {"isDefault": True, "isParam": False, "position": 1},
         },
-        "options": {}
+        "options": {},
     },
     52: {
         "name": "Trigger",
@@ -3044,18 +1455,10 @@ module_index = {
         "params": 1,
         "cpu": 0.1,
         "blocks": {
-            "cv_input": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "cv_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 1
-            }
+            "cv_input": {"isDefault": True, "isParam": True, "position": 0},
+            "cv_output": {"isDefault": True, "isParam": False, "position": 1},
         },
-        "options": {}
+        "options": {},
     },
     53: {
         "name": "Stereo Spread",
@@ -3071,40 +1474,14 @@ module_index = {
         "params": 1,
         "cpu": 2,
         "blocks": {
-            "audio_in_1": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_2": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "side_gain": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 2
-            },
-            "delay_time": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 3
-            },
-            "audio_out_1": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 4
-            },
-            "audio_out_2": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 5
-            }
+            "audio_in_1": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_2": {"isDefault": False, "isParam": False, "position": 1},
+            "side_gain": {"isDefault": False, "isParam": True, "position": 2},
+            "delay_time": {"isDefault": True, "isParam": True, "position": 3},
+            "audio_out_1": {"isDefault": True, "isParam": False, "position": 4},
+            "audio_out_2": {"isDefault": True, "isParam": False, "position": 5},
         },
-        "options": {
-            "method": ["mid_side", "haas"]
-        }
+        "options": {"method": ["mid_side", "haas"]},
     },
     54: {
         "name": "Cport Exp CV In",
@@ -3118,16 +1495,8 @@ module_index = {
         "max_blocks": 1,
         "params": 0,
         "cpu": 0.1,
-        "blocks": {
-            "cv_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            }
-        },
-        "options": {
-            "output_range": ["0 to 1", "-1 to 1"]
-        }
+        "blocks": {"cv_output": {"isDefault": True, "isParam": False, "position": 0}},
+        "options": {"output_range": ["0 to 1", "-1 to 1"]},
     },
     55: {
         "name": "Cport CV Out",
@@ -3142,16 +1511,8 @@ module_index = {
         "max_blocks": 1,
         "params": 0,
         "cpu": 0.2,
-        "blocks": {
-            "cv_input": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            }
-        },
-        "options": {
-            "input_range": ["0 to 1", "-1 to 1"]
-        }
+        "blocks": {"cv_input": {"isDefault": True, "isParam": False, "position": 0}},
+        "options": {"input_range": ["0 to 1", "-1 to 1"]},
     },
     56: {
         "name": "UI Button",
@@ -3193,21 +1554,13 @@ module_index = {
         "params": 1,
         "cpu": 0.04,
         "blocks": {
-            "in": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "cv_output": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            }
+            "in": {"isDefault": True, "isParam": True, "position": 0},
+            "cv_output": {"isDefault": False, "isParam": False, "position": 1},
         },
         "options": {
-            'cv_output': ['disabled', 'enabled'],
-            'range': ['extended', 'basic']
-        }
+            "cv_output": ["disabled", "enabled"],
+            "range": ["extended", "basic"],
+        },
     },
     57: {
         "name": "Audio Panner",
@@ -3222,36 +1575,16 @@ module_index = {
         "params": 3,
         "cpu": 1,
         "blocks": {
-            "audio_in_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "pan": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "audio_out_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 3
-            },
-            "audio_out_R": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 4
-            }
+            "audio_in_L": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_R": {"isDefault": False, "isParam": False, "position": 1},
+            "pan": {"isDefault": True, "isParam": True, "position": 2},
+            "audio_out_L": {"isDefault": True, "isParam": False, "position": 3},
+            "audio_out_R": {"isDefault": True, "isParam": False, "position": 4},
         },
         "options": {
             "channels": ["1in->2out", "2in->2out"],
-            "pan_type": ["equal_pwr", "-4.5dB", "linear"]
-        }
+            "pan_type": ["equal_pwr", "-4.5dB", "linear"],
+        },
     },
     58: {
         "name": "Pitch Detector",
@@ -3270,20 +1603,10 @@ module_index = {
         "params": 0,
         "cpu": 2.5,
         "blocks": {
-            "audio_in": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "cv_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 1
-            }
+            "audio_in": {"isDefault": True, "isParam": False, "position": 0},
+            "cv_output": {"isDefault": True, "isParam": False, "position": 1},
         },
-        "options": {
-
-        }
+        "options": {},
     },
     59: {
         "name": "Pitch Shifter",
@@ -3300,23 +1623,11 @@ module_index = {
         "params": 1,
         "cpu": 15.5,
         "blocks": {
-            "audio_in": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "pitch_shift": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "audio_out": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 2
-            }
+            "audio_in": {"isDefault": True, "isParam": False, "position": 0},
+            "pitch_shift": {"isDefault": True, "isParam": True, "position": 1},
+            "audio_out": {"isDefault": True, "isParam": False, "position": 2},
         },
-        "options": {}
+        "options": {},
     },
     60: {
         "name": "Midi Note Out",
@@ -3330,26 +1641,14 @@ module_index = {
         "params": 3,
         "cpu": 0.1,
         "blocks": {
-            "note_in": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "gate_in": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "velocity_out": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 2
-            }
+            "note_in": {"isDefault": True, "isParam": True, "position": 0},
+            "gate_in": {"isDefault": True, "isParam": True, "position": 1},
+            "velocity_out": {"isDefault": False, "isParam": True, "position": 2},
         },
         "options": {
             "midi_channel": list(range(1, 17)),
-            "velocity_output": ["off", "on"]
-        }
+            "velocity_output": ["off", "on"],
+        },
     },
     61: {
         "name": "Midi CC Out",
@@ -3362,17 +1661,11 @@ module_index = {
         "max_blocks": 1,
         "params": 1,
         "cpu": 0.2,
-        "blocks": {
-            "cc_out": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            }
-        },
+        "blocks": {"cc_out": {"isDefault": True, "isParam": True, "position": 0}},
         "options": {
             "midi_channel": list(range(1, 17)),
-            "controller": list(range(0, 128))
-        }
+            "controller": list(range(0, 128)),
+        },
     },
     62: {
         "name": "Midi PC Out",
@@ -3388,20 +1681,10 @@ module_index = {
         "params": 2,
         "cpu": 0.1,
         "blocks": {
-            "pc_out": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "trigger_in": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            }
+            "pc_out": {"isDefault": True, "isParam": True, "position": 0},
+            "trigger_in": {"isDefault": True, "isParam": True, "position": 1},
         },
-        "options": {
-            "midi_channel": list(range(1, 17))
-        }
+        "options": {"midi_channel": list(range(1, 17))},
     },
     63: {
         "name": "Bit Modulator",
@@ -3418,25 +1701,11 @@ module_index = {
         "params": 0,
         "cpu": 1.2,
         "blocks": {
-            "audio_in_1": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_2": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 1
-            },
-            "audio_out": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 2
-            }
+            "audio_in_1": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_2": {"isDefault": True, "isParam": False, "position": 1},
+            "audio_out": {"isDefault": True, "isParam": False, "position": 2},
         },
-        "options": {
-            "type": ["xor", "and", "or"]
-        }
+        "options": {"type": ["xor", "and", "or"]},
     },
     64: {
         "name": "Audio Balance",
@@ -3451,45 +1720,15 @@ module_index = {
         "params": 1,
         "cpu": 1.7,
         "blocks": {
-            "audio_in_1_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_1_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "audio_in_2_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 2
-            },
-            "audio_in_2_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 3
-            },
-            "mix": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 4
-            },
-            "audio_output_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 5
-            },
-            "audio_output_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 6
-            }
+            "audio_in_1_L": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_1_R": {"isDefault": False, "isParam": False, "position": 1},
+            "audio_in_2_L": {"isDefault": True, "isParam": False, "position": 2},
+            "audio_in_2_R": {"isDefault": False, "isParam": False, "position": 3},
+            "mix": {"isDefault": True, "isParam": True, "position": 4},
+            "audio_output_L": {"isDefault": True, "isParam": False, "position": 5},
+            "audio_output_R": {"isDefault": False, "isParam": False, "position": 6},
         },
-        "options": {
-            "stereo": ["mono", "stereo"]
-        }
+        "options": {"stereo": ["mono", "stereo"]},
     },
     65: {
         "name": "Inverter",
@@ -3508,18 +1747,10 @@ module_index = {
         "params": 0,
         "cpu": 0.3,
         "blocks": {
-            "audio_in": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_out": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 1
-            }
+            "audio_in": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_out": {"isDefault": True, "isParam": False, "position": 1},
         },
-        "options": {}
+        "options": {},
     },
     66: {
         "name": "Fuzz",
@@ -3533,30 +1764,12 @@ module_index = {
         "params": 2,
         "cpu": 16,
         "blocks": {
-            "audio_in": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "input_gain": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "output_gain": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "audio_out": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 3
-            }
+            "audio_in": {"isDefault": True, "isParam": False, "position": 0},
+            "input_gain": {"isDefault": True, "isParam": True, "position": 1},
+            "output_gain": {"isDefault": True, "isParam": True, "position": 2},
+            "audio_out": {"isDefault": True, "isParam": False, "position": 3},
         },
-        "options": {
-            "model": ["efuzzy", "burly", "scoopy", "ugly"]
-        }
+        "options": {"model": ["efuzzy", "burly", "scoopy", "ugly"]},
     },
     67: {
         "name": "Ghostverb",
@@ -3571,50 +1784,16 @@ module_index = {
         "params": 4,
         "cpu": 45,
         "blocks": {
-            "audio_in_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "decay_feedback": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "rate": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 3
-            },
-            "resonance": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 4
-            },
-            "mix": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 5
-            },
-            "audio_out_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 6
-            },
-            "audio_out_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 7
-            }
+            "audio_in_L": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_R": {"isDefault": False, "isParam": False, "position": 1},
+            "decay_feedback": {"isDefault": True, "isParam": True, "position": 2},
+            "rate": {"isDefault": True, "isParam": True, "position": 3},
+            "resonance": {"isDefault": True, "isParam": True, "position": 4},
+            "mix": {"isDefault": True, "isParam": True, "position": 5},
+            "audio_out_L": {"isDefault": True, "isParam": False, "position": 6},
+            "audio_out_R": {"isDefault": False, "isParam": False, "position": 7},
         },
-        "options": {
-            "channels": ["1in->1out", "1in->2out", "stereo"]
-        }
+        "options": {"channels": ["1in->1out", "1in->2out", "stereo"]},
     },
     68: {
         "name": "Cabinet Sim",
@@ -3628,32 +1807,23 @@ module_index = {
         "params": 0,
         "cpu": 10,
         "blocks": {
-            "audio_in_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "audio_out_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 2
-            },
-            "audio_out_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 3
-            }
+            "audio_in_L": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_R": {"isDefault": False, "isParam": False, "position": 1},
+            "audio_out_L": {"isDefault": True, "isParam": False, "position": 2},
+            "audio_out_R": {"isDefault": False, "isParam": False, "position": 3},
         },
         "options": {
             "channels": ["mono", "stereo"],
-            "type": ["4x12_full", "2x12_dark", "2x12_modern", "1x12",
-                     "1x8_lofi", "1x12_vintage", "4x12_hifi"]
-        }
+            "type": [
+                "4x12_full",
+                "2x12_dark",
+                "2x12_modern",
+                "1x12",
+                "1x8_lofi",
+                "1x12_vintage",
+                "4x12_hifi",
+            ],
+        },
     },
     69: {
         "name": "Flanger",
@@ -3669,57 +1839,21 @@ module_index = {
         "params": 5,
         "cpu": 11,
         "blocks": {
-            "audio_in_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "control_in": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "regen": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 3
-            },
-            "width": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 4
-            },
-            "tone_tilt_eq": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 5
-            },
-            "mix": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 6
-            },
-            "audio_out_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 7
-            },
-            "audio_out_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 8
-            }
+            "audio_in_L": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_R": {"isDefault": False, "isParam": False, "position": 1},
+            "control_in": {"isDefault": True, "isParam": True, "position": 2},
+            "regen": {"isDefault": True, "isParam": True, "position": 3},
+            "width": {"isDefault": True, "isParam": True, "position": 4},
+            "tone_tilt_eq": {"isDefault": True, "isParam": True, "position": 5},
+            "mix": {"isDefault": True, "isParam": True, "position": 6},
+            "audio_out_L": {"isDefault": True, "isParam": False, "position": 7},
+            "audio_out_R": {"isDefault": False, "isParam": False, "position": 8},
         },
         "options": {
             "channels": ["1in->1out", "1in->2out", "stereo"],
             "control": ["rate", "tap_tempo", "cv_direct"],
-            "type": ["1960s", "1970s", "thru_0"]
-        }
+            "type": ["1960s", "1970s", "thru_0"],
+        },
     },
     70: {
         "name": "Chorus",
@@ -3736,52 +1870,20 @@ module_index = {
         "params": 4,
         "cpu": 13,
         "blocks": {
-            "audio_in_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "control_in": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "width": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 3
-            },
-            "tone_tilt_eq": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 4
-            },
-            "mix": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 5
-            },
-            "audio_out_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 6
-            },
-            "audio_out_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 7
-            }
+            "audio_in_L": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_R": {"isDefault": False, "isParam": False, "position": 1},
+            "control_in": {"isDefault": True, "isParam": True, "position": 2},
+            "width": {"isDefault": True, "isParam": True, "position": 3},
+            "tone_tilt_eq": {"isDefault": True, "isParam": True, "position": 4},
+            "mix": {"isDefault": True, "isParam": True, "position": 5},
+            "audio_out_L": {"isDefault": True, "isParam": False, "position": 6},
+            "audio_out_R": {"isDefault": False, "isParam": False, "position": 7},
         },
         "options": {
             "channels": ["1in->1out", "1in->2out", "stereo"],
             "control": ["rate", "tap_tempo", "cv_direct"],
-            "type": ["classic"]
-        }
+            "type": ["classic"],
+        },
     },
     71: {
         "name": "Vibrato",
@@ -3797,42 +1899,18 @@ module_index = {
         "params": 2,
         "cpu": 5,
         "blocks": {
-            "audio_in_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "control_in": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "width": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 3
-            },
-            "audio_out_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 4
-            },
-            "audio_out_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 5
-            }
+            "audio_in_L": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_R": {"isDefault": False, "isParam": False, "position": 1},
+            "control_in": {"isDefault": True, "isParam": True, "position": 2},
+            "width": {"isDefault": True, "isParam": True, "position": 3},
+            "audio_out_L": {"isDefault": True, "isParam": False, "position": 4},
+            "audio_out_R": {"isDefault": False, "isParam": False, "position": 5},
         },
         "options": {
             "channels": ["1in->1out", "1in->2out", "stereo"],
             "control": ["rate", "tap_tempo", "cv_direct"],
-            "waveform": ["sine", "triangle", "swung_sine", "swung"]
-        }
+            "waveform": ["sine", "triangle", "swung_sine", "swung"],
+        },
     },
     72: {
         "name": "Env Filter",
@@ -3849,52 +1927,20 @@ module_index = {
         "params": 4,
         "cpu": 7,
         "blocks": {
-            "audio_in_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "sensitivity": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "min_freq": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 3
-            },
-            "max_freq": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 4
-            },
-            "filter_q": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 5
-            },
-            "audio_out_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 6
-            },
-            "audio_out_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 7
-            }
+            "audio_in_L": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_R": {"isDefault": False, "isParam": False, "position": 1},
+            "sensitivity": {"isDefault": True, "isParam": True, "position": 2},
+            "min_freq": {"isDefault": True, "isParam": True, "position": 3},
+            "max_freq": {"isDefault": True, "isParam": True, "position": 4},
+            "filter_q": {"isDefault": True, "isParam": True, "position": 5},
+            "audio_out_L": {"isDefault": True, "isParam": False, "position": 6},
+            "audio_out_R": {"isDefault": False, "isParam": False, "position": 7},
         },
         "options": {
             "channels": ["1in->1out", "1in->2out", "stereo"],
             "control": ["rate", "tap_tempo", "cv_direct"],
-            "direction": ["up", "down"]
-        }
+            "direction": ["up", "down"],
+        },
     },
     73: {
         "name": "Ring Modulator",
@@ -3909,43 +1955,19 @@ module_index = {
         "params": 3,
         "cpu": 14,
         "blocks": {
-            "audio_in": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "frequency": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "ext_in": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "duty_cycle": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 2
-            },
-            "mix": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 3
-            },
-            "audio_out": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 4
-            }
+            "audio_in": {"isDefault": True, "isParam": False, "position": 0},
+            "frequency": {"isDefault": True, "isParam": True, "position": 1},
+            "ext_in": {"isDefault": False, "isParam": False, "position": 1},
+            "duty_cycle": {"isDefault": False, "isParam": True, "position": 2},
+            "mix": {"isDefault": True, "isParam": True, "position": 3},
+            "audio_out": {"isDefault": True, "isParam": False, "position": 4},
         },
         "options": {
             "waveform": ["since", "square", "triangle", "sawtooth"],
             "ext_audio_in": ["off", "on"],
             "duty_cycle": ["off", "on"],
-            "upsampling": ["none", "2x"]
-        }
+            "upsampling": ["none", "2x"],
+        },
     },
     74: {
         "name": "Hall Reverb",
@@ -3961,48 +1983,16 @@ module_index = {
         "params": 4,
         "cpu": 22,
         "blocks": {
-            "audio_in_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_R": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 1
-            },
-            "decay_time": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "low_eq": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 3
-            },
-            "lpf_freq": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 4
-            },
-            "mix": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 5
-            },
-            "audio_out_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 6
-            },
-            "audio_out_R": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 7
-            }
+            "audio_in_L": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_R": {"isDefault": True, "isParam": False, "position": 1},
+            "decay_time": {"isDefault": True, "isParam": True, "position": 2},
+            "low_eq": {"isDefault": True, "isParam": True, "position": 3},
+            "lpf_freq": {"isDefault": True, "isParam": True, "position": 4},
+            "mix": {"isDefault": True, "isParam": True, "position": 5},
+            "audio_out_L": {"isDefault": True, "isParam": False, "position": 6},
+            "audio_out_R": {"isDefault": True, "isParam": False, "position": 7},
         },
-        "options": {}
+        "options": {},
     },
     75: {
         "name": "Ping Pong Delay",
@@ -4019,59 +2009,33 @@ module_index = {
         "params": 5,
         "cpu": 18,
         "blocks": {
-            "audio_in_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "delay_time": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "feedback": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 3
-            },
-            "mod_rate": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 4
-            },
-            "mod_depth": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 5
-            },
-            "mix": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 6
-            },
-            "audio_out_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 7
-            },
-            "audio_out_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 8
-            }
+            "audio_in_L": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_R": {"isDefault": False, "isParam": False, "position": 1},
+            "delay_time": {"isDefault": True, "isParam": True, "position": 2},
+            "feedback": {"isDefault": True, "isParam": True, "position": 3},
+            "mod_rate": {"isDefault": True, "isParam": True, "position": 4},
+            "mod_depth": {"isDefault": True, "isParam": True, "position": 5},
+            "mix": {"isDefault": True, "isParam": True, "position": 6},
+            "audio_out_L": {"isDefault": True, "isParam": False, "position": 7},
+            "audio_out_R": {"isDefault": False, "isParam": False, "position": 8},
         },
         "options": {
             "channels": ["1in->1out", "stereo"],
             "control": ["rate", "tap_tempo", "cv_direct"],
             "type": ["clean", "tape", "old_tape", "bbd"],
-            "tap_ratio": ["1:1", "2:3", "1:2", "1:3", "3:8", "1:4",
-                          "3:16", "1:8", "1:16", "1:32"]
-        }
+            "tap_ratio": [
+                "1:1",
+                "2:3",
+                "1:2",
+                "1:3",
+                "3:8",
+                "1:4",
+                "3:16",
+                "1:8",
+                "1:16",
+                "1:32",
+            ],
+        },
     },
     76: {
         "name": "Audio Mixer",
@@ -4087,182 +2051,46 @@ module_index = {
         "params": 16,
         "cpu": 7,
         "blocks": {
-            "audio_in_1_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_1_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "audio_in_2_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 2
-            },
-            "audio_in_2_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 3
-            },
-            "audio_in_3_L": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 4
-            },
-            "audio_in_3_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 5
-            },
-            "audio_in_4_L": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 6
-            },
-            "audio_in_4_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 7
-            },
-            "audio_in_5_L": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 8
-            },
-            "audio_in_5_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 9
-            },
-            "audio_in_6_L": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 10
-            },
-            "audio_in_6_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 11
-            },
-            "audio_in_7_L": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 12
-            },
-            "audio_in_7_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 13
-            },
-            "audio_in_8_L": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 14
-            },
-            "audio_in_8_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 15
-            },
-            "gain_1": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 16
-            },
-            "gain_2": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 17
-            },
-            "gain_3": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 18
-            },
-            "gain_4": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 19
-            },
-            "gain_5": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 20
-            },
-            "gain_6": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 21
-            },
-            "gain_7": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 22
-            },
-            "gain_8": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 23
-            },
-            "pan_1": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 24
-            },
-            "pan_2": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 25
-            },
-            "pan_3": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 26
-            },
-            "pan_4": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 27
-            },
-            "pan_5": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 28
-            },
-            "pan_6": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 29
-            },
-            "pan_7": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 30
-            },
-            "pan_8": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 31
-            },
-            "audio_out_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 32
-            },
-            "audio_out_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 33
-            }
+            "audio_in_1_L": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_1_R": {"isDefault": False, "isParam": False, "position": 1},
+            "audio_in_2_L": {"isDefault": True, "isParam": False, "position": 2},
+            "audio_in_2_R": {"isDefault": False, "isParam": False, "position": 3},
+            "audio_in_3_L": {"isDefault": False, "isParam": False, "position": 4},
+            "audio_in_3_R": {"isDefault": False, "isParam": False, "position": 5},
+            "audio_in_4_L": {"isDefault": False, "isParam": False, "position": 6},
+            "audio_in_4_R": {"isDefault": False, "isParam": False, "position": 7},
+            "audio_in_5_L": {"isDefault": False, "isParam": False, "position": 8},
+            "audio_in_5_R": {"isDefault": False, "isParam": False, "position": 9},
+            "audio_in_6_L": {"isDefault": False, "isParam": False, "position": 10},
+            "audio_in_6_R": {"isDefault": False, "isParam": False, "position": 11},
+            "audio_in_7_L": {"isDefault": False, "isParam": False, "position": 12},
+            "audio_in_7_R": {"isDefault": False, "isParam": False, "position": 13},
+            "audio_in_8_L": {"isDefault": False, "isParam": False, "position": 14},
+            "audio_in_8_R": {"isDefault": False, "isParam": False, "position": 15},
+            "gain_1": {"isDefault": True, "isParam": True, "position": 16},
+            "gain_2": {"isDefault": True, "isParam": True, "position": 17},
+            "gain_3": {"isDefault": False, "isParam": True, "position": 18},
+            "gain_4": {"isDefault": False, "isParam": True, "position": 19},
+            "gain_5": {"isDefault": False, "isParam": True, "position": 20},
+            "gain_6": {"isDefault": False, "isParam": True, "position": 21},
+            "gain_7": {"isDefault": False, "isParam": True, "position": 22},
+            "gain_8": {"isDefault": False, "isParam": True, "position": 23},
+            "pan_1": {"isDefault": False, "isParam": True, "position": 24},
+            "pan_2": {"isDefault": False, "isParam": True, "position": 25},
+            "pan_3": {"isDefault": False, "isParam": True, "position": 26},
+            "pan_4": {"isDefault": False, "isParam": True, "position": 27},
+            "pan_5": {"isDefault": False, "isParam": True, "position": 28},
+            "pan_6": {"isDefault": False, "isParam": True, "position": 29},
+            "pan_7": {"isDefault": False, "isParam": True, "position": 30},
+            "pan_8": {"isDefault": False, "isParam": True, "position": 31},
+            "audio_out_L": {"isDefault": True, "isParam": False, "position": 32},
+            "audio_out_R": {"isDefault": False, "isParam": False, "position": 33},
         },
         "options": {
             "channels": list(range(2, 9)),
             "stereo": ["mono", "stereo"],
-            "panning": ["off", "on"]
-        }
+            "panning": ["off", "on"],
+        },
     },
     77: {
         "name": "CV Flip Flop",
@@ -4280,18 +2108,10 @@ module_index = {
         "params": 1,
         "cpu": 0.2,
         "blocks": {
-            "cv_input": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            },
-            "cv_output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 1
-            }
+            "cv_input": {"isDefault": True, "isParam": True, "position": 0},
+            "cv_output": {"isDefault": True, "isParam": False, "position": 1},
         },
-        "options": {}
+        "options": {},
     },
     78: {
         "name": "Diffuser",
@@ -4307,38 +2127,14 @@ module_index = {
         "params": 4,
         "cpu": 2,
         "blocks": {
-            "audio_in": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "gain": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "size": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "mod_width": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 3
-            },
-            "mod_rate": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 4
-            },
-            "audio_out": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 5
-            }
+            "audio_in": {"isDefault": True, "isParam": False, "position": 0},
+            "gain": {"isDefault": True, "isParam": True, "position": 1},
+            "size": {"isDefault": True, "isParam": True, "position": 2},
+            "mod_width": {"isDefault": True, "isParam": True, "position": 3},
+            "mod_rate": {"isDefault": True, "isParam": True, "position": 4},
+            "audio_out": {"isDefault": True, "isParam": False, "position": 5},
         },
-        "options": {}
+        "options": {},
     },
     79: {
         "name": "Reverb Lite",
@@ -4352,40 +2148,14 @@ module_index = {
         "params": 2,
         "cpu": 10,
         "blocks": {
-            "audio_in_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "decay_time": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "mix": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 3
-            },
-            "audio_out_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 4
-            },
-            "audio_out_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 5
-            }
+            "audio_in_L": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_R": {"isDefault": False, "isParam": False, "position": 1},
+            "decay_time": {"isDefault": True, "isParam": True, "position": 2},
+            "mix": {"isDefault": True, "isParam": True, "position": 3},
+            "audio_out_L": {"isDefault": True, "isParam": False, "position": 4},
+            "audio_out_R": {"isDefault": False, "isParam": False, "position": 5},
         },
-        "options": {
-            "channels": ["1in->1out", "1in->2out", "stereo"]
-        }
+        "options": {"channels": ["1in->1out", "1in->2out", "stereo"]},
     },
     80: {
         "name": "Room Reverb",
@@ -4401,48 +2171,16 @@ module_index = {
         "params": 4,
         "cpu": 22,
         "blocks": {
-            "audio_in_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_R": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 1
-            },
-            "decay_time": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "low_eq": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 3
-            },
-            "lpf_freq": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 4
-            },
-            "mix": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 5
-            },
-            "audio_out_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 6
-            },
-            "audio_out_R": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 7
-            }
+            "audio_in_L": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_R": {"isDefault": True, "isParam": False, "position": 1},
+            "decay_time": {"isDefault": True, "isParam": True, "position": 2},
+            "low_eq": {"isDefault": True, "isParam": True, "position": 3},
+            "lpf_freq": {"isDefault": True, "isParam": True, "position": 4},
+            "mix": {"isDefault": True, "isParam": True, "position": 5},
+            "audio_out_L": {"isDefault": True, "isParam": False, "position": 6},
+            "audio_out_R": {"isDefault": True, "isParam": False, "position": 7},
         },
-        "options": {}
+        "options": {},
     },
     81: {
         "name": "Pixel",
@@ -4458,16 +2196,8 @@ module_index = {
         "max_blocks": 1,
         "params": 1,
         "cpu": 0.01,
-        "blocks": {
-            "cv_audio_in": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 0
-            }
-        },
-        "options": {
-            "control": ["cv", "audio"]
-        }
+        "blocks": {"cv_audio_in": {"isDefault": True, "isParam": True, "position": 0}},
+        "options": {"control": ["cv", "audio"]},
     },
     82: {
         "name": "Midi Clock In",
@@ -4481,34 +2211,29 @@ module_index = {
         "params": 0,
         "cpu": 0.1,
         "blocks": {
-            "cc_value": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "clock_out": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "run_out": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 2
-            },
-            "divider": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 3
-            }
+            "cc_value": {"isDefault": True, "isParam": False, "position": 0},
+            "clock_out": {"isDefault": False, "isParam": False, "position": 1},
+            "run_out": {"isDefault": False, "isParam": False, "position": 2},
+            "divider": {"isDefault": False, "isParam": False, "position": 3},
         },
         "options": {
             "clock_out": ["disabled", "enabled"],
             "run_out": ["disabled", "enabled"],
             "divider": ["disabled", "enabled"],
-            "beat_modifier": ["1", "2", "3", "4", "6", "12",
-                              "1/12", "1/6", "1/4", "1/3", "1/2"]
-        }
+            "beat_modifier": [
+                "1",
+                "2",
+                "3",
+                "4",
+                "6",
+                "12",
+                "1/12",
+                "1/6",
+                "1/4",
+                "1/3",
+                "1/2",
+            ],
+        },
     },
     83: {
         "name": "Granular",
@@ -4526,63 +2251,23 @@ module_index = {
         "params": 6,
         "cpu": 8,
         "blocks": {
-            "audio_in_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "audio_in_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 1
-            },
-            "grain_size": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "grain_position": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 3
-            },
-            "density": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 4
-            },
-            "texture": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 5
-            },
-            "speed_pitch": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 6
-            },
-            "freeze": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 7
-            },
-            "audio_out_L": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 8
-            },
-            "audio_out_R": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 9
-            }
+            "audio_in_L": {"isDefault": True, "isParam": False, "position": 0},
+            "audio_in_R": {"isDefault": False, "isParam": False, "position": 1},
+            "grain_size": {"isDefault": True, "isParam": True, "position": 2},
+            "grain_position": {"isDefault": True, "isParam": True, "position": 3},
+            "density": {"isDefault": True, "isParam": True, "position": 4},
+            "texture": {"isDefault": True, "isParam": True, "position": 5},
+            "speed_pitch": {"isDefault": True, "isParam": True, "position": 6},
+            "freeze": {"isDefault": True, "isParam": True, "position": 7},
+            "audio_out_L": {"isDefault": True, "isParam": False, "position": 8},
+            "audio_out_R": {"isDefault": False, "isParam": False, "position": 9},
         },
         "options": {
             "num_grains": list(range(1, 9)),
             "channels": ["mono", "stereo"],
             "pos_control": ["cv", "tap_tempo"],
-            "size_control": ["cv", "tap_tempo"]
-        }
+            "size_control": ["cv", "tap_tempo"],
+        },
     },
     84: {
         "name": "Midi Clock Out",
@@ -4597,38 +2282,18 @@ module_index = {
         "params": 5,
         "cpu": 0.3,
         "blocks": {
-            "tap_cv_control": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "sent:": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "reset": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 2
-            },
-            "send_position": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 3
-            },
-            "song_position": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 4
-            }
+            "tap_cv_control": {"isDefault": True, "isParam": False, "position": 0},
+            "sent:": {"isDefault": True, "isParam": True, "position": 1},
+            "reset": {"isDefault": True, "isParam": True, "position": 2},
+            "send_position": {"isDefault": False, "isParam": True, "position": 3},
+            "song_position": {"isDefault": False, "isParam": True, "position": 4},
         },
         "options": {
             "input": ["tap", "cv_control"],
             "run_in": ["enabled", "disabled"],
             "reset_in": ["enabled", "disabled"],
-            "position": ["disabled", "enabled"]
-        }
+            "position": ["disabled", "enabled"],
+        },
     },
     85: {
         "name": "Tap to CV",
@@ -4642,31 +2307,12 @@ module_index = {
         "params": 2,
         "cpu": 0.12,
         "blocks": {
-            "tap_input": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "min_time": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 1
-            },
-            "max_time": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 2
-            },
-            "output": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 3
-            }
+            "tap_input": {"isDefault": True, "isParam": False, "position": 0},
+            "min_time": {"isDefault": False, "isParam": True, "position": 1},
+            "max_time": {"isDefault": False, "isParam": True, "position": 2},
+            "output": {"isDefault": True, "isParam": False, "position": 3},
         },
-        "options": {
-            "range": ["off", "on"],
-            "output": ["linear", "exponential"]
-        }
+        "options": {"range": ["off", "on"], "output": ["linear", "exponential"]},
     },
     86: {
         "name": "Midi Pitch Bend In",
@@ -4681,16 +2327,8 @@ module_index = {
         "max_blocks": 1,
         "params": 0,
         "cpu": 0.1,
-        "blocks": {
-            "pitch_bend": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            }
-        },
-        "options": {
-            "midi_channel": list(range(1, 17))
-        }
+        "blocks": {"pitch_bend": {"isDefault": True, "isParam": False, "position": 0}},
+        "options": {"midi_channel": list(range(1, 17))},
     },
     87: {
         "name": "Sampler",
@@ -4703,53 +2341,21 @@ module_index = {
         "params": 4,
         "cpu": 0.9,
         "blocks": {
-            "audio_in": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 0
-            },
-            "record": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 1
-            },
-            "sample_playback": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 2
-            },
-            "playback_speed": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 3
-            },
-            "start": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 4
-            },
-            "length": {
-                "isDefault": True,
-                "isParam": True,
-                "position": 5
-            },
-            "cv_output": {
-                "isDefault": False,
-                "isParam": False,
-                "position": 6
-            },
-            "audio_out": {
-                "isDefault": True,
-                "isParam": False,
-                "position": 7
-            }
+            "audio_in": {"isDefault": True, "isParam": False, "position": 0},
+            "record": {"isDefault": True, "isParam": True, "position": 1},
+            "sample_playback": {"isDefault": True, "isParam": False, "position": 2},
+            "playback_speed": {"isDefault": True, "isParam": True, "position": 3},
+            "start": {"isDefault": True, "isParam": True, "position": 4},
+            "length": {"isDefault": True, "isParam": True, "position": 5},
+            "cv_output": {"isDefault": False, "isParam": False, "position": 6},
+            "audio_out": {"isDefault": True, "isParam": False, "position": 7},
         },
         "options": {
             "record": ["enabled", "disabled"],
             "playback": ["trigger", "gate", "loop"],
-            "cv_output": ["off", "on"]
-        }
-    }
+            "cv_output": ["off", "on"],
+        },
+    },
 }
 
 for k, v in list(module_index.items()):

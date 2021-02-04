@@ -249,6 +249,12 @@
                        </item>
                        <item>
                         <widget class="QPushButton" name="btn_dwn_all">
+                         <property name="cursor">
+                          <cursorShape>PointingHandCursor</cursorShape>
+                         </property>
+                         <property name="mouseTracking">
+                          <bool>true</bool>
+                         </property>
                          <property name="toolTip">
                           <string>Click here to download all patches currently stored on PatchStorage.</string>
                          </property>
@@ -756,6 +762,12 @@
                           <layout class="QHBoxLayout" name="horizontalLayout_19">
                            <item>
                             <widget class="QPushButton" name="btn_prev_page">
+                             <property name="cursor">
+                              <cursorShape>PointingHandCursor</cursorShape>
+                             </property>
+                             <property name="mouseTracking">
+                              <bool>true</bool>
+                             </property>
                              <property name="toolTip">
                               <string>Click here to view the previous page in the selected patch.</string>
                              </property>
@@ -775,6 +787,12 @@
                            </item>
                            <item>
                             <widget class="QPushButton" name="btn_next_page">
+                             <property name="cursor">
+                              <cursorShape>PointingHandCursor</cursorShape>
+                             </property>
+                             <property name="mouseTracking">
+                              <bool>true</bool>
+                             </property>
                              <property name="toolTip">
                               <string>Click here to view the next page in the selected patch.</string>
                              </property>
@@ -1402,6 +1420,12 @@
                  </item>
                  <item>
                   <widget class="QPushButton" name="back_btn">
+                   <property name="cursor">
+                    <cursorShape>PointingHandCursor</cursorShape>
+                   </property>
+                   <property name="mouseTracking">
+                    <bool>true</bool>
+                   </property>
                    <property name="toolTip">
                     <string>Click here to view the patch-level details.</string>
                    </property>
@@ -1515,85 +1539,114 @@
             <widget class="QWidget" name="layoutWidget_3">
              <layout class="QVBoxLayout" name="verticalLayout_11">
               <item>
-               <widget class="QPushButton" name="delete_folder_sd_btn">
-                <property name="cursor">
-                 <cursorShape>PointingHandCursor</cursorShape>
-                </property>
-                <property name="mouseTracking">
-                 <bool>true</bool>
-                </property>
-                <property name="toolTip">
-                 <string>Click here to delete the currently selected item above from your SD card.</string>
-                </property>
-                <property name="statusTip">
-                 <string>Click here to delete the currently selected item above from your SD card.</string>
-                </property>
-                <property name="accessibleName">
-                 <string>Delete Selected Item from SD Card Tree View Button</string>
-                </property>
-                <property name="accessibleDescription">
-                 <string>Will attempt to delete the currently selected item in the SD tree view above from your SD card. Will create a popup if the currently selected item is a folder, at which point a warning will indicate that deletion will delete everything contained within. The options are yes to continue with the deletion and no to abort. </string>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-                <property name="text">
-                 <string>Delete Selected Item Above</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="import_all_btn">
-                <property name="cursor">
-                 <cursorShape>PointingHandCursor</cursorShape>
-                </property>
-                <property name="mouseTracking">
-                 <bool>true</bool>
-                </property>
-                <property name="toolTip">
-                 <string>Click here to import all patches currently listed below.</string>
-                </property>
-                <property name="statusTip">
-                 <string>Click here to import all patches currently listed below.</string>
-                </property>
-                <property name="accessibleName">
-                 <string>Import All Patches button</string>
-                </property>
-                <property name="accessibleDescription">
-                 <string>Attempts to import all of the patches listed in the tables below (SD card table left and SD card table right) into the ZOIA Librarian. This requires that a folder is selected from the SD Card Viewer above that contains patches.</string>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-                <property name="text">
-                 <string>Import All Listed Patches Below</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="import_all_ver_btn">
-                <property name="cursor">
-                 <cursorShape>PointingHandCursor</cursorShape>
-                </property>
-                <property name="toolTip">
-                 <string>Click here to import all patches listed below as a version history.</string>
-                </property>
-                <property name="statusTip">
-                 <string>Click here to import all patches listed below as a version history.</string>
-                </property>
-                <property name="accessibleName">
-                 <string>Import All Patches as Bank button</string>
-                </property>
-                <property name="accessibleDescription">
-                 <string>Attempts to import all of the patches listed in the tables below (SD card table left and SD card table right) into the ZOIA Librarian as a version history. This requires that a folder is selected from the SD Card Viewer above that contains patches.</string>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-                <property name="text">
-                 <string>Import All Listed Patches Below as a Version History</string>
-                </property>
-               </widget>
+               <layout class="QHBoxLayout" name="horizontalLayout_17">
+                <item>
+                 <widget class="QPushButton" name="delete_folder_sd_btn">
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="mouseTracking">
+                   <bool>true</bool>
+                  </property>
+                  <property name="toolTip">
+                   <string>Click here to delete the currently selected item above from your SD card.</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Click here to delete the currently selected item above from your SD card.</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Delete Selected Item from SD Card Tree View Button</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>Will attempt to delete the currently selected item in the SD tree view above from your SD card. Will create a popup if the currently selected item is a folder, at which point a warning will indicate that deletion will delete everything contained within. The options are yes to continue with the deletion and no to abort. </string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
+                  <property name="text">
+                   <string>Delete Selected Item Above</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="set_export_dir_btn">
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="mouseTracking">
+                   <bool>true</bool>
+                  </property>
+                  <property name="toolTip">
+                   <string>Click here to set the export directory.</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Click here to set the export directory.</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Set Export Directory button</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>Allows the user to set the export directory instead of defaulting to &quot;to_zoia&quot;.</string>
+                  </property>
+                  <property name="text">
+                   <string>Set Export Directory</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="import_all_btn">
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="mouseTracking">
+                   <bool>true</bool>
+                  </property>
+                  <property name="toolTip">
+                   <string>Click here to import all patches currently listed below.</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Click here to import all patches currently listed below.</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Import All Patches button</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>Attempts to import all of the patches listed in the tables below (SD card table left and SD card table right) into the ZOIA Librarian. This requires that a folder is selected from the SD Card Viewer above that contains patches.</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
+                  <property name="text">
+                   <string>Import All Listed Patches Below</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="import_all_ver_btn">
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="toolTip">
+                   <string>Click here to import all patches listed below as a version history.</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Click here to import all patches listed below as a version history.</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Import All Patches as Bank button</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>Attempts to import all of the patches listed in the tables below (SD card table left and SD card table right) into the ZOIA Librarian as a version history. This requires that a folder is selected from the SD Card Viewer above that contains patches.</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
+                  <property name="text">
+                   <string>Import All Listed Patches Below as a Version History</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
               <item>
                <widget class="QSplitter" name="splitter_sd_hori">
@@ -3398,6 +3451,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+]</string>
+   </property>
+  </action>
+  <action name="actionSpecify_Default_Export_Directory">
+   <property name="text">
+    <string>Specify Default Export Directory</string>
    </property>
   </action>
  </widget>

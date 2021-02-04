@@ -7,19 +7,19 @@ from zoia_lib.common import errors
 
 
 class PatchExport(Patch):
-    """ The PatchExport class is a child of the Patch class.
+    """The PatchExport class is a child of the Patch class.
     It is responsible for all patch exporting operations.
     """
 
     def __init__(self):
-        """ Initialize the class such that it has a reference to the
+        """Initialize the class such that it has a reference to the
         backend path.
         """
 
         super().__init__()
 
     def export_patch_bin(self, patch, dest, slot=-1, overwrite=False):
-        """ Attempts to export a patch from the application to the
+        """Attempts to export a patch from the application to the
         specified supplied path. Normally, this will be a user's SD
         card, but it could be used for a location on a user's machine
         as well.
@@ -50,14 +50,12 @@ class PatchExport(Patch):
         # in the destination.
         if not overwrite:
             for pch in os.listdir(dest):
-                if pch[:3] == "00{}".format(slot) or pch[:3] == "0{}".format(
-                        slot):
+                if pch[:3] == "00{}".format(slot) or pch[:3] == "0{}".format(slot):
                     raise errors.ExportingError(slot, 703)
         else:
             # Delete the previous patch that occupied the slot.
             for pch in os.listdir(dest):
-                if pch[:3] == "00{}".format(slot) or pch[:3] == "0{}".format(
-                        slot):
+                if pch[:3] == "00{}".format(slot) or pch[:3] == "0{}".format(slot):
                     os.remove(os.path.join(dest, pch))
                     break
 
@@ -69,8 +67,9 @@ class PatchExport(Patch):
 
         # Get the metadata for this patch.
         try:
-            with open(os.path.join(self.back_path, idx,
-                                   "{}.json".format(patch)), "r") as f:
+            with open(
+                os.path.join(self.back_path, idx, "{}.json".format(patch)), "r"
+            ) as f:
                 metadata = json.loads(f.read())
         except FileNotFoundError:
             raise errors.BadPathError(301)
@@ -111,13 +110,14 @@ class PatchExport(Patch):
 
         # Rename the patch and export.
         try:
-            shutil.copy(os.path.join(self.back_path, idx, patch),
-                        os.path.join(dest, name))
+            shutil.copy(
+                os.path.join(self.back_path, idx, patch), os.path.join(dest, name)
+            )
         except FileNotFoundError or FileExistsError:
             raise errors.ExportingError(patch)
 
     def export_bank(self, bank, dest, name, overwrite=False):
-        """ Exports an entire bank to be ready for use on a ZOIA.
+        """Exports an entire bank to be ready for use on a ZOIA.
         Ideally, this is used to export a bank from a local user's
         machine to an SD card.
 
@@ -144,8 +144,7 @@ class PatchExport(Patch):
         # Process the bank and add each to the bank directory.
         for pch in bank:
             try:
-                self.export_patch_bin(pch["id"], os.path.join(dest, name),
-                                      pch["slot"])
+                self.export_patch_bin(pch["id"], os.path.join(dest, name), pch["slot"])
             except errors.BadPathError:
                 fail_list.append(pch["slot"])
 

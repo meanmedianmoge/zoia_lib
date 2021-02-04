@@ -9,13 +9,13 @@ from zoia_lib.common import errors
 
 
 class ZOIALibrarianPS(QMainWindow):
-    """ The ZOIALibrarianPS class is responsible for all
+    """The ZOIALibrarianPS class is responsible for all
     activities contained within the PatchStorage View tab of the
     application.
     """
 
     def __init__(self, ui, api, path, msg, save, f1):
-        """ Initializes the class with the required parameters.
+        """Initializes the class with the required parameters.
 
         ui: The UI component of ZOIALibrarianMain
         api: Backend class to aid with PS API requests
@@ -46,8 +46,7 @@ class ZOIALibrarianPS(QMainWindow):
         self.worker_ps.signal.connect(self._reload_ps_done)
 
     def metadata_init(self):
-        """ Retrieves all PS metadata via API calls.
-        """
+        """Retrieves all PS metadata via API calls."""
 
         try:
             # Check for metadata in the user's backend.
@@ -56,8 +55,7 @@ class ZOIALibrarianPS(QMainWindow):
             else:
                 # Got previous metadata, need to ensure that there are no
                 # new patches.
-                with open(os.path.join(self.path, "data.json"),
-                          "r") as f:
+                with open(os.path.join(self.path, "data.json"), "r") as f:
                     data = json.loads(f.read())
                 if len(data) == self.api.patch_count:
                     # Assume no new patches; allow the user to refresh manually.
@@ -72,24 +70,25 @@ class ZOIALibrarianPS(QMainWindow):
                     ps_data = new_patches + data
 
             # Create/update the data file with the new data.
-            with open(os.path.join(self.path, "data.json"),
-                      "w") as f:
+            with open(os.path.join(self.path, "data.json"), "w") as f:
                 f.write(json.dumps(ps_data))
                 self.data_PS = ps_data
         except:
             # Let the user know if an internet connect can't be established.
             self.msg.setWindowTitle("No Internet Connection")
             self.msg.setIcon(QMessageBox.Information)
-            self.msg.setText("Failed to retrieve patches from PatchStorage.\n"
-                             "Please check your internet connection and try"
-                             "again.")
+            self.msg.setText(
+                "Failed to retrieve patches from PatchStorage.\n"
+                "Please check your internet connection and try"
+                "again."
+            )
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
             self.msg.setInformativeText(None)
             self.ui.tabs.setCurrentIndex(2)
 
     def reload_ps_thread(self):
-        """ Initializes a Worker thread to manage the refreshing of
+        """Initializes a Worker thread to manage the refreshing of
         all ZOIA patches currently hosted on PatchStorage.
         Currently triggered via a button press.
         """
@@ -103,7 +102,7 @@ class ZOIALibrarianPS(QMainWindow):
         self.worker_ps.start()
 
     def _reload_ps_done(self):
-        """ Notifies the user once all PatchStorage patches have been
+        """Notifies the user once all PatchStorage patches have been
         retrieved.
         """
 
@@ -120,7 +119,7 @@ class ZOIALibrarianPS(QMainWindow):
         self.msg.exec_()
 
     def download_all_thread(self):
-        """ Initializes a Worker thread to manage the downloading of
+        """Initializes a Worker thread to manage the downloading of
         all ZOIA patches currently hosted on PatchStorage.
         Currently triggered via a button press.
         """
@@ -135,7 +134,7 @@ class ZOIALibrarianPS(QMainWindow):
         self.worker_dwn.start()
 
     def _download_all_progress(self, i):
-        """ Progress update provided by the worker to display how
+        """Progress update provided by the worker to display how
         many patches have been downloaded.
 
         i: The current patch that is being downloaded.
@@ -143,10 +142,12 @@ class ZOIALibrarianPS(QMainWindow):
 
         self.ui.statusbar.showMessage(
             "Trying to download patch #{} of {}".format(
-                i + 1, self.ui.table_PS.rowCount()))
+                i + 1, self.ui.table_PS.rowCount()
+            )
+        )
 
     def _download_all_done(self, cnt, fails):
-        """ Notifies the user once all PatchStorage patches have been
+        """Notifies the user once all PatchStorage patches have been
         downloaded. Will also notify the user with the number of
         patches that failed to download and explain why they failed.
 
@@ -157,12 +158,13 @@ class ZOIALibrarianPS(QMainWindow):
         # Notify the user via a popup.
         self.msg.setWindowTitle("Download Complete")
         self.msg.setIcon(QMessageBox.Information)
-        self.msg.setText("Successfully downloaded {} patch(es)."
-                         "".format(cnt))
-        self.msg.setInformativeText("Did not download {} patch(es) because "
-                                    "they are either .py files or use a "
-                                    "compression algorithm other than .zip"
-                                    "".format(fails))
+        self.msg.setText("Successfully downloaded {} patch(es)." "".format(cnt))
+        self.msg.setInformativeText(
+            "Did not download {} patch(es) because "
+            "they are either .py files or use a "
+            "compression algorithm other than .zip"
+            "".format(fails)
+        )
         self.msg.setStandardButtons(QMessageBox.Ok)
         self.msg.exec_()
         self.msg.setInformativeText(None)
@@ -175,7 +177,7 @@ class ZOIALibrarianPS(QMainWindow):
         self.ui.searchbar_PS.setEnabled(True)
 
     def initiate_download(self):
-        """ Attempts to download a patch from the PS API. Once the
+        """Attempts to download a patch from the PS API. Once the
         download completes, it will be saved to the backend application
         directory.
         Currently, only patches uploaded as .bin or .zip files will
@@ -184,14 +186,14 @@ class ZOIALibrarianPS(QMainWindow):
         if users begin to use them on PatchStorage.
         """
 
-        self.ui.statusbar.showMessage("Starting download...",
-                                      timeout=5000)
+        self.ui.statusbar.showMessage("Starting download...", timeout=5000)
 
         # TODO Replace with FCFS thread scheduling
         # Try to download the patch.
         try:
-            self.save.save_to_backend(self.api.download(str(
-                self.sender().objectName())))
+            self.save.save_to_backend(
+                self.api.download(str(self.sender().objectName()))
+            )
             self.sender().setEnabled(False)
             self.sender().setText("Downloaded")
             self.ui.statusbar.showMessage("Download complete.", timeout=5000)
@@ -199,10 +201,10 @@ class ZOIALibrarianPS(QMainWindow):
             # .py or .rar and the user doesn't have WinRAR installed.
             self.msg.setWindowTitle("Invalid File Type")
             self.msg.setIcon(QMessageBox.Information)
-            self.msg.setText("Unfortunately, that patch is not in a "
-                             "supported format.")
-            self.msg.setInformativeText(
-                "Supported formats are .bin and .zip")
+            self.msg.setText(
+                "Unfortunately, that patch is not in a " "supported format."
+            )
+            self.msg.setInformativeText("Supported formats are .bin and .zip")
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
             self.msg.setInformativeText(None)
@@ -210,15 +212,17 @@ class ZOIALibrarianPS(QMainWindow):
             # Let the user know if an internet connect can't be established.
             self.msg.setWindowTitle("No Internet Connection")
             self.msg.setIcon(QMessageBox.Information)
-            self.msg.setText("Failed to retrieve patches from PatchStorage.\n"
-                             "Please check your internet connection and try "
-                             "again.")
+            self.msg.setText(
+                "Failed to retrieve patches from PatchStorage.\n"
+                "Please check your internet connection and try "
+                "again."
+            )
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
             self.msg.setInformativeText(None)
 
     def create_dwn_btn(self, i, idx):
-        """ Creates a download button for patches on the PatchStorage
+        """Creates a download button for patches on the PatchStorage
         tab.
 
         i: The row for which the button will be inserted into.
@@ -237,7 +241,7 @@ class ZOIALibrarianPS(QMainWindow):
         self.ui.table_PS.setCellWidget(i, 4, dwn)
 
     def get_data_ps(self):
-        """ Getter method to get PS table data.
+        """Getter method to get PS table data.
 
         return: The PatchStorage data as a list.
         """
@@ -246,7 +250,7 @@ class ZOIALibrarianPS(QMainWindow):
 
 
 class DownloadAllWorker(QThread):
-    """ The DownloadAllWorker class runs as a separate thread in the
+    """The DownloadAllWorker class runs as a separate thread in the
     application to prevent application snag. This thread will attempt
     to download every ZOIA patch currently hosted on PatchStorage.
     """
@@ -256,7 +260,7 @@ class DownloadAllWorker(QThread):
     signal_2 = QtCore.Signal(int)
 
     def __init__(self, ui, save, api):
-        """ Initializes the thread.
+        """Initializes the thread.
 
         ui: The UI component of ZOIALibrarianMain.
         save: Backend class to aid with the saving of patches.
@@ -272,7 +276,7 @@ class DownloadAllWorker(QThread):
         self.cnt = 0
 
     def run(self):
-        """ Attempts to download all patches currently stored on
+        """Attempts to download all patches currently stored on
         PatchStorage. This method will ignore failures and continue
         on to the next patch until it has exhausted the list.
         """
@@ -286,8 +290,7 @@ class DownloadAllWorker(QThread):
                 if btn.isEnabled():
                     # Try to download the patch.
                     try:
-                        self.save.save_to_backend(self.api.download(
-                            btn.objectName()))
+                        self.save.save_to_backend(self.api.download(btn.objectName()))
                         btn.setEnabled(False)
                         btn.setText("Downloaded")
                         self.cnt += 1
@@ -299,16 +302,18 @@ class DownloadAllWorker(QThread):
             # Let the user know if an internet connect can't be established.
             self.msg.setWindowTitle("No Internet Connection")
             self.msg.setIcon(QMessageBox.Information)
-            self.msg.setText("Failed to download patches from PatchStorage.\n"
-                             "Please check your internet connection and try"
-                             "again.")
+            self.msg.setText(
+                "Failed to download patches from PatchStorage.\n"
+                "Please check your internet connection and try"
+                "again."
+            )
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
             self.msg.setInformativeText(None)
 
 
 class ReloadPSWorker(QThread):
-    """ The ReloadPSWorker class runs as a separate thread in the
+    """The ReloadPSWorker class runs as a separate thread in the
     application to prevent application snag. This thread will reload
     the PS patch list that is displayed on the PatchStorage View tab.
     """
@@ -317,7 +322,7 @@ class ReloadPSWorker(QThread):
     signal = QtCore.Signal()
 
     def __init__(self, path, api):
-        """ Initializes the thread.
+        """Initializes the thread.
 
         path: A string to the backend .ZoiaLibraryApp directory.
         api: Backend class to aid with PS API requests.
@@ -328,7 +333,7 @@ class ReloadPSWorker(QThread):
         self.api = api
 
     def run(self):
-        """ Attempts to download all patches currently stored on
+        """Attempts to download all patches currently stored on
         PatchStorage. This method will ignore failures and continue
         on to the next patch until it has exhausted the list.
         """
@@ -342,9 +347,11 @@ class ReloadPSWorker(QThread):
             # Let the user know if an internet connect can't be established.
             self.msg.setWindowTitle("No Internet Connection")
             self.msg.setIcon(QMessageBox.Information)
-            self.msg.setText("Failed to download the patch from "
-                             "PatchStorage.\nPlease check your internet "
-                             "connection and try again.")
+            self.msg.setText(
+                "Failed to download the patch from "
+                "PatchStorage.\nPlease check your internet "
+                "connection and try again."
+            )
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
             self.msg.setInformativeText(None)
