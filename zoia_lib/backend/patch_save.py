@@ -18,12 +18,12 @@ ps = PatchStorage()
 
 
 class PatchSave(Patch):
-    """ The PatchSave class is a child of the Patch class. It is
+    """The PatchSave class is a child of the Patch class. It is
     responsible for patch importing, saving, and decompressing.
     """
 
     def __init__(self):
-        """ Initialize the class such that it has a reference to the
+        """Initialize the class such that it has a reference to the
         backend path.
         """
 
@@ -47,10 +47,14 @@ class PatchSave(Patch):
         """
 
         # Don't try to save a file when we are missing necessary info.
-        if patch is None or patch[0] is None \
-                or patch[1] is None or self.back_path is None \
-                or not isinstance(patch[0], bytes) \
-                or not isinstance(patch[1], dict):
+        if (
+            patch is None
+            or patch[0] is None
+            or patch[1] is None
+            or self.back_path is None
+            or not isinstance(patch[0], bytes)
+            or not isinstance(patch[1], dict)
+        ):
             raise errors.SavingError(None)
 
         try:
@@ -59,33 +63,52 @@ class PatchSave(Patch):
         except ValueError:
             raise errors.JSONError(patch[1], 801)
 
-        pch_id = str(patch[1]['id'])
+        pch_id = str(patch[1]["id"])
         if len(pch_id) == 5:
             # This is an imported patch. Unfortunately, we need to make sure
             # that its a unique binary by checking every patch currently
             # stored.
             for fld in os.listdir(self.back_path):
-                if os.path.isdir(os.path.join(self.back_path, fld)) \
-                        and fld != "Banks" and fld != "sample_files" \
-                        and fld != ".DS_Store":
+                if (
+                    os.path.isdir(os.path.join(self.back_path, fld))
+                    and fld != "Banks"
+                    and fld != "sample_files"
+                    and fld != ".DS_Store"
+                ):
                     for files in os.listdir(os.path.join(self.back_path, fld)):
                         # Check every .bin file only.
                         if files.split(".")[-1] == "bin":
-                            with open(os.path.join(
-                                    self.back_path, fld, files), "rb") as f:
+                            with open(
+                                os.path.join(self.back_path, fld, files), "rb"
+                            ) as f:
                                 data = f.read()
                             if patch[0] == data:
-                                raise errors.SavingError(patch[1]["title"],
-                                                         503)
+                                with open(
+                                    os.path.join(
+                                        self.back_path,
+                                        fld,
+                                        files.split(".")[0] + ".json",
+                                    ),
+                                    "r",
+                                ) as f:
+                                    meta = json.load(f)
+                                if "_v" in files and meta["title"] != patch[1]["title"]:
+                                    meta = meta["title"] + ": {}".format(
+                                        patch[1]["title"]
+                                    )
+                                else:
+                                    meta = meta["title"]
+                                raise errors.SavingError(meta, 503)
 
         pch = os.path.join(self.back_path, "{}".format(pch_id))
         # Check to see if a directory needs to be made
         # (new patch, no version control needed yet).
         if not os.path.isdir(pch):
             os.mkdir(pch)
-            if "files" in patch[1] \
-                    and patch[1]["files"][0]["filename"].split(".")[-1] \
-                    != "bin":
+            if (
+                "files" in patch[1]
+                and patch[1]["files"][0]["filename"].split(".")[-1] != "bin"
+            ):
                 # If it isn't a straight bin additional work must be done.
                 if patch[1]["files"][0]["filename"].split(".")[-1] == "py":
                     # We are not responsible for .py files.
@@ -109,9 +132,10 @@ class PatchSave(Patch):
             # (otherwise there is no need to save it).
 
             # Case 1: Check if this is a compressed patch download.
-            if "files" in patch[1] \
-                    and patch[1]["files"][0]["filename"].split(".")[-1] \
-                    != "bin":
+            if (
+                "files" in patch[1]
+                and patch[1]["files"][0]["filename"].split(".")[-1] != "bin"
+            ):
                 # We need to check the individual binary files to see which,
                 # if any, differ from the ones currently stored.
 
@@ -124,7 +148,7 @@ class PatchSave(Patch):
                     zfile = os.path.join(self.back_path, "temp.zip")
                     with open(zfile, "wb") as zf:
                         zf.write(patch[0])
-                    with zipfile.ZipFile(zfile, 'r') as zipObj:
+                    with zipfile.ZipFile(zfile, "r") as zipObj:
                         # Extract all the contents into the temporary
                         # directory.
                         zipObj.extractall(os.path.join(self.back_path, "temp"))
@@ -142,8 +166,7 @@ class PatchSave(Patch):
                         with rarfile.RarFile(rfile, "r") as rar_obj:
                             # Extract all the contents into the temporary
                             # directory.
-                            rar_obj.extractall(os.path.join(
-                                self.back_path, "temp"))
+                            rar_obj.extractall(os.path.join(self.back_path, "temp"))
                     except rarfile.RarCannotExec:
                         # No WinRAR installed
                         os.remove(rfile)
@@ -157,8 +180,7 @@ class PatchSave(Patch):
                 # For each binary file, call the method again
                 # and see if the data has been changed.
                 diff = False
-                for file in os.listdir(
-                        os.path.join(self.back_path, "temp")):
+                for file in os.listdir(os.path.join(self.back_path, "temp")):
                     try:
                         # We only care about .bin files.
                         if file.split(".")[-1] == "bin":
@@ -181,6 +203,7 @@ class PatchSave(Patch):
                 if file.split(".")[-1] == "bin":
                     with open(os.path.join(pch, file), "rb") as f:
                         if f.read() == patch[0]:
+                            print("there")
                             # This exact binary is already saved onto the
                             # system.
                             raise errors.SavingError(patch[1]["title"], 503)
@@ -197,20 +220,22 @@ class PatchSave(Patch):
                 # Add the version suffix to the patch that was previously
                 # in the directory.
                 try:
-                    os.rename(os.path.join(pch, "{}.bin".format(pch_id)),
-                              os.path.join(pch, "{}_v2.bin".format(pch_id)))
-                    os.rename(os.path.join(pch, "{}.json".format(pch_id)),
-                              os.path.join(pch, "{}_v2.json".format(pch_id)))
+                    os.rename(
+                        os.path.join(pch, "{}.bin".format(pch_id)),
+                        os.path.join(pch, "{}_v2.bin".format(pch_id)),
+                    )
+                    os.rename(
+                        os.path.join(pch, "{}.json".format(pch_id)),
+                        os.path.join(pch, "{}_v2.json".format(pch_id)),
+                    )
                 except FileNotFoundError or FileExistsError:
                     raise errors.RenamingError(patch, 601)
                 # Update the revision number in the metadata.
                 # (Used for sorting purposes).
-                with open(os.path.join(pch, "{}_v2.json".format(pch_id)),
-                          "r") as f:
+                with open(os.path.join(pch, "{}_v2.json".format(pch_id)), "r") as f:
                     jf = json.loads(f.read())
                 jf["revision"] = 2
-                with open(os.path.join(pch, "{}_v2.json".format(pch_id)),
-                          "w") as f:
+                with open(os.path.join(pch, "{}_v2.json".format(pch_id)), "w") as f:
                     json.dump(jf, f)
             # Case 3: There were already multiple versions in the patch
             # directory.
@@ -218,28 +243,37 @@ class PatchSave(Patch):
                 # Increment the version number for each file in the directory.
                 try:
                     # for file in sorted(os.listdir(pch), key=len):
-                    for file in sorted(sorted(os.listdir(pch), key=len),
-                                       key=natural_key, reverse=True):
+                    for file in sorted(
+                        sorted(os.listdir(pch), key=len), key=natural_key, reverse=True
+                    ):
                         ver = int(file.split("v")[1].split(".")[0]) + 1
                         extension = file.split(".")[-1]
-                        os.rename(os.path.join(
-                            pch, "{}_v{}.{}".format(pch_id, str(ver - 1),
-                                                    extension)),
+                        os.rename(
                             os.path.join(
-                                pch, "{}_v{}.{}".format(pch_id, str(ver),
-                                                        extension)))
+                                pch, "{}_v{}.{}".format(pch_id, str(ver - 1), extension)
+                            ),
+                            os.path.join(
+                                pch, "{}_v{}.{}".format(pch_id, str(ver), extension)
+                            ),
+                        )
                         # Update the revision number in each metadata file
                         if extension == "json":
-                            with open(os.path.join(
-                                    pch, "{}_v{}.json".format(pch_id, str(ver))),
-                                    "r") as f:
+                            with open(
+                                os.path.join(
+                                    pch, "{}_v{}.json".format(pch_id, str(ver))
+                                ),
+                                "r",
+                            ) as f:
                                 jf = json.loads(f.read())
 
                             jf["revision"] = ver
 
-                            with open(os.path.join(
-                                    pch, "{}_v{}.json".format(pch_id, str(ver))),
-                                    "w") as f:
+                            with open(
+                                os.path.join(
+                                    pch, "{}_v{}.json".format(pch_id, str(ver))
+                                ),
+                                "w",
+                            ) as f:
                                 json.dump(jf, f)
 
                 except FileNotFoundError or FileExistsError:
@@ -250,14 +284,14 @@ class PatchSave(Patch):
                     f.write(patch[0])
                 self.save_metadata_json(patch[1], 1)
             else:
-                """ Getting here indicates that the amount of files in the 
-                directory was less than 2 (which would imply some form of 
-                corruption occurred). 
+                """Getting here indicates that the amount of files in the
+                directory was less than 2 (which would imply some form of
+                corruption occurred).
                 """
                 raise errors.SavingError(patch[1]["title"])
 
     def save_metadata_json(self, metadata, version=0):
-        """ Saves metadata for patches to the backend directory.
+        """Saves metadata for patches to the backend directory.
 
         metadata: A string containing the JSON data that will be used for
                   the metadata file that is being created.
@@ -268,12 +302,15 @@ class PatchSave(Patch):
 
         # Save the metadata.
         if version <= 0:
-            name_json = os.path.join(self.back_path, str(metadata['id']),
-                                     "{}.json".format(metadata["id"]))
+            name_json = os.path.join(
+                self.back_path, str(metadata["id"]), "{}.json".format(metadata["id"])
+            )
         else:
             name_json = os.path.join(
-                self.back_path, str(metadata['id']), "{}_v{}.json".format(
-                    metadata["id"], version))
+                self.back_path,
+                str(metadata["id"]),
+                "{}_v{}.json".format(metadata["id"], version),
+            )
 
         # Update the revision number if need be.
         if version > 0:
@@ -379,9 +416,11 @@ class PatchSave(Patch):
             js_data = {
                 "id": patch_id,
                 "created_at": "{:%Y-%m-%dT%H:%M:%S+00:00}".format(
-                    datetime.datetime.now()),
+                    datetime.datetime.now()
+                ),
                 "updated_at": "{:%Y-%m-%dT%H:%M:%S+00:00}".format(
-                    datetime.datetime.now()),
+                    datetime.datetime.now()
+                ),
                 "title": title,
                 "revision": "1",
                 "preview_url": "",
@@ -389,21 +428,14 @@ class PatchSave(Patch):
                 "like_count": 0,
                 "download_count": 0,
                 "view_count": 0,
-                "author": {
-                    "name": ""
-                },
+                "author": {"name": ""},
                 "files": [
-                    {
-                        "id": patch_id,
-                        "filename": "{}.{}".format(patch_name, ext)
-                    }
+                    {"id": patch_id, "filename": "{}.{}".format(patch_name, ext)}
                 ],
                 "categories": [],
                 "tags": [],
                 "content": "",
-                "license": {
-                    "name": ""
-                }
+                "license": {"name": ""},
             }
 
             if os.path.exists(os.path.join(self.back_path, "data.json")):
@@ -414,11 +446,13 @@ class PatchSave(Patch):
                         temp = ps.get_patch_meta(pch["id"])
                         js_data = temp
                         js_data["updated_at"] = "{:%Y-%m-%dT%H:%M:%S+00:00}".format(
-                            datetime.datetime.now())
+                            datetime.datetime.now()
+                        )
                         break
             if version:
                 js_data["updated_at"] = "{:%Y-%m-%dT%H:%M:%S+00:00}".format(
-                    datetime.datetime.now())
+                    datetime.datetime.now()
+                )
                 js_data["files"][0]["filename"] = files[i].split("/")[-1]
 
             # Try to save the patch.
@@ -434,7 +468,7 @@ class PatchSave(Patch):
         return fails
 
     def _patch_decompress(self, patch):
-        """ Method stub for decompressing files retrieved from the PS
+        """Method stub for decompressing files retrieved from the PS
         API. Currently only supports .zip and .rar files.
 
         patch: A tuple containing the downloaded file
@@ -456,22 +490,26 @@ class PatchSave(Patch):
             name_zip = os.path.join(pch, "{}.zip".format(patch_id))
             with open(name_zip, "wb") as f:
                 f.write(patch[0])
-            with zipfile.ZipFile(os.path.join(pch, "{}.zip".format(patch_id)),
-                                 "r") as zip_obj:
+            with zipfile.ZipFile(
+                os.path.join(pch, "{}.zip".format(patch_id)), "r"
+            ) as zip_obj:
                 # Extract all the contents into the patch directory
                 zip_obj.extractall(pch)
             # Ditch the zip
             os.remove(name_zip)
             to_delete = None
-        elif patch[1]["files"][0]["filename"].split(".")[-1] == "rar" \
-                and platform.system().lower() != "darwin":
+        elif (
+            patch[1]["files"][0]["filename"].split(".")[-1] == "rar"
+            and platform.system().lower() != "darwin"
+        ):
             # .rar files
             name_rar = os.path.join(pch, "{}.rar".format(patch_id))
             with open(name_rar, "wb") as f:
                 f.write(patch[0])
             try:
-                with rarfile.RarFile(os.path.join(pch, "{}.rar".format(patch_id)),
-                                     "r") as rar_obj:
+                with rarfile.RarFile(
+                    os.path.join(pch, "{}.rar".format(patch_id)), "r"
+                ) as rar_obj:
                     # Extract all the contents into the patch directory
                     rar_obj.extractall(pch)
                 # Ditch the rar
@@ -485,9 +523,11 @@ class PatchSave(Patch):
                     pass
                 raise errors.SavingError(patch[1]["title"], 506)
             except rarfile.RarCannotExec:
-                print("As .rar compression is a commercial product, you must "
-                      "download external software to download this patch "
-                      "(i.e. You need WinRAR installed for this to work).")
+                print(
+                    "As .rar compression is a commercial product, you must "
+                    "download external software to download this patch "
+                    "(i.e. You need WinRAR installed for this to work)."
+                )
                 try:
                     shutil.rmtree(pch)
                 except FileNotFoundError:
@@ -500,9 +540,8 @@ class PatchSave(Patch):
 
         # Get to the uncompressed directory.
         for file in os.listdir(pch):
-            if os.path.isdir(os.path.join(pch, file)) \
-                    and len(os.listdir(pch)) == 1:
-                to_delete = (os.path.join(pch, file))
+            if os.path.isdir(os.path.join(pch, file)) and len(os.listdir(pch)) == 1:
+                to_delete = os.path.join(pch, file)
                 pch = os.path.join(pch, file)
             elif os.path.isdir(os.path.join(pch, file)):
                 # Oh boy they compressed it with a directory and some
@@ -513,8 +552,10 @@ class PatchSave(Patch):
             # The compressed file only contained 1 patch.
             for file in os.listdir(pch):
                 name = file
-                os.rename(os.path.join(pch, file),
-                          os.path.join(pch, "{}.bin".format(patch_id)))
+                os.rename(
+                    os.path.join(pch, file),
+                    os.path.join(pch, "{}.bin".format(patch_id)),
+                )
                 patch[1]["files"][0]["filename"] = name
                 self.save_metadata_json(patch[1])
         else:
@@ -526,9 +567,10 @@ class PatchSave(Patch):
                     try:
                         name = file
                         # Rename the file to follow the conventional format
-                        os.rename(os.path.join(pch, file),
-                                  os.path.join(pch, "{}_v{}.bin".format(
-                                      patch_id, i)))
+                        os.rename(
+                            os.path.join(pch, file),
+                            os.path.join(pch, "{}_v{}.bin".format(patch_id, i)),
+                        )
                         patch[1]["files"][0]["filename"] = name
                         self.save_metadata_json(patch[1], i)
                     except FileNotFoundError or FileExistsError:
@@ -542,10 +584,8 @@ class PatchSave(Patch):
         if to_delete is not None:
             # We need to cleanup.
             for file in os.listdir(to_delete):
-                correct_pch = os.path.join(
-                    self.back_path, "{}".format(str(patch_id)))
-                shutil.copy(os.path.join(to_delete, file),
-                            os.path.join(correct_pch))
+                correct_pch = os.path.join(self.back_path, "{}".format(str(patch_id)))
+                shutil.copy(os.path.join(to_delete, file), os.path.join(correct_pch))
             try:
                 shutil.rmtree(to_delete)
             except FileNotFoundError:
@@ -553,7 +593,7 @@ class PatchSave(Patch):
 
     @staticmethod
     def _generate_patch_id(path):
-        """ Generates a 5-digit patch ID for a supplied path.
+        """Generates a 5-digit patch ID for a supplied path.
         The same string will hash to the same 5-digit identifier.
 
         return: A 5-digit hash number based on the path, as an int.

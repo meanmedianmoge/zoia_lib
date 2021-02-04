@@ -9,11 +9,11 @@ from bs4 import BeautifulSoup
 from furl import furl
 from numpy import unicode
 
-http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
+http = urllib3.PoolManager(cert_reqs="CERT_REQUIRED", ca_certs=certifi.where())
 
 
 class PatchStorage:
-    """ The PatchStorage class is responsible for all API calls to the
+    """The PatchStorage class is responsible for all API calls to the
     PatchStorage API. This includes the querying of metadata, the
     downloading of patches binaries, and determining the number of
     ZOIA patches currently stored on PatchStorage.
@@ -22,11 +22,10 @@ class PatchStorage:
     """
 
     def __init__(self):
-        """ Initializes the PatchStorage class.
-        """
+        """Initializes the PatchStorage class."""
 
         # Set defaults for query params
-        self.url = 'https://patchstorage.com/api/alpha/'
+        self.url = "https://patchstorage.com/api/alpha/"
         self.platform = 3003  # ZOIA
         try:
             self.patch_count = self._determine_patch_count()
@@ -35,7 +34,7 @@ class PatchStorage:
             pass
 
     def _search(self, more_params=None):
-        """ Make a query to the PS API.
+        """Make a query to the PS API.
         Default args:
             - page (int): current page, default 1
             - per_page (int): max number to return, default 10
@@ -73,27 +72,27 @@ class PatchStorage:
 
         if more_params is None:
             more_params = {}
-        endpoint = os.path.join(self.url, 'patches/')
+        endpoint = os.path.join(self.url, "patches/")
 
         # get param dict
         default_params = {
-            'page': 1,
-            'per_page': 25,
-            'order': 'desc',
-            'orderby': 'date',
-            'platforms': self.platform
+            "page": 1,
+            "per_page": 25,
+            "order": "desc",
+            "orderby": "date",
+            "platforms": self.platform,
         }
 
         params = {**default_params, **more_params}
 
         # make request
         url = str(furl(endpoint).add(params))
-        r = http.request('GET', url)
+        r = http.request("GET", url)
 
         return json.loads(r.data)
 
     def get_patch_meta(self, idx: str):
-        """ Get the metadata associated with a specific
+        """Get the metadata associated with a specific
         patch ID.
 
         idx: The id that the metadata will be retrieved for.
@@ -101,16 +100,16 @@ class PatchStorage:
         return: The metadata for the patch, in a MetadataSchema
                  compliant form.
         """
-        endpoint = os.path.join(self.url, 'patches/{}/'.format(idx))
+        endpoint = os.path.join(self.url, "patches/{}/".format(idx))
 
         # Make the request
-        raw_data = json.loads(http.request('GET', endpoint).data)
+        raw_data = json.loads(http.request("GET", endpoint).data)
 
         # Return the metadata
         return raw_data
 
     def download(self, idx: str):
-        """ Download a file using patch id
+        """Download a file using patch id
 
         Returns: The raw binary data for the patch if it was found,
                  None otherwise.
@@ -123,14 +122,14 @@ class PatchStorage:
 
         try:
             body = self.get_patch_meta(idx)
-            f = http.request('GET', str(body['files'][0]['url'])).data, body
+            f = http.request("GET", str(body["files"][0]["url"])).data, body
             return f
         except KeyError:
             # No patch with the supplied id was found.
             return None
 
     def get_all_patch_data_init(self):
-        """ Retrieves the initial amount of information needed for
+        """Retrieves the initial amount of information needed for
         display purposes once the user starts the application.
 
         return: A list of data, where each item contains the
@@ -138,20 +137,18 @@ class PatchStorage:
         """
 
         per_page = 100
-        search = {
-            'per_page': per_page
-        }
+        search = {"per_page": per_page}
 
         all_patches = []
 
         for page in range(1, math.ceil(self.patch_count / per_page) + 1):
             # Get all the patches on the current page.
-            all_patches.extend(self._search({**search, **{'page': page}}))
+            all_patches.extend(self._search({**search, **{"page": page}}))
 
         return all_patches
 
     def get_potential_updates(self, meta):
-        """ Queries the PS API for all patches that have an updated_at
+        """Queries the PS API for all patches that have an updated_at
         attribute that is more recent than the one present for patches
         that have been previously downloaded.
 
@@ -175,7 +172,7 @@ class PatchStorage:
         return new_bin
 
     def get_newest_patches(self, pch_num):
-        """ Queries the PS API for the latest patches that have not been
+        """Queries the PS API for the latest patches that have not been
         stored in data.json previously. This is only called after the
         initial launch of the application and only if new patches have
         been uploaded to PS since that initial launch.
@@ -190,9 +187,7 @@ class PatchStorage:
         per_page = self.patch_count - pch_num
         if per_page > 100:
             per_page = 100
-        search = {
-            'per_page': per_page
-        }
+        search = {"per_page": per_page}
 
         new_patches = []
         pages = 2
@@ -202,15 +197,15 @@ class PatchStorage:
 
         # Query for each page of patches we need to retrieve.
         if pages == 2:
-            return self._search({**search, **{'page': 1}})
+            return self._search({**search, **{"page": 1}})
         else:
             for i in range(1, pages):
-                new_patches.extend(self._search({**search, **{'page': i}}))
+                new_patches.extend(self._search({**search, **{"page": i}}))
             return new_patches
 
     @staticmethod
     def _determine_patch_count():
-        """ Determines the number of ZOIA patches that
+        """Determines the number of ZOIA patches that
         are currently being stored on PS.
         Does not count questions as patches.
 
@@ -218,27 +213,41 @@ class PatchStorage:
         """
 
         # Hi PS, yes we are a normal Firefox browser and not a program.
-        soup_patch = BeautifulSoup(urlopen(Request(
-            "https://patchstorage.com/", headers={"User-Agent": "Mozilla/5.0"})
-        ).read(), "html.parser")
-        found_pedals = soup_patch.find_all(class_="d-flex flex-column "
-                                                  "justify-content-center")
+        soup_patch = BeautifulSoup(
+            urlopen(
+                Request(
+                    "https://patchstorage.com/", headers={"User-Agent": "Mozilla/5.0"}
+                )
+            ).read(),
+            "html.parser",
+        )
+        found_pedals = soup_patch.find_all(
+            class_="d-flex flex-column " "justify-content-center"
+        )
 
         """ Convert the ResultSet to a string so we can split on what we are 
         looking for. The PS website does not have unique div names, so this
         is to workaround that.
         """
-        zoia = unicode.join(u'\n', map(unicode, found_pedals)
-                            ).split("ZOIA", 1)[1].split("<strong>", 1)[1]
+        zoia = (
+            unicode.join(u"\n", map(unicode, found_pedals))
+            .split("ZOIA", 1)[1]
+            .split("<strong>", 1)[1]
+        )
 
         # For some reason, questions posted on PS count as "patches",
         # so we need to figure out the # of questions.
         soup_ques = BeautifulSoup(
-            urlopen(Request(
-                "https://patchstorage.com/platform/zoia/?search_query=&ptype"
-                "%5B%5D=question&tax_platform=zoia&tax_post_tag=&orderby"
-                "=modified&wpas_id=search_form&wpas_submit=1",
-                headers={"User-Agent": "Mozilla/5.0"})).read(), "html.parser")
+            urlopen(
+                Request(
+                    "https://patchstorage.com/platform/zoia/?search_query=&ptype"
+                    "%5B%5D=question&tax_platform=zoia&tax_post_tag=&orderby"
+                    "=modified&wpas_id=search_form&wpas_submit=1",
+                    headers={"User-Agent": "Mozilla/5.0"},
+                )
+            ).read(),
+            "html.parser",
+        )
 
         # Return the total minus the number of questions found.
         return int(zoia[:3]) - len(soup_ques.find_all(class_="card"))

@@ -6,12 +6,12 @@ from zoia_lib.common import errors
 
 
 class PatchDelete(Patch):
-    """ The PatchDelete class is a child of the Patch class. It is
+    """The PatchDelete class is a child of the Patch class. It is
     responsible for patch deletion operations.
     """
 
     def __init__(self):
-        """ Initialize the class such that it has a reference to the
+        """Initialize the class such that it has a reference to the
         backend path.
         """
 
@@ -48,10 +48,15 @@ class PatchDelete(Patch):
                 # extension on the remaining patch.
                 for left_files in os.listdir(new_path):
                     try:
-                        os.rename(os.path.join(new_path, left_files),
-                                  os.path.join(new_path, "{}.{}".format(
-                                      left_files.split("_")[0],
-                                      left_files.split(".")[-1])))
+                        os.rename(
+                            os.path.join(new_path, left_files),
+                            os.path.join(
+                                new_path,
+                                "{}.{}".format(
+                                    left_files.split("_")[0], left_files.split(".")[-1]
+                                ),
+                            ),
+                        )
                     except FileNotFoundError or FileExistsError:
                         raise errors.RenamingError(left_files, 601)
             elif new_path is not None and len(os.listdir(new_path)) == 0:
@@ -62,7 +67,7 @@ class PatchDelete(Patch):
             raise errors.BadPathError(patch, 301)
 
     def delete_full_patch_directory(self, patch_dir):
-        """ Forces the deletion of an entire patch directory, should
+        """Forces the deletion of an entire patch directory, should
         one exist.
 
         Please note that this method will not attempt to correct invalid
@@ -86,7 +91,7 @@ class PatchDelete(Patch):
 
     @staticmethod
     def delete_patch_sd(index, sd_path):
-        """ Attempts to delete a patch located on an inserted SD card.
+        """Attempts to delete a patch located on an inserted SD card.
 
         This method relies on the user leaving the SD card inserted
         while the deletion occurs. Otherwise, corruption is likely
@@ -123,7 +128,7 @@ class PatchDelete(Patch):
 
     @staticmethod
     def delete_file(path):
-        """ Deletes a file at the specified path.
+        """Deletes a file at the specified path.
 
         path: The path at which the file to be deleted is located.
 

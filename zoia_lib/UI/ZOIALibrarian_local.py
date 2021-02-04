@@ -4,8 +4,13 @@ import os
 
 from PySide2 import QtCore
 from PySide2.QtCore import QEvent, QThread
-from PySide2.QtWidgets import QMainWindow, QMessageBox, QInputDialog, \
-    QPushButton, QSpinBox
+from PySide2.QtWidgets import (
+    QMainWindow,
+    QMessageBox,
+    QInputDialog,
+    QPushButton,
+    QSpinBox,
+)
 
 from zoia_lib.backend.patch_update import PatchUpdate
 from zoia_lib.common import errors
@@ -14,7 +19,7 @@ update = PatchUpdate()
 
 
 class ZOIALibrarianLocal(QMainWindow):
-    """ The ZOIALibrarianLocal class is responsible for all
+    """The ZOIALibrarianLocal class is responsible for all
     activities contained within the Local Storage View tab of the
     application, along with some activities contained within the Banks
     tab. This added responsibility is due to the fact that the Banks
@@ -24,7 +29,7 @@ class ZOIALibrarianLocal(QMainWindow):
     """
 
     def __init__(self, ui, path, sd, msg, window, expt, delete, f1):
-        """ Initializes the class with the required parameters.
+        """Initializes the class with the required parameters.
 
         ui: The UI component of ZOIALibrarianMain
         path: A String representing the path to the backend application
@@ -72,18 +77,19 @@ class ZOIALibrarianLocal(QMainWindow):
         self.viz_disable()
 
     def metadata_init(self):
-        """ Upon startup, check if patch metadata includes a rating.
+        """Upon startup, check if patch metadata includes a rating.
         If not, add it to all patches with a default value of 0.
         """
 
         for patch in os.listdir(self.path):
-            if os.path.isdir(os.path.join(self.path, patch)) \
-                    and len(
-                os.listdir(os.path.join(self.path, patch))) >= 2 \
-                    and patch != "Banks" and patch != "temp":
+            if (
+                os.path.isdir(os.path.join(self.path, patch))
+                and len(os.listdir(os.path.join(self.path, patch))) >= 2
+                and patch != "Banks"
+                and patch != "temp"
+            ):
                 # Need to update all versions
-                for version in glob.glob(os.path.join(self.path,
-                                                      patch, '*json')):
+                for version in glob.glob(os.path.join(self.path, patch, "*json")):
                     with open(version, "r") as f:
                         temp = json.loads(f.read())
                         if "rating" in temp:
@@ -95,7 +101,7 @@ class ZOIALibrarianLocal(QMainWindow):
                                 json.dump(temp, f_new)
 
     def create_rating_ticker(self, i, rating):
-        """ Creates the rating ticker that is displayed on the Local Storage
+        """Creates the rating ticker that is displayed on the Local Storage
         View tab's QTableView. Each QSpinBox is mapped to a row, representing
         the rating of the patch.
 
@@ -116,7 +122,7 @@ class ZOIALibrarianLocal(QMainWindow):
         self.ui.table_local.setCellWidget(i, 4, rate_tkr)
 
     def create_expt_and_del_btns(self, btn, i, idx, ver):
-        """ Creates the export and delete buttons that are displayed on
+        """Creates the export and delete buttons that are displayed on
         the Local Storage View tab's QTableView. Each button is mapped
         to a respective function. Namely, initiate_export() and
         initiate_delete().
@@ -157,7 +163,7 @@ class ZOIALibrarianLocal(QMainWindow):
         self.ui.table_local.setCellWidget(i, 6, del_btn)
 
     def get_local_patches(self):
-        """ Retrieves the metadata for patches that a user has previously
+        """Retrieves the metadata for patches that a user has previously
         downloaded and saved to their machine's backend.
         """
 
@@ -171,9 +177,14 @@ class ZOIALibrarianLocal(QMainWindow):
 
         for patches in os.listdir(self.path):
             # Look for patch directories in the backend.
-            if patches != "Banks" and patches != "data.json" and \
-                    patches != '.DS_Store' and patches != "pref.json" and \
-                    patches != "temp" and patches != "temp.zip":
+            if (
+                patches != "Banks"
+                and patches != "data.json"
+                and patches != ".DS_Store"
+                and patches != "pref.json"
+                and patches != "temp"
+                and patches != "temp.zip"
+            ):
                 for pch in os.listdir(os.path.join(self.path, patches)):
                     # Read the metadata so that we can set up the tables.
                     if pch.split(".")[-1] == "json":
@@ -184,23 +195,25 @@ class ZOIALibrarianLocal(QMainWindow):
         self.sort_and_set()
 
     def initiate_delete(self):
-        """ Attempts to delete a patch that is stored on a user's local
+        """Attempts to delete a patch that is stored on a user's local
         filesystem.
         """
 
         # Check to see if we are deleting in a version directory or not.
         if "_" not in self.sender().objectName():
-            if not self.ui.back_btn_local.isEnabled() and \
-                    len(os.listdir(os.path.join(
-                        self.path, self.sender().objectName()))) > 2:
-                self.delete.delete_full_patch_directory(
-                    self.sender().objectName())
+            if (
+                not self.ui.back_btn_local.isEnabled()
+                and len(os.listdir(os.path.join(self.path, self.sender().objectName())))
+                > 2
+            ):
+                self.delete.delete_full_patch_directory(self.sender().objectName())
             else:
                 self.delete.delete_patch(self.sender().objectName())
             self.get_local_patches()
         else:
             self.delete.delete_patch(
-                os.path.join(self.curr_ver, self.sender().objectName()))
+                os.path.join(self.curr_ver, self.sender().objectName())
+            )
             self.get_version_patches(self.ui.tabs.currentIndex() == 1)
 
         # Reset the text browser.
@@ -208,14 +221,13 @@ class ZOIALibrarianLocal(QMainWindow):
 
         # Special case, we only have one patch in a version history after
         # a deletion.
-        if self.ui.back_btn_local.isEnabled() \
-                and self.ui.table_local.rowCount() == 1:
+        if self.ui.back_btn_local.isEnabled() and self.ui.table_local.rowCount() == 1:
             self.get_local_patches()
             self.ui.back_btn_local.setEnabled(False)
             self.ui.searchbar_local.setText("")
 
     def initiate_export(self):
-        """ Attempts to export a patch saved in the backend to an SD
+        """Attempts to export a patch saved in the backend to an SD
         card. This requires that the user has previously set their SD
         card path using sd_path(). Should the patch be missing, a
         message prompt will inform the user that it must be specified.
@@ -234,6 +246,9 @@ class ZOIALibrarianLocal(QMainWindow):
         export: Helper class to access backend exporting methods.
         """
 
+        export_path = self.sd.get_export_path()
+        export_dir = self.sd.get_export_path().split("/")[-1]
+
         # Exporting this way will only export to a directory named "to_zoia"
         # So we need to check if it exists. If it doesn't, we create it.
         if self.sd.get_sd_root() is None:
@@ -246,17 +261,15 @@ class ZOIALibrarianLocal(QMainWindow):
             self.sd.sd_path(False, self.window.width())
             self.msg.setInformativeText(None)
         else:
-            if "to_zoia" not in os.listdir(self.sd.get_sd_root()):
-                os.mkdir(os.path.join(self.sd.get_sd_root(), "to_zoia"))
+            if export_dir not in os.listdir(self.sd.get_sd_root()):
+                os.mkdir(os.path.join(self.sd.get_sd_root(), export_dir))
 
             # Get the patch(es) which we're exporting
             idx = self.sender().objectName()
 
             # Find the first open slot in the export dir
-            if len(os.listdir(os.path.join(self.sd.get_sd_root(),
-                                           "to_zoia"))) > 0:
-                for pch in sorted(os.listdir(os.path.join(
-                        self.sd.get_sd_root(), "to_zoia"))):
+            if len(os.listdir(export_path)) > 0:
+                for pch in sorted(os.listdir(export_path)):
                     first_open_slot = int(pch[1:3]) + 1
             else:
                 first_open_slot = 0
@@ -264,69 +277,84 @@ class ZOIALibrarianLocal(QMainWindow):
             while True:
                 # Ask for a slot
                 slot, ok = QInputDialog().getInt(
-                    self.window, "Patch Export", "Slot number:",
-                    first_open_slot, minValue=0, maxValue=63)
+                    self.window,
+                    "Exporting to: {}".format(export_dir),
+                    "Slot number:",
+                    first_open_slot,
+                    minValue=0,
+                    maxValue=63,
+                )
                 if ok:
                     self.ui.statusbar.showMessage("Patches be movin'", timeout=5000)
                     # Got a slot and the user hit "OK"
-                    if ("_" not in idx and len(os.listdir(os.path.join(
-                            self.path, idx))) == 2) or "_" in idx:
+                    if (
+                        "_" not in idx
+                        and len(os.listdir(os.path.join(self.path, idx))) == 2
+                    ) or "_" in idx:
                         # Not working within a version directory.
                         # Just a single patch
                         try:
-                            self.export.export_patch_bin(idx, os.path.join(
-                                self.sd.get_sd_root(), "to_zoia"), slot)
-                            self.ui.statusbar.showMessage("Export complete.",
-                                                          timeout=5000)
+                            self.export.export_patch_bin(idx, export_path, slot)
+                            self.ui.statusbar.showMessage(
+                                "Export complete.", timeout=5000
+                            )
                             break
                         except errors.ExportingError:
                             # There was already a patch in that slot.
                             # Find its name and display to the user to confirm.
-                            for pch in sorted(os.listdir(os.path.join(
-                                    self.sd.get_sd_root(), "to_zoia"))):
-                                if pch[:3] == "00{}".format(slot) or \
-                                        pch[:3] == "0{}".format(slot):
-                                    name = pch[9:].split('.')[0].replace(
-                                        '_', ' ').title()
+                            for pch in sorted(os.listdir(export_path)):
+                                if pch[:3] == "00{}".format(slot) or pch[
+                                    :3
+                                ] == "0{}".format(slot):
+                                    name = (
+                                        pch[9:].split(".")[0].replace("_", " ").title()
+                                    )
                                 else:
                                     name = "another patch"
                             self.msg.setWindowTitle("Slot Exists")
                             self.msg.setIcon(QMessageBox.Information)
                             self.msg.setText(
                                 "That slot is occupied by {}. "
-                                "Would you like to overwrite it?".format(name))
-                            self.msg.setStandardButtons(QMessageBox.Yes |
-                                                        QMessageBox.No)
+                                "Would you like to overwrite it?".format(name)
+                            )
+                            self.msg.setStandardButtons(
+                                QMessageBox.Yes | QMessageBox.No
+                            )
                             value = self.msg.exec_()
                             if value == QMessageBox.Yes:
                                 # Overwrite the other patch.
-                                self.export.export_patch_bin(idx, os.path.join(
-                                    self.sd.get_sd_root(), "to_zoia"), slot, True)
+                                self.export.export_patch_bin(
+                                    idx, export_path, slot, True
+                                )
                                 self.ui.statusbar.showMessage(
-                                    "Export complete.", timeout=5000)
+                                    "Export complete.", timeout=5000
+                                )
                                 break
 
                     else:
                         # An entire version directory was selected.
-                        pch_num = int((len(os.listdir(os.path.join(
-                            self.path, idx))) / 2) - 1)
+                        pch_num = int(
+                            (len(os.listdir(os.path.join(self.path, idx))) / 2) - 1
+                        )
                         if slot + pch_num > 63:
                             self.msg.setWindowTitle("No Space")
                             self.msg.setIcon(QMessageBox.Information)
                             self.msg.setText(
                                 "The version directory contains {} patches, "
                                 "so it must be exported to slot {} or lower.".format(
-                                    pch_num + 1, 63 - pch_num))
+                                    pch_num + 1, 63 - pch_num
+                                )
+                            )
                             self.msg.setStandardButtons(QMessageBox.Ok)
                             self.msg.exec_()
                         else:
                             # Need to see how many slots are being replaced.
                             count = 0
                             for slot_check in range(slot, slot + pch_num + 1):
-                                for pch in sorted(os.listdir(os.path.join(
-                                        self.sd.get_sd_root(), "to_zoia"))):
-                                    if pch[:3] == "00{}".format(slot_check) or \
-                                            pch[:3] == "0{}".format(slot_check):
+                                for pch in sorted(os.listdir(export_path)):
+                                    if pch[:3] == "00{}".format(slot_check) or pch[
+                                        :3
+                                    ] == "0{}".format(slot_check):
                                         count += 1
                             if count > 0:
                                 # Remove all of the patches that are in the way.
@@ -334,33 +362,43 @@ class ZOIALibrarianLocal(QMainWindow):
                                 self.msg.setIcon(QMessageBox.Information)
                                 self.msg.setText(
                                     "Those slots are occupied by {} patches. "
-                                    "Would you like to overwrite them?".format(count))
-                                self.msg.setStandardButtons(QMessageBox.Yes |
-                                                            QMessageBox.No)
+                                    "Would you like to overwrite them?".format(count)
+                                )
+                                self.msg.setStandardButtons(
+                                    QMessageBox.Yes | QMessageBox.No
+                                )
                                 value = self.msg.exec_()
                                 if value == QMessageBox.Yes:
                                     # Overwrite the other patches.
-                                    for ver in sorted(os.listdir(os.path.join(self.path, idx))):
-                                        if ver.endswith('.bin'):
-                                            self.export.export_patch_bin(ver, os.path.join(
-                                                self.sd.get_sd_root(), "to_zoia"), slot, True)
+                                    for ver in sorted(
+                                        os.listdir(os.path.join(self.path, idx))
+                                    ):
+                                        if ver.endswith(".bin"):
+                                            self.export.export_patch_bin(
+                                                ver, export_path, slot, True
+                                            )
                                             self.ui.statusbar.showMessage(
-                                                "Export complete.", timeout=5000)
+                                                "Export complete.", timeout=5000
+                                            )
                                             slot += 1
                                     break
                             else:
-                                for ver in sorted(os.listdir(os.path.join(self.path, idx))):
-                                    if ver.endswith('.bin'):
-                                        self.export.export_patch_bin(ver, os.path.join(
-                                            self.sd.get_sd_root(), "to_zoia"), slot)
+                                for ver in sorted(
+                                    os.listdir(os.path.join(self.path, idx))
+                                ):
+                                    if ver.endswith(".bin"):
+                                        self.export.export_patch_bin(
+                                            ver, export_path, slot
+                                        )
                                         self.ui.statusbar.showMessage(
-                                            "Export complete.", timeout=5000)
+                                            "Export complete.", timeout=5000
+                                        )
                                         slot += 1
                 # Operation was aborted.
                 break
 
     def get_version_patches(self, context, idx=None):
-        """ Retrieves the versions of a patch that is locally stored to
+        """Retrieves the versions of a patch that is locally stored to
         a user's backend local storage.
 
         context: True for the Local Storage View tab, False for the
@@ -397,7 +435,7 @@ class ZOIALibrarianLocal(QMainWindow):
         self.sort_and_set()
 
     def update_local_patches_thread(self):
-        """ Initializes a Worker thread to manage the updating of
+        """Initializes a Worker thread to manage the updating of
         patches currently stored on a user's machine.
         Currently triggered via a button press.
         """
@@ -410,7 +448,7 @@ class ZOIALibrarianLocal(QMainWindow):
         self.worker_updates.start()
 
     def update_local_patches_done(self, count):
-        """ Notifies the user once all local patches have been checked
+        """Notifies the user once all local patches have been checked
         for updates. Will also notify the user of which patches were
         updated (should any actually update).
 
@@ -423,8 +461,9 @@ class ZOIALibrarianLocal(QMainWindow):
         if count[0] == 0:
             self.msg.setWindowTitle("No Updates")
             self.msg.setIcon(QMessageBox.Information)
-            self.msg.setText("All of the patches you have downloaded are "
-                             "the latest version.")
+            self.msg.setText(
+                "All of the patches you have downloaded are " "the latest version."
+            )
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
         else:
@@ -434,8 +473,7 @@ class ZOIALibrarianLocal(QMainWindow):
                 self.msg.setText("Successfully updated 1 patch:")
                 self.msg.setDetailedText("\t* {}".format(count[1][0]))
             else:
-                self.msg.setText(
-                    "Successfully updated {} patches:".format(count))
+                self.msg.setText("Successfully updated {} patches:".format(count))
                 text = ""
                 for i in range(count[0]):
                     text += "\t* {}\n".format(count[1][i])
@@ -448,7 +486,7 @@ class ZOIALibrarianLocal(QMainWindow):
         self.ui.btn_dwn_all.setEnabled(True)
 
     def go_back(self):
-        """ Returns to the default local patch screen.
+        """Returns to the default local patch screen.
         Currently triggered via a button press.
         """
 
@@ -471,7 +509,7 @@ class ZOIALibrarianLocal(QMainWindow):
         self.sort_and_set()
 
     def update_rating(self, value):
-        """ Updates the rating for a locally downloaded patch.
+        """Updates the rating for a locally downloaded patch.
         Currently triggered via a valueChanged event from a QSpinBox.
 
         value: The value the rating was changed to.
@@ -484,11 +522,11 @@ class ZOIALibrarianLocal(QMainWindow):
             update.update_data(idx, value, 6)
         except FileNotFoundError:
             for ver in sorted(os.listdir(os.path.join(self.path, idx))):
-                if ver.endswith('.json'):
-                    update.update_data(ver.split('.')[0], value, 6)
+                if ver.endswith(".json"):
+                    update.update_data(ver.split(".")[0], value, 6)
 
     def update_patch_notes(self):
-        """ Updates the patch notes for a patch that has been previously
+        """Updates the patch notes for a patch that has been previously
         locally saved to a user's machine.
         Currently triggered via a button click.
         """
@@ -501,11 +539,10 @@ class ZOIALibrarianLocal(QMainWindow):
             update.update_data(self.local_selected, text.strip("\n"), 3)
         except IndexError:
             update.update_data(self.local_selected, "", 3)
-        self.ui.statusbar.showMessage("Successfully updated patch notes.",
-                                      timeout=5000)
+        self.ui.statusbar.showMessage("Successfully updated patch notes.", timeout=5000)
 
     def update_tags_cats(self, text, mode, idx):
-        """ Updates the tags or categories for a locally downloaded
+        """Updates the tags or categories for a locally downloaded
         patch.
 
         text: The text used to discern tags and categories from.
@@ -532,15 +569,11 @@ class ZOIALibrarianLocal(QMainWindow):
                 curr = curr.strip()
                 if " and " in curr and curr[0] != " ":
                     # They listed tags as "... and ..."
-                    done.append({
-                        "name": curr.split(" and ")[0]
-                    })
+                    done.append({"name": curr.split(" and ")[0]})
                     curr = curr.split(" and ")[1]
                 elif "and " in curr and curr[0:3] == "and":
                     curr = curr.split("and ")[1]
-                done.append({
-                    "name": curr
-                })
+                done.append({"name": curr})
             # Determine the context and update the metadata.
             if mode:
                 update.update_data(idx, done, 1)
@@ -555,7 +588,7 @@ class ZOIALibrarianLocal(QMainWindow):
         self.prev_tag_cat = None
 
     def events(self, e):
-        """ Handles events that relate updating the tags/categories
+        """Handles events that relate updating the tags/categories
         for patches located in the Local Storage View tab's table.
 
         e: The event that was initiated.
@@ -568,34 +601,41 @@ class ZOIALibrarianLocal(QMainWindow):
             else:
                 # Get the next text and if it differs, update the metadata.
                 new_text = self.ui.table_local.item(
-                    self.prev_tag_cat[0], self.prev_tag_cat[1]).text()
+                    self.prev_tag_cat[0], self.prev_tag_cat[1]
+                ).text()
                 # Check if there was no change or we're in columns that
                 # shouldn't be updated via a FocusIn//doubleClick.
-                if new_text == self.prev_tag_cat[2] \
-                        or self.ui.table_local.currentColumn() == 3 \
-                        or self.ui.table_local.currentColumn() == 4:
+                if (
+                    new_text == self.prev_tag_cat[2]
+                    or self.ui.table_local.currentColumn() == 3
+                    or self.ui.table_local.currentColumn() == 4
+                ):
                     return
                 else:
-                    self.update_tags_cats(new_text, self.prev_tag_cat[1] == 1,
-                                          self.ui.table_local.cellWidget(
-                                              self.ui.table_local.currentRow(),
-                                              0).objectName())
+                    self.update_tags_cats(
+                        new_text,
+                        self.prev_tag_cat[1] == 1,
+                        self.ui.table_local.cellWidget(
+                            self.ui.table_local.currentRow(), 0
+                        ).objectName(),
+                    )
                     return
         elif e.type() == QEvent.FocusOut:
             try:
                 # Figure out what the previous tag/cat was now that we are
                 # no longer in edit mode.
                 if self.ui.table_local.currentColumn() != 3:
-                    self.prev_tag_cat = \
-                        (self.ui.table_local.currentRow(),
-                         self.ui.table_local.currentColumn(),
-                         self.ui.table_local.selectedItems()[0].text())
+                    self.prev_tag_cat = (
+                        self.ui.table_local.currentRow(),
+                        self.ui.table_local.currentColumn(),
+                        self.ui.table_local.selectedItems()[0].text(),
+                    )
                 return
             except IndexError:
                 return
 
     def setup_viz(self, viz):
-        """ Prepares the patch visualizer once a patch has been
+        """Prepares the patch visualizer once a patch has been
         selected.
         Currently triggered via a button press.
 
@@ -610,7 +650,8 @@ class ZOIALibrarianLocal(QMainWindow):
         self.curr_page_viz = 0
         self.curr_viz = viz
 
-        self.ui.text_browser_viz.setText("""<html>
+        self.ui.text_browser_viz.setText(
+            """<html>
             <b><h2> {} </b></h2>
             Est CPU: {} <br>
             Inputs: {} <br>
@@ -631,11 +672,11 @@ class ZOIALibrarianLocal(QMainWindow):
             )
         )
 
-        self.ui.page_label.setText("""<html>
+        self.ui.page_label.setText(
+            """<html>
             Page {}: {}
             </html>""".format(
-                str(self.curr_page_viz),
-                viz["pages"][self.curr_page_viz]
+                str(self.curr_page_viz), viz["pages"][self.curr_page_viz]
             )
         )
 
@@ -643,7 +684,7 @@ class ZOIALibrarianLocal(QMainWindow):
         self.set_viz()
 
     def viz_page(self):
-        """ Either increases or decreases the current visualizer page,
+        """Either increases or decreases the current visualizer page,
         depending on which button was pressed.
         Currently triggered via a button press.
         """
@@ -661,7 +702,8 @@ class ZOIALibrarianLocal(QMainWindow):
         # Load the viz for the new page.
         self.set_viz()
 
-        self.ui.text_browser_viz.setText("""<html>
+        self.ui.text_browser_viz.setText(
+            """<html>
             <b><h2> {} </b></h2>
             Est CPU: {} <br>
             Inputs: {} <br>
@@ -683,21 +725,22 @@ class ZOIALibrarianLocal(QMainWindow):
         )
 
         # Update the page number.
-        self.ui.page_label.setText("""<html>
+        self.ui.page_label.setText(
+            """<html>
             Page {}: {}
             </html>""".format(
-                str(self.curr_page_viz),
-                self.curr_viz["pages"][self.curr_page_viz]
+                str(self.curr_page_viz), self.curr_viz["pages"][self.curr_page_viz]
             )
         )
 
     def viz_reset(self):
-        """ Resets the display text to show the patch-level details.
+        """Resets the display text to show the patch-level details.
         Only works if you are zoomed into a module-level block.
         Currently triggered via a button press.
         """
 
-        self.ui.text_browser_viz.setText("""<html>
+        self.ui.text_browser_viz.setText(
+            """<html>
             <b><h2> {} </b></h2>
             Est CPU: {} <br>
             Inputs: {} <br>
@@ -721,7 +764,7 @@ class ZOIALibrarianLocal(QMainWindow):
         self.ui.back_btn.setEnabled(False)
 
     def viz_display(self):
-        """ Displays additional information about a module that appears
+        """Displays additional information about a module that appears
         on the visualizer.
         Currently triggered via a button press.
         """
@@ -729,10 +772,13 @@ class ZOIALibrarianLocal(QMainWindow):
         self.ui.back_btn.setEnabled(True)
         btn_num = int(self.sender().objectName().split("_")[-1])
         for curr_module in self.curr_viz["modules"]:
-            if curr_module["page"] == self.curr_page_viz and \
-                    btn_num in curr_module["position"]:
+            if (
+                curr_module["page"] == self.curr_page_viz
+                and btn_num in curr_module["position"]
+            ):
                 # Output the data for that module.
-                self.ui.text_browser_viz.setText("""<html>
+                self.ui.text_browser_viz.setText(
+                    """<html>
                     <b><h2> {} </b></h2>
                     Type: {} <br>
                     {} <br>
@@ -740,19 +786,19 @@ class ZOIALibrarianLocal(QMainWindow):
                     {} <br>
                     {}
                     </html>""".format(
-                        curr_module["type"] if curr_module["name"] == ""
-                            else curr_module["name"],
+                        curr_module["type"]
+                        if curr_module["name"] == ""
+                        else curr_module["name"],
                         curr_module["type"],
                         self._parse_dict_for_html(curr_module["options"]),
                         self._parse_dict_for_html(curr_module["parameters"]),
                         self._parse_list_for_html(curr_module["starred"]),
-                        self._parse_list_for_html(curr_module["connections"])
+                        self._parse_list_for_html(curr_module["connections"]),
                     )
                 )
 
     def set_viz(self):
-        """ Sets the visualizer for the current page of the patch.
-        """
+        """Sets the visualizer for the current page of the patch."""
 
         # Reset the buttons.
         self.viz_disable()
@@ -766,27 +812,30 @@ class ZOIALibrarianLocal(QMainWindow):
                         break
                     curr_btn = self.get_btn(btn)
                     color_hex = self._get_color_hex(curr_module["color"])
-                    curr_btn.setStyleSheet("QPushButton{background-color:"
-                                           + color_hex + ";"
-                                           + "border: 1px solid #696969;}"
-                                           + "QPushButton:hover{"
-                                           + "border: 5px solid #000000;}")
+                    curr_btn.setStyleSheet(
+                        "QPushButton{background-color:"
+                        + color_hex
+                        + ";"
+                        + "border: 1px solid #696969;}"
+                        + "QPushButton:hover{"
+                        + "border: 5px solid #000000;}"
+                    )
 
                     curr_btn.setEnabled(True)
 
     def viz_disable(self):
-        """ Disables all internal visualizer buttons.
-        """
+        """Disables all internal visualizer buttons."""
 
         for i in range(40):
             curr_btn = self.get_btn(i)
             curr_btn.setEnabled(False)
-            curr_btn.setStyleSheet("border: 1px solid #696969;"
-                                   "background-color: gray;")
+            curr_btn.setStyleSheet(
+                "border: 1px solid #696969;" "background-color: gray;"
+            )
 
     @staticmethod
     def _get_color_hex(color):
-        """ Lookup table to get the correct hex value for a given color.
+        """Lookup table to get the correct hex value for a given color.
 
         color: The color for which the hex value is being looked up.
         return: The correct hex value for the color as a string.
@@ -807,11 +856,11 @@ class ZOIALibrarianLocal(QMainWindow):
             "Purple": "#A020F0",
             "Pink": "#FF007F",
             "Peach": "#FFE5B4",
-            "Mango": "#FF8243"
+            "Mango": "#FF8243",
         }[color]
 
     def get_btn(self, index):
-        """ Lookup table to get the correct UI button for the visualizer
+        """Lookup table to get the correct UI button for the visualizer
 
         index: The index that corresponds to the UI button.
         return:
@@ -861,40 +910,38 @@ class ZOIALibrarianLocal(QMainWindow):
         }[index]
 
     def get_data_local(self):
-        """ Gets the data for the patches in the Local Storage View tab
+        """Gets the data for the patches in the Local Storage View tab
         table.
         """
 
         return self.data_local
 
     def get_data_local_version(self):
-        """ Gets the version data for a patch in the Local Storage View
+        """Gets the version data for a patch in the Local Storage View
         tab table.
         """
 
         return self.data_local_version
 
     def get_data_bank(self):
-        """ Gets the data for the patches in the Banks tab table.
-        """
+        """Gets the data for the patches in the Banks tab table."""
 
         return self.data_bank
 
     def get_data_bank_version(self):
-        """ Gets the version data for a patch in the Banks tab table.
-        """
+        """Gets the version data for a patch in the Banks tab table."""
 
         return self.data_bank_version
 
     def get_prev_tag_cat(self):
-        """ Gets the previous tag/category text.
+        """Gets the previous tag/category text.
         Can be None if it has not been set.
         """
 
         return self.prev_tag_cat
 
     def set_prev_tag_cat(self, data):
-        """ Sets the previous tag/category text.
+        """Sets the previous tag/category text.
 
         data: The previous tag/category text to be set.
         """
@@ -902,7 +949,7 @@ class ZOIALibrarianLocal(QMainWindow):
         self.prev_tag_cat = data
 
     def set_local_selected(self, data):
-        """ Sets the previous locally selected item.
+        """Sets the previous locally selected item.
 
         data: The previous locally selected item to be set.
         """
@@ -910,7 +957,7 @@ class ZOIALibrarianLocal(QMainWindow):
         self.local_selected = data
 
     def set_prev_search(self, data):
-        """ Sets the previous search term.
+        """Sets the previous search term.
 
         data: The previous search term that will be set.
         """
@@ -919,45 +966,47 @@ class ZOIALibrarianLocal(QMainWindow):
 
     @staticmethod
     def _parse_dict_for_html(dct):
-        """ Parse out items in dictionary into newlines for html.
+        """Parse out items in dictionary into newlines for html.
 
         dct: Input dictionary.
 
         return: Parsed html.
         """
 
-        return json.dumps(
-            list(dct.items())
-        ).replace("[[", "["
-                  ).replace("]]", "]"
-                            ).replace('",', '":'
-                                      ).replace(", ", "<br>"
-                                                ).replace("[", ""
-                                                          ).replace("]", ""
-                                                                    ).replace('"', "")
+        return (
+            json.dumps(list(dct.items()))
+            .replace("[[", "[")
+            .replace("]]", "]")
+            .replace('",', '":')
+            .replace(", ", "<br>")
+            .replace("[", "")
+            .replace("]", "")
+            .replace('"', "")
+        )
 
     @staticmethod
     def _parse_list_for_html(lst):
-        """ Parse out items in list into newlines for html.
+        """Parse out items in list into newlines for html.
 
         lst: Input list.
 
         return: Parsed html.
         """
 
-        return json.dumps(
-            lst
-        ).replace("[[", "["
-                  ).replace("]]", "]"
-                            ).replace('",', "<br>"
-                                      ).replace(", ", "<br>"
-                                                ).replace("[", ""
-                                                          ).replace("]", ""
-                                                                    ).replace('"', "")
+        return (
+            json.dumps(lst)
+            .replace("[[", "[")
+            .replace("]]", "]")
+            .replace('",', "<br>")
+            .replace(", ", "<br>")
+            .replace("[", "")
+            .replace("]", "")
+            .replace('"', "")
+        )
 
 
 class UpdatesWorker(QThread):
-    """ The UpdatesWorker class runs as a separate thread in the
+    """The UpdatesWorker class runs as a separate thread in the
     application to prevent application snag. This thread will attempt
     to update every patches stored in the .ZoiaLibraryApp directory.
     """
@@ -966,13 +1015,12 @@ class UpdatesWorker(QThread):
     signal = QtCore.Signal(list)
 
     def __init__(self):
-        """ Initializes the thread.
-        """
+        """Initializes the thread."""
 
         QThread.__init__(self)
 
     def run(self):
-        """ Attempts to update any patch that is stored in the user's
+        """Attempts to update any patch that is stored in the user's
         backend directory.
         Currently triggered via a button press.
         """

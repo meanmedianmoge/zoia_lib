@@ -6,7 +6,7 @@ from zoia_lib.common import errors
 
 
 def sort_metadata(mode, data, rev):
-    """ Sort an array of metadata based on the passed parameters.
+    """Sort an array of metadata based on the passed parameters.
 
     mode: The method in which the data will be sorted. Valid modes are:
           - 1 -> Sort by title
@@ -40,35 +40,39 @@ def sort_metadata(mode, data, rev):
         data.sort(key=lambda x: x["title"].upper(), reverse=rev)
     elif mode == 2:
         # Sort by author
-        data.sort(key=lambda x: x["author"]["name"].upper()
-                  if "author" in x else "", reverse=rev)
+        data.sort(
+            key=lambda x: x["author"]["name"].upper() if "author" in x else "",
+            reverse=rev,
+        )
     elif mode == 3:
         # Sort by like count.
-        data.sort(key=lambda x: x["like_count"] if "like_count" in x else 0,
-                  reverse=rev)
+        data.sort(
+            key=lambda x: x["like_count"] if "like_count" in x else 0, reverse=rev
+        )
     elif mode == 4:
         # Sort by download count.
-        data.sort(key=lambda x: x["download_count"]
-                  if "download_count" in x else 0, reverse=rev)
+        data.sort(
+            key=lambda x: x["download_count"] if "download_count" in x else 0,
+            reverse=rev,
+        )
     elif mode == 5:
         # Sort by view count.
-        data.sort(key=lambda x: x["view_count"] if "view_count" in x else 0,
-                  reverse=rev)
+        data.sort(
+            key=lambda x: x["view_count"] if "view_count" in x else 0, reverse=rev
+        )
     elif mode == 6:
         # Sort by date modified
         data.sort(key=lambda x: x["updated_at"].upper(), reverse=rev)
     elif mode == 7:
         # Sort by revision #
-        data.sort(key=lambda x: x["revision"] if "revision" in x else 0,
-                  reverse=rev)
+        data.sort(key=lambda x: x["revision"] if "revision" in x else 0, reverse=rev)
     elif mode == 8:
         # Sort by rating (local and bank tabs only)
-        data.sort(key=lambda x: x["rating"] if "rating" in x else 0,
-                  reverse=rev)
+        data.sort(key=lambda x: x["rating"] if "rating" in x else 0, reverse=rev)
 
 
 def search_patches(data, query):
-    """ Search an array of metadata based on the passed parameters. The
+    """Search an array of metadata based on the passed parameters. The
     search will attempt to match results using a wildcard regex system.
 
     data: An array of metadata that is to be searched through.
@@ -93,10 +97,18 @@ def search_patches(data, query):
 
     # Special case, searching for a category. Since there are a known # of
     # categories, we prioritize these first.
-    if query in "composition" or query in "effect" or query in "game" or \
-            query in "other" or query in "sampler" or query in "sequencer" or \
-            query in "sound" or query in "synthesizer" or query in "utility" \
-            or query in "video":
+    if (
+        query in "composition"
+        or query in "effect"
+        or query in "game"
+        or query in "other"
+        or query in "sampler"
+        or query in "sequencer"
+        or query in "sound"
+        or query in "synthesizer"
+        or query in "utility"
+        or query in "video"
+    ):
         for curr in data:
             if "categories" in curr:
                 # Check category tag.
@@ -110,8 +122,11 @@ def search_patches(data, query):
         if query in curr["title"].lower() and curr not in hits:
             hits.append(curr)
             continue
-        if "author" in curr and query in curr["author"]["name"].lower() \
-                and curr not in hits:
+        if (
+            "author" in curr
+            and query in curr["author"]["name"].lower()
+            and curr not in hits
+        ):
             hits.append(curr)
             continue
         if "tags" in curr:
@@ -130,11 +145,11 @@ def search_patches(data, query):
 
 
 def natural_key(string_):
-    return [int(s) if s.isdigit() else s for s in re.split(r'(\d+)', string_)]
+    return [int(s) if s.isdigit() else s for s in re.split(r"(\d+)", string_)]
 
 
 def hide_dotted_files(path):
-    """ Removes hidden files from a list of files in a directory.
+    """Removes hidden files from a list of files in a directory.
 
     directory: List of files.
 
@@ -143,15 +158,14 @@ def hide_dotted_files(path):
 
     files = []
     for item in sorted(os.listdir(path)):
-        if not item.startswith(".") and \
-             os.path.isfile(os.path.join(path, item)):
+        if not item.startswith(".") and os.path.isfile(os.path.join(path, item)):
             files.append(os.path.join(path, item))
 
     return files[::-1]
 
 
 def add_test_patch(name, idx, path):
-    """ Note: This method is for testing purposes only.
+    """Note: This method is for testing purposes only.
     Adds a test patch that can be used for unit testing purposes.
 
     name: The name of the patch, to be used for the title attribute

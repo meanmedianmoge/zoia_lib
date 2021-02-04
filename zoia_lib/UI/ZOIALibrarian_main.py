@@ -5,8 +5,14 @@ from os.path import expanduser
 from PySide2 import QtCore
 from PySide2.QtCore import QEvent, Qt, QThread
 from PySide2.QtGui import QIcon, QFont
-from PySide2.QtWidgets import QMainWindow, QMessageBox, \
-    QTableWidgetItem, QRadioButton, QDesktopWidget, QFileDialog
+from PySide2.QtWidgets import (
+    QMainWindow,
+    QMessageBox,
+    QTableWidgetItem,
+    QRadioButton,
+    QDesktopWidget,
+    QFileDialog,
+)
 
 import zoia_lib.UI.ZOIALibrarian as ui_main
 import zoia_lib.backend.utilities as util
@@ -30,7 +36,7 @@ binary = PatchBinary()
 
 
 class ZOIALibrarianMain(QMainWindow):
-    """ The ZOIALibrarian_Main class represents the frontend for the
+    """The ZOIALibrarian_Main class represents the frontend for the
     application. It allows users to interact with the various backend
     functions available. These include searching, downloading, sorting,
     and exporting patches; among other functions.
@@ -45,7 +51,7 @@ class ZOIALibrarianMain(QMainWindow):
     """
 
     def __init__(self):
-        """ Initializes the UI for the application. Currently, upon
+        """Initializes the UI for the application. Currently, upon
         being launched for the first time, it uses ZOIALibrarianPS to query
         the PS API for all ZOIA patches and gets the metadata.
         Upon subsequent launches, it will search for previously stored
@@ -65,8 +71,9 @@ class ZOIALibrarianMain(QMainWindow):
         self.path = save.get_backend_path()
 
         # Message box init
-        self.icon = QIcon(os.path.join(os.getcwd(), "zoia_lib", "UI",
-                                       "resources", "logo.ico"))
+        self.icon = QIcon(
+            os.path.join(os.getcwd(), "zoia_lib", "UI", "resources", "logo.ico")
+        )
         self.msg = QMessageBox()
         self.msg.setWindowIcon(self.icon)
 
@@ -74,10 +81,19 @@ class ZOIALibrarianMain(QMainWindow):
         self.util = ZOIALibrarianUtil(self.ui, self)
         self.sd = ZOIALibrarianSD(self.ui, save, self.msg, delete, self.util)
         self.bank = ZOIALibrarianBank(self.ui, self.path, self.msg, self.util)
-        self.ps = ZOIALibrarianPS(self.ui, api, self.path, self.msg, save,
-                                  self.sort_and_set)
-        self.local = ZOIALibrarianLocal(self.ui, self.path, self.sd, self.msg,
-                                        self, export, delete, self.sort_and_set)
+        self.ps = ZOIALibrarianPS(
+            self.ui, api, self.path, self.msg, save, self.sort_and_set
+        )
+        self.local = ZOIALibrarianLocal(
+            self.ui,
+            self.path,
+            self.sd,
+            self.msg,
+            self,
+            export,
+            delete,
+            self.sort_and_set,
+        )
 
         # Instance variables.
         self.patch_cache = []
@@ -126,8 +142,10 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.btn_clear_bank.setEnabled(False)
         self.ui.btn_export_bank.setEnabled(False)
         self.ui.delete_folder_sd_btn.setEnabled(False)
+        self.ui.set_export_dir_btn.setEnabled(True)
         self.ui.btn_load_bank.setEnabled(
-            not len(os.listdir(os.path.join(self.path, "Banks"))) == 0)
+            not len(os.listdir(os.path.join(self.path, "Banks"))) == 0
+        )
 
         # Load preferences from previous sessions (if they exist)
         while os.path.exists(os.path.join(self.path, "pref.json")):
@@ -136,6 +154,7 @@ class ZOIALibrarianMain(QMainWindow):
                 data = json.loads(f.read())
             if data[0]["sd_root"] != "" and os.path.exists(data[0]["sd_root"]):
                 self.sd.set_sd_root(data[0]["sd_root"])
+                self.sd.set_export_path(os.path.join(self.sd.sd_root, "to_zoia"))
                 self.ui.tab_sd.setEnabled(True)
                 self.sd.sd_path(True, self.width())
 
@@ -214,54 +233,47 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Connect buttons and items to methods.
         self.ui.tabs.currentChanged.connect(self.tab_switch)
-        self.ui.actionAlternating_Row_Colours.triggered.connect(
-            self.util.row_invert)
+        self.ui.actionAlternating_Row_Colours.triggered.connect(self.util.row_invert)
         self.ui.actionSort_by_title_A_Z.triggered.connect(self.sort_and_set)
         self.ui.actionSort_by_title_Z_A.triggered.connect(self.sort_and_set)
         self.ui.actionSort_by_date_new_old.triggered.connect(self.sort_and_set)
         self.ui.actionSort_by_date_old_new.triggered.connect(self.sort_and_set)
-        self.ui.actionSort_by_likes_high_low.triggered.connect(
-            self.sort_and_set)
-        self.ui.actionSort_by_likes_low_high.triggered.connect(
-            self.sort_and_set)
-        self.ui.actionSort_by_views_high_low.triggered.connect(
-            self.sort_and_set)
-        self.ui.actionSort_by_views_low_high.triggered.connect(
-            self.sort_and_set)
-        self.ui.actionSort_by_downloads_high_low.triggered.connect(
-            self.sort_and_set)
-        self.ui.actionSort_by_downloads_low_high.triggered.connect(
-            self.sort_and_set)
-        self.ui.actionSort_by_author_A_Z.triggered.connect(
-            self.sort_and_set)
-        self.ui.actionSort_by_author_Z_A.triggered.connect(
-            self.sort_and_set)
-        self.ui.actionSort_by_rating_high_low.triggered.connect(
-            self.sort_and_set)
-        self.ui.actionSort_by_rating_low_high.triggered.connect(
-            self.sort_and_set)
+        self.ui.actionSort_by_likes_high_low.triggered.connect(self.sort_and_set)
+        self.ui.actionSort_by_likes_low_high.triggered.connect(self.sort_and_set)
+        self.ui.actionSort_by_views_high_low.triggered.connect(self.sort_and_set)
+        self.ui.actionSort_by_views_low_high.triggered.connect(self.sort_and_set)
+        self.ui.actionSort_by_downloads_high_low.triggered.connect(self.sort_and_set)
+        self.ui.actionSort_by_downloads_low_high.triggered.connect(self.sort_and_set)
+        self.ui.actionSort_by_author_A_Z.triggered.connect(self.sort_and_set)
+        self.ui.actionSort_by_author_Z_A.triggered.connect(self.sort_and_set)
+        self.ui.actionSort_by_rating_high_low.triggered.connect(self.sort_and_set)
+        self.ui.actionSort_by_rating_low_high.triggered.connect(self.sort_and_set)
         self.ui.actionSpecify_SD_Card_Location.triggered.connect(
-            lambda: self.sd.sd_path(False, self.width()))
-        self.ui.actionFont.triggered.connect(
-            lambda: self.util.change_font(""))
+            lambda: self.sd.sd_path(False, self.width())
+        )
+        self.ui.actionFont.triggered.connect(lambda: self.util.change_font(""))
         self.ui.actionIncrease_Font_Size.triggered.connect(
-            lambda: self.util.change_font("+"))
+            lambda: self.util.change_font("+")
+        )
         self.ui.actionDecrease_Font_Size.triggered.connect(
-            lambda: self.util.change_font("-"))
+            lambda: self.util.change_font("-")
+        )
         self.ui.actionQuit.triggered.connect(self._try_quit)
         self.ui.check_for_updates_btn.clicked.connect(
-            self.local.update_local_patches_thread)
+            self.local.update_local_patches_thread
+        )
         # self.ui.actionImport_Multiple_Patches.triggered.connect(
         #     self._mass_import_thread)
         self.ui.actionImport_Multiple_Patches.triggered.connect(
-            self.import_multiple_menu)
+            self.import_multiple_menu
+        )
         # self.ui.actionImport_Version_History_directory.triggered.connect(
         #     self._version_import_thread)
         self.ui.actionImport_Version_History_directory.triggered.connect(
-            self.import_version_menu)
+            self.import_version_menu
+        )
         self.ui.refresh_pch_btn.clicked.connect(self.ps.reload_ps_thread)
-        self.ui.update_patch_notes.clicked.connect(
-            self.local.update_patch_notes)
+        self.ui.update_patch_notes.clicked.connect(self.local.update_patch_notes)
         self.ui.actionImport_A_Patch.triggered.connect(self.import_patch)
         self.ui.actionReset_Sizes.triggered.connect(self.reset_ui)
         self.ui.actionDocumentation.triggered.connect(self.util.documentation)
@@ -283,18 +295,18 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.searchbar_bank.installEventFilter(self)
         self.ui.sd_tree.clicked.connect(self.sd.prepare_sd_view)
         self.ui.import_all_btn.clicked.connect(self._mass_import_thread_sd)
-        self.ui.import_all_ver_btn.clicked.connect(
-            self._version_import_thread_sd)
+        self.ui.import_all_ver_btn.clicked.connect(self._version_import_thread_sd)
         self.ui.back_btn_local.clicked.connect(self.local.go_back)
         self.ui.back_btn_bank.clicked.connect(self.local.go_back)
         self.ui.btn_load_bank.clicked.connect(self.bank.load_bank)
         self.ui.btn_save_bank.clicked.connect(lambda: self.bank.save_bank(self))
         self.ui.btn_clear_bank.clicked.connect(self.bank.clear_bank)
         self.ui.btn_export_bank.clicked.connect(
-            lambda: self.bank.export_bank(self.sd, export, self))
+            lambda: self.bank.export_bank(self.sd, export, self)
+        )
         self.ui.delete_folder_sd_btn.clicked.connect(self.sd.delete_sd_item)
-        self.ui.actionToggle_Dark_Mode_2.triggered.connect(
-            self.util.toggle_dark)
+        self.ui.set_export_dir_btn.clicked.connect(self.sd.export_path)
+        self.ui.actionToggle_Dark_Mode_2.triggered.connect(self.util.toggle_dark)
         self.ui.btn_dwn_all.clicked.connect(self.ps.download_all_thread)
         self.ui.back_btn.clicked.connect(self.local.viz_reset)
         self.ui.btn_next_page.clicked.connect(self.local.viz_page)
@@ -310,49 +322,64 @@ class ZOIALibrarianMain(QMainWindow):
         self.util.row_invert()
 
         # Font consistency.
-        self.util.change_font(QFont("Verdana", 10) if self.font is None else
-                              data[0]["font"] + "%" + str(
-                                  data[0]["font_size"]))
+        self.util.change_font(
+            QFont("Verdana", 10)
+            if self.font is None
+            else data[0]["font"] + "%" + str(data[0]["font_size"])
+        )
 
         # Modify the display sizes for some widgets.
         if self.ps_sizes is None:
-            self.ui.splitter_PS.setSizes([self.width() * 0.55,
-                                          self.width() * 0.45])
+            self.ui.splitter_PS.setSizes([self.width() * 0.55, self.width() * 0.45])
         else:
-            self.ui.splitter_PS.setSizes([self.ps_sizes["split_left"],
-                                          self.ps_sizes["split_right"]])
+            self.ui.splitter_PS.setSizes(
+                [self.ps_sizes["split_left"], self.ps_sizes["split_right"]]
+            )
         if self.local_sizes is None:
-            self.ui.splitter_local.setSizes([self.width() * 0.6,
-                                             self.width() * 0.4])
-            self.ui.splitter_local_hori.setSizes([self.height() * 0.55,
-                                                  self.height() * 0.45])
+            self.ui.splitter_local.setSizes([self.width() * 0.6, self.width() * 0.4])
+            self.ui.splitter_local_hori.setSizes(
+                [self.height() * 0.55, self.height() * 0.45]
+            )
         else:
-            self.ui.splitter_local.setSizes([self.local_sizes["split_left"],
-                                             self.local_sizes["split_right"]])
-            self.ui.splitter_local_hori.setSizes([self.local_sizes["split_top"],
-                                                  self.local_sizes["split_bottom"]])
+            self.ui.splitter_local.setSizes(
+                [self.local_sizes["split_left"], self.local_sizes["split_right"]]
+            )
+            self.ui.splitter_local_hori.setSizes(
+                [self.local_sizes["split_top"], self.local_sizes["split_bottom"]]
+            )
         if self.sd_sizes is None:
-            self.ui.splitter_sd_hori.setSizes([self.width() * 0.5,
-                                               self.width() * 0.5])
-            self.ui.splitter_sd_vert.setSizes([self.height() * 0.35,
-                                               self.height() * 0.65])
+            self.ui.splitter_sd_hori.setSizes([self.width() * 0.5, self.width() * 0.5])
+            self.ui.splitter_sd_vert.setSizes(
+                [self.height() * 0.4, self.height() * 0.6]
+            )
         else:
-            self.ui.splitter_sd_vert.setSizes([self.sd_sizes["split_top"],
-                                               self.sd_sizes["split_bottom"]])
-            self.ui.splitter_sd_hori.setSizes([self.sd_sizes["split_left"],
-                                               self.sd_sizes["split_right"]])
+            self.ui.splitter_sd_vert.setSizes(
+                [self.sd_sizes["split_top"], self.sd_sizes["split_bottom"]]
+            )
+            self.ui.splitter_sd_hori.setSizes(
+                [self.sd_sizes["split_left"], self.sd_sizes["split_right"]]
+            )
         if self.bank_sizes is None:
-            self.ui.splitter_bank.setSizes([self.width() * 0.535,
-                                            self.width() * 0.465,
-                                            self.width() * 0])
-            self.ui.splitter_bank_tables.setSizes([self.width() * 0.5,
-                                                   self.width() * 0.5])
+            self.ui.splitter_bank.setSizes(
+                [self.width() * 0.535, self.width() * 0.465, self.width() * 0]
+            )
+            self.ui.splitter_bank_tables.setSizes(
+                [self.width() * 0.5, self.width() * 0.5]
+            )
         else:
-            self.ui.splitter_bank.setSizes([self.bank_sizes["split_left"],
-                                            self.bank_sizes["split_middle"],
-                                            self.bank_sizes["split_right"]])
-            self.ui.splitter_bank_tables.setSizes([self.bank_sizes["split_bank_left"],
-                                                   self.bank_sizes["split_bank_right"]])
+            self.ui.splitter_bank.setSizes(
+                [
+                    self.bank_sizes["split_left"],
+                    self.bank_sizes["split_middle"],
+                    self.bank_sizes["split_right"],
+                ]
+            )
+            self.ui.splitter_bank_tables.setSizes(
+                [
+                    self.bank_sizes["split_bank_left"],
+                    self.bank_sizes["split_bank_right"],
+                ]
+            )
 
         # Sort and set the data.
         self.sort_and_set()
@@ -364,7 +391,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.move(frame.topLeft())
 
     def tab_switch(self):
-        """ Actions performed whenever a tab is switched to within the
+        """Actions performed whenever a tab is switched to within the
         application.
         """
 
@@ -372,15 +399,20 @@ class ZOIALibrarianMain(QMainWindow):
         self.local.set_prev_tag_cat(None)
 
         # Figure out what tab we switched to.
-        if self.ui.tabs.currentIndex() == 1 \
-                or self.ui.tabs.currentIndex() == 3:
+        if self.ui.tabs.currentIndex() == 1 or self.ui.tabs.currentIndex() == 3:
             # Only reload the table data if we need to (new # of patches).
-            if (self.ui.tabs.currentIndex() == 1
-                    and self.ui.table_local.rowCount() == 1) or \
-                    (self.ui.tabs.currentIndex() == 3 and
-                     self.ui.table_bank_local.rowCount() == 1) or \
-                    self.local_pch_count == -1 or \
-                    self.local_pch_count != len(os.listdir(self.path)):
+            if (
+                (
+                    self.ui.tabs.currentIndex() == 1
+                    and self.ui.table_local.rowCount() == 1
+                )
+                or (
+                    self.ui.tabs.currentIndex() == 3
+                    and self.ui.table_bank_local.rowCount() == 1
+                )
+                or self.local_pch_count == -1
+                or self.local_pch_count != len(os.listdir(self.path))
+            ):
                 self.local.get_local_patches()
                 self.local_pch_count = len(os.listdir(self.path))
             # Context cleanup
@@ -407,18 +439,18 @@ class ZOIALibrarianMain(QMainWindow):
                 if self.sd.get_sd_root() is None:
                     # user cancelled without providing a path
                     self.ui.tabs.setCurrentIndex(1)
-        elif self.ui.tabs.currentIndex() == 0 \
-            and self.ui.table_PS.rowCount() == 1:
+        elif self.ui.tabs.currentIndex() == 0 and self.ui.table_PS.rowCount() == 1:
             # We started the app with no internet, need to check if there
             # is a connection now and retry to get the patches.
             api_2 = PatchStorage()
-            self.ps = ZOIALibrarianPS(self.ui, api_2, self.path, self.msg,
-                                      save, self.sort_and_set)
+            self.ps = ZOIALibrarianPS(
+                self.ui, api_2, self.path, self.msg, save, self.sort_and_set
+            )
             self.ps.metadata_init()
             self.sort_and_set()
 
     def set_data(self, search=False, version=False):
-        """ Sets the data for the various patch tables. This is done
+        """Sets the data for the various patch tables. This is done
         when the app begins, whenever a tab is returned to, whenever a
         search is initiated within a tab, or whenever a version history
         is expanded.
@@ -438,7 +470,7 @@ class ZOIALibrarianMain(QMainWindow):
         curr_table = {
             0: self.ui.table_PS,
             1: self.ui.table_local,
-            3: self.ui.table_bank_local
+            3: self.ui.table_bank_local,
         }[table_index]
 
         # Clear the contents of the table
@@ -455,7 +487,7 @@ class ZOIALibrarianMain(QMainWindow):
             (3, True, True): self.search_data_bank_version,
             (3, False, True): self.local.get_data_bank_version(),
             (3, True, False): self.search_data_bank,
-            (3, False, False): self.local.get_data_bank()
+            (3, False, False): self.local.get_data_bank(),
         }[(table_index, search, version)]
 
         data_length = len(data)
@@ -482,17 +514,16 @@ class ZOIALibrarianMain(QMainWindow):
                         title += "\n"
                 btn_title.setText(title.rstrip())
             # Check to see if we are in a version directory.
-            if (table_index == 1 and self.ui.back_btn_local.isEnabled()) or \
-                    (table_index == 3 and self.ui.back_btn_bank.isEnabled()):
-                btn_title.setObjectName("{}_v{}".format(
-                    idx, str(data[i]["revision"])))
+            if (table_index == 1 and self.ui.back_btn_local.isEnabled()) or (
+                table_index == 3 and self.ui.back_btn_bank.isEnabled()
+            ):
+                btn_title.setObjectName("{}_v{}".format(idx, str(data[i]["revision"])))
                 btn_title.setText(data[i]["files"][0]["filename"])
             # Check to see if we need to add the version text outside of
             # a version directory to show you can enter one.
-            elif (table_index == 1 and
-                  not self.ui.back_btn_local.isEnabled()) \
-                    or (table_index == 3 and
-                        not self.ui.back_btn_bank.isEnabled()):
+            elif (table_index == 1 and not self.ui.back_btn_local.isEnabled()) or (
+                table_index == 3 and not self.ui.back_btn_bank.isEnabled()
+            ):
                 if len(os.listdir(os.path.join(self.path, idx))) > 2:
                     btn_title.setText(title.rstrip() + "\n[Multiple Versions]")
                 btn_title.setObjectName(idx)
@@ -513,8 +544,9 @@ class ZOIALibrarianMain(QMainWindow):
                         text += data[i][index][k]["name"] + ", "
                     text += "and " + data[i][index][length - 1]["name"]
                 elif length == 2:
-                    text = data[i][index][0]["name"] + " and " \
-                           + data[i][index][1]["name"]
+                    text = (
+                        data[i][index][0]["name"] + " and " + data[i][index][1]["name"]
+                    )
                 else:
                     try:
                         text = data[i][index][0]["name"]
@@ -524,11 +556,12 @@ class ZOIALibrarianMain(QMainWindow):
                 text_item = QTableWidgetItem(text)
                 text_item.setTextAlignment(Qt.AlignCenter)
                 # Can only edit tags/cats in Local Storage View.
-                if table_index == 1 and not \
-                        self.ui.back_btn_local.isEnabled() and \
-                        len(os.listdir(os.path.join(self.path, idx))) > 2:
-                    text_item.setFlags(
-                        Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                if (
+                    table_index == 1
+                    and not self.ui.back_btn_local.isEnabled()
+                    and len(os.listdir(os.path.join(self.path, idx))) > 2
+                ):
+                    text_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 curr_table.setItem(i, j + 1, text_item)
 
             # Text for the header "Date Modified"
@@ -547,7 +580,8 @@ class ZOIALibrarianMain(QMainWindow):
             if table_index == 1:
                 self.local.create_rating_ticker(i, data[i]["rating"])
                 self.local.create_expt_and_del_btns(
-                    btn_title, i, idx, str(data[i]["revision"]))
+                    btn_title, i, idx, str(data[i]["revision"])
+                )
 
             # Numerical rating for "Rating" header, which is
             # different in the Bank tab (non-editable).
@@ -576,15 +610,14 @@ class ZOIALibrarianMain(QMainWindow):
             curr_table.setColumnWidth(1, self.width() * 0.135)
             curr_table.setColumnWidth(2, self.width() * 0.075)
             curr_table.setColumnWidth(3, self.width() * 0.075)
-            self.ui.splitter_PS.setSizes([self.width() * 0.55,
-                                          self.width() * 0.45])
+            self.ui.splitter_PS.setSizes([self.width() * 0.55, self.width() * 0.45])
             self.ps_sizes = {
                 "col_0": curr_table.columnWidth(0),
                 "col_1": curr_table.columnWidth(1),
                 "col_2": curr_table.columnWidth(2),
                 "col_3": curr_table.columnWidth(3),
                 "split_left": self.ui.splitter_PS.sizes()[0],
-                "split_right": self.ui.splitter_PS.sizes()[1]
+                "split_right": self.ui.splitter_PS.sizes()[1],
             }
 
         elif table_index == 1 and self.local_sizes is None:
@@ -605,7 +638,7 @@ class ZOIALibrarianMain(QMainWindow):
                 "split_left": self.ui.splitter_local.sizes()[0],
                 "split_right": self.ui.splitter_local.sizes()[1],
                 "split_top": self.ui.splitter_local_hori.sizes()[0],
-                "split_bottom": self.ui.splitter_local_hori.sizes()[1]
+                "split_bottom": self.ui.splitter_local_hori.sizes()[1],
             }
 
         elif table_index == 2 and self.sd_sizes is None:
@@ -614,10 +647,8 @@ class ZOIALibrarianMain(QMainWindow):
             curr_table.setColumnWidth(1, self.width() * 0.1)
             curr_table.setColumnWidth(2, self.width() * 0.25)
             curr_table.setColumnWidth(3, self.width() * 0.1)
-            self.ui.splitter_sd_hori.setSizes([self.width() * 0.4,
-                                               self.width() * 0.6])
-            self.ui.splitter_sd_vert.setSizes([self.width() * 0.5,
-                                               self.width() * 0.5])
+            self.ui.splitter_sd_hori.setSizes([self.width() * 0.5, self.width() * 0.5])
+            self.ui.splitter_sd_vert.setSizes([self.width() * 0.4, self.width() * 0.6])
 
             self.sd_sizes = {
                 "col_0": curr_table.columnWidth(0),
@@ -627,7 +658,7 @@ class ZOIALibrarianMain(QMainWindow):
                 "split_top": self.ui.splitter_sd_hori.sizes()[0],
                 "split_bottom": self.ui.splitter_sd_hori.sizes()[1],
                 "split_left": self.ui.splitter_sd_vert.sizes()[0],
-                "split_right": self.ui.splitter_sd_vert.sizes()[1]
+                "split_right": self.ui.splitter_sd_vert.sizes()[1],
             }
 
         elif table_index == 3 and self.bank_sizes is None:
@@ -636,11 +667,12 @@ class ZOIALibrarianMain(QMainWindow):
             curr_table.setColumnWidth(1, self.width() * 0.11)
             curr_table.setColumnWidth(2, self.width() * 0.0625)
             curr_table.setColumnWidth(3, self.width() * 0.035)
-            self.ui.splitter_bank.setSizes([self.width() * 0.535,
-                                            self.width() * 0.465,
-                                            self.width() * 0])
-            self.ui.splitter_bank_tables.setSizes([self.width() * 0.5,
-                                                   self.width() * 0.5])
+            self.ui.splitter_bank.setSizes(
+                [self.width() * 0.535, self.width() * 0.465, self.width() * 0]
+            )
+            self.ui.splitter_bank_tables.setSizes(
+                [self.width() * 0.5, self.width() * 0.5]
+            )
 
             self.bank_sizes = {
                 "col_0": curr_table.columnWidth(0),
@@ -653,20 +685,19 @@ class ZOIALibrarianMain(QMainWindow):
                 "split_middle": self.ui.splitter_bank.sizes()[1],
                 "split_right": self.ui.splitter_bank.sizes()[2],
                 "split_bank_left": self.ui.splitter_bank_tables.sizes()[0],
-                "split_bank_right": self.ui.splitter_bank_tables.sizes()[1]
+                "split_bank_right": self.ui.splitter_bank_tables.sizes()[1],
             }
 
         curr_table.resizeRowsToContents()
 
     def reset_ui(self):
-        """ Resets the UI panels and tables to their default positions.
+        """Resets the UI panels and tables to their default positions.
         Upon closing the application, pref.json will include the defaults.
         Currently triggered via a menu action.
         """
 
         # Reset PS sizes
-        self.ui.splitter_PS.setSizes([self.width() * 0.55,
-                                      self.width() * 0.45])
+        self.ui.splitter_PS.setSizes([self.width() * 0.55, self.width() * 0.45])
         self.ui.table_PS.resizeColumnsToContents()
         self.ui.table_PS.setColumnWidth(0, self.width() * 0.165)
         self.ui.table_PS.setColumnWidth(1, self.width() * 0.135)
@@ -674,10 +705,10 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.table_PS.setColumnWidth(3, self.width() * 0.075)
 
         # Reset local sizes
-        self.ui.splitter_local.setSizes([self.width() * 0.6,
-                                         self.width() * 0.4])
-        self.ui.splitter_local_hori.setSizes([self.height() * 0.55,
-                                              self.height() * 0.45])
+        self.ui.splitter_local.setSizes([self.width() * 0.6, self.width() * 0.4])
+        self.ui.splitter_local_hori.setSizes(
+            [self.height() * 0.55, self.height() * 0.45]
+        )
         self.ui.table_local.resizeColumnsToContents()
         self.ui.table_local.setColumnWidth(0, self.width() * 0.165)
         self.ui.table_local.setColumnWidth(1, self.width() * 0.125)
@@ -687,21 +718,18 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.table_local.setColumnWidth(5, self.width() * 0.065)
 
         # Reset SD sizes
-        self.ui.splitter_sd_hori.setSizes([self.width() * 0.5,
-                                           self.width() * 0.5])
-        self.ui.splitter_sd_vert.setSizes([self.height() * 0.35,
-                                           self.height() * 0.65])
+        self.ui.splitter_sd_hori.setSizes([self.width() * 0.5, self.width() * 0.5])
+        self.ui.splitter_sd_vert.setSizes([self.height() * 0.4, self.height() * 0.6])
         self.ui.table_sd_left.setColumnWidth(0, self.width() * 0.25)
         self.ui.table_sd_left.setColumnWidth(1, self.width() * 0.1)
         self.ui.table_sd_right.setColumnWidth(0, self.width() * 0.25)
         self.ui.table_sd_right.setColumnWidth(1, self.width() * 0.1)
 
         # Reset bank sizes
-        self.ui.splitter_bank.setSizes([self.width() * 0.535,
-                                        self.width() * 0.465,
-                                        self.width() * 0])
-        self.ui.splitter_bank_tables.setSizes([self.width() * 0.5,
-                                               self.width() * 0.5])
+        self.ui.splitter_bank.setSizes(
+            [self.width() * 0.535, self.width() * 0.465, self.width() * 0]
+        )
+        self.ui.splitter_bank_tables.setSizes([self.width() * 0.5, self.width() * 0.5])
         self.ui.table_bank_left.setColumnWidth(0, self.width() * 0.14)
         self.ui.table_bank_right.setColumnWidth(0, self.width() * 0.14)
         self.ui.table_bank_local.setColumnWidth(0, self.width() * 0.16)
@@ -712,7 +740,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.showMaximized()
 
     def display_patch_info(self):
-        """ Queries the PS API for additional patch information whenever
+        """Queries the PS API for additional patch information whenever
         a patch is selected in the PS table or local table. Information
         is displayed via HTML.
         Should the patch contain multiple versions, a call to
@@ -725,11 +753,12 @@ class ZOIALibrarianMain(QMainWindow):
         # The "sender" here is every radio button, so we need to see
         # which one is actually checked.
         if self.sender().isChecked():
-            if (self.ui.tabs.currentIndex() == 1
-                or self.ui.tabs.currentIndex() == 3) and \
-                    "_" not in self.sender().objectName() and \
-                    len(os.listdir(os.path.join(
-                        self.path, self.sender().objectName()))) > 2:
+            if (
+                (self.ui.tabs.currentIndex() == 1 or self.ui.tabs.currentIndex() == 3)
+                and "_" not in self.sender().objectName()
+                and len(os.listdir(os.path.join(self.path, self.sender().objectName())))
+                > 2
+            ):
                 # We are pointing to a version directory.
                 self.display_patch_versions(self.ui.tabs.currentIndex() == 1)
                 return
@@ -765,7 +794,8 @@ class ZOIALibrarianMain(QMainWindow):
                         self.msg.setText(
                             "Failed to retrieve the patch metadata "
                             "from PatchStorage.\nPlease check your internet "
-                            "connection and try again.")
+                            "connection and try again."
+                        )
                         self.msg.setStandardButtons(QMessageBox.Ok)
                         self.msg.exec_()
                         self.msg.setInformativeText(None)
@@ -784,24 +814,25 @@ class ZOIALibrarianMain(QMainWindow):
                 if ver != "":
                     self.local.set_local_selected("{}_{}".format(name, ver))
                 try:
-                    with open(os.path.join(self.path, name,
-                                           name + ".json")) as f:
+                    with open(os.path.join(self.path, name, name + ".json")) as f:
                         content = json.loads(f.read())
                 except FileNotFoundError:
-                    with open(os.path.join(
-                            self.path, name, name + "_{}.json".format(ver))) \
-                            as f:
+                    with open(
+                        os.path.join(self.path, name, name + "_{}.json".format(ver))
+                    ) as f:
                         content = json.loads(f.read())
                 # We are on the Local Storage View, so set the viz up.
                 if viz_browser is not None:
                     try:
-                        with open(os.path.join(self.path, name,
-                                               name + ".bin"), "rb") as f:
+                        with open(
+                            os.path.join(self.path, name, name + ".bin"), "rb"
+                        ) as f:
                             viz = binary.parse_data(f.read())
                     except FileNotFoundError:
-                        with open(os.path.join(
-                                self.path, name, name + "_{}.bin".format(ver)),
-                                "rb") as f:
+                        with open(
+                            os.path.join(self.path, name, name + "_{}.bin".format(ver)),
+                            "rb",
+                        ) as f:
                             viz = binary.parse_data(f.read())
                     self.local.setup_viz(viz)
 
@@ -810,10 +841,14 @@ class ZOIALibrarianMain(QMainWindow):
                 if content["preview_url"] == "":
                     content["preview_url"] = "None provided"
                 else:
-                    content["preview_url"] = \
+                    content["preview_url"] = (
                         "<a href=" + content["preview_url"] + ">Click here</a>"
-            if "license" not in content or content["license"] is None or \
-                    content["license"]["name"] == "":
+                    )
+            if (
+                "license" not in content
+                or content["license"] is None
+                or content["license"]["name"] == ""
+            ):
                 legal = "None provided"
             else:
                 legal = content["license"]["name"]
@@ -825,7 +860,8 @@ class ZOIALibrarianMain(QMainWindow):
             # external sources. Maybe create a cache of images? Not
             # easily implementable without speed hitch.
 
-            curr_browser.setHtml("""<html>
+            curr_browser.setHtml(
+                """<html>
                 <h3> {} </h3>
                 <br/><u> Author:</u> {}
                 <br/><u> Likes:</u> {}
@@ -842,12 +878,12 @@ class ZOIALibrarianMain(QMainWindow):
                     str(content["view_count"]),
                     legal,
                     content["preview_url"],
-                    content["content"]
+                    content["content"],
                 )
             )
 
     def display_patch_versions(self, context):
-        """ Displays the contents of a patch that has multiple versions.
+        """Displays the contents of a patch that has multiple versions.
         Currently triggered via a button press.
 
         context: True for the Local Storage View tab, False for the
@@ -877,52 +913,49 @@ class ZOIALibrarianMain(QMainWindow):
             self.local.get_version_patches(False, self.sender().objectName())
 
     def search(self):
-        """ Initiates a data search for the metadata that is retrieved
+        """Initiates a data search for the metadata that is retrieved
         via the PS API or that is stored locally. The search will then
         set the table to display the returned query matches.
         Currently triggered via a button press.
         """
 
         # Case 1: PS tab
-        if self.ui.tabs.currentIndex() == 0 \
-                and self.ui.searchbar_PS.text() != "":
-            self.search_data_PS = \
-                util.search_patches(self.ps.get_data_ps(),
-                                    self.ui.searchbar_PS.text())
+        if self.ui.tabs.currentIndex() == 0 and self.ui.searchbar_PS.text() != "":
+            self.search_data_PS = util.search_patches(
+                self.ps.get_data_ps(), self.ui.searchbar_PS.text()
+            )
             self.set_data(True)
         # Case 2: Local tab
-        elif self.ui.tabs.currentIndex() == 1 \
-                and self.ui.searchbar_local.text() != "":
+        elif self.ui.tabs.currentIndex() == 1 and self.ui.searchbar_local.text() != "":
             # Case 2.1: No version
             if not self.ui.back_btn_local.isEnabled():
-                self.search_data_local = \
-                    util.search_patches(self.local.get_data_local(),
-                                        self.ui.searchbar_local.text())
+                self.search_data_local = util.search_patches(
+                    self.local.get_data_local(), self.ui.searchbar_local.text()
+                )
                 self.set_data(True)
             # Case 2.2: Version
             else:
-                self.search_data_local_version = \
-                    util.search_patches(self.local.get_data_local_version(),
-                                        self.ui.searchbar_local.text())
+                self.search_data_local_version = util.search_patches(
+                    self.local.get_data_local_version(), self.ui.searchbar_local.text()
+                )
                 self.set_data(True, True)
         # Case 3: Bank tab
-        elif self.ui.tabs.currentIndex() == 3 \
-                and self.ui.searchbar_bank.text() != "":
+        elif self.ui.tabs.currentIndex() == 3 and self.ui.searchbar_bank.text() != "":
             # Case 3.1: No version
             if not self.ui.back_btn_bank.isEnabled():
-                self.search_data_bank = \
-                    util.search_patches(self.local.get_data_bank(),
-                                        self.ui.searchbar_bank.text())
+                self.search_data_bank = util.search_patches(
+                    self.local.get_data_bank(), self.ui.searchbar_bank.text()
+                )
                 self.set_data(True)
             # Case 3.2: Version
             else:
-                self.search_data_bank_version = \
-                    util.search_patches(self.local.get_data_bank_version(),
-                                        self.ui.searchbar_bank.text())
+                self.search_data_bank_version = util.search_patches(
+                    self.local.get_data_bank_version(), self.ui.searchbar_bank.text()
+                )
                 self.set_data(True, True)
 
     def sort_and_set(self):
-        """ Sorts and sets the metadata in a table depending on the
+        """Sorts and sets the metadata in a table depending on the
         option selection via the menu.
         Currently triggered via a menu action.
         """
@@ -961,99 +994,114 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Determine the context in which to perform the sort.
         # Case 1: A user forces a reload of the PS patch list.
-        if self.sender() is not None and self.sender().objectName() == \
-                "refresh_pch_btn":
-            util.sort_metadata(curr_sort[0], self.ps.get_data_ps(),
-                               curr_sort[1])
+        if (
+            self.sender() is not None
+            and self.sender().objectName() == "refresh_pch_btn"
+        ):
+            util.sort_metadata(curr_sort[0], self.ps.get_data_ps(), curr_sort[1])
             self.set_data(self.ui.searchbar_PS.text() != "")
         # Case 2: Sorting on the PatchStorage tab.
         # ->Case 2.1: Sorting on the PS tab with the search bar empty.
         elif table_index == 0 and self.ui.searchbar_PS.text() == "":
-            util.sort_metadata(curr_sort[0], self.ps.get_data_ps(),
-                               curr_sort[1])
+            util.sort_metadata(curr_sort[0], self.ps.get_data_ps(), curr_sort[1])
             self.set_data()
         # ->Case 2.2: Sorting on the PS tab with the search bar containing
         #             text.
         elif table_index == 0 and self.ui.searchbar_PS.text() != "":
             if self.search_data_PS is None:
                 self.search_data_PS = self.ps.get_data_ps()
-            util.sort_metadata(curr_sort[0], self.search_data_PS,
-                               curr_sort[1])
+            util.sort_metadata(curr_sort[0], self.search_data_PS, curr_sort[1])
             self.set_data(True)
         # Case 3: Sorting on the Local Storage View tab.
         # ->Case 3.1: Sorting on the Local tab, no version, and an empty
         #             search bar
-        elif table_index == 1 and self.ui.searchbar_local.text() == "" \
-                and not self.ui.back_btn_local.isEnabled():
-            util.sort_metadata(curr_sort[0], self.local.get_data_local(),
-                               curr_sort[1])
+        elif (
+            table_index == 1
+            and self.ui.searchbar_local.text() == ""
+            and not self.ui.back_btn_local.isEnabled()
+        ):
+            util.sort_metadata(curr_sort[0], self.local.get_data_local(), curr_sort[1])
             self.set_data()
         # ->Case 3.2: Local tab, no version, text in the search bar.
-        elif table_index == 1 and self.ui.searchbar_local.text() != "" \
-                and not self.ui.back_btn_local.isEnabled():
+        elif (
+            table_index == 1
+            and self.ui.searchbar_local.text() != ""
+            and not self.ui.back_btn_local.isEnabled()
+        ):
             if self.search_data_local is None:
                 self.search_data_local = self.local.get_data_local()
-            util.sort_metadata(curr_sort[0], self.search_data_local,
-                               curr_sort[1])
+            util.sort_metadata(curr_sort[0], self.search_data_local, curr_sort[1])
             self.set_data(True)
         # ->Case 3.3: Local tab, it is a version, no text in the search bar.
-        elif table_index == 1 and self.ui.searchbar_local.text() == "" \
-                and self.ui.back_btn_local.isEnabled():
-            util.sort_metadata(7, self.local.get_data_local_version(),
-                               False)
+        elif (
+            table_index == 1
+            and self.ui.searchbar_local.text() == ""
+            and self.ui.back_btn_local.isEnabled()
+        ):
+            util.sort_metadata(7, self.local.get_data_local_version(), False)
             self.set_data(version=True)
         # ->Case 3.4: Local tab, it is a version, and text is in the search
         #             bar.
-        elif table_index == 1 and self.ui.searchbar_local.text() != "" \
-                and self.ui.back_btn_local.isEnabled():
+        elif (
+            table_index == 1
+            and self.ui.searchbar_local.text() != ""
+            and self.ui.back_btn_local.isEnabled()
+        ):
             if self.search_data_local_version is None:
-                self.search_data_local_version = \
-                    self.local.get_data_local_version()
-            util.sort_metadata(7, self.search_data_local_version,
-                               False)
+                self.search_data_local_version = self.local.get_data_local_version()
+            util.sort_metadata(7, self.search_data_local_version, False)
             self.set_data(True, True)
         # Case 4: Sorting on the Banks tab.
         # ->Case 4.1: Sorting on the Banks tab, no version, and an empty search
         #             bar.
-        elif table_index == 3 and self.ui.searchbar_bank.text() == "" \
-                and not self.ui.back_btn_bank.isEnabled():
-            util.sort_metadata(curr_sort[0], self.local.get_data_bank(),
-                               curr_sort[1])
+        elif (
+            table_index == 3
+            and self.ui.searchbar_bank.text() == ""
+            and not self.ui.back_btn_bank.isEnabled()
+        ):
+            util.sort_metadata(curr_sort[0], self.local.get_data_bank(), curr_sort[1])
             self.set_data()
         # ->Case 4.2: Bank tab, no version, text in the search bar.
-        elif table_index == 3 and self.ui.searchbar_bank.text() != "" \
-                and not self.ui.back_btn_bank.isEnabled():
+        elif (
+            table_index == 3
+            and self.ui.searchbar_bank.text() != ""
+            and not self.ui.back_btn_bank.isEnabled()
+        ):
             if self.search_data_bank is None:
                 self.search_data_bank = self.local.get_data_bank()
-            util.sort_metadata(curr_sort[0], self.search_data_bank,
-                               curr_sort[1])
+            util.sort_metadata(curr_sort[0], self.search_data_bank, curr_sort[1])
             self.set_data(True)
         # ->Case 4.3: Bank tab, it is a version, no text in the search bar.
-        elif table_index == 3 and self.ui.searchbar_bank.text() == "" \
-                and self.ui.back_btn_bank.isEnabled():
-            util.sort_metadata(7, self.local.get_data_bank_version(),
-                               False)
+        elif (
+            table_index == 3
+            and self.ui.searchbar_bank.text() == ""
+            and self.ui.back_btn_bank.isEnabled()
+        ):
+            util.sort_metadata(7, self.local.get_data_bank_version(), False)
             self.set_data(version=True)
         # ->Case 4.4: Bank tab, it is a version, and text is in the search bar.
-        elif table_index == 3 and self.ui.searchbar_bank.text() != "" \
-                and self.ui.back_btn_bank.isEnabled():
+        elif (
+            table_index == 3
+            and self.ui.searchbar_bank.text() != ""
+            and self.ui.back_btn_bank.isEnabled()
+        ):
             if self.search_data_bank_version is None:
-                self.search_data_bank_version = \
-                    self.local.get_data_bank_version()
-            util.sort_metadata(7, self.search_data_bank_version,
-                               False)
+                self.search_data_bank_version = self.local.get_data_bank_version()
+            util.sort_metadata(7, self.search_data_bank_version, False)
             self.set_data(True, True)
 
     def import_patch(self):
-        """ Attempts to import a patch into the librarian.
+        """Attempts to import a patch into the librarian.
         Currently triggered via a menu action.
         """
 
         # Prepare a message box.
         self.msg.setWindowTitle("Patch Already In Library")
         self.msg.setIcon(QMessageBox.Information)
-        self.msg.setText("That patch exists within your locally "
-                         "saved patches.\nNo importing has occurred.")
+        self.msg.setText(
+            "That patch exists within your locally "
+            "saved patches.\nNo importing has occurred."
+        )
         self.msg.setStandardButtons(QMessageBox.Ok)
 
         pch = QFileDialog.getOpenFileName()[0]
@@ -1067,10 +1115,13 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setText("The patch has been successfully imported.")
             self.msg.exec_()
             # Reload the tables if we are currently displaying them.
-            if (self.ui.tabs.currentIndex() == 1 and not
-                self.ui.back_btn_local.isEnabled()) or \
-                    (self.ui.tabs.currentIndex() == 3 and not
-                     self.ui.back_btn_bank.isEnabled()):
+            if (
+                self.ui.tabs.currentIndex() == 1
+                and not self.ui.back_btn_local.isEnabled()
+            ) or (
+                self.ui.tabs.currentIndex() == 3
+                and not self.ui.back_btn_bank.isEnabled()
+            ):
                 self.local.get_local_patches()
         # Let the user know of any errors that occurred.
         except errors.BadPathError:
@@ -1081,7 +1132,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.exec_()
 
     def directory_select(self):
-        """ Allows the user to select a directory via their OS specific
+        """Allows the user to select a directory via their OS specific
         file explorer.
 
         return: The path of the directory chosen, as a string.
@@ -1090,7 +1141,8 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Let the user specify a directory.
         input_dir = QFileDialog.getExistingDirectory(
-            None, 'Select a directory', expanduser("~"))
+            None, "Select a directory", expanduser("~")
+        )
         if input_dir == "" or not os.path.isdir(input_dir):
             self.msg.setWindowTitle("Invalid Selection")
             self.msg.setIcon(QMessageBox.Information)
@@ -1101,7 +1153,7 @@ class ZOIALibrarianMain(QMainWindow):
         return input_dir
 
     def _mass_import_thread(self):
-        """ Initializes a Worker thread to manage the importing of
+        """Initializes a Worker thread to manage the importing of
         patches as individual patches into the backend.
         Currently triggered via a menu action.
         TODO fix the menu action imports
@@ -1111,7 +1163,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.worker_mass.start()
 
     def _mass_import_thread_sd(self):
-        """ Initializes a Worker thread to manage the importing of
+        """Initializes a Worker thread to manage the importing of
         patches as individual patches into the backend.
         Currently triggered via a button press.
         """
@@ -1119,7 +1171,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.worker_mass_sd.start()
 
     def _mass_import_done(self, imp_cnt, fail_cnt):
-        """ Notifies the user once the mass import has completed.
+        """Notifies the user once the mass import has completed.
         Will also notify the user with the number of patches that were
         successfully imported and the number of patches that were not
         imported.
@@ -1133,27 +1185,28 @@ class ZOIALibrarianMain(QMainWindow):
         self.msg.setWindowTitle("Import Complete")
         self.msg.setIcon(QMessageBox.Information)
         if imp_cnt > 0:
-            self.msg.setText(
-                "Successfully imported {} patches.".format(imp_cnt))
+            self.msg.setText("Successfully imported {} patches.".format(imp_cnt))
         else:
             self.msg.setText("Did not import any patches.")
         if fail_cnt > 0:
             word = "was" if fail_cnt == 1 else "were"
             self.msg.setInformativeText(
                 "{} {} already saved in the library "
-                "and {} not imported.".format(fail_cnt, word, word))
+                "and {} not imported.".format(fail_cnt, word, word)
+            )
         self.msg.setStandardButtons(QMessageBox.Ok)
         self.msg.exec_()
         self.msg.setInformativeText(None)
-        if (self.ui.tabs.currentIndex() == 1 and not
-            self.ui.back_btn_local.isEnabled()) or \
-                (self.ui.tabs.currentIndex() == 3 and not
-                 self.ui.back_btn_bank.isEnabled()):
+        if (
+            self.ui.tabs.currentIndex() == 1 and not self.ui.back_btn_local.isEnabled()
+        ) or (
+            self.ui.tabs.currentIndex() == 3 and not self.ui.back_btn_bank.isEnabled()
+        ):
             # Reload the table to show the new patches.
             self.local.get_local_patches()
 
     def _version_import_thread(self):
-        """ Initializes a Worker thread to manage the importing of
+        """Initializes a Worker thread to manage the importing of
         patches as a version directory into the backend.
         Currently triggered via a menu action.
         TODO fix the menu-action imports
@@ -1163,7 +1216,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.worker_version.start()
 
     def _version_import_thread_sd(self):
-        """ Initializes a Worker thread to manage the importing of
+        """Initializes a Worker thread to manage the importing of
         patches as a version directory into the backend.
         Currently triggered via a button press.
         """
@@ -1171,7 +1224,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.worker_version_sd.start()
 
     def _version_import_done(self, fails):
-        """ Notifies the user once the version import has completed.
+        """Notifies the user once the version import has completed.
         Will also notify the user with the number of patches that failed
         to be imported if they already existed within the Librarian.
         Should be expanded to list which patches failed to import.
@@ -1188,23 +1241,26 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.exec_()
         else:
             self.msg.setWindowTitle("Warning")
-            self.msg.setText("Certain patches in the specified Version "
-                             "History already existed in the Librarian."
-                             "\nPlease delete them before attempting to "
-                             "import a version history if you would like "
-                             "them to appear.")
+            self.msg.setText(
+                "Certain patches in the specified Version "
+                "History already existed in the Librarian."
+                "\nPlease delete them before attempting to "
+                "import a version history if you would like "
+                "them to appear."
+            )
             self.msg.setIcon(QMessageBox.Warning)
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-        if (self.ui.tabs.currentIndex() == 1 and not
-            self.ui.back_btn_local.isEnabled()) or \
-                (self.ui.tabs.currentIndex() == 3 and not
-                 self.ui.back_btn_bank.isEnabled()):
+        if (
+            self.ui.tabs.currentIndex() == 1 and not self.ui.back_btn_local.isEnabled()
+        ) or (
+            self.ui.tabs.currentIndex() == 3 and not self.ui.back_btn_bank.isEnabled()
+        ):
             # Reload the table to show the new patches.
             self.local.get_local_patches()
 
     def eventFilter(self, o, e):
-        """ Deals with events that originate from various widgets
+        """Deals with events that originate from various widgets
         present in the GUI.
 
         o: The source object that triggered the event.
@@ -1212,36 +1268,50 @@ class ZOIALibrarianMain(QMainWindow):
         """
 
         # SD card tab swap/move
-        if o.objectName() == "table_sd_left" or o.objectName() == \
-                "table_sd_right":
+        if o.objectName() == "table_sd_left" or o.objectName() == "table_sd_right":
             self.sd.events(o, e)
         # Bank tab swap/move
-        elif o.objectName() == "table_bank_local" or o.objectName() == \
-                "table_bank_left" or o.objectName() == "table_bank_right":
+        elif (
+            o.objectName() == "table_bank_local"
+            or o.objectName() == "table_bank_left"
+            or o.objectName() == "table_bank_right"
+        ):
             self.bank.events(o, e)
         # Searching via searchbar
-        elif o.objectName() == "searchbar_PS" \
-                or o.objectName() == "searchbar_local" \
-                or o.objectName() == "searchbar_bank":
+        elif (
+            o.objectName() == "searchbar_PS"
+            or o.objectName() == "searchbar_local"
+            or o.objectName() == "searchbar_bank"
+        ):
             if e.type() == QEvent.KeyRelease:
-                if self.ui.searchbar_local.text() == "" \
-                        and self.ui.tabs.currentIndex() == 1 \
-                        and not self.ui.back_btn_local.isEnabled():
+                if (
+                    self.ui.searchbar_local.text() == ""
+                    and self.ui.tabs.currentIndex() == 1
+                    and not self.ui.back_btn_local.isEnabled()
+                ):
                     self.local.get_local_patches()
-                elif self.ui.searchbar_PS.text() == "" \
-                        and self.ui.tabs.currentIndex() == 0:
+                elif (
+                    self.ui.searchbar_PS.text() == ""
+                    and self.ui.tabs.currentIndex() == 0
+                ):
                     self.sort_and_set()
-                elif self.ui.searchbar_local.text() == "" \
-                        and self.ui.tabs.currentIndex() == 1 \
-                        and self.ui.back_btn_local.isEnabled():
+                elif (
+                    self.ui.searchbar_local.text() == ""
+                    and self.ui.tabs.currentIndex() == 1
+                    and self.ui.back_btn_local.isEnabled()
+                ):
                     self.local.get_version_patches(True)
-                elif self.ui.searchbar_bank.text() == "" \
-                        and self.ui.tabs.currentIndex() == 3 \
-                        and not self.ui.back_btn_bank.isEnabled():
+                elif (
+                    self.ui.searchbar_bank.text() == ""
+                    and self.ui.tabs.currentIndex() == 3
+                    and not self.ui.back_btn_bank.isEnabled()
+                ):
                     self.local.get_local_patches()
-                elif self.ui.searchbar_bank.text() == "" \
-                        and self.ui.tabs.currentIndex() == 3 \
-                        and self.ui.back_btn_bank.isEnabled():
+                elif (
+                    self.ui.searchbar_bank.text() == ""
+                    and self.ui.tabs.currentIndex() == 3
+                    and self.ui.back_btn_bank.isEnabled()
+                ):
                     self.local.get_version_patches(False)
                 return True
         # Update tags/categories on Local tab.
@@ -1273,15 +1343,16 @@ class ZOIALibrarianMain(QMainWindow):
         return self._version_import_done(fail_cnt)
 
     def closeEvent(self, event):
-        """ Override the default close operation so certain application
+        """Override the default close operation so certain application
         settings can be saved.
         """
 
-        self.util.save_pref(self.width(), self.height(), self.sd.get_sd_root(),
-                            self.path)
+        self.util.save_pref(
+            self.width(), self.height(), self.sd.get_sd_root(), self.path
+        )
 
     def _try_quit(self):
-        """ Forces the application to close.
+        """Forces the application to close.
         Currently triggered via a menu action.
         """
 
@@ -1291,7 +1362,7 @@ class ZOIALibrarianMain(QMainWindow):
 
 
 class ImportMassSDWorker(QThread):
-    """ The ImportMassSDWorker class runs as a separate thread in the
+    """The ImportMassSDWorker class runs as a separate thread in the
     application to prevent application snag. This thread will attempt
     to import specified binary files into the backend as individual
     patches that reside on an SD card.
@@ -1301,14 +1372,13 @@ class ImportMassSDWorker(QThread):
     signal = QtCore.Signal(int, int)
 
     def __init__(self, window):
-        """ Initializes the thread.
-        """
+        """Initializes the thread."""
 
         QThread.__init__(self)
         self.window = window
 
     def run(self):
-        """ Attempts to mass import any patches found within a target
+        """Attempts to mass import any patches found within a target
         directory. Unlike import_patch, failing to import a patch will
         not create a message box. A message box will be displayed at the
         end indicating how many patches were and were not imported.
@@ -1333,7 +1403,7 @@ class ImportMassSDWorker(QThread):
 
 
 class ImportMassWorker(QThread):
-    """ The ImportMassWorker class runs as a separate thread in the
+    """The ImportMassWorker class runs as a separate thread in the
     application to prevent application snag. This thread will attempt
     to import specified binary files into the backend as individual
     patches.
@@ -1343,14 +1413,13 @@ class ImportMassWorker(QThread):
     signal = QtCore.Signal(int, int)
 
     def __init__(self, window):
-        """ Initializes the thread.
-        """
+        """Initializes the thread."""
 
         QThread.__init__(self)
         self.window = window
 
     def run(self):
-        """ Attempts to mass import any patches found within a target
+        """Attempts to mass import any patches found within a target
         directory. Unlike import_patch, failing to import a patch will
         not create a message box. A message box will be displayed at the
         end indicating how many patches were and were not imported.
@@ -1375,7 +1444,7 @@ class ImportMassWorker(QThread):
 
 
 class ImportVersionWorker(QThread):
-    """ The ImportVersionWorker class runs as a separate thread in the
+    """The ImportVersionWorker class runs as a separate thread in the
     application to prevent application snag. This thread will attempt
     to import specified binary files into the backend as a version
     history.
@@ -1385,14 +1454,13 @@ class ImportVersionWorker(QThread):
     signal = QtCore.Signal(int)
 
     def __init__(self, window):
-        """ Initializes the thread.
-        """
+        """Initializes the thread."""
 
         QThread.__init__(self)
         self.window = window
 
     def run(self):
-        """ Attempts to import a directory of patches as a version
+        """Attempts to import a directory of patches as a version
         history within the application. Should any non-bin files be
         encountered, they will simply be ignored.
         Currently triggered via a button press or a menu action.
@@ -1403,7 +1471,7 @@ class ImportVersionWorker(QThread):
 
 
 class ImportVersionSDWorker(QThread):
-    """ The ImportVersionSDWorker class runs as a separate thread in the
+    """The ImportVersionSDWorker class runs as a separate thread in the
     application to prevent application snag. This thread will attempt
     to import specified binary files into the backend as a version
     history that are located on an SD card.
@@ -1413,14 +1481,13 @@ class ImportVersionSDWorker(QThread):
     signal = QtCore.Signal(int)
 
     def __init__(self, window):
-        """ Initializes the thread.
-        """
+        """Initializes the thread."""
 
         QThread.__init__(self)
         self.window = window
 
     def run(self):
-        """ Attempts to import a directory of patches as a version
+        """Attempts to import a directory of patches as a version
         history within the application. Should any non-bin files be
         encountered, they will simply be ignored.
         Currently triggered via a button press or a menu action.
