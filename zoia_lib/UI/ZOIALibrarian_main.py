@@ -1170,7 +1170,7 @@ class ZOIALibrarianMain(QMainWindow):
 
         self.worker_mass_sd.start()
 
-    def _mass_import_done(self, imp_cnt, fail_cnt):
+    def _mass_import_done(self, imp_cnt, fail_cnt, fails):
         """Notifies the user once the mass import has completed.
         Will also notify the user with the number of patches that were
         successfully imported and the number of patches that were not
@@ -1179,6 +1179,7 @@ class ZOIALibrarianMain(QMainWindow):
         imp_cnt: The number of patches that were imported, as an int.
         fail_cnt: The number of patches that failed to import, as an
                   int.
+        fails: The list of patches which failed to import.
         """
 
         # Prepare a popup for the user.
@@ -1192,7 +1193,9 @@ class ZOIALibrarianMain(QMainWindow):
             word = "was" if fail_cnt == 1 else "were"
             self.msg.setInformativeText(
                 "{} {} already saved in the library "
-                "and {} not imported.".format(fail_cnt, word, word)
+                "and {} not imported. \n Patch list: {}".format(
+                    fail_cnt, word, word, [x for x in fails]
+                )
             )
         self.msg.setStandardButtons(QMessageBox.Ok)
         self.msg.exec_()
@@ -1322,6 +1325,7 @@ class ZOIALibrarianMain(QMainWindow):
     def import_multiple_menu(self):
         imp_cnt = 0
         fail_cnt = 0
+        fails = []
 
         input_dir = self.directory_select()
 
@@ -1331,10 +1335,18 @@ class ZOIALibrarianMain(QMainWindow):
                 try:
                     save.import_to_backend(os.path.join(input_dir, pch))
                     imp_cnt += 1
-                except errors.SavingError:
+                except errors.SavingError as e:
                     fail_cnt += 1
+                    e = (
+                        str(e)
+                        .split("(")[1]
+                        .split(")")[0]
+                        .split(",")[0]
+                        .replace("'", "")
+                    )
+                    fails.append(e)
 
-        return self._mass_import_done(imp_cnt, fail_cnt)
+        return self._mass_import_done(imp_cnt, fail_cnt, fails)
 
     def import_version_menu(self):
         input_dir = self.directory_select()
@@ -1369,7 +1381,7 @@ class ImportMassSDWorker(QThread):
     """
 
     # UI communication
-    signal = QtCore.Signal(int, int)
+    signal = QtCore.Signal(int, int, list)
 
     def __init__(self, window):
         """Initializes the thread."""
@@ -1387,6 +1399,7 @@ class ImportMassSDWorker(QThread):
 
         imp_cnt = 0
         fail_cnt = 0
+        fails = []
 
         input_dir = self.window.sd.get_sd_path()
 
@@ -1396,10 +1409,18 @@ class ImportMassSDWorker(QThread):
                 try:
                     save.import_to_backend(os.path.join(input_dir, pch))
                     imp_cnt += 1
-                except errors.SavingError:
+                except errors.SavingError as e:
                     fail_cnt += 1
+                    e = (
+                        str(e)
+                        .split("(")[1]
+                        .split(")")[0]
+                        .split(",")[0]
+                        .replace("'", "")
+                    )
+                    fails.append(e)
 
-        self.signal.emit(imp_cnt, fail_cnt)
+        self.signal.emit(imp_cnt, fail_cnt, fails)
 
 
 class ImportMassWorker(QThread):
