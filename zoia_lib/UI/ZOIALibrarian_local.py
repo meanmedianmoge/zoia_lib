@@ -299,22 +299,21 @@ class ZOIALibrarianLocal(QMainWindow):
                                 "Export complete.", timeout=5000
                             )
                             break
-                        except errors.ExportingError:
+                        except errors.ExportingError as e:
                             # There was already a patch in that slot.
                             # Find its name and display to the user to confirm.
-                            for pch in sorted(os.listdir(export_path)):
-                                if pch[:3] == "00{}".format(slot) or \
-                                        pch[:3] == "0{}".format(slot):
-                                    name = (
-                                        pch[9:].split(".")[0].replace("_", " ").title()
-                                    )
-                                else:
-                                    name = "another patch"
+                            e = (
+                                str(e)
+                                .split("(")[1]
+                                .split(")")[0]
+                                .split(",")[0]
+                                .replace("'", "")
+                            )
                             self.msg.setWindowTitle("Slot Exists")
                             self.msg.setIcon(QMessageBox.Information)
                             self.msg.setText(
                                 "That slot is occupied by {}. "
-                                "Would you like to overwrite it?".format(name)
+                                "Would you like to overwrite it?".format(e)
                             )
                             self.msg.setStandardButtons(
                                 QMessageBox.Yes | QMessageBox.No
