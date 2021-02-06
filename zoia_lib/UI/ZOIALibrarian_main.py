@@ -518,7 +518,12 @@ class ZOIALibrarianMain(QMainWindow):
                 table_index == 3 and self.ui.back_btn_bank.isEnabled()
             ):
                 btn_title.setObjectName("{}_v{}".format(idx, str(data[i]["revision"])))
-                btn_title.setText(data[i]["files"][0]["filename"])
+                btn_title.setText(
+                    data[i]["files"][0]["filename"]
+                    .split(".")[0]
+                    .split("_zoia_")[-1]
+                    .replace("_", " ")
+                )
             # Check to see if we need to add the version text outside of
             # a version directory to show you can enter one.
             elif (table_index == 1 and not self.ui.back_btn_local.isEnabled()) or (
