@@ -298,6 +298,10 @@ class ZOIALibrarianLocal(QMainWindow):
                             self.ui.statusbar.showMessage(
                                 "Export complete.", timeout=5000
                             )
+                            self.msg.setIcon(QMessageBox.Information)
+                            self.msg.setWindowTitle("Export Complete")
+                            self.msg.setText("The patch has been successfully exported.")
+                            self.msg.exec_()
                             break
                         except errors.ExportingError as e:
                             # There was already a patch in that slot.
@@ -327,6 +331,10 @@ class ZOIALibrarianLocal(QMainWindow):
                                 self.ui.statusbar.showMessage(
                                     "Export complete.", timeout=5000
                                 )
+                                self.msg.setIcon(QMessageBox.Information)
+                                self.msg.setWindowTitle("Export Complete")
+                                self.msg.setText("The patch has been successfully exported.")
+                                self.msg.exec_()
                                 break
 
                     else:
@@ -379,6 +387,10 @@ class ZOIALibrarianLocal(QMainWindow):
                                                 "Export complete.", timeout=5000
                                             )
                                             slot += 1
+                                    self.msg.setIcon(QMessageBox.Information)
+                                    self.msg.setWindowTitle("Export Complete")
+                                    self.msg.setText("The patches have been successfully exported.")
+                                    self.msg.exec_()
                                     break
                             else:
                                 for ver in sorted(
@@ -392,6 +404,10 @@ class ZOIALibrarianLocal(QMainWindow):
                                             "Export complete.", timeout=5000
                                         )
                                         slot += 1
+                                self.msg.setIcon(QMessageBox.Information)
+                                self.msg.setWindowTitle("Export Complete")
+                                self.msg.setText("The patches have been successfully exported.")
+                                self.msg.exec_()
                 # Operation was aborted.
                 break
 
