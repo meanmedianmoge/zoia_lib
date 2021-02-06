@@ -303,9 +303,8 @@ class ZOIALibrarianLocal(QMainWindow):
                             # There was already a patch in that slot.
                             # Find its name and display to the user to confirm.
                             for pch in sorted(os.listdir(export_path)):
-                                if pch[:3] == "00{}".format(slot) or pch[
-                                    :3
-                                ] == "0{}".format(slot):
+                                if pch[:3] == "00{}".format(slot) or \
+                                        pch[:3] == "0{}".format(slot):
                                     name = (
                                         pch[9:].split(".")[0].replace("_", " ").title()
                                     )

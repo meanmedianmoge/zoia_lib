@@ -251,7 +251,6 @@ class ZOIALibrarianSD(QMainWindow):
                         )
                         self.msg.setStandardButtons(QMessageBox.Ok)
                         self.msg.exec_()
-                        self.msg.setInformativeText(None)
                         return
 
     def delete_sd_item(self):

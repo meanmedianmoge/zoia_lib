@@ -1095,15 +1095,6 @@ class ZOIALibrarianMain(QMainWindow):
         Currently triggered via a menu action.
         """
 
-        # Prepare a message box.
-        self.msg.setWindowTitle("Patch Already In Library")
-        self.msg.setIcon(QMessageBox.Information)
-        self.msg.setText(
-            "That patch exists within your locally "
-            "saved patches.\nNo importing has occurred."
-        )
-        self.msg.setStandardButtons(QMessageBox.Ok)
-
         pch = QFileDialog.getOpenFileName()[0]
         # Didn't make a selection.
         if pch == "":
@@ -1128,7 +1119,24 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setWindowTitle("No Patch Found")
             self.msg.setText("Incorrect file selected, importing failed.")
             self.msg.exec_()
-        except errors.SavingError:
+        except errors.SavingError as e:
+            e = (
+                str(e)
+                .split("(")[1]
+                .split(")")[0]
+                .split(",")[0]
+                .replace("'", "")
+            )
+            # Prepare a message box.
+            self.msg.setWindowTitle("Patch Already In Library")
+            self.msg.setIcon(QMessageBox.Information)
+            self.msg.setText(
+                "That patch exists within your locally "
+                "saved patches as {}. \nNo importing has occurred.".format(
+                    e
+                )
+            )
+            self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
 
     def directory_select(self):
@@ -1431,7 +1439,7 @@ class ImportMassWorker(QThread):
     """
 
     # UI communication
-    signal = QtCore.Signal(int, int)
+    signal = QtCore.Signal(int, int, list)
 
     def __init__(self, window):
         """Initializes the thread."""
@@ -1449,6 +1457,7 @@ class ImportMassWorker(QThread):
 
         imp_cnt = 0
         fail_cnt = 0
+        fails = []
 
         input_dir = self.window.directory_select()
 
@@ -1458,10 +1467,18 @@ class ImportMassWorker(QThread):
                 try:
                     save.import_to_backend(os.path.join(input_dir, pch))
                     imp_cnt += 1
-                except errors.SavingError:
+                except errors.SavingError as e:
                     fail_cnt += 1
+                    e = (
+                        str(e)
+                        .split("(")[1]
+                        .split(")")[0]
+                        .split(",")[0]
+                        .replace("'", "")
+                    )
+                    fails.append(e)
 
-        self.signal.emit(imp_cnt, fail_cnt)
+        self.signal.emit(imp_cnt, fail_cnt, fails)
 
 
 class ImportVersionWorker(QThread):
