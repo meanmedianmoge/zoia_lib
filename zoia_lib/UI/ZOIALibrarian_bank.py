@@ -206,6 +206,7 @@ class ZOIALibrarianBank(QMainWindow):
             value = self.msg.exec_()
             if value != QMessageBox.Yes:
                 return
+            self.msg.setInformativeText(None)
 
         # Keep track of patches that fail to load (because they have been
         # deleted from the backend by the user).
@@ -233,8 +234,13 @@ class ZOIALibrarianBank(QMainWindow):
                 "been deleted from the ZOIA Librarian. Please "
                 "reacquire them to have them load."
             )
+            self.msg.setInformativeText(
+                "Unfortunately, there is no way to retrieve which specific "
+                "patches were deleted."
+            )
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
+            self.msg.setInformativeText(None)
 
         # Prepare the bank tables.
         self._set_data_bank()
@@ -265,6 +271,7 @@ class ZOIALibrarianBank(QMainWindow):
                 value = self.msg.exec_()
                 if value == QMessageBox.No:
                     return
+                self.msg.setInformativeText(None)
 
             # Save the bank
             with open(
@@ -276,6 +283,7 @@ class ZOIALibrarianBank(QMainWindow):
             self.msg.setWindowTitle("Bank Saved")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText("The Bank has been saved successfully.")
+            self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
             self.ui.btn_load_bank.setEnabled(True)
 
@@ -321,9 +329,10 @@ class ZOIALibrarianBank(QMainWindow):
                     fails = export.export_bank(
                         self.data_banks, sd.get_sd_root(), name, True
                     )
+                self.msg.setInformativeText(None)
             else:
                 return
-            self.msg.setInformativeText("")
+
             if len(fails) == 0:
                 # No failed exports, let the user know.
                 self.msg.setWindowTitle("Success")
@@ -351,7 +360,7 @@ class ZOIALibrarianBank(QMainWindow):
                         "{}\nFailures occur when the Bank "
                         "contains a patch that has been deleted "
                         "from the ZOIA "
-                        "Librarian".format(
+                        "Librarian.".format(
                             len(self.data_banks) - len(fails), len(fails)
                         )
                     )

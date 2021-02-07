@@ -264,9 +264,9 @@ class ZOIALibrarianSD(QMainWindow):
             self.msg.setWindowTitle("Warning")
             self.msg.setIcon(QMessageBox.Warning)
             self.msg.setText(
-                "This will delete everything contained within the \n"
+                "This will delete everything contained within the "
                 "selected folder. This includes any files or "
-                "additional\nfolders contained within.\n\n"
+                "additional folders contained within.\n\n"
                 "Do you wish to continue?"
             )
             self.msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)

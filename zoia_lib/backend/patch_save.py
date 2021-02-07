@@ -342,6 +342,7 @@ class PatchSave(Patch):
         """
 
         fails = 0
+        errs = []
 
         if path is None:
             raise errors.SavingError(None)
@@ -437,18 +438,18 @@ class PatchSave(Patch):
                 "content": "",
                 "license": {"name": ""},
             }
-
-            if os.path.exists(os.path.join(self.back_path, "data.json")):
-                with open(os.path.join(self.back_path, "data.json"), "r") as f:
-                    data = json.loads(f.read())
-                for pch in data:
-                    if js_data["title"].lower() in pch["title"].lower():
-                        temp = ps.get_patch_meta(pch["id"])
-                        js_data = temp
-                        js_data["updated_at"] = "{:%Y-%m-%dT%H:%M:%S+00:00}".format(
-                            datetime.datetime.now()
-                        )
-                        break
+            if not version:
+                if os.path.exists(os.path.join(self.back_path, "data.json")):
+                    with open(os.path.join(self.back_path, "data.json"), "r") as f:
+                        data = json.loads(f.read())
+                    for pch in data:
+                        if js_data["title"].lower() in pch["title"].lower():
+                            temp = ps.get_patch_meta(pch["id"])
+                            js_data = temp
+                            js_data["updated_at"] = "{:%Y-%m-%dT%H:%M:%S+00:00}".format(
+                                datetime.datetime.now()
+                            )
+                            break
             if version:
                 js_data["updated_at"] = "{:%Y-%m-%dT%H:%M:%S+00:00}".format(
                     datetime.datetime.now()
@@ -461,11 +462,19 @@ class PatchSave(Patch):
             else:
                 try:
                     self.save_to_backend((temp_data, js_data))
-                except errors.SavingError:
+                except errors.SavingError as e:
                     fails += 1
+                    e = (
+                        str(e)
+                        .split("(")[1]
+                        .split(")")[0]
+                        .split(",")[0]
+                        .replace("'", "")
+                    )
+                    errs.append(e)
                     continue
 
-        return fails
+        return fails, errs
 
     def _patch_decompress(self, patch):
         """Method stub for decompressing files retrieved from the PS
