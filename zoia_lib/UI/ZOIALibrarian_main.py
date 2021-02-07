@@ -1239,17 +1239,18 @@ class ZOIALibrarianMain(QMainWindow):
 
         self.worker_version_sd.start()
 
-    def _version_import_done(self, fails):
+    def _version_import_done(self, fail_cnt, fails):
         """Notifies the user once the version import has completed.
         Will also notify the user with the number of patches that failed
         to be imported if they already existed within the Librarian.
         Should be expanded to list which patches failed to import.
 
-        fails: The number of patches that failed to import, as an int.
+        fail_cnt: The number of patches that failed to import, as an int.
+        fails: The list of patches which failed to import.
         """
 
         # Prepare a popup for the user.
-        if fails == 0:
+        if fail_cnt == 0:
             self.msg.setWindowTitle("Success")
             self.msg.setText("Successfully created a Version History.")
             self.msg.setIcon(QMessageBox.Information)
@@ -1257,6 +1258,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.exec_()
         else:
             self.msg.setWindowTitle("Warning")
+            word = "was" if fail_cnt == 1 else "were"
             self.msg.setText(
                 "Certain patches in the specified Version "
                 "History already existed in the Librarian."
@@ -1264,9 +1266,16 @@ class ZOIALibrarianMain(QMainWindow):
                 "import a version history if you would like "
                 "them to appear."
             )
+            self.msg.setInformativeText(
+                "{} {} already saved in the library "
+                "and {} not imported. \n Patch list: {}".format(
+                    fail_cnt, word, word, [x for x in fails]
+                )
+            )
             self.msg.setIcon(QMessageBox.Warning)
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
+            self.msg.setInformativeText(None)
         if (
             self.ui.tabs.currentIndex() == 1 and not self.ui.back_btn_local.isEnabled()
         ) or (
@@ -1363,9 +1372,9 @@ class ZOIALibrarianMain(QMainWindow):
 
     def import_version_menu(self):
         input_dir = self.directory_select()
-        fail_cnt = save.import_to_backend(input_dir, True)
+        fail_cnt, fails = save.import_to_backend(input_dir, True)
 
-        return self._version_import_done(fail_cnt)
+        return self._version_import_done(fail_cnt, fails)
 
     def closeEvent(self, event):
         """Override the default close operation so certain application
@@ -1494,7 +1503,7 @@ class ImportVersionWorker(QThread):
     """
 
     # UI communication
-    signal = QtCore.Signal(int)
+    signal = QtCore.Signal(int, list)
 
     def __init__(self, window):
         """Initializes the thread."""
@@ -1510,7 +1519,8 @@ class ImportVersionWorker(QThread):
         """
 
         input_dir = self.window.directory_select()
-        self.signal.emit(save.import_to_backend(input_dir, True))
+        fail_cnt, fails = save.import_to_backend(input_dir, True)
+        self.signal.emit(fail_cnt, fails)
 
 
 class ImportVersionSDWorker(QThread):
@@ -1521,7 +1531,7 @@ class ImportVersionSDWorker(QThread):
     """
 
     # UI communication
-    signal = QtCore.Signal(int)
+    signal = QtCore.Signal(int, list)
 
     def __init__(self, window):
         """Initializes the thread."""
@@ -1537,4 +1547,5 @@ class ImportVersionSDWorker(QThread):
         """
 
         input_dir = self.window.sd.get_sd_path()
-        self.signal.emit(save.import_to_backend(input_dir, True))
+        fail_cnt, fails = save.import_to_backend(input_dir, True)
+        self.signal.emit(fail_cnt, fails)

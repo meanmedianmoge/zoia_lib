@@ -10,21 +10,24 @@ New Features
     - This feature also includes a new sorting and filtering method, found in the Sort toolbar.
     - The first time you run v1.1 may take a bit longer than usual, since each patch downloaded or imported needs a new rating field.
 - The app is now versioned properly so that you no longer need to delete your saved preferences before upgrading.
+- Versioned patches display their patch name instead of the filename, for simplicity.
 - Version histories can be exported as a group using the “Export Patches” button in Local Storage.
     - The original functionality (individual exports of versions) still exists in the version history view.
 - The export directory (used for exports from Local Storage) is user-definable, using the new “Set Export Directory” button in the SD Card tab.
     - If you do not define a directory, the default remains as “to_zoia”.
 - The export patch dialog will default to the next-available open slot in the directory chosen.
     - Also, if you attempt to overwrite a slot, it will display the name of the patch currently in that slot.
+    - Lastly, there is now a confirmation window upon a successful export.
 - Searches will extend into version history information.
     - However, results that meet the query will display the version name, not the individual patch.
 - The patch import dialog has been updated to display the name of the patch(es) which failed to import.
 - ZOIA got an update, so the app will reflect those changes during binary decoding.
 - UI updates, including:
-    - Tooltip and status tip text
-    - Shortcut keymaps
-    - Default panel sizes
-    - Button names and style
+    - Tooltip and status tip text.
+    - Shortcut keymaps.
+    - Default panel sizes.
+    - Button names and style.
+    - Pop-up message detail.
 - General code upkeep: applied a fancy auto-formatter to the codebase and automated the app-bundling process.
 
 Fixex
