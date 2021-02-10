@@ -1205,14 +1205,18 @@ class ZOIALibrarianMain(QMainWindow):
         if fail_cnt > 0:
             word = "was" if fail_cnt == 1 else "were"
             self.msg.setInformativeText(
-                "{} {} already saved in the library "
-                "and {} not imported. \n Patch list: {}".format(
-                    fail_cnt, word, word, [x for x in fails]
+                "{} {} already saved in the library and {} not imported.".format(
+                    fail_cnt, word, word
                 )
             )
+            temp = "List of patches that failed to import: \n"
+            for x in fails:
+                temp += x + "\n"
+            self.msg.setDetailedText(temp.strip("\n"))
         self.msg.setStandardButtons(QMessageBox.Ok)
         self.msg.exec_()
         self.msg.setInformativeText(None)
+        self.msg.setDetailedText(None)
         if (
             self.ui.tabs.currentIndex() == 1 and not self.ui.back_btn_local.isEnabled()
         ) or (
@@ -1261,21 +1265,25 @@ class ZOIALibrarianMain(QMainWindow):
             word = "was" if fail_cnt == 1 else "were"
             self.msg.setText(
                 "Certain patches in the specified Version "
-                "History already existed in the Librarian."
-                "\nPlease delete them before attempting to "
+                "History already existed in the Librarian. "
+                "Please delete them before attempting to "
                 "import a version history if you would like "
                 "them to appear."
             )
             self.msg.setInformativeText(
-                "{} {} already saved in the library "
-                "and {} not imported. \n Patch list: {}".format(
-                    fail_cnt, word, word, [x for x in fails]
+                "{} {} already saved in the library and {} not imported.".format(
+                    fail_cnt, word, word
                 )
             )
+            temp = "List of patches that failed to import: \n"
+            for x in fails:
+                temp += x + "\n"
+            self.msg.setDetailedText(temp.strip("\n"))
             self.msg.setIcon(QMessageBox.Warning)
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
             self.msg.setInformativeText(None)
+            self.msg.setDetailedText(None)
         if (
             self.ui.tabs.currentIndex() == 1 and not self.ui.back_btn_local.isEnabled()
         ) or (
