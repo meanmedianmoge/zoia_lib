@@ -171,7 +171,7 @@ class ZOIALibrarianBank(QMainWindow):
         # PySide2 file selectors are bad and occasionally wrong, so try
         # all of them to be safe.
         bnk_file = QFileDialog.getOpenFileName(
-            None, "Select A Patch Bank:", os.path.join(self.path, "Banks")
+            None, "Select a Patch Bank:", os.path.join(self.path, "Banks")
         )[0]
         if bnk_file != "":
             if "/" in bnk_file and platform.system().lower() == "windows":
@@ -197,7 +197,8 @@ class ZOIALibrarianBank(QMainWindow):
             self.msg.setWindowTitle("Warning")
             self.msg.setIcon(QMessageBox.Warning)
             self.msg.setText(
-                "This will overwrite the current data in the " "table.\nIs that okay?"
+                "Are you sure you want to overwrite "
+                "the current data in the table?"
             )
             self.msg.setInformativeText(
                 "If you haven't saved your changes they will be lost."
@@ -338,8 +339,8 @@ class ZOIALibrarianBank(QMainWindow):
                 self.msg.setWindowTitle("Success")
                 self.msg.setIcon(QMessageBox.Information)
                 self.msg.setText(
-                    "The Bank has been successfully exported "
-                    "to the root of your SD card."
+                    "The bank has successfully been exported to the "
+                    "SD card directory: {}."
                 )
                 self.msg.setStandardButtons(QMessageBox.Ok)
                 self.msg.exec_()
@@ -350,21 +351,21 @@ class ZOIALibrarianBank(QMainWindow):
                 self.msg.setIcon(QMessageBox.Information)
                 if len(fails) == len(self.data_banks):
                     self.msg.setText(
-                        "Failed to export any patches because"
-                        "they have all been deleted from the "
-                        "ZOIA Librarian."
+                        "Failed to export any patches because they have"
+                        "all been deleted from the ZOIA Librarian."
                     )
                 else:
                     self.msg.setText(
-                        "Successful exports: {}\nFailed exports: "
-                        "{}\nFailures occur when the Bank "
-                        "contains a patch that has been deleted "
-                        "from the ZOIA "
-                        "Librarian.".format(
+                        "Patches have been exported to the SD card "
+                        "directory: {}.".format(name)
+                    )
+                    self.msg.setInformativeText(
+                        "Successful exports: {} \n"
+                        "Failed exports: {}".format(
                             len(self.data_banks) - len(fails), len(fails)
                         )
                     )
-                    temp = "Here is a list of patches that failed to export:\n"
+                    temp = "List of patches that failed to export:\n"
                     for slot in fails:
                         if slot < 32:
                             temp += self.ui.table_bank_left.item(slot, 0).text() + "\n"
@@ -377,6 +378,7 @@ class ZOIALibrarianBank(QMainWindow):
                 self.msg.setStandardButtons(QMessageBox.Ok)
                 self.msg.exec_()
                 self.msg.setDetailedText(None)
+                self.msg.setInformativeText(None)
 
     def _get_bank_data(self):
         """Gets the data from the current bank tables."""
