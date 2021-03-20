@@ -340,7 +340,7 @@ class ZOIALibrarianBank(QMainWindow):
                 self.msg.setIcon(QMessageBox.Information)
                 self.msg.setText(
                     "The bank has successfully been exported to the "
-                    "SD card directory: {}."
+                    "SD card directory: {}.".format(name)
                 )
                 self.msg.setStandardButtons(QMessageBox.Ok)
                 self.msg.exec_()
