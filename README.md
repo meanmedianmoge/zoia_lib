@@ -5,7 +5,7 @@ To learn more about ZOIA and its community, join our [Discord chat server](https
 [Subreddit](https://reddit.com/r/zoia), and/or [Facebook group](https://facebook.com/groups/EmpressZOIAUsers).
 
 If you would like to leave a tip, we are accepting donations here
-[![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=UUQ3SW5VMV3X4&currency_code=USD&source=url)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=UUQ3SW5VMV3X4&currency_code=USD&source=url).
 Thank you for your support!
 
 This project depends heavily on the PatchStorage API, developed by Blokas: https://patchstorage.com/docs/
@@ -16,23 +16,16 @@ https://www.gnu.org/licenses/gpl-3.0.en.html.
 ZOIA and its patch binary format are a trademark of Empress Effects, Inc. and are used with permission.
 
 Neither the developers nor Empress Effects, Inc. are liable for any issues caused or raised by the use or
-modification of this application. By using the application you agree to these terms.
+modification of this application. By installing the application you agree to these terms.
 
 ## How to Install
-If you've used a beta version of the application, you'll have to delete the saved preferences file from the local backend.
-See here for details on each platform:
-- On Windows, delete `C:\Users\user\AppData\Roaming\.ZoiaLibraryApp\pref.json` (if it exists)
-- On Mac, delete `/Users/user/.Library/Application Support/.ZoiaLibraryApp/pref.json` (if it exists)
-- On Linux, delete `/home/.local/share/.ZoiaLibraryApp/pref.json` (if it exists.. I'd be very surprised if it
-existed since this is the first Linux build)
-
 Application can be installed in one of two ways:
-- (For general users) Use the pre-bundled build, available on Windows, Mac, and Linux (Ubuntu) here:
-https://github.com/meanmedianmoge/zoia_lib/releases/tag/v1.0.
+- (For general users) - Use the pre-bundled build, available on Windows, Mac, and Linux (Ubuntu) here:
+https://github.com/meanmedianmoge/zoia_lib/releases/tag/v1.0.  
 Note that these releases are quite large in size (roughly 100MB compressed), since they require an entire Python
 runtime to work properly. The actual source code is merely 6MB.
 
-- (For developers/contributors) Build from source, requires Python 3.7+
+- (For developers/contributors) - Build from source; requires Python 3.7+
 ```
 # Download source code from Github (either directly from the site or cloning the repo)
 git clone https://github.com/meanmedianmoge/zoia_lib.git
