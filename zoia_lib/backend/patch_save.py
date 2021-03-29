@@ -92,9 +92,12 @@ class PatchSave(Patch):
                                     "r",
                                 ) as f:
                                     meta = json.load(f)
-                                if "_v" in files and meta["title"] != patch[1]["title"]:
+                                if "_v" in files:
                                     meta = meta["title"] + ": {}".format(
-                                        patch[1]["title"]
+                                        patch[1]["files"][0]["filename"]
+                                        .split(".")[0]
+                                        .split("_zoia_")[-1]
+                                        .replace("_", " ")
                                     )
                                 else:
                                     meta = meta["title"]
@@ -203,7 +206,6 @@ class PatchSave(Patch):
                 if file.split(".")[-1] == "bin":
                     with open(os.path.join(pch, file), "rb") as f:
                         if f.read() == patch[0]:
-                            print("there")
                             # This exact binary is already saved onto the
                             # system.
                             raise errors.SavingError(patch[1]["title"], 503)
@@ -474,7 +476,7 @@ class PatchSave(Patch):
                     errs.append(e)
                     continue
 
-        return fails, errs
+        return count-1, fails, errs
 
     def _patch_decompress(self, patch):
         """Method stub for decompressing files retrieved from the PS
