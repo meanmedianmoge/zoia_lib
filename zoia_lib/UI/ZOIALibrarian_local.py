@@ -334,6 +334,7 @@ class ZOIALibrarianLocal(QMainWindow):
                                 self.msg.setIcon(QMessageBox.Information)
                                 self.msg.setWindowTitle("Export Complete")
                                 self.msg.setText("The patch has been successfully exported.")
+                                self.msg.setStandardButtons(QMessageBox.Ok)
                                 self.msg.exec_()
                                 break
 
@@ -390,6 +391,7 @@ class ZOIALibrarianLocal(QMainWindow):
                                     self.msg.setIcon(QMessageBox.Information)
                                     self.msg.setWindowTitle("Export Complete")
                                     self.msg.setText("The patches have been successfully exported.")
+                                    self.msg.setStandardButtons(QMessageBox.Ok)
                                     self.msg.exec_()
                                     break
                             else:
@@ -407,6 +409,7 @@ class ZOIALibrarianLocal(QMainWindow):
                                 self.msg.setIcon(QMessageBox.Information)
                                 self.msg.setWindowTitle("Export Complete")
                                 self.msg.setText("The patches have been successfully exported.")
+                                self.msg.setStandardButtons(QMessageBox.Ok)
                                 self.msg.exec_()
                 # Operation was aborted.
                 break
