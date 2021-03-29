@@ -1243,12 +1243,13 @@ class ZOIALibrarianMain(QMainWindow):
 
         self.worker_version_sd.start()
 
-    def _version_import_done(self, fail_cnt, fails):
+    def _version_import_done(self, count, fail_cnt, fails):
         """Notifies the user once the version import has completed.
         Will also notify the user with the number of patches that failed
         to be imported if they already existed within the Librarian.
         Should be expanded to list which patches failed to import.
 
+        count: The number of patches attempted to be imported, as an int.
         fail_cnt: The number of patches that failed to import, as an int.
         fails: The list of patches which failed to import.
         """
@@ -1260,7 +1261,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-        else:
+        elif count > fail_cnt > 1:
             self.msg.setWindowTitle("Warning")
             word = "was" if fail_cnt == 1 else "were"
             self.msg.setText(
@@ -1271,6 +1272,32 @@ class ZOIALibrarianMain(QMainWindow):
                 "them to appear."
             )
             self.msg.setInformativeText(
+                "Successfully created a partial Version History. "
+                "{} {} already saved in the library and {} not imported.".format(
+                    fail_cnt, word, word
+                )
+            )
+            temp = "List of patches that failed to import: \n"
+            for x in fails:
+                temp += x + "\n"
+            self.msg.setDetailedText(temp.strip("\n"))
+            self.msg.setIcon(QMessageBox.Warning)
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+            self.msg.setInformativeText(None)
+            self.msg.setDetailedText(None)
+        else:
+            self.msg.setWindowTitle("Warning")
+            word = "was" if fail_cnt == 1 else "were"
+            self.msg.setText(
+                "All patches in the specified Version "
+                "History already existed in the Librarian. "
+                "Please delete them before attempting to "
+                "import a version history if you would like "
+                "them to appear."
+            )
+            self.msg.setInformativeText(
+                "Did not create a Version History. "
                 "{} {} already saved in the library and {} not imported.".format(
                     fail_cnt, word, word
                 )
@@ -1380,9 +1407,9 @@ class ZOIALibrarianMain(QMainWindow):
 
     def import_version_menu(self):
         input_dir = self.directory_select()
-        fail_cnt, fails = save.import_to_backend(input_dir, True)
+        count, fail_cnt, fails = save.import_to_backend(input_dir, True)
 
-        return self._version_import_done(fail_cnt, fails)
+        return self._version_import_done(count, fail_cnt, fails)
 
     def closeEvent(self, event):
         """Override the default close operation so certain application
@@ -1511,7 +1538,7 @@ class ImportVersionWorker(QThread):
     """
 
     # UI communication
-    signal = QtCore.Signal(int, list)
+    signal = QtCore.Signal(int, int, list)
 
     def __init__(self, window):
         """Initializes the thread."""
@@ -1527,8 +1554,8 @@ class ImportVersionWorker(QThread):
         """
 
         input_dir = self.window.directory_select()
-        fail_cnt, fails = save.import_to_backend(input_dir, True)
-        self.signal.emit(fail_cnt, fails)
+        count, fail_cnt, fails = save.import_to_backend(input_dir, True)
+        self.signal.emit(count, fail_cnt, fails)
 
 
 class ImportVersionSDWorker(QThread):
@@ -1539,7 +1566,7 @@ class ImportVersionSDWorker(QThread):
     """
 
     # UI communication
-    signal = QtCore.Signal(int, list)
+    signal = QtCore.Signal(int, int, list)
 
     def __init__(self, window):
         """Initializes the thread."""
@@ -1555,5 +1582,5 @@ class ImportVersionSDWorker(QThread):
         """
 
         input_dir = self.window.sd.get_sd_path()
-        fail_cnt, fails = save.import_to_backend(input_dir, True)
-        self.signal.emit(fail_cnt, fails)
+        count, fail_cnt, fails = save.import_to_backend(input_dir, True)
+        self.signal.emit(count, fail_cnt, fails)
