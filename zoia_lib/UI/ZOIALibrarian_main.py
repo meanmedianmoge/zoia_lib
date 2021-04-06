@@ -933,6 +933,7 @@ class ZOIALibrarianMain(QMainWindow):
         # Case 2: Local tab
         elif self.ui.tabs.currentIndex() == 1 and self.ui.searchbar_local.text() != "":
             # Case 2.1: No version
+            # TODO: combine search results by adding the local + versions
             if not self.ui.back_btn_local.isEnabled():
                 self.search_data_local = util.search_patches(
                     self.local.get_data_local(), self.ui.searchbar_local.text()
