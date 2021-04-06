@@ -18,8 +18,6 @@ New Features
 - The export patch dialog will default to the next-available open slot in the directory chosen.
     - Also, if you attempt to overwrite a slot, it will display the name of the patch currently in that slot.
     - Lastly, there is now a confirmation window upon a successful export.
-- Searches will extend into version history information.
-    - However, results that meet the query will display the version name, not the individual patch.
 - The patch import dialog has been updated to display the name of the patch(es) which failed to import.
 - ZOIA got an update, so the app will reflect those changes during binary decoding.
 - UI updates, including:
