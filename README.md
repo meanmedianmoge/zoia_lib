@@ -41,8 +41,7 @@ python -m zoia_lib.backend.startup
 
 ## Documentation
 - Overview video and tutorial: https://www.youtube.com/watch?v=JLOUrWtG1Pk
-- Supplemental 1.1 video: 
-- Includes all collected forms of documentation about using, building, and maintaining the application: see `documentation`
+- Supplemental 1.1 video:
 - User Manuals for all versions thus far are in `/User Manuals`
 - Changelog of the various improvements, bug fixes, and known issues are in `/Changelog`
 - Initial app frameworks and discussions among the dev team and Empress can be found in `/Backend Implementation`, 
@@ -65,18 +64,16 @@ python -m zoia_lib.backend.startup
 - Dark and light themes
 
 ## Contributing
-- We welcome all contributions! If you want to see something added, 
-  either fork or clone the repo to get started.
-  
-  Some useful tools include:
-  - QtDesigner: https://build-system.fman.io/qt-designer-download
-  - PyCharm Community Edition: https://www.jetbrains.com/pycharm/download
-  - Python 3.7.X: https://www.python.org/downloads/release/python-379/
+We welcome all contributions! If you want to see something added, 
+either fork or clone the repo to get started. Some useful tools include:
+- QtDesigner - https://build-system.fman.io/qt-designer-download
+- PyCharm Community Edition - https://www.jetbrains.com/pycharm/download
+- Python 3.9.X - https://www.python.org/downloads/release/python-394/
 
 ## Authors
-- Mike Moger (app owner, primary dev after Beta 3 release, initial Python implementation)
-- John Breton (primary dev, designer, and documentation creator up to Beta 3 release)
-- djigneo/apparent1 (C# binary decoder and testing)
-- Matthew Allen (initial UI frames and app planning)
+- Mike Moger - app owner, primary dev after Beta 3 release, initial Python implementation
+- John Breton - primary dev, designer, and documentation creator up to Beta 3 release
+- djigneo/apparent1 - C# binary decoder and testing
+- Matthew Allen - initial UI frames and app planning
 - Special thanks to Steve Bragg and the entire Empress Effects team for supporting this work
 - Additional thanks to our beta testers and those who submitted user stories
