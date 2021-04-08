@@ -29,7 +29,7 @@ New Features
     - Pop-up message detail.
 - General code upkeep: applied a fancy auto-formatter to the codebase and automated the app-bundling process.
 
-Fixex
+Fixes
 - Fixed an issue where BigSur dependency issues were causing the app to not load (Mac).
 - Fixed an issue where choosing an SD card from the SD tab would cause the UI to snap to the Local Storage tab (credit: smithrobs).
 - Fixed an issue where temp directories would overwrite the patch list in the Local Storage tab, causing it to appear like you had no patches downloaded.
