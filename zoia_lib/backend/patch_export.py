@@ -3,6 +3,7 @@ import os
 import shutil
 
 from zoia_lib.backend.patch import Patch
+from zoia_lib.backend.utilities import generate_blank_patch
 from zoia_lib.common import errors
 
 
@@ -155,4 +156,31 @@ class PatchExport(Patch):
         # we just created.
         if len(fail_list) == len(bank):
             os.rmdir(os.path.join(dest, name))
+        else:
+            # Fill in the empty slots, including ones which failed (if any).
+            if len(bank) - len(fail_list) < 64:
+                slots = sorted([pch["slot"] for pch in bank])
+                empty = list(set([x for x in range(0, 64)]) - set(slots))
+                empty = empty + fail_list
+
+                for slot in empty:
+                    try:
+                        if -1 < slot < 10:
+                            # one digit
+                            blank_name = "00{}_zoia_.bin".format(slot)
+                        elif slot >= 10 < 64:
+                            # two digits
+                            blank_name = "0{}_zoia_.bin".format(slot)
+                        elif slot < 0:
+                            # No slot, not going to an sd card, no need for digits.
+                            pass
+                        else:
+                            # Incorrect slot number provided.
+                            raise errors.ExportingError(slot, 701)
+                    except FileNotFoundError or FileExistsError:
+                        pass
+
+                    with open(os.path.join(dest, name, blank_name), "wb") as f:
+                        f.write(generate_blank_patch())
+
         return fail_list

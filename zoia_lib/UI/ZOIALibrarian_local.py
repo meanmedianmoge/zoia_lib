@@ -13,6 +13,7 @@ from PySide2.QtWidgets import (
 )
 
 from zoia_lib.backend.patch_update import PatchUpdate
+from zoia_lib.backend.utilities import hide_dotted_files
 from zoia_lib.common import errors
 
 update = PatchUpdate()
@@ -269,7 +270,7 @@ class ZOIALibrarianLocal(QMainWindow):
 
             # Find the first open slot in the export dir
             if len(os.listdir(export_path)) > 0:
-                for pch in sorted(os.listdir(export_path)):
+                for pch in hide_dotted_files(export_path, sd=True):
                     first_open_slot = int(pch[1:3]) + 1
             else:
                 first_open_slot = 0
