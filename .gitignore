@@ -134,3 +134,8 @@ dmypy.json
 
 # Mac stuff
 **/.DS_Store
+
+# Editable files
+.docx
+.pptx
+.xlsx
