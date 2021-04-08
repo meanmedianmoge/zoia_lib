@@ -21,7 +21,7 @@ modification of this application. By installing the application you agree to the
 ## How to Install
 Application can be installed in one of two ways:
 - (For general users) - Use the pre-bundled build, available on Windows, Mac, and Linux (Ubuntu) here:
-https://github.com/meanmedianmoge/zoia_lib/releases/tag/v1.0.  
+https://github.com/meanmedianmoge/zoia_lib/releases/tag/v1.1.  
 Note that these releases are quite large in size (roughly 100MB compressed), since they require an entire Python
 runtime to work properly. The actual source code is merely 6MB.
 
@@ -41,6 +41,7 @@ python -m zoia_lib.backend.startup
 
 ## Documentation
 - Overview video and tutorial: https://www.youtube.com/watch?v=JLOUrWtG1Pk
+- Supplemental 1.1 video: 
 - Includes all collected forms of documentation about using, building, and maintaining the application: see `documentation`
 - User Manuals for all versions thus far are in `/User Manuals`
 - Changelog of the various improvements, bug fixes, and known issues are in `/Changelog`
