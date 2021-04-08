@@ -161,10 +161,11 @@ def natural_key(string_):
     return [int(s) if s.isdigit() else s for s in re.split(r"(\d+)", string_)]
 
 
-def hide_dotted_files(path):
+def hide_dotted_files(path, sd: bool = False):
     """Removes hidden files from a list of files in a directory.
 
     directory: List of files.
+    sd: Option to exclude preceding path in list of files.
 
     return: List of files without hidden files.
     """
@@ -172,9 +173,25 @@ def hide_dotted_files(path):
     files = []
     for item in sorted(os.listdir(path)):
         if not item.startswith(".") and os.path.isfile(os.path.join(path, item)):
-            files.append(os.path.join(path, item))
+            if not sd:
+                files.append(os.path.join(path, item))
+            else:
+                files.append(item)
 
-    return files[::-1]
+    if not sd:
+        return files[::-1]
+    else:
+        return sorted(files[::-1])
+
+
+def generate_blank_patch():
+    """Creates a blank patch to be used in the export process
+    to fill any empty slots.
+
+    return: Bytes data.
+    """
+
+    return b'\t' + b'\x00'*8191
 
 
 def add_test_patch(name, idx, path):
