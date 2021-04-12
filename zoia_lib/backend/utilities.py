@@ -123,15 +123,18 @@ def search_patches(data, query):
             hits.append(curr)
             continue
         # Check the version title.
-        if (
-            query
-            in curr["files"][0]["filename"]
-            .split(".")[0]
-            .split("_zoia_")[-1]
-            .replace("_", " ")
-            .lower()
-        ) and curr not in hits:
-            hits.append(curr)
+        try:
+            if (
+                query
+                in curr["files"][0]["filename"]
+                .split(".")[0]
+                .split("_zoia_")[-1]
+                .replace("_", " ")
+                .lower()
+            ) and curr not in hits:
+                hits.append(curr)
+                continue
+        except KeyError:
             continue
         # Check the author (local and bank tabs only).
         if (
