@@ -50,5 +50,137 @@ Future Plans
     - This was originally planned for v1.1, but is now pushed to v1.2 due to added complexity.
     - The intent is to allow users to see the full audio and CV routing for a given patch as a whole.
 
-As always, we welcome any feedback you may have. Thanks for being awesome :)
-- Mike M.
+_________________________________________
+
+Version 1.0 (September 25, 2020)
+
+New Features
+- Finalized ZOIA binary parsing implementation. Again, massive thanks to djigneo/apparent1 for the initial C# code. As of this release, all features of the patch are fully exposed and can be decoded into a JSON object for further use.
+- Patch visualizer has been updated with more information to help you understand patches at a quick-glance.
+- Added the ability to search and sort for patches by author name.
+    - This applies to Local and Bank tabs only
+    - PS tab author search and sort will not be supported at this time due to the API structure.
+- Updated patch importing so that patches with near-identical names are merged upon import (instead of strictly identical names).
+- Updated the behavior of the SD and Bank tables so that multiples can be selected and moved in different ways:
+    - Hold Shift and click the start and end patches to move.
+    - Hold Ctrl/Cmd and click on each patch you'd like to move.
+- Patches can now be moved into a bank in the following ways:
+    - Dragging single or multiple selections (similar options as above) at once.
+    - Include an Add to Bank button for single selections at a time.
+- Added a Clear Bank button to wipe the bank tables clean.
+- Added a new Help toolbar which allows users to access documentation and useful ZOIA resources. These will display in the PS tab browser panel. You can also search for different commands/shortcuts.
+- Added a Reset UI menu option in the event that users mangle the UI panels or tables.
+- Updated the light theme colors to give it a more muted look.
+- Alternating row colors is now a saved preference. It will save whatever is the current setting upon closing the application.
+- Added a step-by-step guide for how to compile the application from source for developers, contributors or users who were unable to open the beta builds.
+- Added our first Linux build! We aim to support the latest stable version of Ubuntu going forward. If you are a Linux user who prefers other distributions, please contact me.
+
+Fixes
+- Fixed an issue that occurred while importing a version history (Mac).
+- Removed the threads used with menu action multi-import functions (Mac temporary fix).
+- Fixed an issue where the dates of imported patches were back-dated to the history of the SD card.
+- Fixed an issue with SD card imported files having mangled filenames (Windows). This also caused patches to not export properly.
+- Fixed an issue where changing the font/font size didn't apply to themes or buttons.
+
+Known Issues
+- Certain patch binaries cannot be fully decoded due to being saved on deprecated ZOIA firmware.
+- Saved UI preferences are not being applied correctly for the Local Storage tab - specifically the vertical splitter (Mac).
+
+Future Plans
+- Expansion view of routing for patch visualizer. Right now, the connections are displayed on a module-block level, but not from a general patch level. The expander would provide an in-depth visualization of audio and CV routing, likely to be displayed in a new tab.
+- Extend the binary decoder methods into an API for other applications/programs to utilize.
+- Simplify and automate code structure for releases (currently, a minimal-working version of the code needs to be created for the app-building process).
+- Allow for custom themes/colors in the UI.
+- Actually fix threading issues associated with menu action multi-imports.
+
+_________________________________________
+
+Beta 3 (August 7, 2020)
+
+New Features
+- Added an early implementation of a patch visualizer. Massive thanks to apparent1 for the initial C#
+  implementation, and special thanks to chmjacques and meanmedianmoge for helping with the binary
+  analysis. This is a feature that will grow in the future and may eventually turn into a full patch
+  editor (absolutely zero promises there).
+- The application now works offline! However, you won't be able to access the PatchStorage View tab while
+  offline. May require a restart to detect an internet connection.
+- Added the ability to download all patches from PatchStorage (via a suggestion from Steve, thanks Steve!)
+- Added threading support to processes that would stall the application (such as importing, checking for
+  updates, and refreshing the PatchStorage patch list).
+- Added some more style tweaks to the Windows version of Beta 3.
+- Optimizations to have the Librarian run smoother and better than Beta 2. Take that Beta 2!
+  Nobody downloaded you anyway.
+- Added the ability to download patches that use the .rar compression algorithm. This will only work if
+  you have WinRAR installed on your computer.
+
+Fixes
+- Fixed a error that occured when trying to import a version history that contained more than 10 patches
+  (thanks chmjacques and meanmedianmoge!)
+- Fixed an exporting error that would result in a popup saying an export was successful even if the user
+  cancelled out of the export.
+- Fixed an isue when the application is launched for the first time and tables would not retain their
+  specified sizes.
+- Fixed sorting order not being maintained after a search.
+- Fixed an issue with Bank saving (it actually works now).
+- Remade the logo and splash screen using a clearer ZOIA logo.
+
+Futrue Plans
+- Expanding on the patch visualizer with more info, having the length of modules be correctly represented,
+  and the ability to view connections between modules.
+- Improving the patch preview widget to make it look nicer and not like a giant wall of text.
+- Anything else the community wants to see implemented!
+
+_________________________________________
+
+Beta 2 (July 15, 2020)
+
+New Features
+- The ZOIA Librarian will now save application settings on close. Did you hate having to resize the tables constantly?
+  Probably. Now you just need to resize once and be done with it! Additional settings that are saved include the size
+  of the window, the font and font size, the SD card (should it have been specified) and whether dark mode is enabled.
+- Speaking of font saving, you can now change the font and font size used throughout the application. Check it out in
+  the options menu.
+- Also speaking of dark mode, yup, there's a dark mode now. Check it out in the options menu.
+  (What do you mean nobody asked for this?)
+- Added early support for imported directories to be treated as versions in the ZOIA Librarian.
+  More features surrounding this will be included in Beta 3.
+- Added some styling to the application to make it less bland.
+- Added keyboard shortcuts to all menu items.
+- Added the ability to delete items off of an SD card from within the ZOIA Librarian.
+- Added a check that will try to detect if a patch you are importing is currently hosted on PatchStorage. If it is,
+  the tags, categories, and patch notes will be retrieved when the patch is imported (Thanks Ch3ryl)!
+  (note this won't work 100% of the time, the patch must be named the same as the entry on PatchStorage).
+- Added the ability to drag/drop multiple patches in the SD card tables and bank tables. Now, organizing banks/sd
+  card folders can be done faster than ever!
+- Added accessibility text throughout the application.
+
+Fixes
+- The "Load Bank" button will not be enabled if there are no banks saved once the user launches the application.
+- Fixed the issue where updating the patch notes added a blank line at the start. The update patch notes button
+  is sorry. (It's okay update patch notes button, we forgive you).
+- Fixed the case where loading/exporting a bank that had a patch that was deleted from the ZOIA Librarian caused
+  a crash. Now, a message box will inform the user of such occurances, and in the case of exporting,
+  will also specify which patches failed to export.
+- Fixed some message boxes failing to display the application logo.
+- Fixed the layout of the Bank tab so that the user does not need to drag a patch as far as before to add it to a
+  Bank.
+- Fixed a bug with the Banks tables where if a user dragged patch and released it between two rows the table would
+  occasionally make new phantom rows.
+- Fixed an issue with importing where the ### prefix would be imported in the _zoia_ prefix was missing from a patch
+  (Thanks markcrosbie!)
+- Fixed an issue where if a bank had multiple of the same patch and a user tried to delete the one that occured later
+  in the slot list, the wrong patch would be deleted from the bank (currently a Windows only fix).
+- Fixed an issue with file names that contained "." in their name before the extension.
+- Fixed importing failing if the directory contained any "."s in its name (thanks chmjacques!)
+- Fixed an issue where views would be counted multiple times in one session.
+- Fixed an error that would "allow" a patch to be exporting even if an SD card was not inserted into the computer.
+- Addressed the case where a user deletes the second to last patch in a Version History such that they are now sent
+  back to the main local patch overview (thanks meanmedianmoge)!
+- Added multiple new popups to confirm when actions have finished processing.
+
+Plans for Beta 3
+- Making the application feel a lot more responsive (no more freezing while trying to look for patch updates).
+- Adding a patch visualizer (very hush hush right now, please stay tuned).
+- Improving the patch preview to have it include images and generally style it more like a website rather than
+  a wall of text.
+- Some low-level optimizations to make it so the application starts faster.
