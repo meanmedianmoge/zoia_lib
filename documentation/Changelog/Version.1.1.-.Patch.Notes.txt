@@ -31,9 +31,9 @@ New Features
 
 Fixes
 - Fixed an issue where BigSur dependency issues were causing the app to not load (Mac).
-- Fixed an issue where choosing an SD card from the SD tab would cause the UI to snap to the Local Storage tab (credit: smithrobs).
+- Fixed an issue where choosing an SD card from the SD tab would cause the UI to snap to the Local Storage tab (credit to smithrobs).
 - Fixed an issue where temp directories would overwrite the patch list in the Local Storage tab, causing it to appear like you had no patches downloaded.
-- Mac build is now confirmed to work with the .app file. No more needing to run from the terminal (credit: smithrobs)!
+- Mac build is now confirmed to work with the .app file. No more needing to run from the terminal (credit to smithrobs).
 
 Known Issues
 - RAR-compressed files cannot be downloaded on Mac (as of this writing, this affects 1 patch - ZOIA Murf v2).
@@ -55,7 +55,8 @@ _________________________________________
 Version 1.0 (September 25, 2020)
 
 New Features
-- Finalized ZOIA binary parsing implementation. Again, massive thanks to djigneo/apparent1 for the initial C# code. As of this release, all features of the patch are fully exposed and can be decoded into a JSON object for further use.
+- Finalized ZOIA binary parsing implementation (massive credit to djigneo/apparent1 for this).
+    - As of this release, all features of the patch are fully exposed and can be decoded into a JSON object for further use.
 - Patch visualizer has been updated with more information to help you understand patches at a quick-glance.
 - Added the ability to search and sort for patches by author name.
     - This applies to Local and Bank tabs only
@@ -68,12 +69,16 @@ New Features
     - Dragging single or multiple selections (similar options as above) at once.
     - Include an Add to Bank button for single selections at a time.
 - Added a Clear Bank button to wipe the bank tables clean.
-- Added a new Help toolbar which allows users to access documentation and useful ZOIA resources. These will display in the PS tab browser panel. You can also search for different commands/shortcuts.
+- Added a new Help toolbar which allows users to access documentation and useful ZOIA resources.
+    - These will display in the PS tab browser panel.
+    - You can also search for different commands/shortcuts.
 - Added a Reset UI menu option in the event that users mangle the UI panels or tables.
 - Updated the light theme colors to give it a more muted look.
-- Alternating row colors is now a saved preference. It will save whatever is the current setting upon closing the application.
+- Alternating row colors is now a saved preference.
+    - It will save whatever is the current setting upon closing the application.
 - Added a step-by-step guide for how to compile the application from source for developers, contributors or users who were unable to open the beta builds.
-- Added our first Linux build! We aim to support the latest stable version of Ubuntu going forward. If you are a Linux user who prefers other distributions, please contact me.
+- Added our first Linux build! We aim to support the latest stable version of Ubuntu going forward.
+    - If you are a Linux user who prefers other distributions, please contact me.
 
 Fixes
 - Fixed an issue that occurred while importing a version history (Mac).
@@ -87,7 +92,9 @@ Known Issues
 - Saved UI preferences are not being applied correctly for the Local Storage tab - specifically the vertical splitter (Mac).
 
 Future Plans
-- Expansion view of routing for patch visualizer. Right now, the connections are displayed on a module-block level, but not from a general patch level. The expander would provide an in-depth visualization of audio and CV routing, likely to be displayed in a new tab.
+- Expansion view of routing for patch visualizer.
+    - Right now, the connections are displayed on a module-block level, but not from a general patch level.
+    - The expander would provide an in-depth visualization of audio and CV routing, likely to be displayed in a new tab.
 - Extend the binary decoder methods into an API for other applications/programs to utilize.
 - Simplify and automate code structure for releases (currently, a minimal-working version of the code needs to be created for the app-building process).
 - Allow for custom themes/colors in the UI.
