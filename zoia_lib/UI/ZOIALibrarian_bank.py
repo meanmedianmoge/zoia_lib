@@ -3,7 +3,6 @@ import os
 import platform
 
 from PySide2.QtCore import QEvent
-from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import (
     QTableWidgetItem,
     QPushButton,
@@ -387,9 +386,10 @@ class ZOIALibrarianBank(QMainWindow):
         # Check each row of both tables and add them to data_banks.
         for i in range(32):
             temp_left = self.ui.table_bank_left.cellWidget(i, 1)
-            temp_right = self.ui.table_bank_right.cellWidget(i, 1)
             if temp_left is not None:
                 self.data_banks.append({"slot": i, "id": temp_left.objectName()})
+        for i in range(32):
+            temp_right = self.ui.table_bank_right.cellWidget(i, 1)
             if temp_right is not None:
                 self.data_banks.append({"slot": i + 32, "id": temp_right.objectName()})
 
