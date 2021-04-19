@@ -80,7 +80,7 @@ class ZOIALibrarianMain(QMainWindow):
         # Helper classes init
         self.util = ZOIALibrarianUtil(self.ui, self)
         self.sd = ZOIALibrarianSD(self.ui, save, self.msg, delete, self.util)
-        self.bank = ZOIALibrarianBank(self.ui, self.path, self.msg, self.util)
+        self.bank = ZOIALibrarianBank(self.ui, self.path, self.msg, self.util, self)
         self.ps = ZOIALibrarianPS(
             self.ui, api, self.path, self.msg, save, self.sort_and_set
         )
