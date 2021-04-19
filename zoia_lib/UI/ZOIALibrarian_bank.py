@@ -19,7 +19,7 @@ class ZOIALibrarianBank(QMainWindow):
     activities contained within the Banks tab of the application.
     """
 
-    def __init__(self, ui, path, msg, util):
+    def __init__(self, ui, path, msg, util, window):
         """Initializes the class with the required parameters.
 
         ui: The UI component of ZOIALibrarianMain
@@ -36,6 +36,7 @@ class ZOIALibrarianBank(QMainWindow):
         self.path = path
         self.msg = msg
         self.util = util
+        self.window = window
 
         self.data_banks = []
         self.rows_left = []
@@ -488,7 +489,32 @@ class ZOIALibrarianBank(QMainWindow):
             occupied = [False] * 64
             for pch in self.data_banks:
                 occupied[pch["slot"]] = True
-            drop_index = occupied.index(False)
+            try:
+                drop_index = occupied.index(False)
+            except ValueError:
+                # Trying to move patches to a full bank
+                slot, ok = QInputDialog().getInt(
+                    self.window,
+                    "Bank Full",
+                    "Select a slot to overwrite. \n\n"
+                    "Note that if you're moving a version history, \n"
+                    "multiple patches will be overwritten.",
+                    0,
+                    minValue=0,
+                    maxValue=63,
+                )
+                if ok:
+                    drop_index = slot
+                else:
+                    self.msg.setWindowTitle("Bank Full")
+                    self.msg.setIcon(QMessageBox.Information)
+                    self.msg.setText(
+                        "No patches were moved. "
+                        "Try dragging and dropping to a slot to overwrite."
+                    )
+                    self.msg.setStandardButtons(QMessageBox.Ok)
+                    self.msg.exec_()
+                    return
         else:
             drop_index = 0
             # Need to enable the buttons now that there is a
@@ -514,7 +540,7 @@ class ZOIALibrarianBank(QMainWindow):
                 self.msg.setIcon(QMessageBox.Information)
                 self.msg.setText(
                     "The version directory contains {} patches, "
-                    "so it must be dragged to slot {} or lower.".format(pch_num + 1, 63-pch_num)
+                    "so it must be moved to slot {} or lower.".format(pch_num + 1, 63-pch_num)
                 )
                 self.msg.setStandardButtons(QMessageBox.Ok)
                 self.msg.exec_()
