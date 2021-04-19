@@ -476,7 +476,7 @@ class PatchSave(Patch):
                     errs.append(e)
                     continue
 
-        return count-1, fails, errs
+        return count - 1, fails, errs
 
     def _patch_decompress(self, patch):
         """Method stub for decompressing files retrieved from the PS

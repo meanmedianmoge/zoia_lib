@@ -194,7 +194,7 @@ def generate_blank_patch():
     return: Bytes data.
     """
 
-    return b'\t' + b'\x00'*32767
+    return b"\t" + b"\x00" * 32767
 
 
 def add_test_patch(name, idx, path):

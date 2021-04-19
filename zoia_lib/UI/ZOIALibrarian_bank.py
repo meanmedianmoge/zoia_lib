@@ -197,8 +197,7 @@ class ZOIALibrarianBank(QMainWindow):
             self.msg.setWindowTitle("Warning")
             self.msg.setIcon(QMessageBox.Warning)
             self.msg.setText(
-                "Are you sure you want to overwrite "
-                "the current data in the table?"
+                "Are you sure you want to overwrite " "the current data in the table?"
             )
             self.msg.setInformativeText(
                 "If you haven't saved your changes they will be lost."
@@ -540,7 +539,9 @@ class ZOIALibrarianBank(QMainWindow):
                 self.msg.setIcon(QMessageBox.Information)
                 self.msg.setText(
                     "The version directory contains {} patches, "
-                    "so it must be moved to slot {} or lower.".format(pch_num + 1, 63-pch_num)
+                    "so it must be moved to slot {} or lower.".format(
+                        pch_num + 1, 63 - pch_num
+                    )
                 )
                 self.msg.setStandardButtons(QMessageBox.Ok)
                 self.msg.exec_()

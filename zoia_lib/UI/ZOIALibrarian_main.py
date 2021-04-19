@@ -1126,21 +1126,13 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setText("Incorrect file selected, importing failed.")
             self.msg.exec_()
         except errors.SavingError as e:
-            e = (
-                str(e)
-                .split("(")[1]
-                .split(")")[0]
-                .split(",")[0]
-                .replace("'", "")
-            )
+            e = str(e).split("(")[1].split(")")[0].split(",")[0].replace("'", "")
             # Prepare a message box.
             self.msg.setWindowTitle("Patch Already In Library")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText(
                 "That patch exists within your locally "
-                "saved patches as {}. \nNo importing has occurred.".format(
-                    e
-                )
+                "saved patches as {}. \nNo importing has occurred.".format(e)
             )
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
