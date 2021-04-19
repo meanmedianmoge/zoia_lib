@@ -301,7 +301,9 @@ class ZOIALibrarianLocal(QMainWindow):
                             )
                             self.msg.setIcon(QMessageBox.Information)
                             self.msg.setWindowTitle("Export Complete")
-                            self.msg.setText("The patch has been successfully exported.")
+                            self.msg.setText(
+                                "The patch has been successfully exported."
+                            )
                             self.msg.exec_()
                             break
                         except errors.ExportingError as e:
@@ -334,7 +336,9 @@ class ZOIALibrarianLocal(QMainWindow):
                                 )
                                 self.msg.setIcon(QMessageBox.Information)
                                 self.msg.setWindowTitle("Export Complete")
-                                self.msg.setText("The patch has been successfully exported.")
+                                self.msg.setText(
+                                    "The patch has been successfully exported."
+                                )
                                 self.msg.setStandardButtons(QMessageBox.Ok)
                                 self.msg.exec_()
                                 break
@@ -391,7 +395,9 @@ class ZOIALibrarianLocal(QMainWindow):
                                             slot += 1
                                     self.msg.setIcon(QMessageBox.Information)
                                     self.msg.setWindowTitle("Export Complete")
-                                    self.msg.setText("The patches have been successfully exported.")
+                                    self.msg.setText(
+                                        "The patches have been successfully exported."
+                                    )
                                     self.msg.setStandardButtons(QMessageBox.Ok)
                                     self.msg.exec_()
                                     break
@@ -409,7 +415,9 @@ class ZOIALibrarianLocal(QMainWindow):
                                         slot += 1
                                 self.msg.setIcon(QMessageBox.Information)
                                 self.msg.setWindowTitle("Export Complete")
-                                self.msg.setText("The patches have been successfully exported.")
+                                self.msg.setText(
+                                    "The patches have been successfully exported."
+                                )
                                 self.msg.setStandardButtons(QMessageBox.Ok)
                                 self.msg.exec_()
                 # Operation was aborted.

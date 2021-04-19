@@ -52,9 +52,7 @@ class PatchExport(Patch):
         if not overwrite:
             for pch in os.listdir(dest):
                 if pch[:3] == "00{}".format(slot) or pch[:3] == "0{}".format(slot):
-                    name = (
-                        pch[9:].split(".")[0].replace("_", " ").title()
-                    )
+                    name = pch[9:].split(".")[0].replace("_", " ").title()
                     raise errors.ExportingError(name, 703)
         else:
             # Delete the previous patch that occupied the slot.
