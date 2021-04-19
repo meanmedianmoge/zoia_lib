@@ -480,10 +480,15 @@ class ZOIALibrarianBank(QMainWindow):
         src = self.ui.table_bank_local.indexAt(self.sender().pos()).row()
         idx = self.ui.table_bank_local.cellWidget(src, 0).objectName()
 
-        # Find the first open slot in the bank
+        # Resort the bank list
+        self._get_bank_data()
+
+        # Find an open slot in the bank
         if self.data_banks:
+            occupied = [False] * 64
             for pch in self.data_banks:
-                drop_index = pch["slot"] + 1
+                occupied[pch["slot"]] = True
+            drop_index = occupied.index(False)
         else:
             drop_index = 0
             # Need to enable the buttons now that there is a
@@ -508,12 +513,8 @@ class ZOIALibrarianBank(QMainWindow):
                 self.msg.setWindowTitle("No Space")
                 self.msg.setIcon(QMessageBox.Information)
                 self.msg.setText(
-                    """
-                    The version directory contains {} patches,
-                    so it must be dragged to slot {} or lower
-                """.format(
-                        pch_num + 1, 63 - pch_num
-                    )
+                    "The version directory contains {} patches, "
+                    "so it must be dragged to slot {} or lower.".format(pch_num + 1, 63-pch_num)
                 )
                 self.msg.setStandardButtons(QMessageBox.Ok)
                 self.msg.exec_()
