@@ -56,7 +56,8 @@ QPushButton {
     color: #FFF;
 }
 
-QPushButton#btn_load_bank {
+QPushButton#btn_load_bank,
+QPushButton#btn_export_bank {
     padding: 2px 25px 2px 25px;
     border: 1px solid black;
 }
@@ -66,7 +67,8 @@ QPushButton#import_all_btn,
 QPushButton#import_all_ver_btn,
 QPushButton#btn_dwn_all,
 QPushButton#btn_prev_page,
-QPushButton#btn_next_page {
+QPushButton#btn_next_page,
+QPushButton#set_export_dir_btn {
     border-radius: 5px;
     padding: 2px 2px 2px 2px;
     border: 1px solid black;
@@ -89,7 +91,7 @@ QPushButton#update_patch_notes {
 
 QPushButton#refresh_pch_btn,
 QPushButton#check_for_updates_btn,
-QPushButton#btn_export_bank {
+QPushButton#btn_clear_bank {
     border-top-right-radius: 10px 5px;
     padding: 2px 5px 2px 5px;
     border: 1px solid black;
