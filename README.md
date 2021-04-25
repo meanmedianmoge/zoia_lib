@@ -21,11 +21,9 @@ modification of this application. By installing the application you agree to the
 ## How to Install
 Application can be installed in one of two ways:
 - (For general users) - Use the pre-bundled build, available on Windows, Mac, and Linux (Ubuntu) here:
-https://github.com/meanmedianmoge/zoia_lib/releases/tag/v1.1.  
-Note that these releases are quite large in size (roughly 100MB compressed), since they require an entire Python
-runtime to work properly. The actual source code is merely 6MB.
+https://github.com/meanmedianmoge/zoia_lib/releases/tag/v1.1.
 
-- (For developers/contributors) - Build from source; requires Python 3.7+
+- (For developers/contributors) - Build from source; requires Python 3.7+.
 ```
 # Download source code from Github (either directly from the site or cloning the repo)
 git clone https://github.com/meanmedianmoge/zoia_lib.git
