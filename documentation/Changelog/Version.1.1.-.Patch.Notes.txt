@@ -1,4 +1,4 @@
-Version 1.1 (April 2021)
+Version 1.1 (May 2021)
 
 New Features
 - The visualizer panel has received a few upgrades, including:
