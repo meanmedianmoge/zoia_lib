@@ -882,17 +882,24 @@ class PatchBinary(Patch):
                 blocks.append(d[1])
                 blocks.append(d[2])
             blocks.append(d[3])
-        elif idx == 87:
-            blocks = [d[0]]
-            if opt[0][1] == "enabled":
-                blocks.append(d[1])
-            blocks.append(d[2])
-            blocks.append(d[3])
-            blocks.append(d[4])
-            blocks.append(d[5])
-            if opt[2][1] == "on":
-                blocks.append(d[6])
-            blocks.append(d[7])
+        elif idx == 104:
+            blocks = []
+            for i in range(1, opt[0][1] + 1):
+                blocks.append(d[i - 1])
+            for i in range(1, opt[0][1] + 1):
+                blocks.append(d[i + 7])
+            blocks.append(d[16])
+        # elif idx == 88:
+        #     blocks = [d[0]]
+        #     if opt[0][1] == "enabled":
+        #         blocks.append(d[1])
+        #     blocks.append(d[2])
+        #     blocks.append(d[3])
+        #     blocks.append(d[4])
+        #     blocks.append(d[5])
+        #     if opt[2][1] == "on":
+        #         blocks.append(d[6])
+        #     blocks.append(d[7])
         elif idx in [
             3,
             8,
