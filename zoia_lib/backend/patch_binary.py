@@ -393,6 +393,7 @@ class PatchBinary(Patch):
         out_count = counter.count("Audio Output")
         midi_count = sum("midi" in s.lower() for s in counter)
         stomp_count = counter.count("Stompswitch")
+        cv_count = sum("cport" in s.lower() for s in counter)
 
         if in_count == 0:
             in_type = None
@@ -410,6 +411,10 @@ class PatchBinary(Patch):
             stomps = None
         elif stomp_count > 1:
             stomps = []
+        if cv_count == 0:
+            cvs = None
+        elif cv_count > 1:
+            cvs = []
 
         for k, v in type_dict.items():
             if v == "Audio Input":
@@ -436,6 +441,24 @@ class PatchBinary(Patch):
                     stomps = modules[k]["options"]["stompswitch"].title()
                 elif stomp_count > 1:
                     stomps.append(modules[k]["options"]["stompswitch"].title())
+            if "cport" in v.lower():
+                try:
+                    if cv_count == 1:
+                        cvs = (
+                            modules[k]["type"]
+                            .title()
+                            .split("Cport")[-1]
+                            .strip()
+                        )
+                    elif cv_count > 1:
+                        cvs.append(
+                            modules[k]["type"]
+                            .split("Cport")[-1]
+                            .strip()
+                        )
+                except KeyError:
+                    if cv_count == 1:
+                        cvs = None
 
         if midi_count > 1:
             midi = list(set(midi))
@@ -452,11 +475,19 @@ class PatchBinary(Patch):
                 stomps = sorted(stomps)
                 stomps = json.dumps(stomps).replace('"', "")
 
+        if cv_count > 1:
+            cvs = list(set(cvs))
+            if len(cvs) == 1:
+                cvs = cvs[0]
+        if not cvs:
+            cvs = None
+
         return {
             "inputs": in_type,
             "outputs": out_type,
             "midi_channel": midi,
             "stompswitches": stomps,
+            "cport": cvs,
         }
 
     def _calc_blocks(self, module):
