@@ -683,6 +683,7 @@ class ZOIALibrarianLocal(QMainWindow):
             Inputs: {} <br>
             Outputs: {} <br>
             Stompswitches: {} <br>
+            Cport: {} <br>
             MIDI Channels: {} <br>
             Number of Pages: {} <br>
             Number of Starred Params: {}
@@ -692,6 +693,7 @@ class ZOIALibrarianLocal(QMainWindow):
                 viz["meta"]["i_o"]["inputs"],
                 viz["meta"]["i_o"]["outputs"],
                 viz["meta"]["i_o"]["stompswitches"],
+                viz["meta"]["i_o"]["cport"],
                 viz["meta"]["i_o"]["midi_channel"],
                 viz["meta"]["n_pages"],
                 viz["meta"]["n_starred"],
@@ -735,6 +737,7 @@ class ZOIALibrarianLocal(QMainWindow):
             Inputs: {} <br>
             Outputs: {} <br>
             Stompswitches: {} <br>
+            Cport: {} <br>
             MIDI Channels: {} <br>
             Number of Pages: {} <br>
             Number of Starred Params: {}
@@ -744,6 +747,7 @@ class ZOIALibrarianLocal(QMainWindow):
                 self.curr_viz["meta"]["i_o"]["inputs"],
                 self.curr_viz["meta"]["i_o"]["outputs"],
                 self.curr_viz["meta"]["i_o"]["stompswitches"],
+                self.curr_viz["meta"]["i_o"]["cport"],
                 self.curr_viz["meta"]["i_o"]["midi_channel"],
                 self.curr_viz["meta"]["n_pages"],
                 self.curr_viz["meta"]["n_starred"],
@@ -772,6 +776,7 @@ class ZOIALibrarianLocal(QMainWindow):
             Inputs: {} <br>
             Outputs: {} <br>
             Stompswitches: {} <br>
+            Cport: {} <br>
             MIDI Channels: {} <br>
             Number of Pages: {} <br>
             Number of Starred Params: {}
@@ -781,6 +786,7 @@ class ZOIALibrarianLocal(QMainWindow):
                 self.curr_viz["meta"]["i_o"]["inputs"],
                 self.curr_viz["meta"]["i_o"]["outputs"],
                 self.curr_viz["meta"]["i_o"]["stompswitches"],
+                self.curr_viz["meta"]["i_o"]["cport"],
                 self.curr_viz["meta"]["i_o"]["midi_channel"],
                 self.curr_viz["meta"]["n_pages"],
                 self.curr_viz["meta"]["n_starred"],
