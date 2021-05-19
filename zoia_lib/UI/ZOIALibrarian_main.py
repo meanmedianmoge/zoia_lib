@@ -308,6 +308,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.set_export_dir_btn.clicked.connect(self.sd.export_path)
         self.ui.actionToggle_Dark_Mode_2.triggered.connect(self.util.toggle_dark)
         self.ui.btn_dwn_all.clicked.connect(self.ps.download_all_thread)
+        self.ui.btn_show_routing.clicked.connect(self.local.setup_exp)
         self.ui.back_btn.clicked.connect(self.local.viz_reset)
         self.ui.btn_next_page.clicked.connect(self.local.viz_page)
         self.ui.btn_prev_page.clicked.connect(self.local.viz_page)
@@ -840,6 +841,7 @@ class ZOIALibrarianMain(QMainWindow):
                         ) as f:
                             viz = binary.parse_data(f.read())
                     self.local.setup_viz(viz)
+                    self.ui.btn_show_routing.setEnabled(True)
 
             # Oh boy HTML code for the patch preview.
             if not skip:

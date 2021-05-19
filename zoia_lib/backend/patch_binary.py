@@ -83,6 +83,7 @@ class PatchBinary(Patch):
             size = data[curr_step]
             curr_module = {
                 "number": i,
+                "category": self._get_module_data(data[curr_step + 1], "category"),
                 "mod_idx": data[curr_step + 1],
                 "name": self._qc_name(
                     pch_data[
@@ -174,7 +175,7 @@ class PatchBinary(Patch):
         # Extract the page data for each page in the patch.
         for k in range(data[curr_step]):
             curr_page = self._qc_name(
-                pch_data[(curr_step + 1) * 4 : (curr_step + 1) * 4 + 16]
+                pch_data[(curr_step + 1) * 4: (curr_step + 1) * 4 + 16]
             )
             pages.append(curr_page)
             curr_step += 4
@@ -225,7 +226,7 @@ class PatchBinary(Patch):
         json_bin = {
             "name": name,
             "modules": modules,
-            # "connections": connections,
+            "connections": connections,
             "pages": pages,
             # "starred": starred,
             # "colours": colours

@@ -759,8 +759,33 @@
                           </widget>
                          </item>
                          <item>
-                          <layout class="QHBoxLayout" name="horizontalLayout_19">
-                           <item>
+                          <layout class="QGridLayout" name="gridLayout">
+                           <item row="0" column="1">
+                            <widget class="QPushButton" name="btn_next_page">
+                             <property name="cursor">
+                              <cursorShape>PointingHandCursor</cursorShape>
+                             </property>
+                             <property name="mouseTracking">
+                              <bool>true</bool>
+                             </property>
+                             <property name="toolTip">
+                              <string>Click here to view the next page in the selected patch.</string>
+                             </property>
+                             <property name="statusTip">
+                              <string>Click here to view the next page in the selected patch.</string>
+                             </property>
+                             <property name="accessibleName">
+                              <string>Next viz page Local Storage View</string>
+                             </property>
+                             <property name="accessibleDescription">
+                              <string>Navigates to the next page in the visualizer for the selected patch.</string>
+                             </property>
+                             <property name="text">
+                              <string>Page +</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item row="0" column="0">
                             <widget class="QPushButton" name="btn_prev_page">
                              <property name="cursor">
                               <cursorShape>PointingHandCursor</cursorShape>
@@ -785,8 +810,8 @@
                              </property>
                             </widget>
                            </item>
-                           <item>
-                            <widget class="QPushButton" name="btn_next_page">
+                           <item row="1" column="1">
+                            <widget class="QPushButton" name="btn_show_routing">
                              <property name="cursor">
                               <cursorShape>PointingHandCursor</cursorShape>
                              </property>
@@ -794,19 +819,44 @@
                               <bool>true</bool>
                              </property>
                              <property name="toolTip">
-                              <string>Click here to view the next page in the selected patch.</string>
+                              <string>Click to display the patch routing for the selected patch.</string>
                              </property>
                              <property name="statusTip">
-                              <string>Click here to view the next page in the selected patch.</string>
+                              <string>Click to display the patch routing for the selected patch.</string>
                              </property>
                              <property name="accessibleName">
-                              <string>Next viz page Local Storage View</string>
+                              <string>Show Routing button Local Storage View</string>
                              </property>
                              <property name="accessibleDescription">
-                              <string>Navigates to the next page in the visualizer for the selected patch.</string>
+                              <string>Opens a new window to display the full patch routing, with interactive options.</string>
                              </property>
                              <property name="text">
-                              <string>Page +</string>
+                              <string>Expand</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item row="1" column="0">
+                            <widget class="QPushButton" name="back_btn">
+                             <property name="cursor">
+                              <cursorShape>PointingHandCursor</cursorShape>
+                             </property>
+                             <property name="mouseTracking">
+                              <bool>true</bool>
+                             </property>
+                             <property name="toolTip">
+                              <string>Click here to view the patch-level details.</string>
+                             </property>
+                             <property name="statusTip">
+                              <string>Click here to view the patch-level details.</string>
+                             </property>
+                             <property name="accessibleName">
+                              <string>Back button viz Local Storage View</string>
+                             </property>
+                             <property name="accessibleDescription">
+                              <string>Navigates the display back to the patch-level details if you are within a module.</string>
+                             </property>
+                             <property name="text">
+                              <string>Clear</string>
                              </property>
                             </widget>
                            </item>
@@ -1416,31 +1466,6 @@
                      </item>
                     </layout>
                    </widget>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="back_btn">
-                   <property name="cursor">
-                    <cursorShape>PointingHandCursor</cursorShape>
-                   </property>
-                   <property name="mouseTracking">
-                    <bool>true</bool>
-                   </property>
-                   <property name="toolTip">
-                    <string>Click here to view the patch-level details.</string>
-                   </property>
-                   <property name="statusTip">
-                    <string>Click here to view the patch-level details.</string>
-                   </property>
-                   <property name="accessibleName">
-                    <string>Back button viz Local Storage View</string>
-                   </property>
-                   <property name="accessibleDescription">
-                    <string>Navigates the display back to the patch-level details if you are within a module.</string>
-                   </property>
-                   <property name="text">
-                    <string>Reset</string>
-                   </property>
                   </widget>
                  </item>
                 </layout>

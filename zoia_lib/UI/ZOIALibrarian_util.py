@@ -78,6 +78,7 @@ class ZOIALibrarianUtil:
             self.ui.back_btn_local.setFont(new_font)
             self.ui.check_for_updates_btn.setFont(new_font)
             self.ui.update_patch_notes.setFont(new_font)
+            self.ui.btn_show_routing.setFont(new_font)
             self.ui.page_label.setFont(new_font)
             self.ui.back_btn.setFont(new_font)
             self.ui.btn_next_page.setFont(new_font)

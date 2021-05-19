@@ -2,6 +2,7 @@ import glob
 import json
 import os
 
+from pyvis.network import Network
 from PySide2 import QtCore
 from PySide2.QtCore import QEvent, QThread
 from PySide2.QtWidgets import (
@@ -10,7 +11,10 @@ from PySide2.QtWidgets import (
     QInputDialog,
     QPushButton,
     QSpinBox,
+    QVBoxLayout,
+    QWidget,
 )
+from PySide2.QtWebEngineWidgets import QWebEngineView
 
 from zoia_lib.backend.patch_update import PatchUpdate
 from zoia_lib.backend.utilities import hide_dotted_files
@@ -73,6 +77,7 @@ class ZOIALibrarianLocal(QMainWindow):
 
         # Disable the viz buttons
         self.ui.back_btn.setEnabled(False)
+        self.ui.btn_show_routing.setEnabled(False)
         self.ui.btn_next_page.setEnabled(False)
         self.ui.btn_prev_page.setEnabled(False)
         self.viz_disable()
@@ -185,6 +190,7 @@ class ZOIALibrarianLocal(QMainWindow):
                 and patches != "pref.json"
                 and patches != "temp"
                 and patches != "temp.zip"
+                and patches != "patch.html"
             ):
                 for pch in os.listdir(os.path.join(self.path, patches)):
                     # Read the metadata so that we can set up the tables.
@@ -688,15 +694,15 @@ class ZOIALibrarianLocal(QMainWindow):
             Number of Pages: {} <br>
             Number of Starred Params: {}
             </html>""".format(
-                viz["meta"]["name"],
-                viz["meta"]["cpu"],
-                viz["meta"]["i_o"]["inputs"],
-                viz["meta"]["i_o"]["outputs"],
-                viz["meta"]["i_o"]["stompswitches"],
-                viz["meta"]["i_o"]["cport"],
-                viz["meta"]["i_o"]["midi_channel"],
-                viz["meta"]["n_pages"],
-                viz["meta"]["n_starred"],
+                self.curr_viz["meta"]["name"],
+                self.curr_viz["meta"]["cpu"],
+                self.curr_viz["meta"]["i_o"]["inputs"],
+                self.curr_viz["meta"]["i_o"]["outputs"],
+                self.curr_viz["meta"]["i_o"]["stompswitches"],
+                self.curr_viz["meta"]["i_o"]["cport"],
+                self.curr_viz["meta"]["i_o"]["midi_channel"],
+                self.curr_viz["meta"]["n_pages"],
+                self.curr_viz["meta"]["n_starred"],
             )
         )
 
@@ -704,12 +710,121 @@ class ZOIALibrarianLocal(QMainWindow):
             """<html>
             Page {}: {}
             </html>""".format(
-                str(self.curr_page_viz), viz["pages"][self.curr_page_viz]
+                str(self.curr_page_viz), self.curr_viz["pages"][self.curr_page_viz]
             )
         )
 
         # Set the colors of the buttons
         self.set_viz()
+
+    def setup_exp(self):
+        """Prepares the patch expander once a patch has been
+        selected.
+        Currently triggered via a button press.
+
+        viz: The parsed binary data that will be used in the visualizer.
+        """
+
+        # Create a window
+        win = QWidget()
+        win.setWindowTitle(
+            "Interactive Patch Routing: {}".format(self.curr_viz["name"])
+        )
+
+        # And give it a layout
+        layout = QVBoxLayout()
+        win.setLayout(layout)
+
+        # Arbitrary storage of html
+        html_path = os.path.join(self.path, "patch.html")
+
+        json_data = {
+            "nodes": self.curr_viz["modules"],
+            "links": self.curr_viz["connections"],
+        }
+
+        mods = [
+            (m["number"], m["type"], m["category"], m["name"])
+            for m in json_data["nodes"]
+        ]
+
+        conns = [
+            (
+                int(c["source"].split(".")[0]),
+                int(c["destination"].split(".")[0]),
+                c["strength"] / 100,
+            )
+            for c in json_data["links"]
+        ]
+
+        nt = Network()
+        # nx_graph = nx.DiGraph()
+
+        for m in mods:
+            nt.add_node(m[0], size=20, title=m[1], group=m[2], label=m[3])
+
+        for c in conns:
+            nt.add_edge(c[0], c[1], weight=c[2])
+
+        # nt.from_nx(nx_graph)
+        # nt.show_buttons()
+
+        nt.set_options(
+            """
+        var_options = {
+            "nodes": {
+                "borderWidthSelected": 3
+            },
+            "edges": {
+                "arrows": {
+                    "middle": {
+                        "enabled": true
+                    }
+                },
+                "color": {
+                    "inherit": true
+                },
+                "physics": false,
+                "smooth": false
+            },
+            "layout": {
+                "hierarchical": {
+                    "enabled": true
+                }
+            },
+            "interaction": {
+                "navigationButtons": true,
+                "tooltipDelay": 100
+            },
+            "manipulation": {
+                "enabled": true
+            },
+            "physics": {
+                "hierarchicalRepulsion": {
+                    "centralGravity": 0
+                },
+                "minVelocity": 0.75,
+                "solver": "hierarchicalRepulsion"
+            }
+        }
+        """
+        )
+
+        nt.show(html_path)
+
+        with open(html_path, "r") as f:
+            grph = f.read()
+
+        # Create and fill a QWebView
+        view = QWebEngineView()
+        view.setHtml(grph)
+
+        # Add the QWebView and button to the layout
+        layout.addWidget(view)
+
+        # Show the window and run the app
+        win.show()
+        win.exec_()
 
     def viz_page(self):
         """Either increases or decreases the current visualizer page,
