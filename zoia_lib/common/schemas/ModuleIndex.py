@@ -2360,8 +2360,8 @@ module_index = {
             "cv_output": {"isDefault": True, "isParam": False, "position": 16},
         },
         "options": {
-            "num_channels": list(range(2, 9)),
-            "levels": ["post_fader", "input"],
+            "num_channels": list(range(1, 9)),
+            "levels": ["summing", "average"],
         },
     },
     # 88: {
