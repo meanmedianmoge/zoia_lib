@@ -730,6 +730,7 @@ class ZOIALibrarianLocal(QMainWindow):
         win.setWindowTitle(
             "Interactive Patch Routing: {}".format(self.curr_viz["name"])
         )
+        win.resize(560, 560)
 
         # And give it a layout
         layout = QVBoxLayout()
@@ -744,7 +745,12 @@ class ZOIALibrarianLocal(QMainWindow):
         }
 
         mods = [
-            (m["number"], m["type"], m["category"], m["name"])
+            (
+                m["number"],
+                m["type"],
+                m["category"],
+                m["name"] if m["name"] != "" else m["type"],
+            )
             for m in json_data["nodes"]
         ]
 
@@ -772,9 +778,6 @@ class ZOIALibrarianLocal(QMainWindow):
         nt.set_options(
             """
         var_options = {
-            "nodes": {
-                "borderWidthSelected": 3
-            },
             "edges": {
                 "arrows": {
                     "middle": {
@@ -784,27 +787,16 @@ class ZOIALibrarianLocal(QMainWindow):
                 "color": {
                     "inherit": true
                 },
-                "physics": false,
                 "smooth": false
             },
-            "layout": {
-                "hierarchical": {
-                    "enabled": true
-                }
-            },
             "interaction": {
-                "navigationButtons": true,
-                "tooltipDelay": 100
+                "navigationButtons": true
             },
             "manipulation": {
                 "enabled": true
             },
             "physics": {
-                "hierarchicalRepulsion": {
-                    "centralGravity": 0
-                },
-                "minVelocity": 0.75,
-                "solver": "hierarchicalRepulsion"
+                "minVelocity": 0.75
             }
         }
         """
