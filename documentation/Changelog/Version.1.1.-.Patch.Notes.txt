@@ -1,4 +1,4 @@
-Version 1.1 (May 2021)
+Version 1.1 (June 2021)
 
 New Features
 - Patch Expander view has been added, which is accessible from the Local Storage tab (choose a patch and click "Expand" in the viz panel).
