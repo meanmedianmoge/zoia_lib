@@ -276,8 +276,21 @@ class ZOIALibrarianLocal(QMainWindow):
 
             # Find the first open slot in the export dir
             if len(os.listdir(export_path)) > 0:
-                for pch in hide_dotted_files(export_path, sd=True):
-                    first_open_slot = int(pch[1:3]) + 1
+                bank = hide_dotted_files(export_path, sd=True)
+                slots = sorted([int(pch.split("_")[0]) for pch in bank])
+                empty = list(set([x for x in range(0, 64)]) - set(slots))
+                blanks = sorted(
+                    [
+                        int(pch.split("_")[0])
+                        for pch in bank
+                        if pch.endswith("zoia_.bin")
+                    ]
+                )
+                empty = sorted(empty + blanks)
+                if not empty:
+                    first_open_slot = 63
+                else:
+                    first_open_slot = empty[0]
             else:
                 first_open_slot = 0
 
