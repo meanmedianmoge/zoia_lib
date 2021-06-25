@@ -372,7 +372,7 @@ class ZOIALibrarianLocal(QMainWindow):
                             self.msg.setWindowTitle("No Space")
                             self.msg.setIcon(QMessageBox.Information)
                             self.msg.setText(
-                                "The version directory contains {} patches, "
+                                "The version history contains {} patches, "
                                 "so it must be exported to slot {} or lower.".format(
                                     pch_num + 1, 63 - pch_num
                                 )
