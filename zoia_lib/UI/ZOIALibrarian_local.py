@@ -2,6 +2,7 @@ import glob
 import json
 import os
 
+from PySide2.QtGui import QIcon
 from pyvis.network import Network
 from PySide2 import QtCore
 from PySide2.QtCore import QEvent, QThread
@@ -477,6 +478,7 @@ class ZOIALibrarianLocal(QMainWindow):
         # Reload the table.
         self.ui.update_patch_notes.setEnabled(not context)
         self.ui.text_browser_viz.setText("")
+        self.ui.btn_show_routing.setEnabled(False)
         self.sort_and_set()
 
     def update_local_patches_thread(self):
@@ -542,6 +544,7 @@ class ZOIALibrarianLocal(QMainWindow):
             self.ui.page_label.setText("")
             self.ui.text_browser_viz.setText("")
             self.ui.back_btn_local.setEnabled(False)
+            self.ui.btn_show_routing.setEnabled(False)
             self.ui.update_patch_notes.setEnabled(False)
             self.ui.btn_prev_page.setEnabled(False)
             self.ui.btn_next_page.setEnabled(False)
@@ -743,7 +746,10 @@ class ZOIALibrarianLocal(QMainWindow):
         win.setWindowTitle(
             "Interactive Patch Routing: {}".format(self.curr_viz["name"])
         )
-        win.resize(560, 560)
+        win.setWindowIcon(QIcon(
+            os.path.join(os.getcwd(), "zoia_lib", "UI", "resources",
+                         "logo.ico")))
+        win.setFixedSize(540, 540)
 
         # And give it a layout
         layout = QVBoxLayout()
