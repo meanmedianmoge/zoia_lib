@@ -188,7 +188,7 @@ class ExportingError(ZoiaLibError):
                     f"due to the slot number being greater than 63 "
                     f"(got {slot}).",
                     702: f"Exporting would result in overwriting of data,"
-                    f"as a bank directory already existed on the SD"
+                    f"as a directory already existed on the SD"
                     f"card",
                     703: f"Exporting would create a conflict between two" f"patches.",
                 }[error_code_zoia]

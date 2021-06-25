@@ -99,7 +99,7 @@
           <string notr="true"/>
          </property>
          <attribute name="title">
-          <string>PatchStorage View</string>
+          <string>PatchStorage</string>
          </attribute>
          <attribute name="toolTip">
           <string>Switch to view all ZOIA patches on PatchStorage</string>
@@ -414,7 +414,7 @@
           <string notr="true"/>
          </property>
          <attribute name="title">
-          <string>Local Storage View</string>
+          <string>Local Storage</string>
          </attribute>
          <attribute name="toolTip">
           <string>Switch to your locally saved patches</string>
@@ -1482,7 +1482,7 @@
           <string notr="true"/>
          </property>
          <attribute name="title">
-          <string>SD Card View</string>
+          <string>SD Card</string>
          </attribute>
          <attribute name="toolTip">
           <string>Switch to view your SD card within the ZOIA Librarian</string>
@@ -2156,10 +2156,10 @@
           <string notr="true"/>
          </property>
          <attribute name="title">
-          <string>Banks</string>
+          <string>Folders</string>
          </attribute>
          <attribute name="toolTip">
-          <string>Switch to view the Bank creator</string>
+          <string>Switch to view the Folders creator</string>
          </attribute>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
@@ -2183,22 +2183,22 @@
                    <bool>true</bool>
                   </property>
                   <property name="toolTip">
-                   <string>Click here to save your Bank.</string>
+                   <string>Click here to save your Folder.</string>
                   </property>
                   <property name="statusTip">
-                   <string>Click here to save your Bank.</string>
+                   <string>Click here to save your Folder.</string>
                   </property>
                   <property name="accessibleName">
-                   <string>Save Bank button</string>
+                   <string>Save Folder button</string>
                   </property>
                   <property name="accessibleDescription">
-                   <string>When clicked, will open a popup asking for a Bank name, which will then be saved such that it can be loaded at a later time.</string>
+                   <string>When clicked, will open a popup asking for a Folder name, which will then be saved such that it can be loaded at a later time.</string>
                   </property>
                   <property name="styleSheet">
                    <string notr="true"/>
                   </property>
                   <property name="text">
-                   <string>Save Bank</string>
+                   <string>Save Folder</string>
                   </property>
                  </widget>
                 </item>
@@ -2211,22 +2211,22 @@
                    <bool>true</bool>
                   </property>
                   <property name="toolTip">
-                   <string>Click here to load a Bank.</string>
+                   <string>Click here to load a Folder.</string>
                   </property>
                   <property name="statusTip">
-                   <string>Click here to load a Bank.</string>
+                   <string>Click here to load a Folder.</string>
                   </property>
                   <property name="accessibleName">
-                   <string>Load Bank button</string>
+                   <string>Load Folder button</string>
                   </property>
                   <property name="accessibleDescription">
-                   <string>When clicked, you will be prompted to select a Bank to load that has been created in a previous session using the ZOIA Librarian.</string>
+                   <string>When clicked, you will be prompted to select a Folder to load that has been created in a previous session using the ZOIA Librarian.</string>
                   </property>
                   <property name="styleSheet">
                    <string notr="true"/>
                   </property>
                   <property name="text">
-                   <string>Load Bank</string>
+                   <string>Load Folder</string>
                   </property>
                  </widget>
                 </item>
@@ -2239,22 +2239,22 @@
                    <bool>true</bool>
                   </property>
                   <property name="toolTip">
-                   <string>Click here to export a Bank as a folder to your SD card.</string>
+                   <string>Click here to export this Folder to your SD card.</string>
                   </property>
                   <property name="statusTip">
-                   <string>Click here to export a Bank as a folder to your SD card.</string>
+                   <string>Click here to export this Folder to your SD card.</string>
                   </property>
                   <property name="accessibleName">
-                   <string>Export Bank button</string>
+                   <string>Export Folder button</string>
                   </property>
                   <property name="accessibleDescription">
-                   <string>When clicked, will open a popup asking for a Bank name, which will then be saved such that it can be exported to an SD card, should it have been specified previously.</string>
+                   <string>When clicked, will open a popup asking for a Folder name, which will then be saved such that it can be exported to an SD card, should it have been specified previously.</string>
                   </property>
                   <property name="styleSheet">
                    <string notr="true"/>
                   </property>
                   <property name="text">
-                   <string>Export Bank</string>
+                   <string>Export Folder</string>
                   </property>
                  </widget>
                 </item>
@@ -2267,22 +2267,22 @@
                    <bool>true</bool>
                   </property>
                   <property name="toolTip">
-                   <string>Click here to clear the bank.</string>
+                   <string>Click here to clear the Folder.</string>
                   </property>
                   <property name="statusTip">
-                   <string>Click here to clear the bank.</string>
+                   <string>Click here to clear the Folder.</string>
                   </property>
                   <property name="accessibleName">
-                   <string>Clear Bank button</string>
+                   <string>Clear Folder button</string>
                   </property>
                   <property name="accessibleDescription">
-                   <string>When clicked, will clear the current bank table without saving or exporting it.</string>
+                   <string>When clicked, will clear the current table without saving or exporting it.</string>
                   </property>
                   <property name="styleSheet">
                    <string notr="true"/>
                   </property>
                   <property name="text">
-                   <string>Clear Bank</string>
+                   <string>Clear Folder</string>
                   </property>
                  </widget>
                 </item>
@@ -2905,7 +2905,7 @@
                 </column>
                 <column>
                  <property name="text">
-                  <string>Add to Bank</string>
+                  <string>Add to Folder</string>
                  </property>
                 </column>
                 <item row="0" column="4">

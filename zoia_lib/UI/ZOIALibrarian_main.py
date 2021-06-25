@@ -47,7 +47,6 @@ class ZOIALibrarianMain(QMainWindow):
      - Certain UI elements do not like font changes (headers, tabs, etc).
      - Deleting items in the banks table will always delete the first entry
        if the item appears more than once.
-     - The code is a huge mess.
     """
 
     def __init__(self):

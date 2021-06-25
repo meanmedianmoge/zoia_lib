@@ -54,10 +54,10 @@ class ZOIALibrarianBank(QMainWindow):
 
         # Prepare the button.
         if "[Multiple Versions]" in btn.text():
-            mv_btn = QPushButton("Move patches \n to bank", self)
+            mv_btn = QPushButton("Move patches \n to folder", self)
             mv_btn.setEnabled(True)
         else:
-            mv_btn = QPushButton("Move patch \n to bank", self)
+            mv_btn = QPushButton("Move patch \n to folder", self)
 
         mv_btn.setObjectName(idx)
         mv_btn.setFont(self.ui.table_bank_local.horizontalHeader().font())
@@ -257,15 +257,15 @@ class ZOIALibrarianBank(QMainWindow):
 
         # Ask for a name
         name, ok = QInputDialog().getText(
-            window, "Save Bank", "Please enter a name for the Bank:"
+            window, "Save Folder", "Please enter a name for the Folder:"
         )
         if ok:
             self._get_bank_data()
             if "{}.json".format(name) in os.listdir(os.path.join(self.path, "Banks")):
                 # There's already a bank with that name.
-                self.msg.setWindowTitle("Bank Exists")
+                self.msg.setWindowTitle("Folder Exists")
                 self.msg.setIcon(QMessageBox.Warning)
-                self.msg.setText("A Bank with that name already exists.")
+                self.msg.setText("A Folder with that name already exists.")
                 self.msg.setInformativeText("Would you like to overwrite it?")
                 self.msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
                 value = self.msg.exec_()
@@ -280,9 +280,9 @@ class ZOIALibrarianBank(QMainWindow):
                 f.write(json.dumps(self.data_banks))
 
             # Let the user know when the saving is done.
-            self.msg.setWindowTitle("Bank Saved")
+            self.msg.setWindowTitle("Folder Saved")
             self.msg.setIcon(QMessageBox.Information)
-            self.msg.setText("The Bank has been saved successfully.")
+            self.msg.setText("The Folder has been saved successfully.")
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
             self.ui.btn_load_bank.setEnabled(True)
@@ -307,7 +307,7 @@ class ZOIALibrarianBank(QMainWindow):
             fails = []
             # Ask for a name
             name, ok = QInputDialog.getText(
-                window, "Export Bank", "Please enter a name for the Bank:"
+                window, "Export Folder", "Please enter a name for the Folder:"
             )
             if ok and name not in os.listdir(sd.get_sd_root()):
                 # Export the bank.
@@ -338,7 +338,7 @@ class ZOIALibrarianBank(QMainWindow):
                 self.msg.setWindowTitle("Success")
                 self.msg.setIcon(QMessageBox.Information)
                 self.msg.setText(
-                    "The bank has successfully been exported to the "
+                    "The Folder has successfully been exported to the "
                     "SD card directory: {}.".format(name)
                 )
                 self.msg.setStandardButtons(QMessageBox.Ok)
@@ -494,7 +494,7 @@ class ZOIALibrarianBank(QMainWindow):
                 # Trying to move patches to a full bank
                 slot, ok = QInputDialog().getInt(
                     self.window,
-                    "Bank Full",
+                    "Folder Full",
                     "Select a slot to overwrite. \n\n"
                     "Note that if you're moving a version history, \n"
                     "multiple patches will be overwritten.",
@@ -505,7 +505,7 @@ class ZOIALibrarianBank(QMainWindow):
                 if ok:
                     drop_index = slot
                 else:
-                    self.msg.setWindowTitle("Bank Full")
+                    self.msg.setWindowTitle("Folder Full")
                     self.msg.setIcon(QMessageBox.Information)
                     self.msg.setText(
                         "No patches were moved. "
@@ -538,7 +538,7 @@ class ZOIALibrarianBank(QMainWindow):
                 self.msg.setWindowTitle("No Space")
                 self.msg.setIcon(QMessageBox.Information)
                 self.msg.setText(
-                    "The version directory contains {} patches, "
+                    "The version history contains {} patches, "
                     "so it must be moved to slot {} or lower.".format(
                         pch_num + 1, 63 - pch_num
                     )
@@ -637,7 +637,7 @@ class ZOIALibrarianBank(QMainWindow):
                                 self.msg.setIcon(QMessageBox.Information)
                                 self.msg.setText(
                                     """
-                                    The version directory contains {} patches,
+                                    The version history contains {} patches,
                                     so it must be dragged to slot {} or lower
                                 """.format(
                                         pch_num + 1, 63 - pch_num
