@@ -62,6 +62,8 @@ QPushButton#import_all_ver_btn,
 QPushButton#btn_dwn_all,
 QPushButton#btn_prev_page,
 QPushButton#btn_next_page,
+QPushButton#back_btn,
+QPushButton#btn_show_routing,
 QPushButton#set_export_dir_btn {
     border-radius: 5px;
     padding: 2px 2px 2px 2px;
