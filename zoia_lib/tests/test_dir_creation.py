@@ -60,10 +60,10 @@ class TestDirectoryCreation(unittest.TestCase):
             "Did not find a .ZoiaLibraryApp directory in the "
             "expected directory: {}".format(backend_path),
         )
-        # Ensure that the Banks directory was also found.
+        # Ensure that the Folders directory was also found.
         self.assertTrue(
-            "Banks" in os.listdir(backend_path),
-            "Did not find a Banks directory nested under the "
+            "Folders" in os.listdir(backend_path),
+            "Did not find a Folders directory nested under the "
             ".ZoiaLibraryApp directory.",
         )
 

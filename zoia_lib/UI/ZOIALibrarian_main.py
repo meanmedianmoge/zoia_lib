@@ -45,7 +45,7 @@ class ZOIALibrarianMain(QMainWindow):
         pyside2-uic.exe ZOIALibrarian.ui -o ZOIALibrarian.py
     Known issues:
      - Certain UI elements do not like font changes (headers, tabs, etc).
-     - Deleting items in the banks table will always delete the first entry
+     - Deleting items in the Folders table will always delete the first entry
        if the item appears more than once.
     """
 
@@ -143,7 +143,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.delete_folder_sd_btn.setEnabled(False)
         self.ui.set_export_dir_btn.setEnabled(True)
         self.ui.btn_load_bank.setEnabled(
-            not len(os.listdir(os.path.join(self.path, "Banks"))) == 0
+            not len(os.listdir(os.path.join(self.path, "Folders"))) == 0
         )
 
         # Load preferences from previous sessions (if they exist)
@@ -205,7 +205,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.ui.table_sd_right.setColumnWidth(0, self.sd_sizes["col_2"])
             self.ui.table_sd_right.setColumnWidth(1, self.sd_sizes["col_3"])
 
-            # Bank Tables
+            # Folder Tables
             # self.ui.splitter_bank_tables.setSizes([self.bank_sizes["split_bank_left"],
             #                                        self.bank_sizes["split_bank_right"]])
             # self.ui.splitter_bank.setSizes([self.bank_sizes["split_left"],
@@ -589,7 +589,7 @@ class ZOIALibrarianMain(QMainWindow):
                 )
 
             # Numerical rating for "Rating" header, which is
-            # different in the Bank tab (non-editable).
+            # different in the Folders tab (non-editable).
             if table_index == 3:
                 index = "rating"
                 try:
@@ -604,7 +604,7 @@ class ZOIALibrarianMain(QMainWindow):
                 text_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 curr_table.setItem(i, 3, text_item)
 
-                # Also need a "Add to Bank" header item.
+                # Also need a "Add to Folder" header item.
                 self.bank.create_add_btn(btn_title, i, idx)
 
         # Also set the title size and resize the columns.
@@ -893,7 +893,7 @@ class ZOIALibrarianMain(QMainWindow):
         Currently triggered via a button press.
 
         context: True for the Local Storage View tab, False for the
-                 Banks tab.
+                 Folders tab.
         """
         if context:
             # Clean up the tab.
@@ -1058,8 +1058,8 @@ class ZOIALibrarianMain(QMainWindow):
                 self.search_data_local_version = self.local.get_data_local_version()
             util.sort_metadata(7, self.search_data_local_version, False)
             self.set_data(True, True)
-        # Case 4: Sorting on the Banks tab.
-        # ->Case 4.1: Sorting on the Banks tab, no version, and an empty search
+        # Case 4: Sorting on the Folders tab.
+        # ->Case 4.1: Sorting on the Folders tab, no version, and an empty search
         #             bar.
         elif (
             table_index == 3

@@ -47,10 +47,24 @@ class Patch:
         # if the directory already exists.
         if self.back_path is not None and not os.path.exists(self.back_path):
             os.mkdir(self.back_path)
-        if self.back_path is not None and not os.path.exists(
+
+        # A little repetition here to ensure it works both as a fresh install
+        # and for users upgrading versions without losing their folders
+
+        # Case 1: Upgrade, rename Banks -> Folders, keep files
+        if self.back_path is not None and os.path.exists(
             os.path.join(self.back_path, "Banks")
         ):
-            os.mkdir(os.path.join(self.back_path, "Banks"))
+            os.rename(
+                os.path.join(self.back_path, "Banks"),
+                os.path.join(self.back_path, "Folders")
+            )
+
+        # Case 2: Fresh install, just create the new directory
+        if self.back_path is not None and not os.path.exists(
+            os.path.join(self.back_path, "Folders")
+        ):
+            os.mkdir(os.path.join(self.back_path, "Folders"))
 
     def get_backend_path(self):
         """Getter method to retrieve the backend path as

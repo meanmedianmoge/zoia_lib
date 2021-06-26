@@ -16,7 +16,7 @@ from PySide2.QtWidgets import (
 
 class ZOIALibrarianBank(QMainWindow):
     """The ZOIALibrarianBank class is responsible for most
-    activities contained within the Banks tab of the application.
+    activities contained within the Folders tab of the application.
     """
 
     def __init__(self, ui, path, msg, util, window):
@@ -171,7 +171,7 @@ class ZOIALibrarianBank(QMainWindow):
         # PySide2 file selectors are bad and occasionally wrong, so try
         # all of them to be safe.
         bnk_file = QFileDialog.getOpenFileName(
-            None, "Select a Patch Bank:", os.path.join(self.path, "Banks")
+            None, "Select a Patch Folder:", os.path.join(self.path, "Folders")
         )[0]
         if bnk_file != "":
             if "/" in bnk_file and platform.system().lower() == "windows":
@@ -188,7 +188,7 @@ class ZOIALibrarianBank(QMainWindow):
             return
 
         # Open the saved bank JSON.
-        with open(os.path.join(self.path, "Banks", bnk_file), "r") as f:
+        with open(os.path.join(self.path, "Folders", bnk_file), "r") as f:
             self.data_banks = json.loads(f.read())
 
         # Make sure the user understands that any items currently in the
@@ -261,7 +261,7 @@ class ZOIALibrarianBank(QMainWindow):
         )
         if ok:
             self._get_bank_data()
-            if "{}.json".format(name) in os.listdir(os.path.join(self.path, "Banks")):
+            if "{}.json".format(name) in os.listdir(os.path.join(self.path, "Folders")):
                 # There's already a bank with that name.
                 self.msg.setWindowTitle("Folder Exists")
                 self.msg.setIcon(QMessageBox.Warning)
@@ -275,7 +275,7 @@ class ZOIALibrarianBank(QMainWindow):
 
             # Save the bank
             with open(
-                os.path.join(self.path, "Banks", "{}.json".format(name)), "w"
+                os.path.join(self.path, "Folders", "{}.json".format(name)), "w"
             ) as f:
                 f.write(json.dumps(self.data_banks))
 

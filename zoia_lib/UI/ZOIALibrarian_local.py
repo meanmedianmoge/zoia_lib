@@ -27,9 +27,9 @@ update = PatchUpdate()
 class ZOIALibrarianLocal(QMainWindow):
     """The ZOIALibrarianLocal class is responsible for all
     activities contained within the Local Storage View tab of the
-    application, along with some activities contained within the Banks
-    tab. This added responsibility is due to the fact that the Banks
-    tab displays local patches that users can then use to create banks.
+    application, along with some activities contained within the Folders
+    tab. This added responsibility is due to the fact that the Folders
+    tab displays local patches that users can then use to create Folders.
     In order to minimize code duplication, the code was merged into
     this class.
     """
@@ -92,7 +92,7 @@ class ZOIALibrarianLocal(QMainWindow):
             if (
                 os.path.isdir(os.path.join(self.path, patch))
                 and len(os.listdir(os.path.join(self.path, patch))) >= 2
-                and patch != "Banks"
+                and patch != "Folders"
                 and patch != "temp"
             ):
                 # Need to update all versions
@@ -185,7 +185,7 @@ class ZOIALibrarianLocal(QMainWindow):
         for patches in os.listdir(self.path):
             # Look for patch directories in the backend.
             if (
-                patches != "Banks"
+                patches != "Folders"
                 and patches != "data.json"
                 and patches != ".DS_Store"
                 and patches != "pref.json"
@@ -448,7 +448,7 @@ class ZOIALibrarianLocal(QMainWindow):
         a user's backend local storage.
 
         context: True for the Local Storage View tab, False for the
-                 Banks tab.
+                 Folders tab.
         idx: Optional. Used to specify which patch directory to access,
              Defaults to None. If it is None, the value stored in
              self.curr_ver is used in its place.
@@ -1082,12 +1082,12 @@ class ZOIALibrarianLocal(QMainWindow):
         return self.data_local_version
 
     def get_data_bank(self):
-        """Gets the data for the patches in the Banks tab table."""
+        """Gets the data for the patches in the Folders tab table."""
 
         return self.data_bank
 
     def get_data_bank_version(self):
-        """Gets the version data for a patch in the Banks tab table."""
+        """Gets the version data for a patch in the Folders tab table."""
 
         return self.data_bank_version
 

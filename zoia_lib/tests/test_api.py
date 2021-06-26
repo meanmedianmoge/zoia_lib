@@ -5,7 +5,7 @@ from urllib.request import Request, urlopen
 
 from bs4 import BeautifulSoup
 from jsonschema import validate
-from numpy import unicode
+from numpy.compat import unicode
 
 import zoia_lib.backend.api as api
 
