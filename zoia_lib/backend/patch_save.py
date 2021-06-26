@@ -71,7 +71,7 @@ class PatchSave(Patch):
             for fld in os.listdir(self.back_path):
                 if (
                     os.path.isdir(os.path.join(self.back_path, fld))
-                    and fld != "Banks"
+                    and fld != "Folders"
                     and fld != "sample_files"
                     and fld != ".DS_Store"
                 ):

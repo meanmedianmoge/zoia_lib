@@ -57,7 +57,7 @@ python -m zoia_lib.backend.startup
 - View and edit patch notes
 - Customized category and tag labels for all patches
 - Manage your SD card folders quickly
-- Drag & drop patches into bank directories, configured automatically into a ZOIA-readable format
+- Drag & drop patches into folders, configured automatically into a ZOIA-readable format
 - Help toolbar for app documentation and ZOIA resources
 - Dark and light themes
 

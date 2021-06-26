@@ -97,7 +97,7 @@ class ZOIALibrarianUtil:
             self.ui.import_all_btn.setFont(new_font)
             self.ui.import_all_ver_btn.setFont(new_font)
 
-            # Bank tab
+            # Folders tab
             self.ui.table_bank_local.setFont(new_font)
             self.ui.table_bank_local.horizontalHeader().setFont(new_font)
             self.ui.table_bank_left.setFont(new_font)
