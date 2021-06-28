@@ -53,8 +53,8 @@ module_index = {
         "params": 0,
         "cpu": 0.4,
         "blocks": {
-            "input_L": {"isDefault": True, "isParam": False, "position": 0},
-            "input_R": {"isDefault": True, "isParam": False, "position": 1},
+            "output_L": {"isDefault": True, "isParam": False, "position": 0},
+            "output_R": {"isDefault": True, "isParam": False, "position": 1},
         },
         "options": {"channels": ["stereo", "left", "right"]},
     },
