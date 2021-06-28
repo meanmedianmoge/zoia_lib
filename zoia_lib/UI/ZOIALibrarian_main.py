@@ -850,6 +850,19 @@ class ZOIALibrarianMain(QMainWindow):
                     content["preview_url"] = (
                         "<a href=" + content["preview_url"] + ">Click here</a>"
                     )
+
+                # Direct link to PS
+                if (
+                    "link" not in content
+                    or content["link"] is None
+                    or content["link"] == ""
+                ):
+                    content["self"] = content["title"]
+                else:
+                    content["self"] = """<a href="{}">{}</a>""".format(
+                        content["link"], content["title"]
+                    )
+
             if (
                 "license" not in content
                 or content["license"] is None
@@ -858,6 +871,7 @@ class ZOIALibrarianMain(QMainWindow):
                 legal = "None provided"
             else:
                 legal = content["license"]["name"]
+
             content["content"] = content["content"].replace("\n", "<br/>")
 
             # TODO Add artwork to HTML view.
@@ -868,7 +882,7 @@ class ZOIALibrarianMain(QMainWindow):
 
             curr_browser.setHtml(
                 """<html>
-                <h3> {} </h3>
+                <h3>{}</h3>
                 <br/><u> Author:</u> {}
                 <br/><u> Likes:</u> {}
                 <br/><u> Downloads:</u> {}
@@ -877,7 +891,7 @@ class ZOIALibrarianMain(QMainWindow):
                 <br/><u> Preview:</u> {}
                 <br/><br/><u> Patch Notes:</u><br/> {}
             </html>""".format(
-                    content["title"],
+                    content["self"],
                     content["author"]["name"],
                     str(content["like_count"]),
                     str(content["download_count"]),
