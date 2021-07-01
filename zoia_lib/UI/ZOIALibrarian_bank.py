@@ -89,16 +89,22 @@ class ZOIALibrarianBank(QMainWindow):
 
             # Check for a version extension.
             if "_" not in idx:
-                with open(
-                    os.path.join(self.path, idx, "{}.json".format(idx)), "r"
-                ) as f:
-                    temp = json.loads(f.read())
+                try:
+                    with open(
+                        os.path.join(self.path, idx, "{}.json".format(idx)), "r"
+                    ) as f:
+                        temp = json.loads(f.read())
+                except FileNotFoundError:
+                    continue
             else:
                 idx, ver = idx.split("_")
-                with open(
-                    os.path.join(self.path, idx, "{}_{}.json".format(idx, ver)), "r"
-                ) as f:
-                    temp = json.loads(f.read())
+                try:
+                    with open(
+                        os.path.join(self.path, idx, "{}_{}.json".format(idx, ver)), "r"
+                    ) as f:
+                        temp = json.loads(f.read())
+                except FileNotFoundError:
+                    continue
 
             # Prep the remove button.
             name = temp["files"][0]["filename"]
