@@ -1025,10 +1025,8 @@ class PatchBinary(Patch):
             raise ValueError("No module found")
 
         if len(blocks) < start:
-            print(idx, d, len(d))
             raise ValueError("Block count cannot be below the minimum")
         elif len(blocks) > stop:
-            print(idx, d, len(d))
             raise ValueError("Block count cannot be above the maximum")
         else:
             return dict(blocks)
