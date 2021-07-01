@@ -3,7 +3,6 @@ import json
 import os
 
 from PySide2.QtGui import QIcon
-from pyvis.network import Network
 from PySide2 import QtCore
 from PySide2.QtCore import QEvent, QThread
 from PySide2.QtWidgets import (
@@ -16,6 +15,7 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 from PySide2.QtWebEngineWidgets import QWebEngineView
+from pyvis.network import Network
 
 from zoia_lib.backend.patch_update import PatchUpdate
 from zoia_lib.backend.utilities import hide_dotted_files
@@ -254,11 +254,7 @@ class ZOIALibrarianLocal(QMainWindow):
         export: Helper class to access backend exporting methods.
         """
 
-        export_path = self.sd.get_export_path()
-        export_dir = self.sd.get_export_path().split("/")[-1]
-
-        # Exporting this way will only export to a directory named "to_zoia"
-        # So we need to check if it exists. If it doesn't, we create it.
+        # Make sure SD is set up properly
         if self.sd.get_sd_root() is None:
             # No SD path.
             self.msg.setWindowTitle("No SD Path")
@@ -269,6 +265,9 @@ class ZOIALibrarianLocal(QMainWindow):
             self.sd.sd_path(False, self.window.width())
             self.msg.setInformativeText(None)
         else:
+            export_path = self.sd.get_export_path()
+            export_dir = self.sd.get_export_path().split("/")[-1]
+
             if export_dir not in os.listdir(self.sd.get_sd_root()):
                 os.mkdir(os.path.join(self.sd.get_sd_root(), export_dir))
 
