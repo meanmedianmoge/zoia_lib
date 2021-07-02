@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import sys
 
 from zoia_lib.common import errors
 
@@ -195,6 +196,18 @@ def generate_blank_patch():
     """
 
     return b"\t" + b"\x00" * 32767
+
+
+def meipass(resource, is_ui=False):
+    """Helper function for the UI to find resource files."""
+
+    if is_ui:
+        resource = str(resource).split("/")[-1]
+        bundle_dir = getattr(sys, "_MEIPASS", os.path.abspath(os.path.dirname(__file__)))
+        file_path = os.path.abspath(os.path.join(bundle_dir, resource))
+        return file_path
+    else:
+        return resource
 
 
 def add_test_patch(name, idx, path):
