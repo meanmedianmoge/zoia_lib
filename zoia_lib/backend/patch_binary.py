@@ -93,8 +93,8 @@ class PatchBinary(Patch):
                 ),
                 "cpu": self._get_module_data(data[curr_step + 1], "cpu"),
                 "type": self._get_module_data(data[curr_step + 1], "name"),
+                "version": data[curr_step + 2],
                 "page": int(data[curr_step + 3]),
-                "version": data[curr_step + 6],
                 "position": [
                     x
                     for x in range(
@@ -106,6 +106,7 @@ class PatchBinary(Patch):
                 "old_color": self._get_color_name(data[curr_step + 4]),
                 "new_color": "" if skip_real else self._get_color_name(colors[i]),
                 "options": {},
+                "options_binary": {},
                 "options_copy": self._get_module_data(data[curr_step + 1], "options"),
                 "options_list": list(
                     bytearray(pch_data[(curr_step + 8) * 4: (curr_step + 8) * 4 + 4])
@@ -113,11 +114,13 @@ class PatchBinary(Patch):
                 + list(
                     bytearray(pch_data[(curr_step + 9) * 4: (curr_step + 9) * 4 + 4])
                 ),
+                "params": int(data[curr_step + 6]),
+                # also can be fetched from self._get_module_data(data[curr_step + 1], "params")
                 "parameters": dict(
                     zip(
                         ["param_{}".format(str(x)) for x in range(data[curr_step + 6])],
                         [
-                            round(data[curr_step + x + 10] / 64560, 2)
+                            round(data[curr_step + x + 10] / 65535, 2)
                             for x in range(data[curr_step + 6])
                         ],
                     )
@@ -137,6 +140,7 @@ class PatchBinary(Patch):
                     option = curr_module["options_list"][v]
                     value = curr_module["options_copy"][opt][option]
                     curr_module["options"][opt] = value
+                    curr_module["options_binary"][opt] = option
                     v += 1
             except IndexError:
                 raise errors.BinaryError(pch_data[:10], 101)
@@ -230,8 +234,8 @@ class PatchBinary(Patch):
             "modules": modules,
             "connections": connections,
             "pages": pages,
-            # "starred": starred,
-            # "colours": colours
+            "starred": starred,
+            "colours": colours,
             "meta": {
                 "name": name,
                 "cpu": round(sum([k["cpu"] for k in modules]), 2),
@@ -794,7 +798,7 @@ class PatchBinary(Patch):
                 blocks.append(d[3])
             blocks.append(d[4])
         elif idx == 49:
-            if ver >= 4:
+            if ver >= 1:
                 blocks = [d[0], d[1], d[3], d[4], d[5]]
             else:
                 blocks = [d[0], d[1], d[2], d[5]]
