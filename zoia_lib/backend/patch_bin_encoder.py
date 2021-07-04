@@ -1,39 +1,22 @@
 import math
 import struct
 
-from zoia_lib.backend.patch_binary import PatchBinary
+from zoia_lib.backend.patch import Patch
 from zoia_lib.common import errors
 
-class PatchBinEncoder():
-    def __init__(self, source_binary_path):
-        self.bin_path = source_binary_path
 
-        self.bin_data = open(self.bin_path, "rb").read()
+class PatchBinEncoder(Patch):
+    """The PatchBinEncoder class is a child of the Patch class. It is
+    responsible for ZOIA patch binary re-encoding.
+    """
 
-        self.patch = PatchBinary()
-        self.data = self.patch.parse_data(self.bin_data)
+    def __init__(self):
+        """"""
+        super().__init__()
 
-        self.file = open(r"output_test.bin", "w+b")
-        self.color_dict = {
-            "Blue": 1,
-            "Green": 2,
-            "Red": 3,
-            "Yellow": 4,
-            "Aqua": 5,
-            "Magenta": 6,
-            "White": 7,
-            "Orange": 8,
-            "Lima": 9,
-            "Surf": 10,
-            "Sky": 11,
-            "Purple": 12,
-            "Pink": 13,
-            "Peach": 14,
-            "Mango": 15
-        }
-
-    def encode(self):
+    def encode(self, data):
         """
+        data: parsed .bin using PatchBinary
         ================================================================
         Patch Structure:
 
@@ -51,15 +34,35 @@ class PatchBinEncoder():
 
         ================================================================
         """
+
+        file = open(r"output_test.bin", "w+b")
+        color_dict = {
+            "Blue": 1,
+            "Green": 2,
+            "Red": 3,
+            "Yellow": 4,
+            "Aqua": 5,
+            "Magenta": 6,
+            "White": 7,
+            "Orange": 8,
+            "Lima": 9,
+            "Surf": 10,
+            "Sky": 11,
+            "Purple": 12,
+            "Pink": 13,
+            "Peach": 14,
+            "Mango": 15
+        }
+
         file_array = bytearray()
 
-        patch_name = self.encode_text(self.data["name"], 16)
-        module_count = self.encode_value(len(self.data["modules"]), 4)
+        patch_name = self.encode_text(data["name"], 16)
+        module_count = self.encode_value(len(data["modules"]), 4)
 
         modules_array = bytearray()
         colors_array = bytearray()
 
-        for module in self.data["modules"]:
+        for module in data["modules"]:
 
             module_array = bytearray()
 
@@ -107,15 +110,15 @@ class PatchBinEncoder():
             modules_array.extend(module_size)
             modules_array.extend(module_array)
 
-            color_array = self.encode_value(self.color_dict[module["color"]], 4)
+            color_array = self.encode_value(color_dict[module["color"]], 4)
             colors_array.extend(color_array)
 
         # Connections Encoding Section
         connections_array = bytearray()
-        connection_count_array = self.encode_value(len(self.data["connections"]), 4)
+        connection_count_array = self.encode_value(len(data["connections"]), 4)
         connections_array.extend(connection_count_array)
 
-        for connection in self.data["connections"]:
+        for connection in data["connections"]:
             connection_array = bytearray()
 
             source_values = connection["source"].split(".")
@@ -138,9 +141,9 @@ class PatchBinEncoder():
         # Build out the byte array for the pages by first calculating the number of pages,
         # then looping over them and pulling out the names
         pages_array = bytearray()
-        pages_count_array = self.encode_value(len(self.data["pages"]), 4)
+        pages_count_array = self.encode_value(len(data["pages"]), 4)
         pages_array.extend(pages_count_array)
-        for page in self.data["pages"]:
+        for page in data["pages"]:
             if len(page) > 0:
                 page_array = self.encode_text(page, 16)
                 pages_array.extend(page_array)
@@ -149,9 +152,9 @@ class PatchBinEncoder():
         # of starred params, then looping over them and pulling out the values to be
         # encoded per parameter
         starred_params_array = bytearray()
-        starred_params_count_array = self.encode_value(len(self.data["starred"]), 4)
+        starred_params_count_array = self.encode_value(len(data["starred"]), 4)
         starred_params_array.extend(starred_params_count_array)
-        for starred_param in self.data["starred"]:
+        for starred_param in data["starred"]:
             starred_module_array = self.encode_value(starred_param["module"], 2)
             starred_block_array = self.encode_byte(starred_param["block"], 1)
 
@@ -176,11 +179,14 @@ class PatchBinEncoder():
 
         # Patch Size includes itself in the calculation!
         patch_size_array = self.encode_value(int(len(file_array) / 4 + 1), 4)
-        self.file.write(patch_size_array)
-        self.file.write(file_array)
-        self.file.close()
+        file.write(patch_size_array)
+        file.write(file_array)
+        file.close()
 
-    def encode_text(self, text, byte_array_length):
+        return file_array
+
+    @staticmethod
+    def encode_text(text, byte_array_length):
         # Helper function used to handle text encoding,
         # which is sequential and left-aligned
         format_string = "{}B{}x".format(len(text), byte_array_length - len(text))
@@ -188,7 +194,8 @@ class PatchBinEncoder():
 
         return bytearray(struct.pack(format_string, *data))
 
-    def encode_value(self, value, byte_array_length):
+    @staticmethod
+    def encode_value(value, byte_array_length):
         # Helper function used to handle non-text encoding, which is little-endian
         # and left-aligned
 
@@ -224,14 +231,16 @@ class PatchBinEncoder():
 
         return bytearray(struct.pack(format_string, value))
 
-    def encode_byte(self, byte, byte_array_length):
+    @staticmethod
+    def encode_byte(byte, byte_array_length):
         # Helper function used to handle text encoding,
         # which is sequential and left-aligned
         format_string = "B{}x".format(byte_array_length - 1)
 
         return bytearray(struct.pack(format_string, byte))
 
-    def encode_bool(self, bool, byte_array_length):
+    @staticmethod
+    def encode_bool(bool, byte_array_length):
         # Helper function used to handle text encoding,
         # which is sequential and left-aligned
         format_string = "?{}x".format(byte_array_length - 1)
