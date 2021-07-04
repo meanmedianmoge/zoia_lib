@@ -2,9 +2,10 @@ import json
 import struct
 
 from zoia_lib.backend.patch import Patch
+from zoia_lib.backend.utilities import meipass
 from zoia_lib.common import errors
 
-with open("zoia_lib/common/schemas/ModuleIndex.json", "r") as f:
+with open(meipass("zoia_lib/common/schemas/ModuleIndex.json")) as f:
     mod = json.load(f)
 
 

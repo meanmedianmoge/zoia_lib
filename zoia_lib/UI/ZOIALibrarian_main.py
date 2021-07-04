@@ -447,7 +447,7 @@ class ZOIALibrarianMain(QMainWindow):
                 self.ui, api_2, self.path, self.msg, save, self.sort_and_set
             )
             self.ps.metadata_init()
-            self.sort_and_set()
+        self.sort_and_set()
 
     def set_data(self, search=False, version=False):
         """Sets the data for the various patch tables. This is done

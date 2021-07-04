@@ -5,6 +5,8 @@ from PySide2.QtWidgets import QFontDialog, QApplication
 import os
 import json
 
+from zoia_lib.backend.utilities import meipass
+
 
 class ZOIALibrarianUtil:
     """The ZOIALibrarianUTIL class is responsible for all
@@ -257,7 +259,7 @@ class ZOIALibrarianUtil:
             ("linux", False): "dark.css",
         }[(platform.system().lower(), self.dark)]
 
-        with open(os.path.join("zoia_lib", "UI", "resources", sheet), "r") as f:
+        with open(meipass(os.path.join("zoia_lib", "UI", "resources", sheet)), "r") as f:
             data = f.read()
 
         self.dark = not self.dark
@@ -304,7 +306,7 @@ class ZOIALibrarianUtil:
     def documentation(self):
         """Passes documentation to the front-end PS tab."""
 
-        with open("documentation/Resources/manual.html", "r", errors="ignore") as f:
+        with open(meipass("documentation/Resources/manual.html"), "r", errors="ignore") as f:
             manual = f.read()
 
         self.ui.text_browser_PS.setText(
@@ -318,7 +320,7 @@ class ZOIALibrarianUtil:
     def faq(self):
         """Passes FAQ to the front-end PS tab."""
 
-        with open("documentation/Resources/faq.html", "r", errors="ignore") as f:
+        with open(meipass("documentation/Resources/faq.html"), "r", errors="ignore") as f:
             faq = f.read()
 
         self.ui.text_browser_PS.setText(
@@ -332,7 +334,7 @@ class ZOIALibrarianUtil:
     def tips(self):
         """Passes Tips & Tricks to front-end PS tab."""
 
-        with open("documentation/Resources/tips.html", "r", errors="ignore") as f:
+        with open(meipass("documentation/Resources/tips.html"), "r", errors="ignore") as f:
             tips = f.read()
 
         self.ui.text_browser_PS.setText(
@@ -346,7 +348,7 @@ class ZOIALibrarianUtil:
     def mod_idx(self):
         """Passes Module Index to front-end PS tab."""
 
-        with open("documentation/Resources/mod.html", "r", errors="ignore") as f:
+        with open(meipass("documentation/Resources/mod.html"), "r", errors="ignore") as f:
             mod = f.read()
 
         self.ui.text_browser_PS.setText(
@@ -360,7 +362,7 @@ class ZOIALibrarianUtil:
     def firmware(self):
         """Passes firmware changelog to front-end PS tab."""
 
-        with open("documentation/Resources/changelog.html", "r", errors="ignore") as f:
+        with open(meipass("documentation/Resources/changelog.html"), "r", errors="ignore") as f:
             logs = f.read()
 
         self.ui.text_browser_PS.setText(
@@ -368,20 +370,6 @@ class ZOIALibrarianUtil:
             {}
         """.format(
                 logs
-            )
-        )
-
-    def expander(self):
-        """Testing patch expander."""
-
-        with open("src/exp.html", "r", errors="ignore") as f:
-            exp = f.read()
-
-        self.ui.text_browser_PS.setText(
-            """
-            {}
-        """.format(
-                exp
             )
         )
 
