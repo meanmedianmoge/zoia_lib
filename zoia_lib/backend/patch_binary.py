@@ -2,9 +2,10 @@ import json
 import struct
 
 from zoia_lib.backend.patch import Patch
+from zoia_lib.backend.utilities import meipass
 from zoia_lib.common import errors
 
-with open("zoia_lib/common/schemas/ModuleIndex.json", "r") as f:
+with open(meipass("zoia_lib/common/schemas/ModuleIndex.json")) as f:
     mod = json.load(f)
 
 
@@ -92,8 +93,8 @@ class PatchBinary(Patch):
                 ),
                 "cpu": self._get_module_data(data[curr_step + 1], "cpu"),
                 "type": self._get_module_data(data[curr_step + 1], "name"),
+                "version": data[curr_step + 2],
                 "page": int(data[curr_step + 3]),
-                "version": data[curr_step + 6],
                 "position": [
                     x
                     for x in range(
@@ -113,7 +114,8 @@ class PatchBinary(Patch):
                 + list(
                     bytearray(pch_data[(curr_step + 9) * 4: (curr_step + 9) * 4 + 4])
                 ),
-                "params": self._get_module_data(data[curr_step + 1], "params"),
+                "params": int(data[curr_step + 6]),
+                # also can be fetched from self._get_module_data(data[curr_step + 1], "params")
                 "parameters": dict(
                     zip(
                         ["param_{}".format(str(x)) for x in range(data[curr_step + 6])],
@@ -796,7 +798,7 @@ class PatchBinary(Patch):
                 blocks.append(d[3])
             blocks.append(d[4])
         elif idx == 49:
-            if ver >= 4:
+            if ver >= 1:
                 blocks = [d[0], d[1], d[3], d[4], d[5]]
             else:
                 blocks = [d[0], d[1], d[2], d[5]]

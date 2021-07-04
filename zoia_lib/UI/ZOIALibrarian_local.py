@@ -278,7 +278,7 @@ class ZOIALibrarianLocal(QMainWindow):
             export_dir = self.sd.get_export_path().split("/")[-1]
 
             if export_dir not in os.listdir(self.sd.get_sd_root()):
-                os.mkdir(os.path.join(self.sd.get_sd_root(), export_dir))
+                os.makedirs(os.path.join(self.sd.get_sd_root(), export_dir), exist_ok=True)
 
             # Get the patch(es) which we're exporting
             idx = self.sender().objectName()
@@ -332,6 +332,7 @@ class ZOIALibrarianLocal(QMainWindow):
                             self.msg.setText(
                                 "The patch has been successfully exported."
                             )
+                            self.msg.setStandardButtons(QMessageBox.Ok)
                             self.msg.exec_()
                             break
                         except errors.ExportingError as e:
