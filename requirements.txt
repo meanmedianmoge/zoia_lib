@@ -8,4 +8,4 @@ requests~=2.25.1
 beautifulsoup4~=4.9.1
 jsonschema~=3.2.0
 rarfile~=4.0
-pyvis >=0.1.9
+# pyvis >=0.1.9
