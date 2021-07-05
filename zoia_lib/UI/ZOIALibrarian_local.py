@@ -5,13 +5,12 @@ import os
 from NodeGraphQt import (
     NodeGraph,
     BaseNode,
-    BackdropNode,
     PropertiesBinWidget,
     NodeTreeWidget,
     setup_context_menu
 )
 
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2 import QtCore
 from PySide2.QtGui import QIcon
 from PySide2.QtCore import QEvent, QThread
 from PySide2.QtWidgets import (
@@ -20,11 +19,8 @@ from PySide2.QtWidgets import (
     QInputDialog,
     QPushButton,
     QSpinBox,
-    # QVBoxLayout,
     QWidget,
 )
-# from PySide2.QtWebEngineWidgets import QWebEngineView
-# from pyvis.network import Network
 
 from zoia_lib.backend.patch_update import PatchUpdate
 from zoia_lib.backend.utilities import hide_dotted_files
@@ -743,11 +739,8 @@ class ZOIALibrarianLocal(QMainWindow):
         self.set_viz()
 
     def setup_exp(self):
-        """Prepares the patch expander once a patch has been
-        selected.
+        """Prepares the patch expander once a patch has been selected.
         Currently triggered via a button press.
-
-        viz: The parsed binary data that will be used in the visualizer.
         """
 
         class MyNode(BaseNode):
@@ -891,102 +884,6 @@ class ZOIALibrarianLocal(QMainWindow):
         graph.fit_to_selection()
 
         win.exec_()
-
-        # # Create a window
-        # win = QWidget()
-        # win.setWindowTitle(
-        #     "Interactive Patch Routing: {}".format(self.curr_viz["name"])
-        # )
-        # win.setWindowIcon(QIcon(
-        #     os.path.join(os.getcwd(), "zoia_lib", "UI", "resources",
-        #                  "logo.ico")))
-        # win.setFixedSize(540, 540)
-        #
-        # # And give it a layout
-        # layout = QVBoxLayout()
-        # win.setLayout(layout)
-        #
-        # # Arbitrary storage of html
-        # html_path = os.path.join(self.path, "patch.html")
-        #
-        # json_data = {
-        #     "nodes": self.curr_viz["modules"],
-        #     "links": self.curr_viz["connections"],
-        # }
-        #
-        # mods = [
-        #     (
-        #         m["number"],
-        #         m["type"],
-        #         m["category"],
-        #         m["name"] if m["name"] != "" else m["type"],
-        #     )
-        #     for m in json_data["nodes"]
-        # ]
-        #
-        # conns = [
-        #     (
-        #         int(c["source"].split(".")[0]),
-        #         int(c["destination"].split(".")[0]),
-        #         c["strength"] / 100,
-        #     )
-        #     for c in json_data["links"]
-        # ]
-        #
-        # nt = Network()
-        # # nx_graph = nx.DiGraph()
-        #
-        # for m in mods:
-        #     nt.add_node(m[0], size=20, title=m[1], group=m[2], label=m[3])
-        #
-        # for c in conns:
-        #     nt.add_edge(c[0], c[1], weight=c[2])
-        #
-        # # nt.from_nx(nx_graph)
-        # # nt.show_buttons()
-        #
-        # nt.set_options(
-        #     """
-        # var_options = {
-        #     "edges": {
-        #         "arrows": {
-        #             "middle": {
-        #                 "enabled": true
-        #             }
-        #         },
-        #         "color": {
-        #             "inherit": true
-        #         },
-        #         "smooth": false
-        #     },
-        #     "interaction": {
-        #         "navigationButtons": true
-        #     },
-        #     "manipulation": {
-        #         "enabled": true
-        #     },
-        #     "physics": {
-        #         "minVelocity": 0.75
-        #     }
-        # }
-        # """
-        # )
-        #
-        # nt.show(html_path)
-        #
-        # with open(html_path, "r") as f:
-        #     grph = f.read()
-        #
-        # # Create and fill a QWebView
-        # view = QWebEngineView()
-        # view.setHtml(grph)
-        #
-        # # Add the QWebView and button to the layout
-        # layout.addWidget(view)
-        #
-        # # Show the window and run the app
-        # win.show()
-        # win.exec_()
 
     def viz_page(self):
         """Either increases or decreases the current visualizer page,
