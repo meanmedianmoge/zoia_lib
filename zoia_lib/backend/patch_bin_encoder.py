@@ -1,4 +1,5 @@
 import math
+import re
 import struct
 
 from zoia_lib.backend.patch import Patch
@@ -14,7 +15,7 @@ class PatchBinEncoder(Patch):
         """"""
         super().__init__()
 
-    def encode(self, pch):
+    def encode(self, pch, byt):
         """
         pch: parsed .bin using PatchBinary
         ================================================================
@@ -71,8 +72,8 @@ class PatchBinEncoder(Patch):
             module_size = self.encode_value(module["size"], 4)
             module_type = self.encode_value(module["mod_idx"], 4)
             module_version = self.encode_value(module["version"], 4)
-            module_color = self.encode_value(module["old_color"], 4)
             module_page = self.encode_value(module["page"], 4)
+            module_color = self.encode_value(module["old_color"], 4)
             module_position = self.encode_value(min(module["position"]), 4)
             module_params_count = self.encode_value(len(module["parameters"]), 4)
             module_size_bytes = self.encode_value(module["size_of_saveable_data"], 4)
@@ -140,7 +141,8 @@ class PatchBinEncoder(Patch):
             source_output_number_array = self.encode_value(int(source_values[1]), 4)
             dest_module_number_array = self.encode_value(int(dest_values[0]), 4)
             dest_input_number_array = self.encode_value(int(dest_values[1]), 4)
-            connection_strength = self.encode_value(connection["strength"], 4)
+            strength_value = int(round(connection["strength"] * 100, 0))
+            connection_strength = self.encode_value(strength_value, 4)
 
             connection_array.extend(source_module_number_array)
             connection_array.extend(source_output_number_array)
@@ -189,14 +191,27 @@ class PatchBinEncoder(Patch):
         file_array.extend(pages_array)
         file_array.extend(starred_params_array)
         file_array.extend(colors_array)
+        padding_length = len(byt) - len(file_array)
+        padding = bytearray(b"\x00" * int(padding_length))
+        file_array.extend(padding)
 
         # Patch Size includes itself in the calculation!
-        patch_size_array = self.encode_value(int(len(file_array) / 4 + 1), 4)
-        file.write(patch_size_array)
+        # patch_size_array = self.encode_value(int(len(file_array) / 4 + 1), 4)
+        # file.write(patch_size_array)
         file.write(file_array)
         file.close()
 
         return file_array
+
+    @staticmethod
+    def search(pattern, byt):
+        regex = re.compile(pattern)
+
+        for match_obj in regex.finditer(byt):
+            offset = match_obj.start()
+            print("decimal: {}".format(offset))
+            print("hex(): " + hex(offset))
+            print('formatted hex: {:02X} \n'.format(offset))
 
     @staticmethod
     def encode_text(text, byte_array_length):
@@ -205,7 +220,7 @@ class PatchBinEncoder(Patch):
         format_string = "{}B{}x".format(len(text), byte_array_length - len(text))
         data = list(text.encode())
 
-        return struct.pack(format_string, *data)
+        return bytearray(struct.pack(format_string, *data))
 
     @staticmethod
     def encode_value(value, byte_array_length):
@@ -242,7 +257,7 @@ class PatchBinEncoder(Patch):
         # Little-endian encoding is enforced to allow for cross-platform consistency
         format_string = "<{}{}x".format(byte_array_format, byte_array_length - used_bytes)
 
-        return struct.pack(format_string, value)
+        return bytearray(struct.pack(format_string, value))
 
     @staticmethod
     def encode_byte(byte, byte_array_length):
@@ -250,7 +265,7 @@ class PatchBinEncoder(Patch):
         # which is sequential and left-aligned
         format_string = "B{}x".format(byte_array_length - 1)
 
-        return struct.pack(format_string, byte)
+        return bytearray(struct.pack(format_string, byte))
 
     @staticmethod
     def encode_bool(bool, byte_array_length):
@@ -258,4 +273,4 @@ class PatchBinEncoder(Patch):
         # which is sequential and left-aligned
         format_string = "?{}x".format(byte_array_length - 1)
 
-        return struct.pack(format_string, bool)
+        return bytearray(struct.pack(format_string, bool))
