@@ -266,7 +266,9 @@ class ZOIALibrarianLocal(QMainWindow):
             export_dir = self.sd.get_export_path().split("/")[-1]
 
             if export_dir not in os.listdir(self.sd.get_sd_root()):
-                os.makedirs(os.path.join(self.sd.get_sd_root(), export_dir), exist_ok=True)
+                os.makedirs(
+                    os.path.join(self.sd.get_sd_root(), export_dir), exist_ok=True
+                )
 
             # Get the patch(es) which we're exporting
             idx = self.sender().objectName()
@@ -727,6 +729,9 @@ class ZOIALibrarianLocal(QMainWindow):
             )
         )
 
+        if self.curr_viz["meta"]["n_pages"] - 1 == self.curr_page_viz:
+            self.ui.btn_next_page.setEnabled(False)
+
         # Set the colors of the buttons
         self.set_viz()
 
@@ -759,6 +764,10 @@ class ZOIALibrarianLocal(QMainWindow):
             self.curr_page_viz += 1
 
         self.ui.btn_prev_page.setEnabled(not self.curr_page_viz == 0)
+        self.ui.btn_next_page.setEnabled(
+            not self.curr_page_viz == self.curr_viz["meta"]["n_pages"] - 1
+        )
+        self.ui.back_btn.setEnabled(False)
 
         # Load the viz for the new page.
         self.set_viz()
