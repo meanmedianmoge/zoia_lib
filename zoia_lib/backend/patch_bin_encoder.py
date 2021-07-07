@@ -14,9 +14,9 @@ class PatchBinEncoder(Patch):
         """"""
         super().__init__()
 
-    def encode(self, data):
+    def encode(self, pch):
         """
-        data: parsed .bin using PatchBinary
+        pch: parsed .bin using PatchBinary
         ================================================================
         Patch Structure:
 
@@ -56,20 +56,26 @@ class PatchBinEncoder(Patch):
 
         file_array = bytearray()
 
-        patch_name = self.encode_text(data["name"], 16)
-        module_count = self.encode_value(len(data["modules"]), 4)
+        patch_size = self.encode_value(pch["size"], 4)
+        patch_name = self.encode_text(pch["name"], 16)
+        module_count = self.encode_value(pch["meta"]["n_modules"], 4)
 
         modules_array = bytearray()
         colors_array = bytearray()
 
-        for module in data["modules"]:
+        for module in pch["modules"]:
 
             module_array = bytearray()
 
-            module_type = self.encode_value(module["mod_idx"], 8)
-            module_page = self.encode_value(module["page"], 8)
+            # Determine module size (in 4-byte words)
+            module_size = self.encode_value(module["size"], 4)
+            module_type = self.encode_value(module["mod_idx"], 4)
+            module_version = self.encode_value(module["version"], 4)
+            module_color = self.encode_value(module["old_color"], 4)
+            module_page = self.encode_value(module["page"], 4)
             module_position = self.encode_value(min(module["position"]), 4)
-            module_params_count = self.encode_value(len(module["parameters"]), 8)
+            module_params_count = self.encode_value(len(module["parameters"]), 4)
+            module_size_bytes = self.encode_value(module["size_of_saveable_data"], 4)
 
             module_options = bytearray()
             options_padding = 8 - len(module["options_binary"])
@@ -81,6 +87,12 @@ class PatchBinEncoder(Patch):
             elif options_padding > 0:
                 module_options.extend(self.encode_byte(0, options_padding))
 
+            # module params has extra int between the only param and the module name
+            # bytearray(byt[64:88])
+            # 64:68 is the single param's value (1) [\xfe\xff\x00\x00]
+            # 68:72 is the extra int [\x00o\x08\x00]
+            # 72:88 is the module name (4 ints)
+            #   [MIX\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00]
             module_params = bytearray()
             for param in module["parameters"]:
                 if module["parameters"][param] is None:
@@ -94,20 +106,20 @@ class PatchBinEncoder(Patch):
 
             module_name = self.encode_text(module["name"], 16)
 
+            module_array.extend(module_size)
             module_array.extend(module_type)
+            module_array.extend(module_version)
             module_array.extend(module_page)
+            module_array.extend(module_color)
             module_array.extend(module_position)
             module_array.extend(module_params_count)
+            module_array.extend(module_size_bytes)
             module_array.extend(module_options)
             module_array.extend(module_params)
             module_array.extend(module_name)
 
-            # Determine module size (in 4-byte words)
-            module_size = self.encode_value(int(len(module_array) / 4 + 1), 4)
-
             # Add the module byte array to the modules byte array, by first
-            # appending the size of the module, then the module data
-            modules_array.extend(module_size)
+            # appending the size of the module, then the module pch
             modules_array.extend(module_array)
 
             color_array = self.encode_value(color_dict[module["color"]], 4)
@@ -115,10 +127,10 @@ class PatchBinEncoder(Patch):
 
         # Connections Encoding Section
         connections_array = bytearray()
-        connection_count_array = self.encode_value(len(data["connections"]), 4)
+        connection_count_array = self.encode_value(pch["meta"]["n_connections"], 4)
         connections_array.extend(connection_count_array)
 
-        for connection in data["connections"]:
+        for connection in pch["connections"]:
             connection_array = bytearray()
 
             source_values = connection["source"].split(".")
@@ -141,9 +153,9 @@ class PatchBinEncoder(Patch):
         # Build out the byte array for the pages by first calculating the number of pages,
         # then looping over them and pulling out the names
         pages_array = bytearray()
-        pages_count_array = self.encode_value(len(data["pages"]), 4)
+        pages_count_array = self.encode_value((pch["meta"]["n_pages"]), 4)
         pages_array.extend(pages_count_array)
-        for page in data["pages"]:
+        for page in pch["pages"]:
             if len(page) > 0:
                 page_array = self.encode_text(page, 16)
                 pages_array.extend(page_array)
@@ -152,9 +164,9 @@ class PatchBinEncoder(Patch):
         # of starred params, then looping over them and pulling out the values to be
         # encoded per parameter
         starred_params_array = bytearray()
-        starred_params_count_array = self.encode_value(len(data["starred"]), 4)
+        starred_params_count_array = self.encode_value(pch["meta"]["n_starred"], 4)
         starred_params_array.extend(starred_params_count_array)
-        for starred_param in data["starred"]:
+        for starred_param in pch["starred"]:
             starred_module_array = self.encode_value(starred_param["module"], 2)
             starred_block_array = self.encode_byte(starred_param["block"], 1)
 
@@ -169,6 +181,7 @@ class PatchBinEncoder(Patch):
 
         # Now we stitch together the byte arrays into one large one which will be
         # analyzed for size, then written out to the binary file
+        file_array.extend(patch_size)
         file_array.extend(patch_name)
         file_array.extend(module_count)
         file_array.extend(modules_array)
@@ -192,7 +205,7 @@ class PatchBinEncoder(Patch):
         format_string = "{}B{}x".format(len(text), byte_array_length - len(text))
         data = list(text.encode())
 
-        return bytearray(struct.pack(format_string, *data))
+        return struct.pack(format_string, *data)
 
     @staticmethod
     def encode_value(value, byte_array_length):
@@ -229,7 +242,7 @@ class PatchBinEncoder(Patch):
         # Little-endian encoding is enforced to allow for cross-platform consistency
         format_string = "<{}{}x".format(byte_array_format, byte_array_length - used_bytes)
 
-        return bytearray(struct.pack(format_string, value))
+        return struct.pack(format_string, value)
 
     @staticmethod
     def encode_byte(byte, byte_array_length):
@@ -237,7 +250,7 @@ class PatchBinEncoder(Patch):
         # which is sequential and left-aligned
         format_string = "B{}x".format(byte_array_length - 1)
 
-        return bytearray(struct.pack(format_string, byte))
+        return struct.pack(format_string, byte)
 
     @staticmethod
     def encode_bool(bool, byte_array_length):
@@ -245,4 +258,4 @@ class PatchBinEncoder(Patch):
         # which is sequential and left-aligned
         format_string = "?{}x".format(byte_array_length - 1)
 
-        return bytearray(struct.pack(format_string, bool))
+        return struct.pack(format_string, bool)

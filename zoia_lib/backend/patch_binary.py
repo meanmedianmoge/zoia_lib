@@ -18,7 +18,7 @@ class PatchBinary(Patch):
         """"""
         super().__init__()
 
-    def parse_data(self, pch_data):
+    def parse_data(self, byt):
         """Parses the binary data of a patch for information relating
         to the patch. This information is collected into a string that
         is returned such that it can be displayed via the frontend.
@@ -29,6 +29,7 @@ class PatchBinary(Patch):
           - For each module:
             - Module name
             - Module type
+            - Module version
             - Estimated CPU
             - Page number
             - Color
@@ -46,7 +47,7 @@ class PatchBinary(Patch):
             - Module and block
             - MIDI CC (if applicable)
 
-        pch_data: The binary to be parsed and analyzed.
+        byt: The binary to be parsed and analyzed.
 
         return: A formatted JSON that can be shown in the frontend.
         """
@@ -54,14 +55,15 @@ class PatchBinary(Patch):
         # Massive credit to apparent1 for figuring this stuff out.
         # They did all the heavy lifting.
 
-        if pch_data is None:
+        if byt is None:
             raise errors.BinaryError(None)
 
         # Extract the string name of the patch.
-        name = self._qc_name(pch_data[4:])
+        name = self._qc_name(byt[4:])
 
         # Unpack the binary data.
-        data = struct.unpack("i" * int(len(pch_data) / 4), pch_data)
+        data = struct.unpack("i" * int(len(byt) / 4), byt)
+        pch_size = data[0]
 
         # Get a list of colors for the modules
         # (appears at the end of the binary)
@@ -87,12 +89,14 @@ class PatchBinary(Patch):
                 "category": self._get_module_data(data[curr_step + 1], "category"),
                 "mod_idx": data[curr_step + 1],
                 "name": self._qc_name(
-                    pch_data[
+                    byt[
                         (curr_step + (size - 4)) * 4: (curr_step + (size - 4)) * 4 + 16
                     ]
                 ),
                 "cpu": self._get_module_data(data[curr_step + 1], "cpu"),
                 "type": self._get_module_data(data[curr_step + 1], "name"),
+                "size": data[curr_step],
+                "size_of_saveable_data": data[curr_step + 7],
                 "version": data[curr_step + 2],
                 "page": int(data[curr_step + 3]),
                 "position": [
@@ -103,16 +107,16 @@ class PatchBinary(Patch):
                         + self._get_module_data(data[curr_step + 1], "min_blocks"),
                     )
                 ],
-                "old_color": self._get_color_name(data[curr_step + 4]),
+                "old_color": data[curr_step + 4],
                 "new_color": "" if skip_real else self._get_color_name(colors[i]),
                 "options": {},
                 "options_binary": {},
                 "options_copy": self._get_module_data(data[curr_step + 1], "options"),
                 "options_list": list(
-                    bytearray(pch_data[(curr_step + 8) * 4: (curr_step + 8) * 4 + 4])
+                    bytearray(byt[(curr_step + 8) * 4: (curr_step + 8) * 4 + 4])
                 )
                 + list(
-                    bytearray(pch_data[(curr_step + 9) * 4: (curr_step + 9) * 4 + 4])
+                    bytearray(byt[(curr_step + 9) * 4: (curr_step + 9) * 4 + 4])
                 ),
                 "params": int(data[curr_step + 6]),
                 # also can be fetched from self._get_module_data(data[curr_step + 1], "params")
@@ -143,18 +147,18 @@ class PatchBinary(Patch):
                     curr_module["options_binary"][opt] = option
                     v += 1
             except IndexError:
-                raise errors.BinaryError(pch_data[:10], 101)
+                raise errors.BinaryError(byt[:10], 101)
 
             # Combine colors into one key
             curr_module["color"] = (
-                curr_module["old_color"]
+                self._get_color_name(curr_module["old_color"])
                 if curr_module["new_color"] == ""
                 else curr_module["new_color"]
             )
 
             # Remove extra keys from module dict
             curr_module.pop("new_color", None)
-            curr_module.pop("old_color", None)
+            # curr_module.pop("old_color", None)
             curr_module.pop("options_copy", None)
             curr_module.pop("options_list", None)
 
@@ -181,7 +185,7 @@ class PatchBinary(Patch):
         # Extract the page data for each page in the patch.
         for k in range(data[curr_step]):
             curr_page = self._qc_name(
-                pch_data[(curr_step + 1) * 4: (curr_step + 1) * 4 + 16]
+                byt[(curr_step + 1) * 4: (curr_step + 1) * 4 + 16]
             )
             pages.append(curr_page)
             curr_step += 4
@@ -194,7 +198,7 @@ class PatchBinary(Patch):
         # Extract the starred parameters in the patch.
         for l in range(data[curr_step]):
             byte2 = struct.unpack(
-                "hh", pch_data[(curr_step + 1) * 4: (curr_step + 1) * 4 + 4]
+                "hh", byt[(curr_step + 1) * 4: (curr_step + 1) * 4 + 4]
             )
             curr_param = {
                 "module": byte2[0],
@@ -231,6 +235,7 @@ class PatchBinary(Patch):
         # Prepare a dict to pass to the frontend.
         json_bin = {
             "name": name,
+            "size": pch_size,
             "modules": modules,
             "connections": connections,
             "pages": pages,
@@ -981,6 +986,24 @@ class PatchBinary(Patch):
                 blocks.append(d[1])
                 blocks.append(d[2])
             blocks.append(d[3])
+        elif idx == 102:
+            blocks = [d[0]]
+            if opt[0][1] == "enabled":
+                blocks.append(d[1])
+            blocks.append(d[2])
+            blocks.append(d[3])
+            blocks.append(d[4])
+            blocks.append(d[5])
+            if opt[2][1] == "on":
+                blocks.append(d[6])
+            blocks.append(d[7])
+        elif idx == 103:
+            if opt[0][1] == "bypass":
+                blocks = [d[0]]
+            elif opt[0][1] == "aux":
+                blocks = [d[1]]
+            else:
+                blocks = [d[2]]
         elif idx == 104:
             blocks = []
             for i in range(1, opt[0][1] + 1):
@@ -988,46 +1011,8 @@ class PatchBinary(Patch):
             for i in range(1, opt[0][1] + 1):
                 blocks.append(d[i + 7])
             blocks.append(d[16])
-        elif idx in [
-            3,
-            8,
-            9,
-            10,
-            11,
-            15,
-            17,
-            18,
-            21,
-            25,
-            26,
-            27,
-            35,
-            38,
-            44,
-            45,
-            46,
-            50,
-            51,
-            52,
-            54,
-            55,
-            58,
-            59,
-            61,
-            62,
-            63,
-            65,
-            66,
-            74,
-            76,
-            77,
-            78,
-            80,
-            86,
-        ]:
-            blocks = d
         else:
-            raise ValueError("No module found")
+            blocks = d
 
         if len(blocks) < start:
             raise ValueError("Block count cannot be below the minimum")
