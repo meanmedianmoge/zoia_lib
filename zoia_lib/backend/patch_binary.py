@@ -189,8 +189,8 @@ class PatchBinary(Patch):
             )
             pages.append(curr_page)
             curr_step += 4
-        # Pad list with empty strings so that viz doesn't blow up
-        n_pages = modules[-1]["page"] + 1
+        # Get number of pages and fill with blank strings
+        n_pages = modules[-1]["page"] + 1 if len(modules) != 0 else 1
         while len(pages) < n_pages:
             pages += [""]
 
