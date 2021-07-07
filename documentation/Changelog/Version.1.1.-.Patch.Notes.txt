@@ -1,10 +1,5 @@
 Version 1.1 (July 2021)
 
-New Features
-- Patch Expander view has been added, which is accessible from the Local Storage tab (choose a patch and click "Expand" in the viz panel).
-    - Full patch routing is exposed and color-coded to identify module types, names, connections, and more.
-    - The applet is interactive to provide a better understanding of user-created patches.
-    - Individual block connections can be explored by clicking on each node.
 - The visualizer panel has received a few upgrades, including:
     - Calculate and display the correct number of blocks per module.
     - List the actual parameter names, with their values scaled from 0 to 1.
