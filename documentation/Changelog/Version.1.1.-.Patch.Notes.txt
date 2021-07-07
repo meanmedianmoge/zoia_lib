@@ -1,5 +1,6 @@
 Version 1.1 (July 2021)
 
+New Features
 - The visualizer panel has received a few upgrades, including:
     - Calculate and display the correct number of blocks per module.
     - List the actual parameter names, with their values scaled from 0 to 1.
