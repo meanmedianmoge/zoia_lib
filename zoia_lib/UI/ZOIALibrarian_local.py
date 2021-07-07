@@ -97,6 +97,7 @@ class ZOIALibrarianLocal(QMainWindow):
             if (
                 os.path.isdir(os.path.join(self.path, patch))
                 and len(os.listdir(os.path.join(self.path, patch))) >= 2
+                and patch != "Banks"
                 and patch != "Folders"
                 and patch != "temp"
             ):
@@ -190,7 +191,8 @@ class ZOIALibrarianLocal(QMainWindow):
         for patches in os.listdir(self.path):
             # Look for patch directories in the backend.
             if (
-                patches != "Folders"
+                patches != "Banks"
+                and patches != "Folders"
                 and patches != "data.json"
                 and patches != ".DS_Store"
                 and patches != "pref.json"
