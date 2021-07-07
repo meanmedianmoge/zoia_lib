@@ -1,4 +1,4 @@
-Version 1.1 (June 2021)
+Version 1.1 (July 2021)
 
 New Features
 - Patch Expander view has been added, which is accessible from the Local Storage tab (choose a patch and click "Expand" in the viz panel).
@@ -14,6 +14,7 @@ New Features
 - Local patches can be rated on a scale of 0-5 stars.
     - This feature also includes a new sorting and filtering method, found in the Sort toolbar.
     - The first time you run v1.1 may take a bit longer than usual, since each patch downloaded or imported needs a new rating field.
+- Patches now include a direct link to their entry on PS, if applicable.
 - The app is now versioned properly so that you no longer need to delete your saved preferences before upgrading.
 - Versioned patches display their patch name instead of the filename, for simplicity.
 - Version histories can be exported as a group using the “Export Patches” button in Local Storage.
@@ -23,9 +24,9 @@ New Features
 - The export patch dialog will default to the next-available open slot in the directory chosen.
     - Also, if you attempt to overwrite a slot, it will display the name of the patch currently in that slot.
     - Lastly, there is now a confirmation window upon a successful export.
-- Bank exports will automatically fill empty slots with blank patches.
+- Folder exports will automatically fill empty slots with blank patches.
 - The patch import dialog has been updated to display the name of the patch(es) which failed to import.
-- ZOIA got an update, so the app will reflect those changes during binary decoding.
+- ZOIA got two updates, so the app will reflect those changes during binary decoding.
 - UI updates, including:
     - Tooltip and status tip text.
     - Shortcut keymaps.
@@ -35,9 +36,13 @@ New Features
 - General code upkeep: applied a fancy auto-formatter to the codebase and automated the app-bundling process.
 
 Fixes
+- Underlying patch decoding code has been fixed to reflect block positions and versioned modules.
 - Fixed an issue where BigSur dependency issues were causing the app to not load (Mac).
+- Fixed an issue where new patches wouldn't load upon tab switch (credit to Elipses22).
 - Fixed an issue where choosing an SD card from the SD tab would cause the UI to snap to the Local Storage tab (credit to smithrobs).
 - Fixed an issue where temp directories would overwrite the patch list in the Local Storage tab, causing it to appear like you had no patches downloaded.
+- Fixed an issue where an error in loading a patch from a saved Folder would cause all subsequenet Folder slots to be empty.
+- Fixed an issue where local exports would not function due to an improper SD location.
 - Mac build is now confirmed to work with the .app file. No more needing to run from the terminal (credit to smithrobs).
 
 Known Issues
