@@ -21,7 +21,7 @@ modification of this application. By installing the application you agree to the
 ## How to Install
 Application can be installed in one of two ways:
 - (For general users) - Use the pre-bundled build, available on Windows, Mac, and Linux (Ubuntu) here:
-https://github.com/meanmedianmoge/zoia_lib/releases/tag/v1.1.
+https://github.com/meanmedianmoge/zoia_lib/releases.
 
 - (For developers/contributors) - Build from source; requires Python 3.7+.
 ```
@@ -39,7 +39,7 @@ python -m zoia_lib.backend.startup
 
 ## Documentation
 - Overview video and tutorial: https://www.youtube.com/watch?v=JLOUrWtG1Pk
-- Supplemental 1.1 video:
+- Supplemental 1.1 video: coming soon!
 - The current version of the manual can be found in `/User Manual`
 - Changelog of the various improvements, bug fixes, and known issues are in `/Changelog`
 - Initial app frameworks and discussions among the dev team and Empress can be found in `/Backend Implementation`, 
