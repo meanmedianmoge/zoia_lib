@@ -88,12 +88,6 @@ class PatchBinEncoder(Patch):
             elif options_padding > 0:
                 module_options.extend(self.encode_byte(0, options_padding))
 
-            # module params has extra int between the only param and the module name
-            # bytearray(byt[64:88])
-            # 64:68 is the single param's value (1) [\xfe\xff\x00\x00]
-            # 68:72 is the extra int [\x00o\x08\x00]
-            # 72:88 is the module name (4 ints)
-            #   [MIX\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00]
             module_params = bytearray()
             for param in module["parameters"]:
                 if module["parameters"][param] is None:
@@ -104,6 +98,13 @@ class PatchBinEncoder(Patch):
 
             for i in range(module["params"] - len(module["parameters"])):
                 module_params.extend(self.encode_value(0, 4))
+
+            module_saved_data = bytearray()
+            nearest_int = self.round_up_to_nearest_int(module["size_of_saveable_data"])
+            if nearest_int == 0:
+                pass
+            else:
+                module_saved_data.extend(self.encode_value(0, nearest_int))
 
             module_name = self.encode_text(module["name"], 16)
 
@@ -117,6 +118,7 @@ class PatchBinEncoder(Patch):
             module_array.extend(module_size_bytes)
             module_array.extend(module_options)
             module_array.extend(module_params)
+            module_array.extend(module_saved_data)
             module_array.extend(module_name)
 
             # Add the module byte array to the modules byte array, by first
@@ -212,6 +214,10 @@ class PatchBinEncoder(Patch):
             print("decimal: {}".format(offset))
             print("hex(): " + hex(offset))
             print('formatted hex: {:02X} \n'.format(offset))
+
+    @staticmethod
+    def round_up_to_nearest_int(n):
+        return n + (4 - n) % 4
 
     @staticmethod
     def encode_text(text, byte_array_length):
