@@ -71,7 +71,8 @@ either fork or clone the repo to get started. Some useful tools include:
 ## Authors
 - Mike Moger - app owner, primary dev after Beta 3 release, initial Python implementation
 - John Breton - primary dev, designer, and documentation creator up to Beta 3 release
-- djigneo/apparent1 - C# binary decoder and testing
+- djigneo/apparent1 - C# binary decoding and testing
+- Sranderley - binary encoding, editing, and UI
 - Matthew Allen - initial UI frames and app planning
 - Special thanks to Steve Bragg and the entire Empress Effects team for supporting this work
 - Additional thanks to our beta testers and those who submitted user stories
