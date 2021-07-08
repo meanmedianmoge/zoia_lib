@@ -1,5 +1,4 @@
 import math
-import re
 import struct
 
 from zoia_lib.backend.patch import Patch
@@ -15,7 +14,7 @@ class PatchBinEncoder(Patch):
         """"""
         super().__init__()
 
-    def encode(self, pch, byt):
+    def encode(self, pch):
         """
         pch: parsed .bin using PatchBinary
         ================================================================
@@ -56,6 +55,7 @@ class PatchBinEncoder(Patch):
         }
 
         file_array = bytearray()
+        farray = bytearray()
 
         patch_size = self.encode_value(pch["size"], 4)
         patch_name = self.encode_text(pch["name"], 16)
@@ -185,35 +185,29 @@ class PatchBinEncoder(Patch):
 
         # Now we stitch together the byte arrays into one large one which will be
         # analyzed for size, then written out to the binary file
-        file_array.extend(patch_size)
-        file_array.extend(patch_name)
-        file_array.extend(module_count)
-        file_array.extend(modules_array)
-        file_array.extend(connections_array)
-        file_array.extend(pages_array)
-        file_array.extend(starred_params_array)
-        file_array.extend(colors_array)
-        padding_length = len(byt) - len(file_array)
+        farray.extend(patch_name)
+        farray.extend(module_count)
+        farray.extend(modules_array)
+        farray.extend(connections_array)
+        farray.extend(pages_array)
+        farray.extend(starred_params_array)
+        farray.extend(colors_array)
+
+        # Patch Size includes itself in the calculation!
+        patch_size_array = self.encode_value(int(len(farray) / 4 + 1), 4)
+
+        file_array.extend(patch_size_array)
+        file_array.extend(farray)
+
+        # Need some padding to fill the 32kB
+        padding_length = 32764 - len(farray)
         padding = bytearray(b"\x00" * int(padding_length))
         file_array.extend(padding)
 
-        # Patch Size includes itself in the calculation!
-        # patch_size_array = self.encode_value(int(len(file_array) / 4 + 1), 4)
-        # file.write(patch_size_array)
         file.write(file_array)
         file.close()
 
         return file_array
-
-    @staticmethod
-    def search(pattern, byt):
-        regex = re.compile(pattern)
-
-        for match_obj in regex.finditer(byt):
-            offset = match_obj.start()
-            print("decimal: {}".format(offset))
-            print("hex(): " + hex(offset))
-            print('formatted hex: {:02X} \n'.format(offset))
 
     @staticmethod
     def round_up_to_nearest_int(n):
