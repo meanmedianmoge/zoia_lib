@@ -19,14 +19,16 @@ class ZOIALibrarianBank(QMainWindow):
     activities contained within the Folders tab of the application.
     """
 
-    def __init__(self, ui, path, msg, util, window):
+    def __init__(self, ui, path, sd,  msg, util, window):
         """Initializes the class with the required parameters.
 
         ui: The UI component of ZOIALibrarianMain
         path: A String representing the path to the backend application
               directory.
+        sd: Helper class to access UI-related SD methods.
         msg: A template QMessageBox.
         util: Helper class to access multi drag/drop.
+        window: A reference to the main UI window for icon consistency.
         """
 
         # Needed to make use of self.sender()
@@ -34,6 +36,7 @@ class ZOIALibrarianBank(QMainWindow):
 
         self.ui = ui
         self.path = path
+        self.sd = sd
         self.msg = msg
         self.util = util
         self.window = window
@@ -323,19 +326,21 @@ class ZOIALibrarianBank(QMainWindow):
             elif ok and name in os.listdir(sd.get_sd_root()):
                 # Already have that directory on the SD, need to check if they
                 # want to overwrite it.
-                self.msg.setWindowTitle("Directory exists")
+                self.msg.setWindowTitle("Folder exists")
                 self.msg.setIcon(QMessageBox.Warning)
-                self.msg.setText("A directory with that name already exists.")
+                self.msg.setText("A Folder with that name already exists.")
                 self.msg.setInformativeText("Would you like to overwrite it?")
                 self.msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
                 value = self.msg.exec_()
+                self.msg.setInformativeText(None)
                 if value == QMessageBox.Yes:
                     self.ui.statusbar.showMessage("Patches be movin'", timeout=1000)
                     self._get_bank_data()
                     fails = export.export_bank(
                         self.data_banks, sd.get_sd_root(), name, True
                     )
-                self.msg.setInformativeText(None)
+                else:
+                    return
             else:
                 return
 
