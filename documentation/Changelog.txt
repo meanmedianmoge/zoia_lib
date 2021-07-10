@@ -39,7 +39,7 @@ Fixes
 - Fixed an issue where new patches wouldn't load upon tab switch (credit to Elipses22).
 - Fixed an issue where choosing an SD card from the SD tab would cause the UI to snap to the Local Storage tab (credit to smithrobs).
 - Fixed an issue where temp directories would overwrite the patch list in the Local Storage tab, causing it to appear like you had no patches downloaded.
-- Fixed an issue where an error in loading a patch from a saved Folder would cause all subsequenet Folder slots to be empty.
+- Fixed an issue where an error in loading a patch from a saved Folder would cause all subsequent Folder slots to be empty.
 - Fixed an issue where local exports would not function due to an improper SD location.
 - Fixed an issue with setting the SD card location from the Folders tab.
 - Fixed an issue where documentation would not show on the PS tab.
@@ -49,12 +49,11 @@ Known Issues
 - RAR-compressed files cannot be downloaded on Mac (as of this writing, this affects 1 patch - ZOIA Murf v2).
     - Due to RAR’s licensing, we cannot include a version of the compression algorithm, nor can we verify that the user’s machine has the algo installed.
     - A workaround for this is to download the RAR patch(es) separately on PatchStorage, and then import the binary file to the app.
-- Occasionally, drag-and-drop will cease to work if you have an SD card location selected.
-    - Resetting the SD location and/or rebooting the app should mitigate the issue. It is currently being looked into (quite a tricky bug to diagnose..).
 
 Future Plans
+- Fully implement the Patch Expander view and improve its features.
+- Provide patch editing and patch creation.
 - An iPadOS version is coming soon! There are no plans for an Android release at this time.
-- Continue working on the Patch Expander and improve its features.
 
 _________________________________________
 
