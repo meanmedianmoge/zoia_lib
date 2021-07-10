@@ -40,11 +40,11 @@ python -m zoia_lib.backend.startup
 ## Documentation
 - Overview video and tutorial: https://www.youtube.com/watch?v=JLOUrWtG1Pk
 - Supplemental 1.1 video: coming soon!
-- The current version of the manual can be found in `/User Manual`
-- Changelog of the various improvements, bug fixes, and known issues are in `/Changelog`
-- Initial app frameworks and discussions among the dev team and Empress can be found in `/Backend Implementation`, 
-`/Design Document`, and `/Testing Plan`
-- HTML versions of the featured documentation (available in the Help toolbar) are in `/Resources`
+- You'll find the following in `/documentation`: <br>
+    - Current version of the manual (pdf)
+    - Overall changelog - lists new features, bug fixes, and known issues for each release
+    - Initial app frameworks and discussions among the dev team
+    - Binary format
 
 ## Features
 - Browse PatchStorage uploads and local patches within the UI
