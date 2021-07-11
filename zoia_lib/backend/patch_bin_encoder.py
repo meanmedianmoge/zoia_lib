@@ -172,16 +172,15 @@ class PatchBinEncoder(Patch):
         starred_params_array.extend(starred_params_count_array)
         for starred_param in pch["starred"]:
             starred_module_array = self.encode_value(starred_param["module"], 2)
-            starred_block_array = self.encode_byte(starred_param["block"], 1)
 
             if starred_param["midi_cc"] == "None":
-                starred_midi_cc_array = self.encode_byte(0, 1)
+                starred_block_midi_array = self.encode_value(starred_param["block"], 2)
             else:
-                starred_midi_cc_array = self.encode_byte(starred_param["midi_cc"], 1)
+                cc = 128 * (starred_param["midi_cc"]+1) + starred_param["block"]
+                starred_block_midi_array = self.encode_value(cc, 2)
 
             starred_params_array.extend(starred_module_array)
-            starred_params_array.extend(starred_block_array)
-            starred_params_array.extend(starred_midi_cc_array)
+            starred_params_array.extend(starred_block_midi_array)
 
         # Now we stitch together the byte arrays into one large one which will be
         # analyzed for size, then written out to the binary file
