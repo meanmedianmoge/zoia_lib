@@ -73,7 +73,7 @@ class PatchBinEncoder(Patch):
             module_type = self.encode_value(module["mod_idx"], 4)
             module_version = self.encode_value(module["version"], 4)
             module_page = self.encode_value(module["page"], 4)
-            module_color = self.encode_value(module["old_color"], 4)
+            module_color = self.encode_value(color_dict[module["color"]], 4)
             module_position = self.encode_value(min(module["position"]), 4)
             module_params_count = self.encode_value(len(module["parameters"]), 4)
             module_size_bytes = self.encode_value(module["size_of_saveable_data"], 4)

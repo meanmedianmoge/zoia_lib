@@ -158,7 +158,7 @@ class PatchBinary(Patch):
 
             # Remove extra keys from module dict
             curr_module.pop("new_color", None)
-            # curr_module.pop("old_color", None)
+            curr_module.pop("old_color", None)
             curr_module.pop("options_copy", None)
             curr_module.pop("options_list", None)
 
@@ -211,11 +211,11 @@ class PatchBinary(Patch):
             starred.append(curr_param)
             curr_step += 1
 
-        colours = []
+        colors = []
         # Extract the colors of each module in the patch.
         for m in range(len(modules)):
             curr_color = data[curr_step + 1]
-            colours.append(curr_color)
+            colors.append(curr_color)
             curr_step += 1
 
         # Block information
@@ -241,7 +241,7 @@ class PatchBinary(Patch):
             "connections": connections,
             "pages": pages,
             "starred": starred,
-            "colours": colours,
+            "colors": colors,
             "meta": {
                 "name": name,
                 "cpu": round(sum([k["cpu"] for k in modules]), 2),
