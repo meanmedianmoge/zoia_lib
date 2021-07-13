@@ -223,6 +223,7 @@ class ZOIALibrarianLocal(QMainWindow):
 
         # Reset the text browser.
         self.ui.text_browser_local.setText("")
+        self.ui.statusbar.showMessage("Patch(es) deleted.", timeout=5000)
 
         # Special case, we only have one patch in a version history after
         # a deletion.
@@ -304,7 +305,7 @@ class ZOIALibrarianLocal(QMainWindow):
                     maxValue=63,
                 )
                 if ok:
-                    self.ui.statusbar.showMessage("Patches be movin'", timeout=5000)
+                    self.ui.statusbar.showMessage("Exporting patches.", timeout=5000)
                     # Got a slot and the user hit "OK"
                     if (
                         "_" not in idx
@@ -368,6 +369,7 @@ class ZOIALibrarianLocal(QMainWindow):
                             (len(os.listdir(os.path.join(self.path, idx))) / 2) - 1
                         )
                         if slot + pch_num > 63:
+                            self.ui.statusbar.showMessage("Export failed.", timeout=5000)
                             self.msg.setWindowTitle("No Space")
                             self.msg.setIcon(QMessageBox.Information)
                             self.msg.setText(
@@ -413,6 +415,7 @@ class ZOIALibrarianLocal(QMainWindow):
                                             )
                                             slot += 1
                                     self.msg.setIcon(QMessageBox.Information)
+                                    self.ui.statusbar.showMessage("Export complete.", timeout=5000)
                                     self.msg.setWindowTitle("Export Complete")
                                     self.msg.setText(
                                         "The patches have been successfully exported."
@@ -433,6 +436,7 @@ class ZOIALibrarianLocal(QMainWindow):
                                         )
                                         slot += 1
                                 self.msg.setIcon(QMessageBox.Information)
+                                self.ui.statusbar.showMessage("Export complete.", timeout=5000)
                                 self.msg.setWindowTitle("Export Complete")
                                 self.msg.setText(
                                     "The patches have been successfully exported."
@@ -490,7 +494,7 @@ class ZOIALibrarianLocal(QMainWindow):
         self.ui.check_for_updates_btn.setEnabled(False)
         self.ui.refresh_pch_btn.setEnabled(False)
         self.ui.btn_dwn_all.setEnabled(False)
-        self.ui.statusbar.showMessage("Checking for updates...")
+        self.ui.statusbar.showMessage("Checking for updates.", timeout=5000)
         self.worker_updates.start()
 
     def update_local_patches_done(self, count):
@@ -505,6 +509,7 @@ class ZOIALibrarianLocal(QMainWindow):
 
         # Check to see if we actually got an updates and let the user know.
         if count[0] == 0:
+            self.ui.statusbar.showMessage("No updates needed.", timeout=5000)
             self.msg.setWindowTitle("No Updates")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText(
@@ -513,6 +518,7 @@ class ZOIALibrarianLocal(QMainWindow):
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
         else:
+            self.ui.statusbar.showMessage("Updates complete.", timeout=5000)
             self.msg.setWindowTitle("Updates")
             self.msg.setIcon(QMessageBox.Information)
             if count[0] == 1:
@@ -571,6 +577,7 @@ class ZOIALibrarianLocal(QMainWindow):
             for ver in sorted(os.listdir(os.path.join(self.path, idx))):
                 if ver.endswith(".json"):
                     update.update_data(ver.split(".")[0], value, 6)
+        self.ui.statusbar.showMessage("Successfully updated patch rating.", timeout=5000)
 
     def update_patch_notes(self):
         """Updates the patch notes for a patch that has been previously
@@ -633,6 +640,7 @@ class ZOIALibrarianLocal(QMainWindow):
             else:
                 self.get_version_patches(True)
         self.prev_tag_cat = None
+        self.ui.statusbar.showMessage("Successfully updated patch tags/cats.", timeout=5000)
 
     def events(self, e):
         """Handles events that relate updating the tags/categories

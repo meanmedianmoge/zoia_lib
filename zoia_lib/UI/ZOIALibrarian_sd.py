@@ -81,6 +81,7 @@ class ZOIALibrarianSD(QMainWindow):
                 self.ui.tabs.setCurrentIndex(1)
 
         # Setup the SD card tree view for the SD Card tab.
+        self.ui.statusbar.showMessage("SD card location successfully set.", timeout=5000)
         model = QFileSystemModel()
         model.setRootPath(self.sd_root)
         self.ui.sd_tree.setModel(model)
@@ -198,6 +199,7 @@ class ZOIALibrarianSD(QMainWindow):
             self.export_dir = str(input_dir)
 
             e = self.export_dir.split("/")[-1]
+            self.ui.statusbar.showMessage("Export directory successfully set.", timeout=5000)
             self.msg.setWindowTitle("Export Directory Has Been Set")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText("Export directory has been set to {}.".format(e))
@@ -226,7 +228,7 @@ class ZOIALibrarianSD(QMainWindow):
                         self.save.import_to_backend(
                             os.path.join(self.sd_path_full, sd_pch)
                         )
-                        self.ui.statusbar.showMessage("Import complete.")
+                        self.ui.statusbar.showMessage("Import complete.", timeout=5000)
                         self.msg.setIcon(QMessageBox.Information)
                         self.msg.setWindowTitle("Import Complete")
                         self.msg.setText("The patch has been successfully imported.")
@@ -241,6 +243,7 @@ class ZOIALibrarianSD(QMainWindow):
                             .split(",")[0]
                             .replace("'", "")
                         )
+                        self.ui.statusbar.showMessage("Import failed.", timeout=5000)
                         self.msg.setWindowTitle("Patch Already In Library")
                         self.msg.setIcon(QMessageBox.Information)
                         self.msg.setText(
@@ -273,6 +276,7 @@ class ZOIALibrarianSD(QMainWindow):
             val = self.msg.exec_()
             if val == QMessageBox.Yes:
                 self.delete.delete_full_patch_directory(self.sd_path_full)
+                self.ui.statusbar.showMessage("Selected SD folder has been deleted.", timeout=5000)
         else:
             self.delete.delete_file(self.get_sd_path())
 
@@ -500,6 +504,8 @@ class ZOIALibrarianSD(QMainWindow):
         row = self.sender().objectName()
         index = "00{}".format(row) if len(row) < 2 else "0{}".format(row)
         self.delete.delete_patch_sd(index, self.sd_path_full)
+        self.ui.statusbar.showMessage("Patch deleted.", timeout=5000)
+
         # Reload the tables.
         self._set_data_sd()
         self.ui.table_sd_right.clearSelection()
