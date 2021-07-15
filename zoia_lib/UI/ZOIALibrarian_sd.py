@@ -229,10 +229,10 @@ class ZOIALibrarianSD(QMainWindow):
                             os.path.join(self.sd_path_full, sd_pch)
                         )
                         self.ui.statusbar.showMessage("Import complete.", timeout=5000)
-                        self.msg.setIcon(QMessageBox.Information)
-                        self.msg.setWindowTitle("Import Complete")
-                        self.msg.setText("The patch has been successfully imported.")
-                        self.msg.exec_()
+                        # self.msg.setIcon(QMessageBox.Information)
+                        # self.msg.setWindowTitle("Import Complete")
+                        # self.msg.setText("The patch has been successfully imported.")
+                        # self.msg.exec_()
                         return
                     except errors.SavingError as e:
                         # Prep the error message

@@ -293,11 +293,11 @@ class ZOIALibrarianBank(QMainWindow):
 
             # Let the user know when the saving is done.
             self.ui.statusbar.showMessage("Successfully saved the folder.", timeout=5000)
-            self.msg.setWindowTitle("Folder Saved")
-            self.msg.setIcon(QMessageBox.Information)
-            self.msg.setText("The Folder has been saved successfully.")
-            self.msg.setStandardButtons(QMessageBox.Ok)
-            self.msg.exec_()
+            # self.msg.setWindowTitle("Folder Saved")
+            # self.msg.setIcon(QMessageBox.Information)
+            # self.msg.setText("The Folder has been saved successfully.")
+            # self.msg.setStandardButtons(QMessageBox.Ok)
+            # self.msg.exec_()
             self.ui.btn_load_bank.setEnabled(True)
 
     def export_bank(self, sd, export, window):
@@ -351,14 +351,14 @@ class ZOIALibrarianBank(QMainWindow):
             if len(fails) == 0:
                 # No failed exports, let the user know.
                 self.ui.statusbar.showMessage("Export complete.", timeout=5000)
-                self.msg.setWindowTitle("Success")
-                self.msg.setIcon(QMessageBox.Information)
-                self.msg.setText(
-                    "The Folder has successfully been exported to the "
-                    "SD card directory: {}.".format(name)
-                )
-                self.msg.setStandardButtons(QMessageBox.Ok)
-                self.msg.exec_()
+                # self.msg.setWindowTitle("Success")
+                # self.msg.setIcon(QMessageBox.Information)
+                # self.msg.setText(
+                #     "The Folder has successfully been exported to the "
+                #     "SD card directory: {}.".format(name)
+                # )
+                # self.msg.setStandardButtons(QMessageBox.Ok)
+                # self.msg.exec_()
             else:
                 # Some patches were deleted since they were added to the
                 # bank tables, so they failed to export, let the user know.
@@ -371,7 +371,7 @@ class ZOIALibrarianBank(QMainWindow):
                         "all been deleted from the ZOIA Librarian."
                     )
                 else:
-                    self.ui.statusbar.showMessage("Export partially complete.", timeout=5000)
+                    self.ui.statusbar.showMessage("Export complete.", timeout=5000)
                     self.msg.setText(
                         "Patches have been exported to the SD card "
                         "directory: {}.".format(name)
