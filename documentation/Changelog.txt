@@ -20,7 +20,6 @@ New Features
     - If you do not define a directory, the default remains as “to_zoia”.
 - The export patch dialog will default to the next open slot in the directory chosen.
     - If you attempt to overwrite, it will display the name of the patch currently there.
-    - Lastly, there is now a confirmation window upon a successful export.
 - Folder exports will automatically fill empty slots with blank patches.
 - The patch import dialog has been updated to display the name of the patch(es) which failed to import.
 - ZOIA got an update, so the app will reflect those changes during binary decoding.
