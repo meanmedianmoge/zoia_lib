@@ -2360,6 +2360,7 @@ module_index = {
         "name": "CV Mixer",
         "category": "CV",
         "description": """
+            An 8 channel CV Mixer and Attenuverter.
         """,
         "default_blocks": 5,
         "min_blocks": 5,
