@@ -25,7 +25,7 @@ class ZOIALibrarianUtil:
         self.ui = ui
         self.window = window
 
-        self.dark = True
+        self.dark = False
         self.row_inversion = False
         self.font = QFont("Verdana", 10)
 

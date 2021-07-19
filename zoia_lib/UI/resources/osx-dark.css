@@ -1,17 +1,10 @@
-QTabBar::tab:selected {
+QHeaderView::section {
     background-color: #444851;
-    border-bottom: 0;
-    border-top-left-radius: 10px 5px;
-    border-top-right-radius: 10px 5px;
-    color: #FFF;
-    font: bold;
-    padding: 5px;
-    width: 200%;
-}
-
-QTabWidget::pane {
-    background-color: #31363b;
-    position: absolute;
+    color: #fff;
+    selected: {
+        background-color: #3b4045;
+        color: #fff;
+    }
 }
 
 QLineEdit {
@@ -19,6 +12,11 @@ QLineEdit {
     border: 1px solid #696969;
     color: #FFF;
     padding: -2px 0 0;
+}
+
+QMenuBar {
+    background-color: #31363b;
+    color: #FFF;
 }
 
 QMenuBar::item:pressed {
@@ -31,9 +29,35 @@ QSplitter::handle {
     border: .1ex #76797c;
 }
 
-QMenuBar {
-    background-color: #31363b;
+QTabBar::tab {
+    border-bottom: 0;
+    border-top-left-radius: 10px 5px;
+    border-top-right-radius: 10px 5px;
     color: #FFF;
+    padding: 5px;
+    width: 200%;
+}
+
+QTabBar::tab:selected {
+    background-color: #444851;
+    font: bold;
+}
+
+QTabBar::tab:!selected {
+    background-color: #191a20;
+    hover: {
+        background-color: #727888;
+    };
+}
+
+QTabWidget::pane {
+    background-color: #31363b;
+    position: absolute;
+}
+
+QTabWidget::tab-bar {
+    background-color: #31363b;
+    border-bottom: 1px solid #31363b;
 }
 
 QTableView::item:selected {
@@ -49,35 +73,6 @@ QToolTip {
     padding: .5ex;
 }
 
-QHeaderView::section {
-    background-color: #444851;
-    color: #fff;
-}
-
-QHeaderView::section:selected {
-    background-color: #3b4045;
-    color: #fff;
-}
-
-QTabBar::tab:!selected {
-    background-color: #191a20;
-    border-bottom: 0;
-    border-top-left-radius: 10px 5px;
-    border-top-right-radius: 10px 5px;
-    color: #FFF;
-    padding: 5px;
-    width: 200%;
-}
-
-QTabBar::tab:!selected:hover {
-    background-color: #727888;
-}
-
-QTabWidget::tab-bar {
-    background-color: #31363b;
-    border-bottom: 1px solid #31363b;
-}
-
 QHeaderView, QMainWindow, QTabBar, QTabWidget {
     background-color: #31363b;
 }
@@ -88,12 +83,12 @@ QSplitter, QTableCornerButton::section {
     background-color: #444851;
 }
 
-QTreeView, QTextBrowser, QTableView {
+QTableView, QTextBrowser, QTreeView {
     background-color: #31363b;
     color: #FFF;
 }
 
-QStatusBar, QRadioButton {
+QRadioButton, QStatusBar {
     color: #FFF;
 }
 

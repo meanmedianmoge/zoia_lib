@@ -13,7 +13,7 @@ import os
 import sys
 
 from PySide2.QtGui import QPixmap, Qt
-from PySide2.QtWidgets import QApplication, QSplashScreen
+from PySide2.QtWidgets import QApplication, QSplashScreen, QStyleFactory
 
 from zoia_lib.backend.utilities import meipass
 from zoia_lib.UI.ZOIALibrarian_main import ZOIALibrarianMain
@@ -21,6 +21,9 @@ from zoia_lib.UI.ZOIALibrarian_main import ZOIALibrarianMain
 # Entry point for the application.
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+
+    # Set style
+    app.setStyle(QStyleFactory.create("Fusion"))
 
     file_path = meipass(
         os.path.join(os.getcwd(), "zoia_lib", "UI", "resources", "splash.png")
