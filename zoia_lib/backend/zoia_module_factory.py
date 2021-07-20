@@ -1,6 +1,13 @@
 from zoia_lib.backend.zoia_modules import *
 
 class ZoiaModuleFactory:
+"""
+This class will be used by the application to provide a single
+dependency which can generate instances of zoia_modules. The factory's only
+method "create_module" is built to accept module_id and version as arguments,
+allowing for this factory to generate a module instance directly from a bin
+file or from a ZOIA Libarrian UI call.
+"""
     def __init__(self):
         self.module_index = {
             "0": SVFilter
