@@ -1,101 +1,8 @@
-import json
-import sys
-
-from zoia_lib.backend.utilities import meipass
-
-with open(meipass("zoia_lib/common/schemas/ModuleIndex.json")) as f:
-    mod = json.load(f)
-
-
-class Module:
-    def __init__(self):
-        """Base class for Module creation.
-
-        enum {
-          MODULE_SIZE_OFFSET = 0,    // size of serialized module including this int
-          MODULE_ID_OFFSET = 1,
-          MODULE_VERSION_OFFSET = 2,
-          MODULE_PAGE_OFFSET = 3,
-          MODULE_COLOUR_OFFSET = 4,
-          MODULE_ORIGIN_OFFSET = 5,
-          MODULE_NUMBER_OF_JACK_BIASES_OFFSET = 6,    // number of jack biases saved
-          // the number of ints that saveable_data takes up will be this rounded up to the nearest
-          // multiple of 4 and divided by 4. so if some saveable_data takes up 5 bytes, saveable_data
-          // would have a size of 2 ints
-          MODULE_SIZE_OF_SAVEABLE_DATA_IN_BYTES_OFFSET = 7,
-          MODULE_OPTIONS_OFFSET = 8,                  // this is eight chars so 2 ints
-          MODULE_CV_INPUT_JACK_BIASES_OFFSET = 10     // each cv_input jack bias gets it own int
-                                               // then after this
-                                               // SAVEABLE_DATA
-                                               // MODULE_NAME  // 16 bytes, so 4 ints
-        };
-        """
-
-        self.app_version = 1.2
-
-    def create_module(self, idx, version=1):
-        """Construct module piece-by-piece"""
-        module = self.choose_module(idx)
-        if module["options"]:
-            module["options"] = self.select_options(module)
-        module["blocks"] = self.calc_blocks(self.blocks)
-        module["params"] = self.get_params()
-        return module
-
-    @staticmethod
-    def choose_module(idx):
-        """Selects module from mod index reference."""
-        return mod[str(idx)]
-
-    def select_options(self):
-        """Selects option for a module"""
-        print("Selecting options for {}: ".format(self.name))
-        options = {}
-        for opt, values in self.options.items():
-            print(opt, values)
-            P1 = self._make_selection(values)
-            options[opt] = P1
-        return options
-
-    @staticmethod
-    def _make_selection(options):
-        """Have the user select options for module-creation"""
-        user_choice = input("")
-        if str(user_choice) in str(options):
-            return user_choice
-        elif user_choice in ["quit", "exit", "leave"]:
-            sys.exit()
-        else:
-            print("Please select an option")
-            user_choice = input()
-            if str(user_choice) in str(options):
-                return user_choice
-            else:
-                print("Aborting the module creation process")
-                sys.exit()
-
-    def calc_blocks(self):
-        """Relies on ChildClass' get_blocks upon init.
-        Must happen after options are chosen and confirmed.
-        """
-        blocks = self.get_blocks()
-        if len(blocks) < self.min_blocks:
-            raise ValueError("Block count cannot be below the minimum")
-        elif len(blocks) > self.max_blocks:
-            raise ValueError("Block count cannot be above the maximum")
-        else:
-            return dict(blocks)
-
-    def get_params(self):
-        """Use block/options to determine param count"""
-        tmp = {k: v["isParam"] for k, v in self.blocks.items() if v["isParam"]}
-        return len(tmp.keys())
+from zoia_lib.backend.module import Module
 
 
 class SVFilter(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 0
         self.name = "SV Filter"
         self.version = version
@@ -122,9 +29,10 @@ class SVFilter(Module):
             "bandpass_output": ["off", "on"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0], d[1], d[2]]
@@ -137,8 +45,6 @@ class SVFilter(Module):
 
 class AudioInput(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 1
         self.name = "Audio Input"
         self.version = version
@@ -158,9 +64,10 @@ class AudioInput(Module):
         }
         self.options = {"channels": ["stereo", "left", "right"]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         if opt[0][1] == "left":
@@ -175,8 +82,6 @@ class AudioInput(Module):
 
 class AudioOutput(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 2
         self.name = "Audio Output"
         self.version = version
@@ -201,9 +106,10 @@ class AudioOutput(Module):
             "channels": ["stereo", "left", "right"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         if opt[1][1] == "left":
@@ -220,8 +126,6 @@ class AudioOutput(Module):
 
 class Aliaser(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 3
         self.name = "Aliaser"
         self.version = version
@@ -245,6 +149,7 @@ class Aliaser(Module):
         }
         self.options = {}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -252,8 +157,6 @@ class Aliaser(Module):
 
 class Sequencer(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 4
         self.name = "Sequencer"
         self.version = version
@@ -319,9 +222,10 @@ class Sequencer(Module):
             "behavior": ["loop", "once"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = []
@@ -338,8 +242,6 @@ class Sequencer(Module):
 
 class LFO(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 5
         self.name = "LFO"
         self.version = version
@@ -375,9 +277,10 @@ class LFO(Module):
             "phase_reset": ["off", "on"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = []
@@ -398,8 +301,6 @@ class LFO(Module):
 
 class ADSR(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 6
         self.name = "ADSR"
         self.version = version
@@ -445,10 +346,10 @@ class ADSR(Module):
             "hold_sustain_release": ["off", "on"],
             "time_scale": ["exponent", "linear"],
         }
-        self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -473,8 +374,6 @@ class ADSR(Module):
 
 class VCA(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 7
         self.name = "VCA"
         self.version = version
@@ -500,9 +399,10 @@ class VCA(Module):
         }
         self.options = {"channels": ["1in->1out", "stereo"]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -518,8 +418,6 @@ class VCA(Module):
 
 class AudioMultiply(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 8
         self.name = "Audio Multiply"
         self.version = version
@@ -542,6 +440,7 @@ class AudioMultiply(Module):
         }
         self.options = {}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -549,8 +448,6 @@ class AudioMultiply(Module):
 
 class BitCrusher(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 9
         self.name = "Bit Crusher"
         self.version = version
@@ -572,6 +469,7 @@ class BitCrusher(Module):
         }
         self.options = {"fractions": ["off", "on"]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -579,8 +477,6 @@ class BitCrusher(Module):
 
 class SampleandHold(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 10
         self.name = "Sample and Hold"
         self.version = version
@@ -603,6 +499,7 @@ class SampleandHold(Module):
         }
         self.options = {"track & hold": ["off", "on"]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -610,8 +507,6 @@ class SampleandHold(Module):
 
 class ODandDistortion(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 11
         self.name = "OD and Distortion"
         self.version = version
@@ -632,6 +527,7 @@ class ODandDistortion(Module):
         }
         self.options = {"model": ["plexi", "germ", "classic", "pushed", "edgy"]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -639,8 +535,6 @@ class ODandDistortion(Module):
 
 class EnvFollower(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 12
         self.name = "Env Follower"
         self.version = version
@@ -667,9 +561,10 @@ class EnvFollower(Module):
             "output_scale": ["log", "linear"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -683,8 +578,6 @@ class EnvFollower(Module):
 
 class DelayLine(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 13
         self.name = "Delay Line"
         self.version = version
@@ -715,9 +608,10 @@ class DelayLine(Module):
             "CV Input": ["exponent", "linear"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -733,8 +627,6 @@ class DelayLine(Module):
 
 class Oscillator(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 14
         self.name = "Oscillator"
         self.version = version
@@ -765,9 +657,10 @@ class Oscillator(Module):
             "upsampling": ["none", "2x"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -782,8 +675,6 @@ class Oscillator(Module):
 
 class Pushbutton(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 15
         self.name = "Pushbutton"
         self.version = version
@@ -806,6 +697,7 @@ class Pushbutton(Module):
             "normally": ["zero", "one"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -813,8 +705,6 @@ class Pushbutton(Module):
 
 class Keyboard(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 16
         self.name = "Keyboard"
         self.version = version
@@ -876,9 +766,10 @@ class Keyboard(Module):
         }
         self.options = {"#_of_notes": list(range(1, 41))}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = []
@@ -893,8 +784,6 @@ class Keyboard(Module):
 
 class CVInvert(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 17
         self.name = "CV Invert"
         self.version = version
@@ -914,6 +803,7 @@ class CVInvert(Module):
         }
         self.options = {}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -921,8 +811,6 @@ class CVInvert(Module):
 
 class Steps(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 18
         self.name = "Steps"
         self.version = version
@@ -945,6 +833,7 @@ class Steps(Module):
         }
         self.options = {}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -952,8 +841,6 @@ class Steps(Module):
 
 class SlewLimiter(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 19
         self.name = "Slew Limiter"
         self.version = version
@@ -980,9 +867,10 @@ class SlewLimiter(Module):
         }
         self.options = {"control": ["linked", "separate"]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -998,8 +886,6 @@ class SlewLimiter(Module):
 
 class MidiNotesIn(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 20
         self.name = "Midi Notes In"
         self.version = version
@@ -1059,9 +945,10 @@ class MidiNotesIn(Module):
             "trigger_pulse": ["off", "on"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = []
@@ -1078,8 +965,6 @@ class MidiNotesIn(Module):
 
 class MidiCCIn(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 21
         self.name = "Midi CC In"
         self.version = version
@@ -1100,6 +985,7 @@ class MidiCCIn(Module):
             "output_range": ["0 to 1", "-1 to 1"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -1107,8 +993,6 @@ class MidiCCIn(Module):
 
 class Multiplier(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 22
         self.name = "Multiplier"
         self.version = version
@@ -1138,9 +1022,10 @@ class Multiplier(Module):
         }
         self.options = {"num_inputs": list(range(2, 9))}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -1153,8 +1038,6 @@ class Multiplier(Module):
 
 class Compressor(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 23
         self.name = "Compressor"
         self.version = version
@@ -1191,9 +1074,10 @@ class Compressor(Module):
             "sidechain": ["internal", "external"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -1217,8 +1101,6 @@ class Compressor(Module):
 
 class MultiFilter(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 24
         self.name = "Multi Filter"
         self.version = version
@@ -1250,9 +1132,10 @@ class MultiFilter(Module):
             ]
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -1267,8 +1150,6 @@ class MultiFilter(Module):
 
 class PlateReverb(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 25
         self.name = "Plate Reverb"
         self.version = version
@@ -1294,6 +1175,7 @@ class PlateReverb(Module):
         }
         self.options = {}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -1301,8 +1183,6 @@ class PlateReverb(Module):
 
 class BufferDelay(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 26
         self.name = "Buffer Delay"
         self.version = version
@@ -1323,6 +1203,7 @@ class BufferDelay(Module):
         }
         self.options = {"buffer_length": list(range(0, 17))}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -1330,8 +1211,6 @@ class BufferDelay(Module):
 
 class AllPassFilter(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 27
         self.name = "All Pass Filter"
         self.version = version
@@ -1352,6 +1231,7 @@ class AllPassFilter(Module):
         }
         self.options = {"#_of_poles": [1, 2, 3, 4, 5, 6, 7, 8]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -1359,8 +1239,6 @@ class AllPassFilter(Module):
 
 class Quantizer(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 28
         self.name = "Quantizer"
         self.version = version
@@ -1381,9 +1259,10 @@ class Quantizer(Module):
         }
         self.options = {"key_scale_jacks": ["no", "yes"]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -1397,8 +1276,6 @@ class Quantizer(Module):
 
 class Phaser(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 29
         self.name = "Phaser"
         self.version = version
@@ -1431,9 +1308,10 @@ class Phaser(Module):
             "number_of_stages": [4, 2, 1, 3, 6, 8],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -1457,8 +1335,6 @@ class Phaser(Module):
 
 class Looper(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 30
         self.name = "Looper"
         self.version = version
@@ -1496,9 +1372,10 @@ class Looper(Module):
             "stop_play_button": ["no", "yes"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0], d[1], d[2]]
@@ -1519,8 +1396,6 @@ class Looper(Module):
 
 class InSwitch(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 31
         self.name = "In Switch"
         self.version = version
@@ -1559,9 +1434,10 @@ class InSwitch(Module):
         }
         self.options = {"num_inputs": list(range(1, 17))}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = []
@@ -1575,8 +1451,6 @@ class InSwitch(Module):
 
 class OutSwitch(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 32
         self.name = "Out Switch"
         self.version = version
@@ -1612,9 +1486,10 @@ class OutSwitch(Module):
         }
         self.options = {"num_outputs": list(range(1, 17))}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0], d[1]]
@@ -1626,8 +1501,6 @@ class OutSwitch(Module):
 
 class AudioInSwitch(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 33
         self.name = "Audio In Switch"
         self.version = version
@@ -1670,9 +1543,10 @@ class AudioInSwitch(Module):
             "fades": ["on", "off"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = []
@@ -1686,8 +1560,6 @@ class AudioInSwitch(Module):
 
 class AudioOutSwitch(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 34
         self.name = "Audio Out Switch"
         self.version = version
@@ -1730,9 +1602,10 @@ class AudioOutSwitch(Module):
             "fades": ["on", "off"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0], d[1]]
@@ -1744,8 +1617,6 @@ class AudioOutSwitch(Module):
 
 class MidiPressure(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 35
         self.name = "Midi Pressure"
         self.version = version
@@ -1765,6 +1636,7 @@ class MidiPressure(Module):
         }
         self.options = {"midi_channel": list(range(1, 17))}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -1772,8 +1644,6 @@ class MidiPressure(Module):
 
 class OnsetDetector(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 36
         self.name = "Onset Detector"
         self.version = version
@@ -1794,9 +1664,10 @@ class OnsetDetector(Module):
         }
         self.options = {"sensitivity": ["off", "on"]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -1809,8 +1680,6 @@ class OnsetDetector(Module):
 
 class Rhythm(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 37
         self.name = "Rhythm"
         self.version = version
@@ -1833,9 +1702,10 @@ class Rhythm(Module):
         }
         self.options = {"done_ctrl": ["off", "on"]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0], d[1], d[2]]
@@ -1848,8 +1718,6 @@ class Rhythm(Module):
 
 class Noise(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 38
         self.name = "Noise"
         self.version = version
@@ -1869,6 +1737,7 @@ class Noise(Module):
         }
         self.options = {}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -1876,8 +1745,6 @@ class Noise(Module):
 
 class Random(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 39
         self.name = "Random"
         self.version = version
@@ -1901,9 +1768,10 @@ class Random(Module):
             "new_val_on_trig": ["off", "on"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = []
@@ -1916,8 +1784,6 @@ class Random(Module):
 
 class Gate(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 40
         self.name = "Gate"
         self.version = version
@@ -1951,9 +1817,10 @@ class Gate(Module):
             "sidechain": ["internal", "external"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -1975,8 +1842,6 @@ class Gate(Module):
 
 class Tremolo(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 41
         self.name = "Tremolo"
         self.version = version
@@ -2009,9 +1874,10 @@ class Tremolo(Module):
             "waveform": ["fender-ish", "vox-ish", "triangle", "sine", "square"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -2033,8 +1899,6 @@ class Tremolo(Module):
 
 class ToneControl(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 42
         self.name = "Tone Control"
         self.version = version
@@ -2063,9 +1927,10 @@ class ToneControl(Module):
         }
         self.options = {"channels": ["1in->1out", "stereo"], "num_mid_bands": [1, 2]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -2087,8 +1952,6 @@ class ToneControl(Module):
 
 class DelaywMod(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 43
         self.name = "Delay w Mod"
         self.version = version
@@ -2139,9 +2002,10 @@ class DelaywMod(Module):
             ],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -2164,8 +2028,6 @@ class DelaywMod(Module):
 
 class Stompswitch(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 44
         self.name = "Stompswitch"
         self.version = version
@@ -2192,6 +2054,7 @@ class Stompswitch(Module):
             "normally": ["zero", "one"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -2199,8 +2062,6 @@ class Stompswitch(Module):
 
 class Value(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 45
         self.name = "Value"
         self.version = version
@@ -2220,6 +2081,7 @@ class Value(Module):
         }
         self.options = {"output": ["0 to 1", "-1 to 1"]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -2227,8 +2089,6 @@ class Value(Module):
 
 class CVDelay(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 46
         self.name = "CV Delay"
         self.version = version
@@ -2248,6 +2108,7 @@ class CVDelay(Module):
         }
         self.options = {}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -2255,8 +2116,6 @@ class CVDelay(Module):
 
 class CVLoop(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 47
         self.name = "CV Loop"
         self.version = version
@@ -2287,9 +2146,10 @@ class CVLoop(Module):
             "length_edit": ["off", "on"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0], d[1], d[2], d[3]]
@@ -2304,8 +2164,6 @@ class CVLoop(Module):
 
 class CVFilter(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 48
         self.name = "CV Filter"
         self.version = version
@@ -2333,9 +2191,10 @@ class CVFilter(Module):
         }
         self.options = {"control": ["linked", "separate"]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -2351,8 +2210,6 @@ class CVFilter(Module):
 
 class ClockDivider(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 49
         self.name = "Clock Divider"
         self.version = version
@@ -2377,9 +2234,10 @@ class ClockDivider(Module):
         }
         self.options = {"input": ["tap", "cv_control"]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         if self.version >= 1:
@@ -2392,8 +2250,6 @@ class ClockDivider(Module):
 
 class Comparator(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 50
         self.name = "Comparator"
         self.version = version
@@ -2418,6 +2274,7 @@ class Comparator(Module):
         }
         self.options = {"output": ["0 to 1", "-1 to 1"]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -2425,8 +2282,6 @@ class Comparator(Module):
 
 class CVRectify(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 51
         self.name = "CV Rectify"
         self.version = version
@@ -2446,6 +2301,7 @@ class CVRectify(Module):
         }
         self.options = {}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -2453,8 +2309,6 @@ class CVRectify(Module):
 
 class Trigger(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 52
         self.name = "Trigger"
         self.version = version
@@ -2475,6 +2329,7 @@ class Trigger(Module):
         }
         self.options = {}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -2482,8 +2337,6 @@ class Trigger(Module):
 
 class StereoSpread(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 53
         self.name = "Stereo Spread"
         self.version = version
@@ -2508,9 +2361,10 @@ class StereoSpread(Module):
         }
         self.options = {"method": ["mid_side", "haas"]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         if opt[0][1] == "haas":
@@ -2523,8 +2377,6 @@ class StereoSpread(Module):
 
 class CportExpCVIn(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 54
         self.name = "Cport Exp CV In"
         self.version = version
@@ -2543,6 +2395,7 @@ class CportExpCVIn(Module):
         }
         self.options = {"output_range": ["0 to 1", "-1 to 1"]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -2550,8 +2403,6 @@ class CportExpCVIn(Module):
 
 class CportCVOut(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 55
         self.name = "Cport CV Out"
         self.version = version
@@ -2568,6 +2419,7 @@ class CportCVOut(Module):
         self.blocks = {"cv_input": {"isDefault": True, "isParam": True, "position": 0}}
         self.options = {"input_range": ["0 to 1", "-1 to 1"]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -2575,8 +2427,6 @@ class CportCVOut(Module):
 
 class UIButton(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 56
         self.name = "UI Button"
         self.version = version
@@ -2626,9 +2476,10 @@ class UIButton(Module):
             "range": ["extended", "basic"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -2640,8 +2491,6 @@ class UIButton(Module):
 
 class AudioPanner(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 57
         self.name = "Audio Panner"
         self.version = version
@@ -2667,9 +2516,10 @@ class AudioPanner(Module):
             "pan_type": ["equal_pwr", "-4.5dB", "linear"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -2684,8 +2534,6 @@ class AudioPanner(Module):
 
 class PitchDetector(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 58
         self.name = "Pitch Detector"
         self.version = version
@@ -2709,6 +2557,7 @@ class PitchDetector(Module):
         }
         self.options = {}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -2716,8 +2565,6 @@ class PitchDetector(Module):
 
 class PitchShifter(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 59
         self.name = "Pitch Shifter"
         self.version = version
@@ -2740,6 +2587,7 @@ class PitchShifter(Module):
         }
         self.options = {}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -2747,8 +2595,6 @@ class PitchShifter(Module):
 
 class MidiNoteOut(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 60
         self.name = "Midi Note Out"
         self.version = version
@@ -2771,9 +2617,10 @@ class MidiNoteOut(Module):
             "velocity_output": ["off", "on"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0], d[1]]
@@ -2785,8 +2632,6 @@ class MidiNoteOut(Module):
 
 class MidiCCOut(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 61
         self.name = "Midi CC Out"
         self.version = version
@@ -2805,6 +2650,7 @@ class MidiCCOut(Module):
             "controller": list(range(0, 128)),
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -2812,8 +2658,6 @@ class MidiCCOut(Module):
 
 class MidiPCOut(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 62
         self.name = "Midi PC Out"
         self.version = version
@@ -2834,6 +2678,7 @@ class MidiPCOut(Module):
         }
         self.options = {"midi_channel": list(range(1, 17))}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -2841,8 +2686,6 @@ class MidiPCOut(Module):
 
 class BitModulator(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 63
         self.name = "Bit Modulator"
         self.version = version
@@ -2865,6 +2708,7 @@ class BitModulator(Module):
         }
         self.options = {"type": ["xor", "and", "or"]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -2872,8 +2716,6 @@ class BitModulator(Module):
 
 class AudioBalance(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 64
         self.name = "Audio Balance"
         self.version = version
@@ -2898,9 +2740,10 @@ class AudioBalance(Module):
         }
         self.options = {"stereo": ["mono", "stereo"]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         if opt[0][1] == "mono":
@@ -2913,8 +2756,6 @@ class AudioBalance(Module):
 
 class Inverter(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 65
         self.name = "Inverter"
         self.version = version
@@ -2938,6 +2779,7 @@ class Inverter(Module):
         }
         self.options = {}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -2945,8 +2787,6 @@ class Inverter(Module):
 
 class Fuzz(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 66
         self.name = "Fuzz"
         self.version = version
@@ -2967,6 +2807,7 @@ class Fuzz(Module):
         }
         self.options = {"model": ["efuzzy", "burly", "scoopy", "ugly"]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -2974,8 +2815,6 @@ class Fuzz(Module):
 
 class Ghostverb(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 67
         self.name = "Ghostverb"
         self.version = version
@@ -3001,9 +2840,10 @@ class Ghostverb(Module):
         }
         self.options = {"channels": ["1in->1out", "1in->2out", "stereo"]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -3022,8 +2862,6 @@ class Ghostverb(Module):
 
 class CabinetSim(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 68
         self.name = "Cabinet Sim"
         self.version = version
@@ -3055,9 +2893,10 @@ class CabinetSim(Module):
             ],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         if opt[0][1] == "mono":
@@ -3070,8 +2909,6 @@ class CabinetSim(Module):
 
 class Flanger(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 69
         self.name = "Flanger"
         self.version = version
@@ -3105,9 +2942,10 @@ class Flanger(Module):
             "type": ["1960s", "1970s", "thru_0"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -3132,8 +2970,6 @@ class Flanger(Module):
 
 class Chorus(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 70
         self.name = "Chorus"
         self.version = version
@@ -3167,9 +3003,10 @@ class Chorus(Module):
             "type": ["classic"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -3193,8 +3030,6 @@ class Chorus(Module):
 
 class Vibrato(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 71
         self.name = "Vibrato"
         self.version = version
@@ -3225,9 +3060,10 @@ class Vibrato(Module):
             "waveform": ["sine", "triangle", "swung_sine", "swung"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -3249,8 +3085,6 @@ class Vibrato(Module):
 
 class EnvFilter(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 72
         self.name = "Env Filter"
         self.version = version
@@ -3282,9 +3116,10 @@ class EnvFilter(Module):
             "direction": ["up", "down"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -3303,8 +3138,6 @@ class EnvFilter(Module):
 
 class RingModulator(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 73
         self.name = "Ring Modulator"
         self.version = version
@@ -3333,9 +3166,10 @@ class RingModulator(Module):
             "upsampling": ["none", "2x"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -3353,8 +3187,6 @@ class RingModulator(Module):
 
 class HallReverb(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 74
         self.name = "Hall Reverb"
         self.version = version
@@ -3381,6 +3213,7 @@ class HallReverb(Module):
         }
         self.options = {}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -3388,8 +3221,6 @@ class HallReverb(Module):
 
 class PingPongDelay(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 75
         self.name = "Ping Pong Delay"
         self.version = version
@@ -3435,9 +3266,10 @@ class PingPongDelay(Module):
             ],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -3459,8 +3291,6 @@ class PingPongDelay(Module):
 
 class AudioMixer(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 76
         self.name = "Audio Mixer"
         self.version = version
@@ -3517,9 +3347,10 @@ class AudioMixer(Module):
             "panning": ["off", "on"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = []
@@ -3541,8 +3372,6 @@ class AudioMixer(Module):
 
 class CVFlipFlop(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 77
         self.name = "CV Flip Flop"
         self.version = version
@@ -3565,6 +3394,7 @@ class CVFlipFlop(Module):
         }
         self.options = {}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -3572,8 +3402,6 @@ class CVFlipFlop(Module):
 
 class Diffuser(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 78
         self.name = "Diffuser"
         self.version = version
@@ -3598,6 +3426,7 @@ class Diffuser(Module):
         }
         self.options = {}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -3605,8 +3434,6 @@ class Diffuser(Module):
 
 class ReverbLite(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 79
         self.name = "Reverb Lite"
         self.version = version
@@ -3629,9 +3456,10 @@ class ReverbLite(Module):
         }
         self.options = {"channels": ["1in->1out", "1in->2out", "stereo"]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -3648,8 +3476,6 @@ class ReverbLite(Module):
 
 class RoomReverb(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 80
         self.name = "Room Reverb"
         self.version = version
@@ -3676,6 +3502,7 @@ class RoomReverb(Module):
         }
         self.options = {}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -3683,8 +3510,6 @@ class RoomReverb(Module):
 
 class Pixel(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 81
         self.name = "Pixel"
         self.version = version
@@ -3706,9 +3531,10 @@ class Pixel(Module):
         }
         self.options = {"control": ["cv", "audio"]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         if opt[0][1] == "cv":
@@ -3721,8 +3547,6 @@ class Pixel(Module):
 
 class MidiClockIn(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 82
         self.name = "Midi Clock In"
         self.version = version
@@ -3760,9 +3584,10 @@ class MidiClockIn(Module):
             ],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -3778,8 +3603,6 @@ class MidiClockIn(Module):
 
 class Granular(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 83
         self.name = "Granular"
         self.version = version
@@ -3815,9 +3638,10 @@ class Granular(Module):
             "size_control": ["cv", "tap_tempo"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         if opt[1][0] == "mono":
@@ -3830,8 +3654,6 @@ class Granular(Module):
 
 class MidiClockOut(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 84
         self.name = "Midi Clock Out"
         self.version = version
@@ -3859,9 +3681,10 @@ class MidiClockOut(Module):
             "position": ["disabled", "enabled"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -3878,8 +3701,6 @@ class MidiClockOut(Module):
 
 class TaptoCV(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 85
         self.name = "Tap to CV"
         self.version = version
@@ -3900,9 +3721,10 @@ class TaptoCV(Module):
         }
         self.options = {"range": ["off", "on"], "output": ["linear", "exponential"]}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = [d[0]]
@@ -3916,8 +3738,6 @@ class TaptoCV(Module):
 
 class MidiPitchBendIn(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 86
         self.name = "Midi Pitch Bend In"
         self.version = version
@@ -3937,6 +3757,7 @@ class MidiPitchBendIn(Module):
         }
         self.options = {"midi_channel": list(range(1, 17))}
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
         return self.blocks
@@ -3944,8 +3765,6 @@ class MidiPitchBendIn(Module):
 
 class CVMixer(Module):
     def __init__(self, version):
-        super(Module, self).__init__()
-
         self.module_id = 104
         self.name = "CV Mixer"
         self.version = version
@@ -3981,9 +3800,10 @@ class CVMixer(Module):
             "levels": ["summing", "average"],
         }
         self.saveable_data = {}
+        super().__init__(version)
 
     def get_blocks(self):
-        opt = list(self.options.items())
+        opt = list(self.options_new.items())
         d = list(self.blocks.items())
 
         blocks = []
