@@ -651,9 +651,9 @@ class ZOIALibrarianMain(QMainWindow):
         elif table_index == 2 and self.sd_sizes is None:
             curr_table.resizeColumnsToContents()
             curr_table.setColumnWidth(0, self.width() * 0.25)
-            curr_table.setColumnWidth(1, self.width() * 0.1)
+            curr_table.setColumnWidth(1, self.width() * 0.125)
             curr_table.setColumnWidth(2, self.width() * 0.25)
-            curr_table.setColumnWidth(3, self.width() * 0.1)
+            curr_table.setColumnWidth(3, self.width() * 0.125)
             self.ui.splitter_sd_hori.setSizes([self.width() * 0.5, self.width() * 0.5])
             self.ui.splitter_sd_vert.setSizes([self.width() * 0.4, self.width() * 0.6])
 
@@ -728,9 +728,9 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.splitter_sd_hori.setSizes([self.width() * 0.5, self.width() * 0.5])
         self.ui.splitter_sd_vert.setSizes([self.height() * 0.4, self.height() * 0.6])
         self.ui.table_sd_left.setColumnWidth(0, self.width() * 0.25)
-        self.ui.table_sd_left.setColumnWidth(1, self.width() * 0.1)
+        self.ui.table_sd_left.setColumnWidth(1, self.width() * 0.125)
         self.ui.table_sd_right.setColumnWidth(0, self.width() * 0.25)
-        self.ui.table_sd_right.setColumnWidth(1, self.width() * 0.1)
+        self.ui.table_sd_right.setColumnWidth(1, self.width() * 0.125)
 
         # Reset bank sizes
         self.ui.splitter_bank.setSizes(
