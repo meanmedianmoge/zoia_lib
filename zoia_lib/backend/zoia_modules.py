@@ -108,19 +108,25 @@ class SVFilter(Module):
         self.max_blocks = 6
         self.params = 2
         self.cpu = 3
-        self.blocks = {
-            "audio_in": {"isDefault": True, "isParam": False, "position": 0},
-            "frequency": {"isDefault": True, "isParam": True, "position": 1},
-            "resonance": {"isDefault": True, "isParam": True, "position": 2},
-            "lowpass_output": {"isDefault": True, "isParam": False, "position": 3},
-            "hipass_output": {"isDefault": False, "isParam": False, "position": 4},
-            "bandpass_output": {"isDefault": False, "isParam": False, "position": 5},
+        self.version_properties = {
+            "0": {
+                "blocks": {
+                    "audio_in": {"isDefault": True, "isParam": False, "position": 0},
+                    "frequency": {"isDefault": True, "isParam": True, "position": 1},
+                    "resonance": {"isDefault": True, "isParam": True, "position": 2},
+                    "lowpass_output": {"isDefault": True, "isParam": False, "position": 3},
+                    "hipass_output": {"isDefault": False, "isParam": False, "position": 4},
+                    "bandpass_output": {"isDefault": False, "isParam": False, "position": 5},
+                },
+                "options": {
+                    "lowpass_output": ["on", "off"],
+                    "hipass_output": ["off", "on"],
+                    "bandpass_output": ["off", "on"],
+                }
+            }
         }
-        self.options = {
-            "lowpass_output": ["on", "off"],
-            "hipass_output": ["off", "on"],
-            "bandpass_output": ["off", "on"],
-        }
+        self.blocks = self.version_properties[version]["blocks"]
+        self.options = self.version_properties[version]["options"]
         self.saveable_data = {}
 
     def get_blocks(self):
