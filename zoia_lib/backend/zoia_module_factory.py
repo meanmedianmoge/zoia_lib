@@ -102,4 +102,4 @@ class ZoiaModuleFactory:
         }
    
     def create_module(self, module_id, version):
-        return self.module_index[module_id](version)
+        return self.module_index[str(module_id)](version)

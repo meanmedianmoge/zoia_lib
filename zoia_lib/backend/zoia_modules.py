@@ -1,7 +1,7 @@
-from zoia_lib.backend.module import Module
+from zoia_lib.backend.zoia_module import ZoiaModule
 
 
-class SVFilter(Module):
+class SVFilter(ZoiaModule):
     def __init__(self, version):
         self.module_id = 0
         self.name = "SV Filter"
@@ -32,10 +32,10 @@ class SVFilter(Module):
                 }
             }
         }
-        self.blocks = self.version_properties[version]["blocks"]
-        self.options = self.version_properties[version]["options"]
+        self.blocks = self.version_properties[str(version)]["blocks"]
+        self.options = self.version_properties[str(version)]["options"]
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -49,7 +49,7 @@ class SVFilter(Module):
         return blocks
 
 
-class AudioInput(Module):
+class AudioInput(ZoiaModule):
     def __init__(self, version):
         self.module_id = 1
         self.name = "Audio Input"
@@ -70,7 +70,7 @@ class AudioInput(Module):
         }
         self.options = {"channels": ["stereo", "left", "right"]}
         self.saveable_data = {}
-        super().__init__(version)
+        super.__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -86,7 +86,7 @@ class AudioInput(Module):
         return blocks
 
 
-class AudioOutput(Module):
+class AudioOutput(ZoiaModule):
     def __init__(self, version):
         self.module_id = 2
         self.name = "Audio Output"
@@ -130,7 +130,7 @@ class AudioOutput(Module):
         return blocks
 
 
-class Aliaser(Module):
+class Aliaser(ZoiaModule):
     def __init__(self, version):
         self.module_id = 3
         self.name = "Aliaser"
@@ -161,7 +161,7 @@ class Aliaser(Module):
         return self.blocks
 
 
-class Sequencer(Module):
+class Sequencer(ZoiaModule):
     def __init__(self, version):
         self.module_id = 4
         self.name = "Sequencer"
@@ -246,7 +246,7 @@ class Sequencer(Module):
         return blocks
 
 
-class LFO(Module):
+class LFO(ZoiaModule):
     def __init__(self, version):
         self.module_id = 5
         self.name = "LFO"
@@ -305,7 +305,7 @@ class LFO(Module):
         return blocks
 
 
-class ADSR(Module):
+class ADSR(ZoiaModule):
     def __init__(self, version):
         self.module_id = 6
         self.name = "ADSR"
@@ -378,7 +378,7 @@ class ADSR(Module):
         return blocks
 
 
-class VCA(Module):
+class VCA(ZoiaModule):
     def __init__(self, version):
         self.module_id = 7
         self.name = "VCA"
@@ -422,7 +422,7 @@ class VCA(Module):
         return blocks
 
 
-class AudioMultiply(Module):
+class AudioMultiply(ZoiaModule):
     def __init__(self, version):
         self.module_id = 8
         self.name = "Audio Multiply"
@@ -452,7 +452,7 @@ class AudioMultiply(Module):
         return self.blocks
 
 
-class BitCrusher(Module):
+class BitCrusher(ZoiaModule):
     def __init__(self, version):
         self.module_id = 9
         self.name = "Bit Crusher"
@@ -481,7 +481,7 @@ class BitCrusher(Module):
         return self.blocks
 
 
-class SampleandHold(Module):
+class SampleandHold(ZoiaModule):
     def __init__(self, version):
         self.module_id = 10
         self.name = "Sample and Hold"
@@ -511,7 +511,7 @@ class SampleandHold(Module):
         return self.blocks
 
 
-class ODandDistortion(Module):
+class ODandDistortion(ZoiaModule):
     def __init__(self, version):
         self.module_id = 11
         self.name = "OD and Distortion"
@@ -539,7 +539,7 @@ class ODandDistortion(Module):
         return self.blocks
 
 
-class EnvFollower(Module):
+class EnvFollower(ZoiaModule):
     def __init__(self, version):
         self.module_id = 12
         self.name = "Env Follower"
@@ -582,7 +582,7 @@ class EnvFollower(Module):
         return blocks
 
 
-class DelayLine(Module):
+class DelayLine(ZoiaModule):
     def __init__(self, version):
         self.module_id = 13
         self.name = "Delay Line"
@@ -631,7 +631,7 @@ class DelayLine(Module):
         return blocks
 
 
-class Oscillator(Module):
+class Oscillator(ZoiaModule):
     def __init__(self, version):
         self.module_id = 14
         self.name = "Oscillator"
@@ -679,7 +679,7 @@ class Oscillator(Module):
         return blocks
 
 
-class Pushbutton(Module):
+class Pushbutton(ZoiaModule):
     def __init__(self, version):
         self.module_id = 15
         self.name = "Pushbutton"
@@ -709,7 +709,7 @@ class Pushbutton(Module):
         return self.blocks
 
 
-class Keyboard(Module):
+class Keyboard(ZoiaModule):
     def __init__(self, version):
         self.module_id = 16
         self.name = "Keyboard"
@@ -788,7 +788,7 @@ class Keyboard(Module):
         return blocks
 
 
-class CVInvert(Module):
+class CVInvert(ZoiaModule):
     def __init__(self, version):
         self.module_id = 17
         self.name = "CV Invert"
@@ -815,7 +815,7 @@ class CVInvert(Module):
         return self.blocks
 
 
-class Steps(Module):
+class Steps(ZoiaModule):
     def __init__(self, version):
         self.module_id = 18
         self.name = "Steps"
@@ -845,7 +845,7 @@ class Steps(Module):
         return self.blocks
 
 
-class SlewLimiter(Module):
+class SlewLimiter(ZoiaModule):
     def __init__(self, version):
         self.module_id = 19
         self.name = "Slew Limiter"
@@ -890,7 +890,7 @@ class SlewLimiter(Module):
         return blocks
 
 
-class MidiNotesIn(Module):
+class MidiNotesIn(ZoiaModule):
     def __init__(self, version):
         self.module_id = 20
         self.name = "Midi Notes In"
@@ -969,7 +969,7 @@ class MidiNotesIn(Module):
         return blocks
 
 
-class MidiCCIn(Module):
+class MidiCCIn(ZoiaModule):
     def __init__(self, version):
         self.module_id = 21
         self.name = "Midi CC In"
@@ -997,7 +997,7 @@ class MidiCCIn(Module):
         return self.blocks
 
 
-class Multiplier(Module):
+class Multiplier(ZoiaModule):
     def __init__(self, version):
         self.module_id = 22
         self.name = "Multiplier"
@@ -1042,7 +1042,7 @@ class Multiplier(Module):
         return blocks
 
 
-class Compressor(Module):
+class Compressor(ZoiaModule):
     def __init__(self, version):
         self.module_id = 23
         self.name = "Compressor"
@@ -1105,7 +1105,7 @@ class Compressor(Module):
         return blocks
 
 
-class MultiFilter(Module):
+class MultiFilter(ZoiaModule):
     def __init__(self, version):
         self.module_id = 24
         self.name = "Multi Filter"
@@ -1154,7 +1154,7 @@ class MultiFilter(Module):
         return blocks
 
 
-class PlateReverb(Module):
+class PlateReverb(ZoiaModule):
     def __init__(self, version):
         self.module_id = 25
         self.name = "Plate Reverb"
@@ -1187,7 +1187,7 @@ class PlateReverb(Module):
         return self.blocks
 
 
-class BufferDelay(Module):
+class BufferDelay(ZoiaModule):
     def __init__(self, version):
         self.module_id = 26
         self.name = "Buffer Delay"
@@ -1215,7 +1215,7 @@ class BufferDelay(Module):
         return self.blocks
 
 
-class AllPassFilter(Module):
+class AllPassFilter(ZoiaModule):
     def __init__(self, version):
         self.module_id = 27
         self.name = "All Pass Filter"
@@ -1243,7 +1243,7 @@ class AllPassFilter(Module):
         return self.blocks
 
 
-class Quantizer(Module):
+class Quantizer(ZoiaModule):
     def __init__(self, version):
         self.module_id = 28
         self.name = "Quantizer"
@@ -1280,7 +1280,7 @@ class Quantizer(Module):
         return blocks
 
 
-class Phaser(Module):
+class Phaser(ZoiaModule):
     def __init__(self, version):
         self.module_id = 29
         self.name = "Phaser"
@@ -1339,7 +1339,7 @@ class Phaser(Module):
         return blocks
 
 
-class Looper(Module):
+class Looper(ZoiaModule):
     def __init__(self, version):
         self.module_id = 30
         self.name = "Looper"
@@ -1400,7 +1400,7 @@ class Looper(Module):
         return blocks
 
 
-class InSwitch(Module):
+class InSwitch(ZoiaModule):
     def __init__(self, version):
         self.module_id = 31
         self.name = "In Switch"
@@ -1455,7 +1455,7 @@ class InSwitch(Module):
         return blocks
 
 
-class OutSwitch(Module):
+class OutSwitch(ZoiaModule):
     def __init__(self, version):
         self.module_id = 32
         self.name = "Out Switch"
@@ -1505,7 +1505,7 @@ class OutSwitch(Module):
         return blocks
 
 
-class AudioInSwitch(Module):
+class AudioInSwitch(ZoiaModule):
     def __init__(self, version):
         self.module_id = 33
         self.name = "Audio In Switch"
@@ -1564,7 +1564,7 @@ class AudioInSwitch(Module):
         return blocks
 
 
-class AudioOutSwitch(Module):
+class AudioOutSwitch(ZoiaModule):
     def __init__(self, version):
         self.module_id = 34
         self.name = "Audio Out Switch"
@@ -1621,7 +1621,7 @@ class AudioOutSwitch(Module):
         return blocks
 
 
-class MidiPressure(Module):
+class MidiPressure(ZoiaModule):
     def __init__(self, version):
         self.module_id = 35
         self.name = "Midi Pressure"
@@ -1648,7 +1648,7 @@ class MidiPressure(Module):
         return self.blocks
 
 
-class OnsetDetector(Module):
+class OnsetDetector(ZoiaModule):
     def __init__(self, version):
         self.module_id = 36
         self.name = "Onset Detector"
@@ -1684,7 +1684,7 @@ class OnsetDetector(Module):
         return blocks
 
 
-class Rhythm(Module):
+class Rhythm(ZoiaModule):
     def __init__(self, version):
         self.module_id = 37
         self.name = "Rhythm"
@@ -1722,7 +1722,7 @@ class Rhythm(Module):
         return blocks
 
 
-class Noise(Module):
+class Noise(ZoiaModule):
     def __init__(self, version):
         self.module_id = 38
         self.name = "Noise"
@@ -1749,7 +1749,7 @@ class Noise(Module):
         return self.blocks
 
 
-class Random(Module):
+class Random(ZoiaModule):
     def __init__(self, version):
         self.module_id = 39
         self.name = "Random"
@@ -1788,7 +1788,7 @@ class Random(Module):
         return blocks
 
 
-class Gate(Module):
+class Gate(ZoiaModule):
     def __init__(self, version):
         self.module_id = 40
         self.name = "Gate"
@@ -1846,7 +1846,7 @@ class Gate(Module):
         return blocks
 
 
-class Tremolo(Module):
+class Tremolo(ZoiaModule):
     def __init__(self, version):
         self.module_id = 41
         self.name = "Tremolo"
@@ -1903,7 +1903,7 @@ class Tremolo(Module):
         return blocks
 
 
-class ToneControl(Module):
+class ToneControl(ZoiaModule):
     def __init__(self, version):
         self.module_id = 42
         self.name = "Tone Control"
@@ -1956,7 +1956,7 @@ class ToneControl(Module):
         return blocks
 
 
-class DelaywMod(Module):
+class DelaywMod(ZoiaModule):
     def __init__(self, version):
         self.module_id = 43
         self.name = "Delay w Mod"
@@ -2032,7 +2032,7 @@ class DelaywMod(Module):
         return blocks
 
 
-class Stompswitch(Module):
+class Stompswitch(ZoiaModule):
     def __init__(self, version):
         self.module_id = 44
         self.name = "Stompswitch"
@@ -2066,7 +2066,7 @@ class Stompswitch(Module):
         return self.blocks
 
 
-class Value(Module):
+class Value(ZoiaModule):
     def __init__(self, version):
         self.module_id = 45
         self.name = "Value"
@@ -2093,7 +2093,7 @@ class Value(Module):
         return self.blocks
 
 
-class CVDelay(Module):
+class CVDelay(ZoiaModule):
     def __init__(self, version):
         self.module_id = 46
         self.name = "CV Delay"
@@ -2120,7 +2120,7 @@ class CVDelay(Module):
         return self.blocks
 
 
-class CVLoop(Module):
+class CVLoop(ZoiaModule):
     def __init__(self, version):
         self.module_id = 47
         self.name = "CV Loop"
@@ -2168,7 +2168,7 @@ class CVLoop(Module):
         return blocks
 
 
-class CVFilter(Module):
+class CVFilter(ZoiaModule):
     def __init__(self, version):
         self.module_id = 48
         self.name = "CV Filter"
@@ -2214,7 +2214,7 @@ class CVFilter(Module):
         return blocks
 
 
-class ClockDivider(Module):
+class ClockDivider(ZoiaModule):
     def __init__(self, version):
         self.module_id = 49
         self.name = "Clock Divider"
@@ -2254,7 +2254,7 @@ class ClockDivider(Module):
         return blocks
 
 
-class Comparator(Module):
+class Comparator(ZoiaModule):
     def __init__(self, version):
         self.module_id = 50
         self.name = "Comparator"
@@ -2286,7 +2286,7 @@ class Comparator(Module):
         return self.blocks
 
 
-class CVRectify(Module):
+class CVRectify(ZoiaModule):
     def __init__(self, version):
         self.module_id = 51
         self.name = "CV Rectify"
@@ -2313,7 +2313,7 @@ class CVRectify(Module):
         return self.blocks
 
 
-class Trigger(Module):
+class Trigger(ZoiaModule):
     def __init__(self, version):
         self.module_id = 52
         self.name = "Trigger"
@@ -2341,7 +2341,7 @@ class Trigger(Module):
         return self.blocks
 
 
-class StereoSpread(Module):
+class StereoSpread(ZoiaModule):
     def __init__(self, version):
         self.module_id = 53
         self.name = "Stereo Spread"
@@ -2381,7 +2381,7 @@ class StereoSpread(Module):
         return blocks
 
 
-class CportExpCVIn(Module):
+class CportExpCVIn(ZoiaModule):
     def __init__(self, version):
         self.module_id = 54
         self.name = "Cport Exp CV In"
@@ -2407,7 +2407,7 @@ class CportExpCVIn(Module):
         return self.blocks
 
 
-class CportCVOut(Module):
+class CportCVOut(ZoiaModule):
     def __init__(self, version):
         self.module_id = 55
         self.name = "Cport CV Out"
@@ -2431,7 +2431,7 @@ class CportCVOut(Module):
         return self.blocks
 
 
-class UIButton(Module):
+class UIButton(ZoiaModule):
     def __init__(self, version):
         self.module_id = 56
         self.name = "UI Button"
@@ -2495,7 +2495,7 @@ class UIButton(Module):
         return blocks
 
 
-class AudioPanner(Module):
+class AudioPanner(ZoiaModule):
     def __init__(self, version):
         self.module_id = 57
         self.name = "Audio Panner"
@@ -2538,7 +2538,7 @@ class AudioPanner(Module):
         return blocks
 
 
-class PitchDetector(Module):
+class PitchDetector(ZoiaModule):
     def __init__(self, version):
         self.module_id = 58
         self.name = "Pitch Detector"
@@ -2569,7 +2569,7 @@ class PitchDetector(Module):
         return self.blocks
 
 
-class PitchShifter(Module):
+class PitchShifter(ZoiaModule):
     def __init__(self, version):
         self.module_id = 59
         self.name = "Pitch Shifter"
@@ -2599,7 +2599,7 @@ class PitchShifter(Module):
         return self.blocks
 
 
-class MidiNoteOut(Module):
+class MidiNoteOut(ZoiaModule):
     def __init__(self, version):
         self.module_id = 60
         self.name = "Midi Note Out"
@@ -2636,7 +2636,7 @@ class MidiNoteOut(Module):
         return blocks
 
 
-class MidiCCOut(Module):
+class MidiCCOut(ZoiaModule):
     def __init__(self, version):
         self.module_id = 61
         self.name = "Midi CC Out"
@@ -2662,7 +2662,7 @@ class MidiCCOut(Module):
         return self.blocks
 
 
-class MidiPCOut(Module):
+class MidiPCOut(ZoiaModule):
     def __init__(self, version):
         self.module_id = 62
         self.name = "Midi PC Out"
@@ -2690,7 +2690,7 @@ class MidiPCOut(Module):
         return self.blocks
 
 
-class BitModulator(Module):
+class BitModulator(ZoiaModule):
     def __init__(self, version):
         self.module_id = 63
         self.name = "Bit Modulator"
@@ -2720,7 +2720,7 @@ class BitModulator(Module):
         return self.blocks
 
 
-class AudioBalance(Module):
+class AudioBalance(ZoiaModule):
     def __init__(self, version):
         self.module_id = 64
         self.name = "Audio Balance"
@@ -2760,7 +2760,7 @@ class AudioBalance(Module):
         return blocks
 
 
-class Inverter(Module):
+class Inverter(ZoiaModule):
     def __init__(self, version):
         self.module_id = 65
         self.name = "Inverter"
@@ -2791,7 +2791,7 @@ class Inverter(Module):
         return self.blocks
 
 
-class Fuzz(Module):
+class Fuzz(ZoiaModule):
     def __init__(self, version):
         self.module_id = 66
         self.name = "Fuzz"
@@ -2819,7 +2819,7 @@ class Fuzz(Module):
         return self.blocks
 
 
-class Ghostverb(Module):
+class Ghostverb(ZoiaModule):
     def __init__(self, version):
         self.module_id = 67
         self.name = "Ghostverb"
@@ -2866,7 +2866,7 @@ class Ghostverb(Module):
         return blocks
 
 
-class CabinetSim(Module):
+class CabinetSim(ZoiaModule):
     def __init__(self, version):
         self.module_id = 68
         self.name = "Cabinet Sim"
@@ -2913,7 +2913,7 @@ class CabinetSim(Module):
         return blocks
 
 
-class Flanger(Module):
+class Flanger(ZoiaModule):
     def __init__(self, version):
         self.module_id = 69
         self.name = "Flanger"
@@ -2974,7 +2974,7 @@ class Flanger(Module):
         return blocks
 
 
-class Chorus(Module):
+class Chorus(ZoiaModule):
     def __init__(self, version):
         self.module_id = 70
         self.name = "Chorus"
@@ -3034,7 +3034,7 @@ class Chorus(Module):
         return blocks
 
 
-class Vibrato(Module):
+class Vibrato(ZoiaModule):
     def __init__(self, version):
         self.module_id = 71
         self.name = "Vibrato"
@@ -3089,7 +3089,7 @@ class Vibrato(Module):
         return blocks
 
 
-class EnvFilter(Module):
+class EnvFilter(ZoiaModule):
     def __init__(self, version):
         self.module_id = 72
         self.name = "Env Filter"
@@ -3142,7 +3142,7 @@ class EnvFilter(Module):
         return blocks
 
 
-class RingModulator(Module):
+class RingModulator(ZoiaModule):
     def __init__(self, version):
         self.module_id = 73
         self.name = "Ring Modulator"
@@ -3191,7 +3191,7 @@ class RingModulator(Module):
         return blocks
 
 
-class HallReverb(Module):
+class HallReverb(ZoiaModule):
     def __init__(self, version):
         self.module_id = 74
         self.name = "Hall Reverb"
@@ -3225,7 +3225,7 @@ class HallReverb(Module):
         return self.blocks
 
 
-class PingPongDelay(Module):
+class PingPongDelay(ZoiaModule):
     def __init__(self, version):
         self.module_id = 75
         self.name = "Ping Pong Delay"
@@ -3295,7 +3295,7 @@ class PingPongDelay(Module):
         return blocks
 
 
-class AudioMixer(Module):
+class AudioMixer(ZoiaModule):
     def __init__(self, version):
         self.module_id = 76
         self.name = "Audio Mixer"
@@ -3376,7 +3376,7 @@ class AudioMixer(Module):
         return blocks
 
 
-class CVFlipFlop(Module):
+class CVFlipFlop(ZoiaModule):
     def __init__(self, version):
         self.module_id = 77
         self.name = "CV Flip Flop"
@@ -3406,7 +3406,7 @@ class CVFlipFlop(Module):
         return self.blocks
 
 
-class Diffuser(Module):
+class Diffuser(ZoiaModule):
     def __init__(self, version):
         self.module_id = 78
         self.name = "Diffuser"
@@ -3438,7 +3438,7 @@ class Diffuser(Module):
         return self.blocks
 
 
-class ReverbLite(Module):
+class ReverbLite(ZoiaModule):
     def __init__(self, version):
         self.module_id = 79
         self.name = "Reverb Lite"
@@ -3480,7 +3480,7 @@ class ReverbLite(Module):
         return blocks
 
 
-class RoomReverb(Module):
+class RoomReverb(ZoiaModule):
     def __init__(self, version):
         self.module_id = 80
         self.name = "Room Reverb"
@@ -3514,7 +3514,7 @@ class RoomReverb(Module):
         return self.blocks
 
 
-class Pixel(Module):
+class Pixel(ZoiaModule):
     def __init__(self, version):
         self.module_id = 81
         self.name = "Pixel"
@@ -3551,7 +3551,7 @@ class Pixel(Module):
         return blocks
 
 
-class MidiClockIn(Module):
+class MidiClockIn(ZoiaModule):
     def __init__(self, version):
         self.module_id = 82
         self.name = "Midi Clock In"
@@ -3607,7 +3607,7 @@ class MidiClockIn(Module):
         return blocks
 
 
-class Granular(Module):
+class Granular(ZoiaModule):
     def __init__(self, version):
         self.module_id = 83
         self.name = "Granular"
@@ -3658,7 +3658,7 @@ class Granular(Module):
         return blocks
 
 
-class MidiClockOut(Module):
+class MidiClockOut(ZoiaModule):
     def __init__(self, version):
         self.module_id = 84
         self.name = "Midi Clock Out"
@@ -3705,7 +3705,7 @@ class MidiClockOut(Module):
         return blocks
 
 
-class TaptoCV(Module):
+class TaptoCV(ZoiaModule):
     def __init__(self, version):
         self.module_id = 85
         self.name = "Tap to CV"
@@ -3742,7 +3742,7 @@ class TaptoCV(Module):
         return blocks
 
 
-class MidiPitchBendIn(Module):
+class MidiPitchBendIn(ZoiaModule):
     def __init__(self, version):
         self.module_id = 86
         self.name = "Midi Pitch Bend In"
@@ -3769,7 +3769,7 @@ class MidiPitchBendIn(Module):
         return self.blocks
 
 
-class CVMixer(Module):
+class CVMixer(ZoiaModule):
     def __init__(self, version):
         self.module_id = 104
         self.name = "CV Mixer"

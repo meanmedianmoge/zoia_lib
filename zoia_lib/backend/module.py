@@ -2,7 +2,7 @@ import sys
 
 
 class Module:
-    def __init__(self, version):
+    def __init__(self):
         """Base class for Module creation.
 
         enum {
@@ -24,15 +24,8 @@ class Module:
                                                // MODULE_NAME  // 16 bytes, so 4 ints
         };
         """
-
-        self.version = version
-        self.module_dict = self.set_module()
-        self.options_new = self.select_options()
-        self.blocks_new = self.get_default_blocks()
-
-    def set_module(self):
-        """Creates dictionary from child module class."""
-        return vars(self)
+        self.user_selected_options = self.select_options()
+        self.user_selected_blocks = self.get_default_blocks()
 
     def select_options(self):
         """Selects option for a module"""
