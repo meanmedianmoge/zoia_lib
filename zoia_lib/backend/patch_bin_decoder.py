@@ -1,8 +1,11 @@
 import math
 import struct
 
-from zoia_lib.backend.patch import Patch
 from zoia_lib.common import errors
 
-class PatchBinDecoder(Patch):
-    pass
+class PatchBinDecoder():
+    def __init__(self):
+        pass
+
+    def decode(self, bytearray):
+        return decoded_patch

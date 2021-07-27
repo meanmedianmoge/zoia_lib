@@ -1,19 +1,34 @@
 from zoia_lib.backend.patch import Patch
-
+from zoia_lib.backend.zoia_module_factory import ZoiaModuleFactory
+from zoia_lib.backend.patch_bin_encoder import PatchBinEncoder
+from zoia_lib.backend.patch_bin_decoder import PatchBinDecoder
 
 class ZoiaPatch(Patch):
    
-    def __init__(self, module_factory, bin_encoder, patch_name):
+    def __init__(self):
         super(ZoiaPatch, self).__init__()
 
-        self.module_factory = module_factory
-        self.bin_encoder = bin_encoder
+        self.module_factory = ZoiaModuleFactory()
+        self.bin_encoder = PatchBinEncoder()
+        self.bin_decoder = PatchBinDecoder()
 
-        self.name = patch_name
+        self.name = ""
         self.modules = []
         self.connections = {}
         self.pages = []
         self.starred_params = []
+
+    # ===========================================================================================
+    #   Patch Functions Exposed to User
+    # ===========================================================================================
+    def set_patch_name(self, patch_name):
+        self.name = patch_name
+
+    def encode_patch_binary(self):
+        return self.bin_encoder.encode(self)
+
+    def decode_patch_binary(self, byte_array):
+        
 
     # ===========================================================================================
     #   Module Functions Exposed to User
