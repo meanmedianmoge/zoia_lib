@@ -1,7 +1,6 @@
 from zoia_lib.backend.patch import Patch
 from zoia_lib.backend.zoia_module_factory import ZoiaModuleFactory
 from zoia_lib.backend.patch_bin_encoder import PatchBinEncoder
-from zoia_lib.backend.patch_bin_decoder import PatchBinDecoder
 
 class ZoiaPatch(Patch):
    
@@ -10,8 +9,8 @@ class ZoiaPatch(Patch):
 
         self.module_factory = ZoiaModuleFactory()
         self.bin_encoder = PatchBinEncoder()
-        self.bin_decoder = PatchBinDecoder()
 
+        self.size = 0
         self.name = ""
         self.modules = []
         self.connections = {}
@@ -28,7 +27,10 @@ class ZoiaPatch(Patch):
         return self.bin_encoder.encode(self)
 
     def decode_patch_binary(self, byte_array):
-        
+        # Get Size
+        # Get Name
+        # Get Modules
+        pass
 
     # ===========================================================================================
     #   Module Functions Exposed to User
