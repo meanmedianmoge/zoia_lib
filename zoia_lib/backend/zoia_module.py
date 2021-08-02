@@ -8,3 +8,6 @@ class ZoiaModule:
 
     def encode(self):
         pass
+
+    def decode(self, byte_array):
+        pass
