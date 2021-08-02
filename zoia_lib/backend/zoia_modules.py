@@ -70,7 +70,7 @@ class AudioInput(ZoiaModule):
         }
         self.options = {"channels": ["stereo", "left", "right"]}
         self.saveable_data = {}
-        super.__init__()
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -112,7 +112,7 @@ class AudioOutput(ZoiaModule):
             "channels": ["stereo", "left", "right"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -155,7 +155,7 @@ class Aliaser(ZoiaModule):
         }
         self.options = {}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -228,7 +228,7 @@ class Sequencer(ZoiaModule):
             "behavior": ["loop", "once"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -283,7 +283,7 @@ class LFO(ZoiaModule):
             "phase_reset": ["off", "on"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -352,7 +352,7 @@ class ADSR(ZoiaModule):
             "hold_sustain_release": ["off", "on"],
             "time_scale": ["exponent", "linear"],
         }
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -405,7 +405,7 @@ class VCA(ZoiaModule):
         }
         self.options = {"channels": ["1in->1out", "stereo"]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -446,7 +446,7 @@ class AudioMultiply(ZoiaModule):
         }
         self.options = {}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -475,7 +475,7 @@ class BitCrusher(ZoiaModule):
         }
         self.options = {"fractions": ["off", "on"]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -505,7 +505,7 @@ class SampleandHold(ZoiaModule):
         }
         self.options = {"track & hold": ["off", "on"]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -533,7 +533,7 @@ class ODandDistortion(ZoiaModule):
         }
         self.options = {"model": ["plexi", "germ", "classic", "pushed", "edgy"]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -567,7 +567,7 @@ class EnvFollower(ZoiaModule):
             "output_scale": ["log", "linear"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -614,7 +614,7 @@ class DelayLine(ZoiaModule):
             "CV Input": ["exponent", "linear"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -663,7 +663,7 @@ class Oscillator(ZoiaModule):
             "upsampling": ["none", "2x"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -703,7 +703,7 @@ class Pushbutton(ZoiaModule):
             "normally": ["zero", "one"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -772,7 +772,7 @@ class Keyboard(ZoiaModule):
         }
         self.options = {"#_of_notes": list(range(1, 41))}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -809,7 +809,7 @@ class CVInvert(ZoiaModule):
         }
         self.options = {}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -839,7 +839,7 @@ class Steps(ZoiaModule):
         }
         self.options = {}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -873,7 +873,7 @@ class SlewLimiter(ZoiaModule):
         }
         self.options = {"control": ["linked", "separate"]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -951,7 +951,7 @@ class MidiNotesIn(ZoiaModule):
             "trigger_pulse": ["off", "on"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -991,7 +991,7 @@ class MidiCCIn(ZoiaModule):
             "output_range": ["0 to 1", "-1 to 1"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -1028,7 +1028,7 @@ class Multiplier(ZoiaModule):
         }
         self.options = {"num_inputs": list(range(2, 9))}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -1080,7 +1080,7 @@ class Compressor(ZoiaModule):
             "sidechain": ["internal", "external"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -1138,7 +1138,7 @@ class MultiFilter(ZoiaModule):
             ]
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -1181,7 +1181,7 @@ class PlateReverb(ZoiaModule):
         }
         self.options = {}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -1209,7 +1209,7 @@ class BufferDelay(ZoiaModule):
         }
         self.options = {"buffer_length": list(range(0, 17))}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -1237,7 +1237,7 @@ class AllPassFilter(ZoiaModule):
         }
         self.options = {"#_of_poles": [1, 2, 3, 4, 5, 6, 7, 8]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -1265,7 +1265,7 @@ class Quantizer(ZoiaModule):
         }
         self.options = {"key_scale_jacks": ["no", "yes"]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -1314,7 +1314,7 @@ class Phaser(ZoiaModule):
             "number_of_stages": [4, 2, 1, 3, 6, 8],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -1378,7 +1378,7 @@ class Looper(ZoiaModule):
             "stop_play_button": ["no", "yes"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -1440,7 +1440,7 @@ class InSwitch(ZoiaModule):
         }
         self.options = {"num_inputs": list(range(1, 17))}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -1492,7 +1492,7 @@ class OutSwitch(ZoiaModule):
         }
         self.options = {"num_outputs": list(range(1, 17))}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -1549,7 +1549,7 @@ class AudioInSwitch(ZoiaModule):
             "fades": ["on", "off"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -1608,7 +1608,7 @@ class AudioOutSwitch(ZoiaModule):
             "fades": ["on", "off"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -1642,7 +1642,7 @@ class MidiPressure(ZoiaModule):
         }
         self.options = {"midi_channel": list(range(1, 17))}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -1670,7 +1670,7 @@ class OnsetDetector(ZoiaModule):
         }
         self.options = {"sensitivity": ["off", "on"]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -1708,7 +1708,7 @@ class Rhythm(ZoiaModule):
         }
         self.options = {"done_ctrl": ["off", "on"]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -1743,7 +1743,7 @@ class Noise(ZoiaModule):
         }
         self.options = {}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -1774,7 +1774,7 @@ class Random(ZoiaModule):
             "new_val_on_trig": ["off", "on"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -1823,7 +1823,7 @@ class Gate(ZoiaModule):
             "sidechain": ["internal", "external"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -1880,7 +1880,7 @@ class Tremolo(ZoiaModule):
             "waveform": ["fender-ish", "vox-ish", "triangle", "sine", "square"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -1933,7 +1933,7 @@ class ToneControl(ZoiaModule):
         }
         self.options = {"channels": ["1in->1out", "stereo"], "num_mid_bands": [1, 2]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -2008,7 +2008,7 @@ class DelaywMod(ZoiaModule):
             ],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -2060,7 +2060,7 @@ class Stompswitch(ZoiaModule):
             "normally": ["zero", "one"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -2087,7 +2087,7 @@ class Value(ZoiaModule):
         }
         self.options = {"output": ["0 to 1", "-1 to 1"]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -2114,7 +2114,7 @@ class CVDelay(ZoiaModule):
         }
         self.options = {}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -2152,7 +2152,7 @@ class CVLoop(ZoiaModule):
             "length_edit": ["off", "on"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -2197,7 +2197,7 @@ class CVFilter(ZoiaModule):
         }
         self.options = {"control": ["linked", "separate"]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -2240,7 +2240,7 @@ class ClockDivider(ZoiaModule):
         }
         self.options = {"input": ["tap", "cv_control"]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -2280,7 +2280,7 @@ class Comparator(ZoiaModule):
         }
         self.options = {"output": ["0 to 1", "-1 to 1"]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -2307,7 +2307,7 @@ class CVRectify(ZoiaModule):
         }
         self.options = {}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -2335,7 +2335,7 @@ class Trigger(ZoiaModule):
         }
         self.options = {}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -2367,7 +2367,7 @@ class StereoSpread(ZoiaModule):
         }
         self.options = {"method": ["mid_side", "haas"]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -2401,7 +2401,7 @@ class CportExpCVIn(ZoiaModule):
         }
         self.options = {"output_range": ["0 to 1", "-1 to 1"]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -2425,7 +2425,7 @@ class CportCVOut(ZoiaModule):
         self.blocks = {"cv_input": {"isDefault": True, "isParam": True, "position": 0}}
         self.options = {"input_range": ["0 to 1", "-1 to 1"]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -2482,7 +2482,7 @@ class UIButton(ZoiaModule):
             "range": ["extended", "basic"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -2522,7 +2522,7 @@ class AudioPanner(ZoiaModule):
             "pan_type": ["equal_pwr", "-4.5dB", "linear"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -2563,7 +2563,7 @@ class PitchDetector(ZoiaModule):
         }
         self.options = {}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -2593,7 +2593,7 @@ class PitchShifter(ZoiaModule):
         }
         self.options = {}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -2623,7 +2623,7 @@ class MidiNoteOut(ZoiaModule):
             "velocity_output": ["off", "on"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -2656,7 +2656,7 @@ class MidiCCOut(ZoiaModule):
             "controller": list(range(0, 128)),
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -2684,7 +2684,7 @@ class MidiPCOut(ZoiaModule):
         }
         self.options = {"midi_channel": list(range(1, 17))}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -2714,7 +2714,7 @@ class BitModulator(ZoiaModule):
         }
         self.options = {"type": ["xor", "and", "or"]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -2746,7 +2746,7 @@ class AudioBalance(ZoiaModule):
         }
         self.options = {"stereo": ["mono", "stereo"]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -2785,7 +2785,7 @@ class Inverter(ZoiaModule):
         }
         self.options = {}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -2813,7 +2813,7 @@ class Fuzz(ZoiaModule):
         }
         self.options = {"model": ["efuzzy", "burly", "scoopy", "ugly"]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -2846,7 +2846,7 @@ class Ghostverb(ZoiaModule):
         }
         self.options = {"channels": ["1in->1out", "1in->2out", "stereo"]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -2899,7 +2899,7 @@ class CabinetSim(ZoiaModule):
             ],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -2948,7 +2948,7 @@ class Flanger(ZoiaModule):
             "type": ["1960s", "1970s", "thru_0"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -3009,7 +3009,7 @@ class Chorus(ZoiaModule):
             "type": ["classic"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -3066,7 +3066,7 @@ class Vibrato(ZoiaModule):
             "waveform": ["sine", "triangle", "swung_sine", "swung"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -3122,7 +3122,7 @@ class EnvFilter(ZoiaModule):
             "direction": ["up", "down"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -3172,7 +3172,7 @@ class RingModulator(ZoiaModule):
             "upsampling": ["none", "2x"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -3219,7 +3219,7 @@ class HallReverb(ZoiaModule):
         }
         self.options = {}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -3272,7 +3272,7 @@ class PingPongDelay(ZoiaModule):
             ],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -3353,7 +3353,7 @@ class AudioMixer(ZoiaModule):
             "panning": ["off", "on"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -3400,7 +3400,7 @@ class CVFlipFlop(ZoiaModule):
         }
         self.options = {}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -3432,7 +3432,7 @@ class Diffuser(ZoiaModule):
         }
         self.options = {}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -3462,7 +3462,7 @@ class ReverbLite(ZoiaModule):
         }
         self.options = {"channels": ["1in->1out", "1in->2out", "stereo"]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -3508,7 +3508,7 @@ class RoomReverb(ZoiaModule):
         }
         self.options = {}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -3537,7 +3537,7 @@ class Pixel(ZoiaModule):
         }
         self.options = {"control": ["cv", "audio"]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -3590,7 +3590,7 @@ class MidiClockIn(ZoiaModule):
             ],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -3644,7 +3644,7 @@ class Granular(ZoiaModule):
             "size_control": ["cv", "tap_tempo"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -3687,7 +3687,7 @@ class MidiClockOut(ZoiaModule):
             "position": ["disabled", "enabled"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -3727,7 +3727,7 @@ class TaptoCV(ZoiaModule):
         }
         self.options = {"range": ["off", "on"], "output": ["linear", "exponential"]}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -3763,7 +3763,7 @@ class MidiPitchBendIn(ZoiaModule):
         }
         self.options = {"midi_channel": list(range(1, 17))}
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         return self.blocks
@@ -3806,7 +3806,7 @@ class CVMixer(ZoiaModule):
             "levels": ["summing", "average"],
         }
         self.saveable_data = {}
-        super().__init__(version)
+        super().__init__()
 
     def get_blocks(self):
         opt = list(self.options_new.items())

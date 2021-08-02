@@ -35,14 +35,62 @@ class ZoiaPatch(Patch):
         # Unpack the binary data.
         self.size = self.convert_bin_to_int(self.bin_array[0:4])
         self.name = self.convert_bin_to_text(self.bin_array[4:20])
-        # Get Size
-        # Get Name
-        # Get Modules
-        # Get Connections
-        # Get Pages
-        # Get Starred Params
-        # Get Colors
-        pass
+
+        # Decode the modules portion of the binary and pass all of the
+        # Module binary down to the individual modules to parse
+        number_of_modules = self.convert_bin_to_int(self.bin_array[20:24])
+        cursor = 24
+        for i in range(number_of_modules):
+            size_of_module = self.convert_bin_to_int(self.bin_array[cursor:cursor + 4]) * 4
+            module_id = self.convert_bin_to_int(self.bin_array[cursor + 4:cursor + 8])
+            version = self.convert_bin_to_int(self.bin_array[cursor + 8:cursor + 12])
+
+            module = self.module_factory.create_module(module_id, version)
+            module_bin_array = self.bin_array[cursor:size_of_module]
+            module.decode(module_bin_array)
+
+            self.modules.append(module)
+
+            cursor += size_of_module
+
+        # Decode the connections portion of the binary
+        number_of_connections = self.convert_bin_to_int(self.bin_array[cursor:cursor + 4])
+        cursor += 4
+        for i in range(number_of_connections):
+            source_module = self.convert_bin_to_int(self.bin_array[cursor:cursor + 4])
+            output_number = self.convert_bin_to_int(self.bin_array[cursor + 4:cursor + 8])
+            dest_module = self.convert_bin_to_int(self.bin_array[cursor + 8:cursor + 12])
+            input_number = self.convert_bin_to_int(self.bin_array[cursor + 12:cursor + 16])
+            strength = self.convert_bin_to_int(self.bin_array[cursor + 16:cursor + 20]) / 100
+
+            connection_id = str(source_module) + str(output_number) + str(dest_module) + str(input_number)
+            connection = {
+                "source": "{}.{}".format(source_module, output_number),
+                "destination": "{}.{}".format(dest_module, input_number),
+                "strength": strength,
+            }
+            self.connections[connection_id] = connection
+            cursor += 20
+
+        # Decode the pages portion of the binary
+        number_of_pages = self.convert_bin_to_int(self.bin_array[cursor:cursor + 4])
+        cursor += 4
+        for i in range(number_of_pages):
+            self.pages.append(self.convert_bin_to_text(self.bin_array[cursor:cursor + 16]))
+            cursor += 16
+
+        # Decode the starred params portion of the binary
+        number_of_starred_params = self.convert_bin_to_int(self.bin_array[cursor:cursor + 4])
+        cursor += 4
+        for i in range(number_of_starred_params):
+            self.starred_params.append(self.convert_bin_to_int(self.bin_array[cursor:cursor + 4]))
+            cursor += 4
+
+        # Decode the colors portion of the binary and add it to each module object
+        # Not sure if this is actually used....
+        # for i in range(number_of_modules):
+        #     self.modules[i].color = self.convert_bin_to_int(self.bin_array[cursor:cursor + 4])
+        #     cursor += 4
 
     def set_patch_size(self, patch_size):
         self.size = patch_size
@@ -121,6 +169,7 @@ class ZoiaPatch(Patch):
     # ===========================================================================================
     @staticmethod
     def convert_bin_to_int(byte_string):
+        # Force little-endian for cross-platform support
         return int.from_bytes(byte_string[0:4], "little")
 
     @staticmethod
