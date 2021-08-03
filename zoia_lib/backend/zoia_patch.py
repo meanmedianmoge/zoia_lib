@@ -46,7 +46,7 @@ class ZoiaPatch(Patch):
             version = self.convert_bin_to_int(self.bin_array[cursor + 8:cursor + 12])
 
             module = self.module_factory.create_module(module_id, version)
-            module_bin_array = self.bin_array[cursor:size_of_module]
+            module_bin_array = self.bin_array[cursor:cursor + size_of_module]
             module.decode(module_bin_array)
 
             self.modules.append(module)
