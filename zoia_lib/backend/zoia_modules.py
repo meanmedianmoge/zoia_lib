@@ -26,9 +26,30 @@ class SVFilter(ZoiaModule):
                     "bandpass_output": {"isDefault": False, "isParam": False, "position": 5},
                 },
                 "options": {
-                    "lowpass_output": ["on", "off"],
-                    "hipass_output": ["off", "on"],
-                    "bandpass_output": ["off", "on"],
+                    "lowpass_output": {
+                        "settings": ["on", "off"],
+                        "default_setting_index": 0,
+                        "setting_requires_block_lookup": {
+                            0: True,
+                            1: False
+                        }
+                    },
+                    "hipass_output": {
+                        "settings": ["off", "on"],
+                        "default_setting_index": 0,
+                        "setting_requires_block_lookup": {
+                            0: False,
+                            1: True
+                        }
+                    },
+                    "bandpass_output": {
+                        "settings": ["off", "on"],
+                        "default_setting_index": 0,
+                        "setting_requires_block_lookup": {
+                            0: False,
+                            1: True
+                        }
+                    }
                 }
             }
         }
@@ -36,6 +57,15 @@ class SVFilter(ZoiaModule):
         self.options = self.version_properties[str(version)]["options"]
         self.saveable_data = {}
         super().__init__()
+
+    def decode(self, bin_array):
+        super().decode(bin_array)
+
+    def get_blocks(self):
+        self.ui_blocks = []
+
+
+        return self.ui_blocks
 
     def get_blocks(self):
         opt = list(self.options_new.items())

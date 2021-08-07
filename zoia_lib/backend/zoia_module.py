@@ -36,8 +36,7 @@ class ZoiaModule:
         #   and value should be presented to the app as the binary int / 65535, then rounded to 2 decimal places
         # Module Name 16
 
-        # Unpack the binary data.
-        self.size = self.convert_bin_to_int(self.bin_array[0:4]) * 4
+        # Unpack the binary data that wasn't unpacked in the patch
         self.page_number = self.convert_bin_to_int(self.bin_array[12:16])
         self.old_color = self.convert_bin_to_int(self.bin_array[16:20])
         self.grid_position = self.convert_bin_to_int(self.bin_array[20:24])
