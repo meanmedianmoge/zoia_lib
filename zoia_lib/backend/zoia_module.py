@@ -14,8 +14,28 @@ class ZoiaModule:
         self.params = {}
         self.name = ""
 
+    def set_module_type_and_version(self, module_id, version):
+        self.module_id = module_id
+        self.version = version
+
+        pass
+
+    def set_module_position(self, page, position):
+        # ZoiaPatch class will do the QA checks to confirm that the
+        # position is valid before calling this function
+        pass
+
     def set_color(self, color):
         self.color = self.colors[str(color)]
+
+    def set_option_value(self, option, value):
+        self.option
+
+    def set_param_value(self, param_index, value):
+        pass
+
+    def set_saveable_data_value(self, index, value):
+        pass
 
     def encode(self):
         pass

@@ -1,7 +1,6 @@
 from zoia_lib.backend.zoia_modules import *
 
-
-class ZoiaModuleFactory:
+class ZoiaModuleDecorator:
     """
     This class will be used by the application to provide a single
     dependency which can generate instances of zoia_modules. The factory's only
@@ -11,7 +10,7 @@ class ZoiaModuleFactory:
     """
     def __init__(self):
         self.module_index = {
-            "0": SVFilter,
+            "0": sv_filter_decorator,
             "1": AudioInput,
             "2": AudioOutput,
             "3": Aliaser,
@@ -101,5 +100,5 @@ class ZoiaModuleFactory:
             "104": CVMixer,
         }
    
-    def create_module(self, module_id, version):
-        return self.module_index[str(module_id)](version)
+    def decorate_module(self, module_id, module):
+        return self.module_index[str(module_id)](module)

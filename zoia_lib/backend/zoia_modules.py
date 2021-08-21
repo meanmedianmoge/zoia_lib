@@ -1,4 +1,30 @@
+# Slight paradigm shift:
+# These classes should be thought of as decorators of the ZoiaModule class
+# Because these Modules will only be tweaked in the UI and will not need
+# to exhibit any real behaviors, there is no need for them to exist as
+# classes in their own right. They will be implemented as classes for the
+# sake of keeping the codebase organized.
+
 from zoia_lib.backend.zoia_module import ZoiaModule
+
+def sv_filter_decorator(mod):
+    mod.name = "SV Filter"
+    mod.category = "Audio"
+    mod.description = """
+            The State Variable Filter will resonate and cutoff around a set frequency.
+            """
+    mod.default_blocks = 4
+    mod.min_blocks = 3
+    mod.max_blocks = 6
+    mod.params = 2
+    mod.cpu = 3
+    mod.version_properties = {}
+    mod.saveable_data = {}
+    mod.blocks = {}
+    mod.options = {}
+
+    return mod
+
 
 
 class SVFilter(ZoiaModule):
@@ -17,55 +43,47 @@ class SVFilter(ZoiaModule):
         self.cpu = 3
         self.version_properties = {
             "0": {
+                "required_blocks": {
+                    "audio_in": {"position": 0, "isParam": False},
+                    "frequency": {"position": 1, "isParam": True},
+                    "resonance": {"position": 2, "isParam": True}
+                },
+                "options": {
+                    "lowpass_output": ["on", "off"],
+                    "hipass_output": ["off", "on"],
+                    "bandpass_output": ["off", "on"]
+                },
+                "set_options": {
+                    "lowpass_output": self.set_lowpass_output,
+                    "hipass_output": self.set_hipass_output,
+                    "bandpass_output": self.set_bandpass_output
+                },
                 "blocks": {
                     "audio_in": {"isDefault": True, "isParam": False, "position": 0},
                     "frequency": {"isDefault": True, "isParam": True, "position": 1},
                     "resonance": {"isDefault": True, "isParam": True, "position": 2},
                     "lowpass_output": {"isDefault": True, "isParam": False, "position": 3},
                     "hipass_output": {"isDefault": False, "isParam": False, "position": 4},
-                    "bandpass_output": {"isDefault": False, "isParam": False, "position": 5},
+                    "bandpass_output": {"isDefault": False, "isParam": False, "position": 5}
                 },
-                "options": {
-                    "lowpass_output": {
-                        "settings": ["on", "off"],
-                        "default_setting_index": 0,
-                        "setting_requires_block_lookup": {
-                            0: True,
-                            1: False
-                        }
-                    },
-                    "hipass_output": {
-                        "settings": ["off", "on"],
-                        "default_setting_index": 0,
-                        "setting_requires_block_lookup": {
-                            0: False,
-                            1: True
-                        }
-                    },
-                    "bandpass_output": {
-                        "settings": ["off", "on"],
-                        "default_setting_index": 0,
-                        "setting_requires_block_lookup": {
-                            0: False,
-                            1: True
-                        }
-                    }
-                }
             }
         }
-        self.blocks = self.version_properties[str(version)]["blocks"]
-        self.options = self.version_properties[str(version)]["options"]
+
         self.saveable_data = {}
         super().__init__()
 
+    def set_lowpass_output(self, value):
+        self.blocks.append()
+        pass
+
+    def set_hipass_output(self):
+        pass
+
+    def set_bandpass_output(self):
+        pass
+
     def decode(self, bin_array):
         super().decode(bin_array)
-
-    def get_blocks(self):
-        self.ui_blocks = []
-
-
-        return self.ui_blocks
 
     def get_blocks(self):
         opt = list(self.options_new.items())
@@ -365,11 +383,7 @@ class ADSR(ZoiaModule):
             "hold_attack_decay": {"isDefault": False, "isParam": True, "position": 4},
             "decay": {"isDefault": True, "isParam": True, "position": 5},
             "sustain": {"isDefault": True, "isParam": True, "position": 6},
-            "hold_sustain_release": {
-                "isDefault": False,
-                "isParam": True,
-                "position": 7,
-            },
+            "hold_sustain_release": {"isDefault": False, "isParam": True, "position": 7},
             "release": {"isDefault": True, "isParam": True, "position": 8},
             "cv_output": {"isDefault": True, "isParam": False, "position": 9},
         }
