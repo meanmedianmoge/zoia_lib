@@ -1,14 +1,15 @@
 import json
 import os
 import unittest
-from urllib.request import Request, urlopen
 
+import certifi
+import urllib3
 from bs4 import BeautifulSoup
 from jsonschema import validate
 from numpy.compat import unicode
-
 import zoia_lib.backend.api as api
 
+http = urllib3.PoolManager(cert_reqs="CERT_REQUIRED", ca_certs=certifi.where())
 ps = api.PatchStorage()
 
 
@@ -26,10 +27,13 @@ class TestAPI(unittest.TestCase):
 
         # Need a known user agent to avoid getting 403'd.
         # Used to grab the current number of ZOIA patches on PS.
-        req_patch = Request(
-            "https://patchstorage.com/", headers={"User-Agent": "Mozilla/5.0"}
+        soup_patch = BeautifulSoup(
+            http.request(
+                "GET",
+                "https://patchstorage.com/", headers={"User-Agent": "Mozilla/5.0"}
+            ).data,
+            features="html.parser",
         )
-        soup_patch = BeautifulSoup(urlopen(req_patch).read(), "html.parser")
         found_pedals = soup_patch.find_all(
             class_="d-flex flex-column " "justify-content-center"
         )
@@ -45,14 +49,16 @@ class TestAPI(unittest.TestCase):
 
         # For some reason, questions posted on PS count as "patches",
         # so we need to figure out the # of questions.
-        req_ques = Request(
-            "https://patchstorage.com/platform/zoia/?search_query=&ptype%5B"
-            "%5D=question&tax_platform"
-            "=zoia&tax_post_tag=&orderby=modified&wpas_id=search_form"
-            "&wpas_submit=1",
-            headers={"User-Agent": "Mozilla/5.0"},
+        soup_ques = BeautifulSoup(
+            http.request(
+                "GET",
+                "https://patchstorage.com/platform/zoia/?search_query=&ptype"
+                "%5B%5D=question&tax_platform=zoia&tax_post_tag=&orderby"
+                "=modified&wpas_id=search_form&wpas_submit=1",
+                headers={"User-Agent": "Mozilla/5.0"},
+            ).data,
+            features="html.parser",
         )
-        soup_ques = BeautifulSoup(urlopen(req_ques).read(), "html.parser")
 
         pch_list = ps.get_all_patch_data_init()
 

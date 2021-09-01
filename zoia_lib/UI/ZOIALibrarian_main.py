@@ -126,6 +126,9 @@ class ZOIALibrarianMain(QMainWindow):
         self.worker_version_sd = ImportVersionSDWorker(self)
         self.worker_version_sd.signal.connect(self._version_import_done)
 
+        self.worker_expander = DisplayExpandedRouting(self)
+        self.worker_expander.signal.connect(self.expand_patch_done)
+
         # Get the data necessary for the PS tab.
         self.ps.metadata_init()
 
@@ -1329,6 +1332,28 @@ class ZOIALibrarianMain(QMainWindow):
             # Reload the table to show the new patches.
             self.local.get_local_patches()
 
+    def expand_patch_thread(self):
+        """Initializes a Worker thread to load the expanded display
+        of a given binary patch.
+        """
+
+        # Disable the necessary buttons and start the thread.
+        self.ui.btn_show_routing.setEnabled(False)
+        self.ui.check_for_updates_btn.setEnabled(False)
+        self.ui.refresh_pch_btn.setEnabled(False)
+        self.ui.btn_dwn_all.setEnabled(False)
+        self.ui.statusbar.showMessage("Generating the expanded view...")
+        self.worker_expander.start()
+
+    def expand_patch_done(self, msg):
+        """"""
+
+        # Re-enable the buttons now that the thread is done.
+        self.ui.btn_show_routing.setEnabled(True)
+        self.ui.check_for_updates_btn.setEnabled(True)
+        self.ui.refresh_pch_btn.setEnabled(True)
+        self.ui.btn_dwn_all.setEnabled(True)
+
     def eventFilter(self, o, e):
         """Deals with events that originate from various widgets
         present in the GUI.
@@ -1440,56 +1465,6 @@ class ZOIALibrarianMain(QMainWindow):
         self.close()
 
 
-class ImportMassSDWorker(QThread):
-    """The ImportMassSDWorker class runs as a separate thread in the
-    application to prevent application snag. This thread will attempt
-    to import specified binary files into the backend as individual
-    patches that reside on an SD card.
-    """
-
-    # UI communication
-    signal = QtCore.Signal(int, int, list)
-
-    def __init__(self, window):
-        """Initializes the thread."""
-
-        QThread.__init__(self)
-        self.window = window
-
-    def run(self):
-        """Attempts to mass import any patches found within a target
-        directory. Unlike import_patch, failing to import a patch will
-        not create a message box. A message box will be displayed at the
-        end indicating how many patches were and were not imported.
-        Currently triggered via a button press or a menu action.
-        """
-
-        imp_cnt = 0
-        fail_cnt = 0
-        fails = []
-
-        input_dir = self.window.sd.get_sd_path()
-
-        for pch in os.listdir(input_dir):
-            if pch.split(".")[1] == "bin":
-                # Try to save the binary.
-                try:
-                    save.import_to_backend(os.path.join(input_dir, pch))
-                    imp_cnt += 1
-                except errors.SavingError as e:
-                    fail_cnt += 1
-                    e = (
-                        str(e)
-                        .split("(")[1]
-                        .split(")")[0]
-                        .split(",")[0]
-                        .replace("'", "")
-                    )
-                    fails.append(e)
-
-        self.signal.emit(imp_cnt, fail_cnt, fails)
-
-
 class ImportMassWorker(QThread):
     """The ImportMassWorker class runs as a separate thread in the
     application to prevent application snag. This thread will attempt
@@ -1568,6 +1543,56 @@ class ImportVersionWorker(QThread):
         self.signal.emit(count, fail_cnt, fails)
 
 
+class ImportMassSDWorker(QThread):
+    """The ImportMassSDWorker class runs as a separate thread in the
+    application to prevent application snag. This thread will attempt
+    to import specified binary files into the backend as individual
+    patches that reside on an SD card.
+    """
+
+    # UI communication
+    signal = QtCore.Signal(int, int, list)
+
+    def __init__(self, window):
+        """Initializes the thread."""
+
+        QThread.__init__(self)
+        self.window = window
+
+    def run(self):
+        """Attempts to mass import any patches found within a target
+        directory. Unlike import_patch, failing to import a patch will
+        not create a message box. A message box will be displayed at the
+        end indicating how many patches were and were not imported.
+        Currently triggered via a button press or a menu action.
+        """
+
+        imp_cnt = 0
+        fail_cnt = 0
+        fails = []
+
+        input_dir = self.window.sd.get_sd_path()
+
+        for pch in os.listdir(input_dir):
+            if pch.split(".")[1] == "bin":
+                # Try to save the binary.
+                try:
+                    save.import_to_backend(os.path.join(input_dir, pch))
+                    imp_cnt += 1
+                except errors.SavingError as e:
+                    fail_cnt += 1
+                    e = (
+                        str(e)
+                        .split("(")[1]
+                        .split(")")[0]
+                        .split(",")[0]
+                        .replace("'", "")
+                    )
+                    fails.append(e)
+
+        self.signal.emit(imp_cnt, fail_cnt, fails)
+
+
 class ImportVersionSDWorker(QThread):
     """The ImportVersionSDWorker class runs as a separate thread in the
     application to prevent application snag. This thread will attempt
@@ -1594,3 +1619,29 @@ class ImportVersionSDWorker(QThread):
         input_dir = self.window.sd.get_sd_path()
         count, fail_cnt, fails = save.import_to_backend(input_dir, True)
         self.signal.emit(count, fail_cnt, fails)
+
+
+class DisplayExpandedRouting(QThread):
+    """The DisplayExpandedRouting class runs as a separate thread in the
+    application to prevent application snag. This thread will attempt
+    to display the expanded routing for a given binary file on the
+    Local Storage tab.
+    """
+
+    # UI communication
+    signal = QtCore.Signal(str)
+
+    def __init__(self, window):
+        """Initializes the thread."""
+
+        QThread.__init__(self)
+        self.window = window
+
+    def run(self):
+        """Attempts to display the expanded patch for a given binary file.
+        Currently triggered by a button press.
+        """
+
+        curr_viz = self.window.local.get_viz()
+        self.window.local.setup_exp(curr_viz)
+        self.signal.emit("Pass")

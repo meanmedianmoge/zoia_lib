@@ -1050,6 +1050,15 @@ class ZOIALibrarianLocal(QMainWindow):
                 "border: 1px solid #696969;" "background-color: gray;"
             )
 
+    def get_viz(self):
+        """Gets the current patch's visualization.
+        Will be None if it has not been determined.
+
+        return: Dict with decoded patch object.
+        """
+
+        return self.curr_viz
+
     @staticmethod
     def _get_color_hex(color):
         """Lookup table to get the correct hex value for a given color.
