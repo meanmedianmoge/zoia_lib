@@ -170,6 +170,7 @@ class ZOIALibrarianBank(QMainWindow):
         self.ui.btn_save_bank.setEnabled(False)
         self.ui.btn_clear_bank.setEnabled(False)
         self._get_bank_data()
+        self.ui.statusbar.showMessage("Folder cleared.", timeout=5000)
 
     def load_bank(self):
         """Loads a Bank file that was previously saved to the
@@ -199,6 +200,7 @@ class ZOIALibrarianBank(QMainWindow):
         # Open the saved bank JSON.
         with open(os.path.join(self.path, "Folders", bnk_file), "r") as f:
             self.data_banks = json.loads(f.read())
+        self.ui.statusbar.showMessage("Loading folder.", timeout=5000)
 
         # Make sure the user understands that any items currently in the
         # tables will be deleted.
@@ -236,6 +238,7 @@ class ZOIALibrarianBank(QMainWindow):
         # Notify the user of the patches that failed to load. No way to know
         # which since we don't save that info in the bank JSONs.
         if len(fails) != 0:
+            self.ui.statusbar.showMessage("Some patches failed to load.", timeout=5000)
             self.msg.setWindowTitle("Warning")
             self.msg.setIcon(QMessageBox.Warning)
             self.msg.setText(
@@ -289,11 +292,12 @@ class ZOIALibrarianBank(QMainWindow):
                 f.write(json.dumps(self.data_banks))
 
             # Let the user know when the saving is done.
-            self.msg.setWindowTitle("Folder Saved")
-            self.msg.setIcon(QMessageBox.Information)
-            self.msg.setText("The Folder has been saved successfully.")
-            self.msg.setStandardButtons(QMessageBox.Ok)
-            self.msg.exec_()
+            self.ui.statusbar.showMessage("Successfully saved the folder.", timeout=5000)
+            # self.msg.setWindowTitle("Folder Saved")
+            # self.msg.setIcon(QMessageBox.Information)
+            # self.msg.setText("The Folder has been saved successfully.")
+            # self.msg.setStandardButtons(QMessageBox.Ok)
+            # self.msg.exec_()
             self.ui.btn_load_bank.setEnabled(True)
 
     def export_bank(self, sd, export, window):
@@ -320,7 +324,7 @@ class ZOIALibrarianBank(QMainWindow):
             )
             if ok and name not in os.listdir(sd.get_sd_root()):
                 # Export the bank.
-                self.ui.statusbar.showMessage("Patches be movin'", timeout=1000)
+                self.ui.statusbar.showMessage("Exporting patches.", timeout=5000)
                 self._get_bank_data()
                 fails = export.export_bank(self.data_banks, sd.get_sd_root(), name)
             elif ok and name in os.listdir(sd.get_sd_root()):
@@ -334,7 +338,7 @@ class ZOIALibrarianBank(QMainWindow):
                 value = self.msg.exec_()
                 self.msg.setInformativeText(None)
                 if value == QMessageBox.Yes:
-                    self.ui.statusbar.showMessage("Patches be movin'", timeout=1000)
+                    self.ui.statusbar.showMessage("Exporting patches.", timeout=5000)
                     self._get_bank_data()
                     fails = export.export_bank(
                         self.data_banks, sd.get_sd_root(), name, True
@@ -346,25 +350,28 @@ class ZOIALibrarianBank(QMainWindow):
 
             if len(fails) == 0:
                 # No failed exports, let the user know.
-                self.msg.setWindowTitle("Success")
-                self.msg.setIcon(QMessageBox.Information)
-                self.msg.setText(
-                    "The Folder has successfully been exported to the "
-                    "SD card directory: {}.".format(name)
-                )
-                self.msg.setStandardButtons(QMessageBox.Ok)
-                self.msg.exec_()
+                self.ui.statusbar.showMessage("Export complete.", timeout=5000)
+                # self.msg.setWindowTitle("Success")
+                # self.msg.setIcon(QMessageBox.Information)
+                # self.msg.setText(
+                #     "The Folder has successfully been exported to the "
+                #     "SD card directory: {}.".format(name)
+                # )
+                # self.msg.setStandardButtons(QMessageBox.Ok)
+                # self.msg.exec_()
             else:
                 # Some patches were deleted since they were added to the
                 # bank tables, so they failed to export, let the user know.
                 self.msg.setWindowTitle("Some export failures")
                 self.msg.setIcon(QMessageBox.Information)
                 if len(fails) == len(self.data_banks):
+                    self.ui.statusbar.showMessage("Export failed.", timeout=5000)
                     self.msg.setText(
                         "Failed to export any patches because they have"
                         "all been deleted from the ZOIA Librarian."
                     )
                 else:
+                    self.ui.statusbar.showMessage("Export complete.", timeout=5000)
                     self.msg.setText(
                         "Patches have been exported to the SD card "
                         "directory: {}.".format(name)
@@ -516,6 +523,7 @@ class ZOIALibrarianBank(QMainWindow):
                 if ok:
                     drop_index = slot
                 else:
+                    self.ui.statusbar.showMessage("Patch move failed.", timeout=5000)
                     self.msg.setWindowTitle("Folder Full")
                     self.msg.setIcon(QMessageBox.Information)
                     self.msg.setText(
@@ -546,6 +554,7 @@ class ZOIALibrarianBank(QMainWindow):
             pch_num = int((len(os.listdir(os.path.join(self.path, idx))) / 2) - 1)
             if drop_index + pch_num > 63:
                 self._set_data_bank()
+                self.ui.statusbar.showMessage("Patch move failed.", timeout=5000)
                 self.msg.setWindowTitle("No Space")
                 self.msg.setIcon(QMessageBox.Information)
                 self.msg.setText(
@@ -644,6 +653,7 @@ class ZOIALibrarianBank(QMainWindow):
                             )
                             if drop_index + pch_num > 63:
                                 self._set_data_bank()
+                                self.ui.statusbar.showMessage("Patch move failed.", timeout=5000)
                                 self.msg.setWindowTitle("No Space")
                                 self.msg.setIcon(QMessageBox.Information)
                                 self.msg.setText(
@@ -790,6 +800,7 @@ class ZOIALibrarianBank(QMainWindow):
         # Known bug, this will always delete the first entry of an item
         # if multiple exist. Correcting this breaks the tables on macOS,
         # so best just to leave it alone for now.
+        self.ui.statusbar.showMessage("Patch removed from Folder.", timeout=5000)
         for i in range(32):
             item_left = self.ui.table_bank_left.cellWidget(i, 1)
             item_right = self.ui.table_bank_right.cellWidget(i, 1)
@@ -805,6 +816,7 @@ class ZOIALibrarianBank(QMainWindow):
             ):
                 curr_table = self.ui.table_bank_right
                 break
+
         # Clear the item and determine if buttons need to be disabled.
         curr_table.setItem(i, 0, QTableWidgetItem(None))
         curr_table.setCellWidget(i, 1, None)

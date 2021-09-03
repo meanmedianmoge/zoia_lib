@@ -75,6 +75,7 @@ class ZOIALibrarianPS(QMainWindow):
                 self.data_PS = ps_data
         except:
             # Let the user know if an internet connect can't be established.
+            self.ui.statusbar.showMessage("No internet connection.", timeout=5000)
             self.msg.setWindowTitle("No Internet Connection")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText(
@@ -96,7 +97,7 @@ class ZOIALibrarianPS(QMainWindow):
         # Disable the necessary buttons.
         self.ui.btn_dwn_all.setEnabled(False)
         self.ui.refresh_pch_btn.setEnabled(False)
-        self.ui.statusbar.showMessage("Retrieving patches...", timeout=5000)
+        self.ui.statusbar.showMessage("Retrieving patches.", timeout=5000)
 
         # Execute
         self.worker_ps.start()
@@ -111,7 +112,7 @@ class ZOIALibrarianPS(QMainWindow):
         self.sort_and_set()
         self.ui.btn_dwn_all.setEnabled(True)
         self.ui.refresh_pch_btn.setEnabled(True)
-        self.ui.statusbar.showMessage("Patch list refreshed", timeout=5000)
+        self.ui.statusbar.showMessage("Patch list refreshed.", timeout=5000)
         self.msg.setWindowTitle("Patches Refreshed")
         self.msg.setText("The PatchStorage patch list has been refreshed.")
         self.msg.setIcon(QMessageBox.Information)
@@ -143,7 +144,7 @@ class ZOIALibrarianPS(QMainWindow):
         self.ui.statusbar.showMessage(
             "Trying to download patch #{} of {}".format(
                 i + 1, self.ui.table_PS.rowCount()
-            )
+            ), timeout=5000
         )
 
     def _download_all_done(self, cnt, fails):
@@ -156,6 +157,7 @@ class ZOIALibrarianPS(QMainWindow):
         """
 
         # Notify the user via a popup.
+        self.ui.statusbar.showMessage("All patches successfully downloaded.", timeout=5000)
         self.msg.setWindowTitle("Download Complete")
         self.msg.setIcon(QMessageBox.Information)
         self.msg.setText("Successfully downloaded {} patch(es)." "".format(cnt))
@@ -186,7 +188,7 @@ class ZOIALibrarianPS(QMainWindow):
         if users begin to use them on PatchStorage.
         """
 
-        self.ui.statusbar.showMessage("Starting download...", timeout=5000)
+        self.ui.statusbar.showMessage("Starting download.", timeout=5000)
 
         # TODO Replace with FCFS thread scheduling
         # Try to download the patch.
@@ -199,6 +201,7 @@ class ZOIALibrarianPS(QMainWindow):
             self.ui.statusbar.showMessage("Download complete.", timeout=5000)
         except errors.SavingError:
             # .py or .rar and the user doesn't have WinRAR installed.
+            self.ui.statusbar.showMessage("Download failed.", timeout=5000)
             self.msg.setWindowTitle("Invalid File Type")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText(
@@ -210,6 +213,7 @@ class ZOIALibrarianPS(QMainWindow):
             self.msg.setInformativeText(None)
         except:
             # Let the user know if an internet connect can't be established.
+            self.ui.statusbar.showMessage("No internet connection.", timeout=5000)
             self.msg.setWindowTitle("No Internet Connection")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText(
@@ -300,6 +304,7 @@ class DownloadAllWorker(QThread):
             self.signal.emit(self.cnt, self.fails)
         except:
             # Let the user know if an internet connect can't be established.
+            self.ui.statusbar.showMessage("No internet connection.", timeout=5000)
             self.msg.setWindowTitle("No Internet Connection")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText(
@@ -345,6 +350,7 @@ class ReloadPSWorker(QThread):
             self.signal.emit()
         except:
             # Let the user know if an internet connect can't be established.
+            self.ui.statusbar.showMessage("No internet connection.", timeout=5000)
             self.msg.setWindowTitle("No Internet Connection")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText(

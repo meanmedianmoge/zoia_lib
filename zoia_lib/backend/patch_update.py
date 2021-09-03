@@ -81,25 +81,29 @@ class PatchUpdate(Patch):
         for patch in os.listdir(self.back_path):
             # Only check for updates for patches hosted on PS
             # (denoted via the 6-digit ID numbers).
+            # Exclude any special dirs in the backend.
             if (
                 os.path.isdir(os.path.join(self.back_path, patch))
                 and len(patch) > 5
-                and len(os.listdir(os.path.join(self.back_path, patch))) > 2
                 and patch != "Banks"
                 and patch != "Folders"
                 and patch != ".DS_Store"
             ):
-                # Multiple versions, only need the latest.
-                with open(
-                    os.path.join(self.back_path, patch, "{}_v1.json".format(patch)), "r"
-                ) as f:
-                    temp = json.loads(f.read())
-            elif os.path.isdir(os.path.join(self.back_path, patch)) and len(patch) > 5:
-                # Just a single patch in the directory, easy.
-                with open(
-                    os.path.join(self.back_path, patch, "{}.json".format(patch)), "r"
-                ) as f:
-                    temp = json.loads(f.read())
+                # Split on number of versions in the dir.
+                if (
+                    len(os.listdir(os.path.join(self.back_path, patch))) > 2
+                ):
+                    # Multiple versions, only need the latest.
+                    with open(
+                        os.path.join(self.back_path, patch, "{}_v1.json".format(patch)), "r"
+                    ) as f:
+                        temp = json.loads(f.read())
+                else:
+                    # Just a single patch in the directory, easy.
+                    with open(
+                        os.path.join(self.back_path, patch, "{}.json".format(patch)), "r"
+                    ) as f:
+                        temp = json.loads(f.read())
             else:
                 continue
             # Only need the id and updated_at for comparison purposes.

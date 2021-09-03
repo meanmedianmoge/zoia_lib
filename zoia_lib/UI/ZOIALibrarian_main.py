@@ -654,9 +654,9 @@ class ZOIALibrarianMain(QMainWindow):
         elif table_index == 2 and self.sd_sizes is None:
             curr_table.resizeColumnsToContents()
             curr_table.setColumnWidth(0, self.width() * 0.25)
-            curr_table.setColumnWidth(1, self.width() * 0.1)
+            curr_table.setColumnWidth(1, self.width() * 0.125)
             curr_table.setColumnWidth(2, self.width() * 0.25)
-            curr_table.setColumnWidth(3, self.width() * 0.1)
+            curr_table.setColumnWidth(3, self.width() * 0.125)
             self.ui.splitter_sd_hori.setSizes([self.width() * 0.5, self.width() * 0.5])
             self.ui.splitter_sd_vert.setSizes([self.width() * 0.4, self.width() * 0.6])
 
@@ -731,9 +731,9 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.splitter_sd_hori.setSizes([self.width() * 0.5, self.width() * 0.5])
         self.ui.splitter_sd_vert.setSizes([self.height() * 0.4, self.height() * 0.6])
         self.ui.table_sd_left.setColumnWidth(0, self.width() * 0.25)
-        self.ui.table_sd_left.setColumnWidth(1, self.width() * 0.1)
+        self.ui.table_sd_left.setColumnWidth(1, self.width() * 0.125)
         self.ui.table_sd_right.setColumnWidth(0, self.width() * 0.25)
-        self.ui.table_sd_right.setColumnWidth(1, self.width() * 0.1)
+        self.ui.table_sd_right.setColumnWidth(1, self.width() * 0.125)
 
         # Reset bank sizes
         self.ui.splitter_bank.setSizes(
@@ -799,6 +799,7 @@ class ZOIALibrarianMain(QMainWindow):
                     except:
                         # Let the user know they aren't connected to the
                         # internet.
+                        self.ui.statusbar.showMessage("No internet connection.", timeout=5000)
                         self.msg.setWindowTitle("No Internet Connection")
                         self.msg.setIcon(QMessageBox.Information)
                         self.msg.setText(
@@ -1127,7 +1128,7 @@ class ZOIALibrarianMain(QMainWindow):
             return
         try:
             save.import_to_backend(pch)
-            self.ui.statusbar.showMessage("Import complete.")
+            self.ui.statusbar.showMessage("Import complete.", timeout=5000)
             self.msg.setWindowTitle("Import Complete")
             self.msg.setText("The patch has been successfully imported.")
             self.msg.exec_()
@@ -1142,12 +1143,14 @@ class ZOIALibrarianMain(QMainWindow):
                 self.local.get_local_patches()
         # Let the user know of any errors that occurred.
         except errors.BadPathError:
+            self.ui.statusbar.showMessage("Import failed.", timeout=5000)
             self.msg.setWindowTitle("No Patch Found")
             self.msg.setText("Incorrect file selected, importing failed.")
             self.msg.exec_()
         except errors.SavingError as e:
             e = str(e).split("(")[1].split(")")[0].split(",")[0].replace("'", "")
             # Prepare a message box.
+            self.ui.statusbar.showMessage("Import not applicable.", timeout=5000)
             self.msg.setWindowTitle("Patch Already In Library")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText(
@@ -1212,10 +1215,13 @@ class ZOIALibrarianMain(QMainWindow):
         self.msg.setWindowTitle("Import Complete")
         self.msg.setIcon(QMessageBox.Information)
         if imp_cnt > 0:
+            self.ui.statusbar.showMessage("Import complete.", timeout=5000)
             self.msg.setText("Successfully imported {} patches.".format(imp_cnt))
         else:
+            self.ui.statusbar.showMessage("Import failed.", timeout=5000)
             self.msg.setText("Did not import any patches.")
         if fail_cnt > 0:
+            self.ui.statusbar.showMessage("Import partially complete.", timeout=5000)
             word = "was" if fail_cnt == 1 else "were"
             self.msg.setInformativeText(
                 "{} {} already saved in the library and {} not imported.".format(
@@ -1269,12 +1275,14 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Prepare a popup for the user.
         if fail_cnt == 0:
+            self.ui.statusbar.showMessage("Import complete.", timeout=5000)
             self.msg.setWindowTitle("Success")
             self.msg.setText("Successfully created a Version History.")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
         elif count > fail_cnt > 1:
+            self.ui.statusbar.showMessage("Import partially complete.", timeout=5000)
             self.msg.setWindowTitle("Warning")
             word = "was" if fail_cnt == 1 else "were"
             self.msg.setText(
@@ -1300,6 +1308,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setInformativeText(None)
             self.msg.setDetailedText(None)
         else:
+            self.ui.statusbar.showMessage("Import failed.", timeout=5000)
             self.msg.setWindowTitle("Warning")
             word = "was" if fail_cnt == 1 else "were"
             self.msg.setText(
