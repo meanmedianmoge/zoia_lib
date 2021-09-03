@@ -2356,6 +2356,306 @@ module_index = {
         "blocks": {"pitch_bend": {"isDefault": True, "isParam": False, "position": 0}},
         "options": {"midi_channel": list(range(1, 17))},
     },
+    87: {
+        "name": "Euro CV Out 4",
+        "category": "Interface",
+        "description": """
+        """,
+        "default_blocks": 1,
+        "min_blocks": 1,
+        "max_blocks": 1,
+        "params": 1,
+        "cpu": 0.1,
+        "blocks": {"cv_in": {"isDefault": True, "isParam": True, "position": 0}},
+        "options": {
+            "out_range": ["0 to 10V", "0 to 5V", "-5 to 5V"],
+            "in_range": ["0 to 1", "-1 to 1"],
+            "transpose": ["A", "C"],
+        },
+    },
+    88: {
+        "name": "Euro CV In 1",
+        "category": "Interface",
+        "description": """
+        """,
+        "default_blocks": 1,
+        "min_blocks": 1,
+        "max_blocks": 1,
+        "params": 0,
+        "cpu": 0.1,
+        "blocks": {"cv_out": {"isDefault": True, "isParam": False, "position": 0}},
+        "options": {
+            "out_range": ["0 to 1", "-1 to 1"],
+            "in_range": ["0 to 10V", "0 to 5V", "-5 to 5V"],
+            "clock_filter": ["none", "2,8", "1,4", "5,5"],
+            "transpose": ["A", "C"],
+        },
+    },
+    89: {
+        "name": "Euro CV In 2",
+        "category": "Interface",
+        "description": """
+        """,
+        "default_blocks": 1,
+        "min_blocks": 1,
+        "max_blocks": 1,
+        "params": 0,
+        "cpu": 0.1,
+        "blocks": {"cv_out": {"isDefault": True, "isParam": False, "position": 0}},
+        "options": {
+            "out_range": ["0 to 1", "-1 to 1"],
+            "in_range": ["0 to 10V", "0 to 5V", "-5 to 5V"],
+            "clock_filter": ["none", "2,8", "1,4", "5,5"],
+            "transpose": ["A", "C"],
+        },
+    },
+    90: {
+        "name": "Euro CV In 3",
+        "category": "Interface",
+        "description": """
+        """,
+        "default_blocks": 1,
+        "min_blocks": 1,
+        "max_blocks": 1,
+        "params": 0,
+        "cpu": 0.1,
+        "blocks": {"cv_out": {"isDefault": True, "isParam": False, "position": 0}},
+        "options": {
+            "out_range": ["0 to 1", "-1 to 1"],
+            "in_range": ["0 to 10V", "0 to 5V", "-5 to 5V"],
+            "clock_filter": ["none", "2,8", "1,4", "5,5"],
+            "transpose": ["A", "C"],
+        },
+    },
+    91: {
+        "name": "Euro CV In 4",
+        "category": "Interface",
+        "description": """
+        """,
+        "default_blocks": 1,
+        "min_blocks": 1,
+        "max_blocks": 1,
+        "params": 0,
+        "cpu": 0.1,
+        "blocks": {"cv_out": {"isDefault": True, "isParam": False, "position": 0}},
+        "options": {
+            "out_range": ["0 to 1", "-1 to 1"],
+            "in_range": ["0 to 10V", "0 to 5V", "-5 to 5V"],
+            "clock_filter": ["none", "2,8", "1,4", "5,5"],
+            "transpose": ["A", "C"],
+        },
+    },
+    92: {
+        "name": "Euro Headphone Amp",
+        "category": "Interface",
+        "description": """
+        """,
+        "default_blocks": 1,
+        "min_blocks": 1,
+        "max_blocks": 1,
+        "params": 1,
+        "cpu": 0.4,
+        "blocks": {
+            "level": {"isDefault": True, "isParam": True, "position": 0},
+        },
+        "options": {},
+    },
+    93: {
+        "name": "Euro Audio Input 1",
+        "category": "Interface",
+        "description": """
+            Connect audio from the outside world into the grid.
+            This could be a guitar, bass, synth module, computer Audio, etc
+        """,
+        "default_blocks": 1,
+        "min_blocks": 1,
+        "max_blocks": 1,
+        "params": 0,
+        "cpu": 0.4,
+        "blocks": {
+            "output": {"isDefault": True, "isParam": False, "position": 0},
+        },
+        "options": {"input_pad": ["6dB", "12dB", "no_pad"]},
+    },
+    94: {
+        "name": "Euro Audio Input 2",
+        "category": "Interface",
+        "description": """
+            Connect audio from the outside world into the grid.
+            This could be a guitar, bass, synth module, computer Audio, etc
+        """,
+        "default_blocks": 1,
+        "min_blocks": 1,
+        "max_blocks": 1,
+        "params": 0,
+        "cpu": 0.4,
+        "blocks": {
+            "output": {"isDefault": True, "isParam": False, "position": 0},
+        },
+        "options": {"input_pad": ["6dB", "12dB", "no_pad"]},
+    },
+    95: {
+        "name": "Euro Audio Output 1",
+        "category": "Interface",
+        "description": """
+            Connect audio from your ZOIA into the outside world.
+            Connect to your amplifier, a DI box, your audio interface, etc.
+        """,
+        "default_blocks": 1,
+        "min_blocks": 1,
+        "max_blocks": 1,
+        "params": 0,
+        "cpu": 0.4,
+        "blocks": {
+            "input": {"isDefault": True, "isParam": False, "position": 0},
+        },
+        "options": {},
+    },
+    96: {
+        "name": "Euro Audio Output 2",
+        "category": "Interface",
+        "description": """
+            Connect audio from your ZOIA into the outside world.
+            Connect to your amplifier, a DI box, your audio interface, etc.
+        """,
+        "default_blocks": 1,
+        "min_blocks": 1,
+        "max_blocks": 1,
+        "params": 0,
+        "cpu": 0.4,
+        "blocks": {
+            "input": {"isDefault": True, "isParam": False, "position": 0},
+        },
+        "options": {},
+    },
+    97: {
+        "name": "Euro Pushbutton 1",
+        "category": "Interface",
+        "description": """
+            Turns a grid button into a button you can push to send a CV signal.
+            Tap in a tempo, open up a VCA, trigger a sequencer, or anything else.
+            The grid is your oyster!
+        """,
+        "default_blocks": 1,
+        "min_blocks": 1,
+        "max_blocks": 1,
+        "params": 0,
+        "cpu": 0.02,
+        "blocks": {"cv_output": {"isDefault": True, "isParam": False, "position": 1}},
+        "options": {"action": ["momentary", "latching"], "normally": ["zero", "one"]},
+    },
+    98: {
+        "name": "Euro Pushbutton 2",
+        "category": "Interface",
+        "description": """
+            Turns a grid button into a button you can push to send a CV signal.
+            Tap in a tempo, open up a VCA, trigger a sequencer, or anything else.
+            The grid is your oyster!
+        """,
+        "default_blocks": 1,
+        "min_blocks": 1,
+        "max_blocks": 1,
+        "params": 0,
+        "cpu": 0.02,
+        "blocks": {"cv_output": {"isDefault": True, "isParam": False, "position": 1}},
+        "options": {"action": ["momentary", "latching"], "normally": ["zero", "one"]},
+    },
+    99: {
+        "name": "Euro CV Out 1",
+        "category": "Interface",
+        "description": """
+        """,
+        "default_blocks": 1,
+        "min_blocks": 1,
+        "max_blocks": 1,
+        "params": 1,
+        "cpu": 0.1,
+        "blocks": {"cv_in": {"isDefault": True, "isParam": True, "position": 0}},
+        "options": {
+            "out_range": ["0 to 10V", "0 to 5V", "-5 to 5V"],
+            "in_range": ["0 to 1", "-1 to 1"],
+            "transpose": ["A", "C"],
+        },
+    },
+    100: {
+        "name": "Euro CV Out 2",
+        "category": "Interface",
+        "description": """
+        """,
+        "default_blocks": 1,
+        "min_blocks": 1,
+        "max_blocks": 1,
+        "params": 1,
+        "cpu": 0.1,
+        "blocks": {"cv_in": {"isDefault": True, "isParam": True, "position": 0}},
+        "options": {
+            "out_range": ["0 to 10V", "0 to 5V", "-5 to 5V"],
+            "in_range": ["0 to 1", "-1 to 1"],
+            "transpose": ["A", "C"],
+        },
+    },
+    101: {
+        "name": "Euro CV Out 3",
+        "category": "Interface",
+        "description": """
+        """,
+        "default_blocks": 1,
+        "min_blocks": 1,
+        "max_blocks": 1,
+        "params": 1,
+        "cpu": 0.1,
+        "blocks": {"cv_in": {"isDefault": True, "isParam": True, "position": 0}},
+        "options": {
+            "out_range": ["0 to 10V", "0 to 5V", "-5 to 5V"],
+            "in_range": ["0 to 1", "-1 to 1"],
+            "transpose": ["A", "C"],
+        },
+    },
+    102: {
+        "name": "Sampler",
+        "category": "Audio",
+        "description": """
+        """,
+        "default_blocks": 7,
+        "min_blocks": 6,
+        "max_blocks": 8,
+        "params": 4,
+        "cpu": 0.9,
+        "blocks": {
+            "audio_in": {"isDefault": True, "isParam": False, "position": 0},
+            "record": {"isDefault": True, "isParam": True, "position": 1},
+            "sample_playback": {"isDefault": True, "isParam": False, "position": 2},
+            "playback_speed": {"isDefault": True, "isParam": True, "position": 3},
+            "start": {"isDefault": True, "isParam": True, "position": 4},
+            "length": {"isDefault": True, "isParam": True, "position": 5},
+            "cv_output": {"isDefault": False, "isParam": False, "position": 6},
+            "audio_out": {"isDefault": True, "isParam": False, "position": 7},
+        },
+        "options": {
+            "record": ["enabled", "disabled"],
+            "playback": ["trigger", "gate", "loop"],
+            "cv_output": ["off", "on"],
+        },
+    },
+    103: {
+        "name": "Device Control",
+        "category": "Interface",
+        "description": """
+        """,
+        "default_blocks": 1,
+        "min_blocks": 1,
+        "max_blocks": 1,
+        "params": 1,
+        "cpu": 0.1,
+        "blocks": {
+            "bypass": {"isDefault": True, "isParam": True, "position": 0},
+            "aux": {"isDefault": False, "isParam": True, "position": 1},
+            "performance": {"isDefault": False, "isParam": True, "position": 2},
+        },
+        "options": {
+            "control": ["bypass", "aux", "performance"],
+        },
+    },
     104: {
         "name": "CV Mixer",
         "category": "CV",

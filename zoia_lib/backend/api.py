@@ -1,7 +1,6 @@
 import json
 import math
 import os
-from urllib.request import urlopen, Request
 
 import certifi
 import urllib3
@@ -214,12 +213,12 @@ class PatchStorage:
 
         # Hi PS, yes we are a normal Firefox browser and not a program.
         soup_patch = BeautifulSoup(
-            urlopen(
-                Request(
-                    "https://patchstorage.com/", headers={"User-Agent": "Mozilla/5.0"}
-                )
-            ).read(),
-            "html.parser",
+            http.request(
+                "GET",
+                "https://patchstorage.com/",
+                headers={"User-Agent": "Mozilla/5.0"}
+            ).data,
+            features="html.parser",
         )
         found_pedals = soup_patch.find_all(
             class_="d-flex flex-column " "justify-content-center"
@@ -238,15 +237,14 @@ class PatchStorage:
         # For some reason, questions posted on PS count as "patches",
         # so we need to figure out the # of questions.
         soup_ques = BeautifulSoup(
-            urlopen(
-                Request(
-                    "https://patchstorage.com/platform/zoia/?search_query=&ptype"
-                    "%5B%5D=question&tax_platform=zoia&tax_post_tag=&orderby"
-                    "=modified&wpas_id=search_form&wpas_submit=1",
-                    headers={"User-Agent": "Mozilla/5.0"},
-                )
-            ).read(),
-            "html.parser",
+            http.request(
+                "GET",
+                "https://patchstorage.com/platform/zoia/?search_query=&ptype"
+                "%5B%5D=question&tax_platform=zoia&tax_post_tag=&orderby"
+                "=modified&wpas_id=search_form&wpas_submit=1",
+                headers={"User-Agent": "Mozilla/5.0"},
+            ).data,
+            features="html.parser",
         )
 
         # Return the total minus the number of questions found.

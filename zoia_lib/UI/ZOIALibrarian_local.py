@@ -2,14 +2,24 @@ import glob
 import json
 import os
 
+from NodeGraphQt import (
+    NodeGraph,
+    BaseNode,
+    PropertiesBinWidget,
+    NodeTreeWidget,
+    setup_context_menu
+)
+
 from PySide2 import QtCore
+from PySide2.QtGui import QIcon
 from PySide2.QtCore import QEvent, QThread
 from PySide2.QtWidgets import (
     QMainWindow,
     QMessageBox,
     QInputDialog,
     QPushButton,
-    QSpinBox
+    QSpinBox,
+    QWidget,
 )
 
 from zoia_lib.backend.patch_update import PatchUpdate
@@ -745,14 +755,147 @@ class ZOIALibrarianLocal(QMainWindow):
         Currently triggered via a button press.
         """
 
-        self.msg.setIcon(QMessageBox.Information)
-        self.msg.setWindowTitle("Patch Expander")
-        self.msg.setText(
-            "This is an experimental feature. "
-            "Please see the `nodegraph` branch for more."
+        class MyNode(BaseNode):
+            """
+            example test node.
+            """
+
+            # set a unique node identifier.
+            __identifier__ = 'com.chantasticvfx'
+
+            # set the initial default node name.
+            NODE_NAME = 'my node'
+
+            def __init__(self):
+                super(MyNode, self).__init__()
+                self.set_color(25, 58, 51)
+
+        # QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
+        # win = QtWidgets.QApplication([])
+
+        win = QWidget()
+        win.setWindowTitle(
+            "Interactive Patch Routing: {}".format(self.curr_viz["name"])
         )
-        self.msg.setStandardButtons(QMessageBox.Ok)
-        self.msg.exec_()
+        win.setWindowIcon(QIcon(
+            os.path.join(os.getcwd(), "zoia_lib", "UI", "resources",
+                         "logo.ico")))
+        win.setFixedSize(540, 540)
+
+        # create node graph.
+        graph = NodeGraph()
+
+        # set up default menu and commands.
+        setup_context_menu(graph)
+
+        # widget used for the node graph.
+        graph_widget = graph.widget
+        graph_widget.resize(1100, 800)
+        graph_widget.show()
+
+        # show the properties bin when a node is "double clicked" in the graph.
+        properties_bin = PropertiesBinWidget(node_graph=graph)
+        properties_bin.setWindowFlags(QtCore.Qt.Tool)
+
+        def show_prop_bin(node):
+            if not properties_bin.isVisible():
+                properties_bin.show()
+
+        graph.node_double_clicked.connect(show_prop_bin)
+
+        # show the nodes list when a node is "double clicked" in the graph.
+        node_tree = NodeTreeWidget(node_graph=graph)
+
+        def show_nodes_list(node):
+            if not node_tree.isVisible():
+                node_tree.update()
+                node_tree.show()
+
+        graph.node_double_clicked.connect(show_nodes_list)
+
+        # registered nodes.
+        nodes_to_reg = [
+            # BackdropNode,
+            MyNode,
+            # basic_nodes.FooNode,
+            # basic_nodes.BarNode,
+            # widget_nodes.DropdownMenuNode,
+            # widget_nodes.TextInputNode,
+            # widget_nodes.CheckboxNode
+        ]
+        graph.register_nodes(nodes_to_reg)
+
+        pch = self.curr_viz
+
+        nodes = {}
+        for module in pch['modules']:
+            my_node = graph.create_node(
+                'com.chantasticvfx.MyNode',
+                name=(module['type'] if module['name'] == '' else module['name']) + str(module["number"]),
+                color='#0a1e20',
+                text_color='#feab20'
+            )
+            inp, outp, in_pos, out_pos = [], [], [], []
+            for key, param in module['blocks'].items():
+                if 'in' in key:
+                    my_node.add_input(key)
+                    inp.append(key)
+                    in_pos.append(int(param["position"]))
+                elif param["isParam"]:
+                    my_node.add_input(key)
+                    inp.append(key)
+                    in_pos.append(int(param["position"]))
+                elif 'out' in key:
+                    my_node.add_output(key)
+                    outp.append(key)
+                    out_pos.append(int(param["position"]))
+            nodes[module["number"]] = my_node, inp, outp, in_pos, out_pos
+
+        # print(nodes)
+
+        # map pos from nodes to connections
+        def node_pos_map(node):
+            inpts = node[1]
+            outps = node[2]
+            in_pos = node[3]
+            out_pos = node[4]
+            node_pos_start = [x for x in range(0, len(inpts))]
+            node_pos_end = [x for x in range(0, len(outps))]
+            data_input = dict(zip(in_pos, node_pos_start))
+            data_output = dict(zip(out_pos, node_pos_end))
+
+            return {**data_input, **data_output}
+
+        data = []
+        for key, node in nodes.items():
+            data.append(node_pos_map(node))
+
+        for conn in pch['connections']:
+            mod, block = conn['source'].split('.')
+            nmod, nblock = conn['destination'].split('.')
+            src = data[int(mod)]
+            dest = data[int(nmod)]
+            try:
+                nodes[int(mod)][0].set_output(
+                    src[int(block)],
+                    nodes[int(nmod)][0].input(dest[int(nblock)])
+                )
+            except KeyError as e:
+                print(conn, e)
+            except IndexError as e:
+                print(conn, e)
+        print('done making connections')
+
+        # auto layout nodes.
+        graph.auto_layout_nodes()
+
+        # wrap a backdrop node.
+        # backdrop_node = graph.create_node('nodeGraphQt.nodes.BackdropNode')
+        # backdrop_node.wrap_nodes([text_node, checkbox_node])
+
+        graph.fit_to_selection()
+
+        win.exec_()
 
     def viz_page(self):
         """Either increases or decreases the current visualizer page,
@@ -911,6 +1054,15 @@ class ZOIALibrarianLocal(QMainWindow):
             curr_btn.setStyleSheet(
                 "border: 1px solid #696969;" "background-color: gray;"
             )
+
+    def get_viz(self):
+        """Gets the current patch's visualization.
+        Will be None if it has not been determined.
+
+        return: Dict with decoded patch object.
+        """
+
+        return self.curr_viz
 
     @staticmethod
     def _get_color_hex(color):
