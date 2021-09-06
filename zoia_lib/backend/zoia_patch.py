@@ -1,7 +1,7 @@
 import struct
 
 from zoia_lib.backend.patch import Patch
-from zoia_lib.backend.zoia_module_factory import ZoiaModuleFactory
+from zoia_lib.backend.zoia_module import ZoiaModule
 from zoia_lib.backend.patch_bin_encoder import PatchBinEncoder
 
 
@@ -10,7 +10,6 @@ class ZoiaPatch(Patch):
     def __init__(self):
         super(ZoiaPatch, self).__init__()
 
-        self.module_factory = ZoiaModuleFactory()
         self.bin_encoder = PatchBinEncoder()
 
         self.bin_file_path = ""
@@ -45,7 +44,8 @@ class ZoiaPatch(Patch):
             module_id = self.convert_bin_to_int(self.bin_array[cursor + 4:cursor + 8])
             version = self.convert_bin_to_int(self.bin_array[cursor + 8:cursor + 12])
 
-            module = self.module_factory.create_module(module_id, version)
+            module = ZoiaModule()
+            module.set_module_type_and_version(module_id, version)
             module_bin_array = self.bin_array[cursor:cursor + size_of_module]
             module.decode(module_bin_array)
 
