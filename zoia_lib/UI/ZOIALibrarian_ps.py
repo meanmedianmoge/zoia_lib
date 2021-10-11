@@ -80,7 +80,7 @@ class ZOIALibrarianPS(QMainWindow):
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText(
                 "Failed to retrieve patches from PatchStorage.\n"
-                "Please check your internet connection and try"
+                "Please check your internet connection and try "
                 "again."
             )
             self.msg.setStandardButtons(QMessageBox.Ok)
