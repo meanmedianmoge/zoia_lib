@@ -1520,7 +1520,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"ZOIA Librarian - Version 1.1", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"ZOIA Librarian - Version 1.2", None))
         self.actionSpecify_SD_Card_Location.setText(QCoreApplication.translate("MainWindow", u"Specify SD Card Location", None))
 #if QT_CONFIG(shortcut)
         self.actionSpecify_SD_Card_Location.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+S", None))
