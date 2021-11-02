@@ -259,7 +259,7 @@ class ZOIALibrarianUtil:
             ("linux", False): "dark.css",
         }[(platform.system().lower(), self.dark)]
 
-        with open(meipass(os.path.join("zoia_lib", "UI", "resources", sheet)), "r") as f:
+        with open(meipass("zoia_lib/UI/resources/{}".format(sheet)), "r") as f:
             data = f.read()
 
         self.dark = not self.dark
