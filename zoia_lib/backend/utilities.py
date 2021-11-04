@@ -11,7 +11,7 @@ def sort_metadata(mode, data, rev):
 
     mode: The method in which the data will be sorted. Valid modes are:
           - 1 -> Sort by title
-          - 2 -> Sort by author (local and folder tabs only)
+          - 2 -> Sort by author
           - 3 -> Sort by like count
           - 4 -> Sort by download count
           - 5 -> Sort by view count
@@ -123,21 +123,22 @@ def search_patches(data, query):
         if query in curr["title"].lower() and curr not in hits:
             hits.append(curr)
             continue
-        # Check the version title.
-        try:
-            if (
-                query
-                in curr["files"][0]["filename"]
-                .split(".")[0]
-                .split("_zoia_")[-1]
-                .replace("_", " ")
-                .lower()
-            ) and curr not in hits:
-                hits.append(curr)
+        # Check the version title (local and folders tab only).
+        if "files" in curr:
+            try:
+                if (
+                    query
+                    in curr["files"][0]["filename"]
+                    .split(".")[0]
+                    .split("_zoia_")[-1]
+                    .replace("_", " ")
+                    .lower()
+                ) and curr not in hits:
+                    hits.append(curr)
+                    continue
+            except KeyError:
                 continue
-        except KeyError:
-            continue
-        # Check the author (local and bank tabs only).
+        # Check the author.
         if (
             "author" in curr
             and query in curr["author"]["name"].lower()
