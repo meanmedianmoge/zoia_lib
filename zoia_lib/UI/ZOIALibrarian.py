@@ -1570,7 +1570,7 @@ class Ui_MainWindow(object):
         self.actionSort_by_downloads_low_high.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+0", None))
 #endif // QT_CONFIG(shortcut)
         self.actionZOIA_Librarian_Help.setText(QCoreApplication.translate("MainWindow", u"ZOIA Librarian Help", None))
-        self.actionAlternating_Row_Colours.setText(QCoreApplication.translate("MainWindow", u"Alternating Row Colours", None))
+        self.actionAlternating_Row_Colours.setText(QCoreApplication.translate("MainWindow", u"Alternating Row Colors", None))
 #if QT_CONFIG(shortcut)
         self.actionAlternating_Row_Colours.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+R", None))
 #endif // QT_CONFIG(shortcut)

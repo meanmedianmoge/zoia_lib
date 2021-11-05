@@ -147,7 +147,6 @@ class ZOIALibrarianLocal(QMainWindow):
         ver: The version associated with this row (if it exists).
         """
 
-        # Only enable exporting if there is a single version on the main page.
         if "[Multiple Versions]" in btn.text():
             ext_btn = QPushButton("Export \n patches", self)
             ext_btn.setEnabled(True)
@@ -584,6 +583,10 @@ class ZOIALibrarianLocal(QMainWindow):
             for ver in sorted(os.listdir(os.path.join(self.path, idx))):
                 if ver.endswith(".json"):
                     update.update_data(ver.split(".")[0], value, 6)
+        if not self.ui.back_btn_local.isEnabled():
+            self.get_local_patches()
+        else:
+            self.get_version_patches(True)
         self.ui.statusbar.showMessage("Successfully updated patch rating.", timeout=5000)
 
     def update_patch_notes(self):
@@ -600,6 +603,10 @@ class ZOIALibrarianLocal(QMainWindow):
             update.update_data(self.local_selected, text.strip("\n"), 3)
         except IndexError:
             update.update_data(self.local_selected, "", 3)
+        if not self.ui.back_btn_local.isEnabled():
+            self.get_local_patches()
+        else:
+            self.get_version_patches(True)
         self.ui.statusbar.showMessage("Successfully updated patch notes.", timeout=5000)
 
     def update_tags_cats(self, text, mode, idx):
