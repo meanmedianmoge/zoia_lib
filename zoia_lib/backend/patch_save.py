@@ -29,7 +29,7 @@ class PatchSave(Patch):
 
         super().__init__()
 
-    def save_to_backend(self, patch):
+    def save_to_backend(self, patch, sd=None):
         """Attempts to save a simple binary patch and its metadata
         to the backend ZoiaLibraryApp directory. This method is meant
         to work for patches retrieved via the PS API. As such, it should
@@ -41,6 +41,8 @@ class PatchSave(Patch):
         patch: A tuple containing the downloaded file
                data and the patch metadata, comes from ps.download(IDX).
                patch[0] is raw binary data, while patch[1] is json data.
+        sd: Flag to determine source of the save. None for default PS download behavior,
+            any other value for user import.
 
         raise: SavingError should the patch fail to save.
         raise: RenamingError should the patch fail to be renamed.
@@ -139,6 +141,7 @@ class PatchSave(Patch):
             if (
                 "files" in patch[1]
                 and patch[1]["files"][0]["filename"].split(".")[-1] != "bin"
+                and not sd
             ):
                 # We need to check the individual binary files to see which,
                 # if any, differ from the ones currently stored.
@@ -461,10 +464,10 @@ class PatchSave(Patch):
 
             # Try to save the patch.
             if not version:
-                self.save_to_backend((temp_data, js_data))
+                self.save_to_backend((temp_data, js_data), sd=True)
             else:
                 try:
-                    self.save_to_backend((temp_data, js_data))
+                    self.save_to_backend((temp_data, js_data), sd=True)
                 except errors.SavingError as e:
                     fails += 1
                     e = (
