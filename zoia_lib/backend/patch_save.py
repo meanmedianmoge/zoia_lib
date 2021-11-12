@@ -29,7 +29,7 @@ class PatchSave(Patch):
 
         super().__init__()
 
-    def save_to_backend(self, patch, sd=None):
+    def save_to_backend(self, patch):
         """Attempts to save a simple binary patch and its metadata
         to the backend ZoiaLibraryApp directory. This method is meant
         to work for patches retrieved via the PS API. As such, it should
@@ -41,8 +41,6 @@ class PatchSave(Patch):
         patch: A tuple containing the downloaded file
                data and the patch metadata, comes from ps.download(IDX).
                patch[0] is raw binary data, while patch[1] is json data.
-        sd: Flag to determine source of the save. None for default PS download behavior,
-            any other value for user import.
 
         raise: SavingError should the patch fail to save.
         raise: RenamingError should the patch fail to be renamed.
@@ -137,11 +135,10 @@ class PatchSave(Patch):
             # we need to check if this is a unique patch version
             # (otherwise there is no need to save it).
 
-            # Case 1: Check if this is a compressed patch download.
+            # Case 1: Check if this is a compressed patch import.
             if (
                 "files" in patch[1]
                 and patch[1]["files"][0]["filename"].split(".")[-1] != "bin"
-                and not sd
             ):
                 # We need to check the individual binary files to see which,
                 # if any, differ from the ones currently stored.
@@ -219,76 +216,43 @@ class PatchSave(Patch):
 
             # Case 2: Only one version of the patch existed previously.
             if len(os.listdir(os.path.join(self.back_path, pch))) == 2:
-                name_bin = os.path.join(pch, "{}_v1.bin".format(pch_id))
+                name_bin = os.path.join(pch, "{}_v2.bin".format(pch_id))
                 with open(name_bin, "wb") as f:
                     f.write(patch[0])
-                self.save_metadata_json(patch[1], 1)
+                self.save_metadata_json(patch[1], 2)
                 # Add the version suffix to the patch that was previously
                 # in the directory.
                 try:
                     os.rename(
                         os.path.join(pch, "{}.bin".format(pch_id)),
-                        os.path.join(pch, "{}_v2.bin".format(pch_id)),
+                        os.path.join(pch, "{}_v1.bin".format(pch_id)),
                     )
                     os.rename(
                         os.path.join(pch, "{}.json".format(pch_id)),
-                        os.path.join(pch, "{}_v2.json".format(pch_id)),
+                        os.path.join(pch, "{}_v1.json".format(pch_id)),
                     )
                 except FileNotFoundError or FileExistsError:
                     raise errors.RenamingError(patch, 601)
                 # Update the revision number in the metadata.
                 # (Used for sorting purposes).
-                with open(os.path.join(pch, "{}_v2.json".format(pch_id)), "r") as f:
+                with open(os.path.join(pch, "{}_v1.json".format(pch_id)), "r") as f:
                     jf = json.loads(f.read())
-                jf["revision"] = 2
-                with open(os.path.join(pch, "{}_v2.json".format(pch_id)), "w") as f:
+                jf["revision"] = 1
+                with open(os.path.join(pch, "{}_v1.json".format(pch_id)), "w") as f:
                     json.dump(jf, f)
+
             # Case 3: There were already multiple versions in the patch
             # directory.
             elif len(os.listdir(os.path.join(self.back_path, pch))) > 2:
-                # Increment the version number for each file in the directory.
-                try:
-                    # for file in sorted(os.listdir(pch), key=len):
-                    for file in sorted(
-                        sorted(os.listdir(pch), key=len), key=natural_key, reverse=True
-                    ):
-                        ver = int(file.split("v")[1].split(".")[0]) + 1
-                        extension = file.split(".")[-1]
-                        os.rename(
-                            os.path.join(
-                                pch, "{}_v{}.{}".format(pch_id, str(ver - 1), extension)
-                            ),
-                            os.path.join(
-                                pch, "{}_v{}.{}".format(pch_id, str(ver), extension)
-                            ),
-                        )
-                        # Update the revision number in each metadata file
-                        if extension == "json":
-                            with open(
-                                os.path.join(
-                                    pch, "{}_v{}.json".format(pch_id, str(ver))
-                                ),
-                                "r",
-                            ) as f:
-                                jf = json.loads(f.read())
-
-                            jf["revision"] = ver
-
-                            with open(
-                                os.path.join(
-                                    pch, "{}_v{}.json".format(pch_id, str(ver))
-                                ),
-                                "w",
-                            ) as f:
-                                json.dump(jf, f)
-
-                except FileNotFoundError or FileExistsError:
-                    raise errors.SavingError(patch)
-                # Save the newest version
-                name_bin = os.path.join(pch, "{}_v1.bin".format(pch_id))
+                # Save as newest version
+                fls = sorted(
+                    sorted(os.listdir(pch), key=len), key=natural_key, reverse=True
+                )
+                latest = int(fls[0].split("_v")[-1].split(".")[0]) + 1
+                name_bin = os.path.join(pch, "{}_v{}.bin".format(pch_id, latest))
                 with open(name_bin, "wb") as f:
                     f.write(patch[0])
-                self.save_metadata_json(patch[1], 1)
+                self.save_metadata_json(patch[1], latest)
             else:
                 """Getting here indicates that the amount of files in the
                 directory was less than 2 (which would imply some form of
@@ -407,8 +371,8 @@ class PatchSave(Patch):
                 patch_id = self._generate_patch_id(files[i])
             # Get the bytes.
             temp_path = files[i]
-            if temp_path.split(".")[-1] != "bin":
-                continue
+            # if temp_path.split(".")[-1] != "bin":
+            #     continue
             with open(temp_path, "rb") as f:
                 temp_data = f.read()
 
@@ -452,6 +416,9 @@ class PatchSave(Patch):
                         if js_data["title"].lower() in pch["title"].lower():
                             temp = ps.get_patch_meta(pch["id"])
                             js_data = temp
+                            js_data["files"] = [
+                                {"id": pch["id"], "filename": "{}.{}".format(patch_name, ext)}
+                            ]
                             js_data["updated_at"] = "{:%Y-%m-%dT%H:%M:%S+00:00}".format(
                                 datetime.datetime.now()
                             )
@@ -464,10 +431,10 @@ class PatchSave(Patch):
 
             # Try to save the patch.
             if not version:
-                self.save_to_backend((temp_data, js_data), sd=True)
+                self.save_to_backend((temp_data, js_data))
             else:
                 try:
-                    self.save_to_backend((temp_data, js_data), sd=True)
+                    self.save_to_backend((temp_data, js_data))
                 except errors.SavingError as e:
                     fails += 1
                     e = (

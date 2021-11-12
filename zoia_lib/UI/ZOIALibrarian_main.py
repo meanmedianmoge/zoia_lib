@@ -1065,7 +1065,7 @@ class ZOIALibrarianMain(QMainWindow):
             and self.ui.searchbar_local.text() == ""
             and self.ui.back_btn_local.isEnabled()
         ):
-            util.sort_metadata(7, self.local.get_data_local_version(), False)
+            util.sort_metadata(7, self.local.get_data_local_version(), True)
             self.set_data(version=True)
         # ->Case 3.4: Local tab, it is a version, and text is in the search
         #             bar.
@@ -1076,7 +1076,7 @@ class ZOIALibrarianMain(QMainWindow):
         ):
             if self.search_data_local_version is None:
                 self.search_data_local_version = self.local.get_data_local_version()
-            util.sort_metadata(7, self.search_data_local_version, False)
+            util.sort_metadata(7, self.search_data_local_version, True)
             self.set_data(True, True)
         # Case 4: Sorting on the Folders tab.
         # ->Case 4.1: Sorting on the Folders tab, no version, and an empty search
@@ -1104,7 +1104,7 @@ class ZOIALibrarianMain(QMainWindow):
             and self.ui.searchbar_bank.text() == ""
             and self.ui.back_btn_bank.isEnabled()
         ):
-            util.sort_metadata(7, self.local.get_data_bank_version(), False)
+            util.sort_metadata(7, self.local.get_data_bank_version(), True)
             self.set_data(version=True)
         # ->Case 4.4: Bank tab, it is a version, and text is in the search bar.
         elif (
@@ -1114,7 +1114,7 @@ class ZOIALibrarianMain(QMainWindow):
         ):
             if self.search_data_bank_version is None:
                 self.search_data_bank_version = self.local.get_data_bank_version()
-            util.sort_metadata(7, self.search_data_bank_version, False)
+            util.sort_metadata(7, self.search_data_bank_version, True)
             self.set_data(True, True)
 
     def import_patch(self):
