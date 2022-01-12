@@ -9,6 +9,7 @@ QMessageBox {
 
 QMenu {
     border: #5e616e;
+    background: #000;
 }
 
 QMenu::separator
