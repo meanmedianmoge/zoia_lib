@@ -40,6 +40,7 @@ module_index = {
             "lowpass_output": ["on", "off"],
             "hipass_output": ["off", "on"],
             "bandpass_output": ["off", "on"],
+            "freq_change": ["smooth", "instant"],
         },
     },
     1: {
@@ -824,7 +825,10 @@ module_index = {
             "scale": {"isDefault": False, "isParam": True, "position": 3},
             "cv_output": {"isDefault": True, "isParam": False, "position": 1},
         },
-        "options": {"key_scale_jacks": ["no", "yes"]},
+        "options": {
+            "key_scale_jacks": ["no", "yes"],
+            "scales": ["basic", "extended"],
+        },
     },
     29: {
         "name": "Phaser",
@@ -1336,7 +1340,7 @@ module_index = {
             "delay_time": {"isDefault": True, "isParam": True, "position": 1},
             "cv_output": {"isDefault": True, "isParam": False, "position": 2},
         },
-        "options": {},
+        "options": {"cv_input": ["exponent", "linear"]},
     },
     47: {
         "name": "CV Loop",
@@ -2653,7 +2657,7 @@ module_index = {
             "performance": {"isDefault": False, "isParam": True, "position": 2},
         },
         "options": {
-            "control": ["bypass", "aux", "performance"],
+            "control": ["bypass", "stomp aux", "perform"],
         },
     },
     104: {

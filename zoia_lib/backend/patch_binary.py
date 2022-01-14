@@ -1001,7 +1001,7 @@ class PatchBinary(Patch):
         elif idx == 103:
             if opt[0][1] == "bypass":
                 blocks = [d[0]]
-            elif opt[0][1] == "aux":
+            elif opt[0][1] == "stomp aux":
                 blocks = [d[1]]
             else:
                 blocks = [d[2]]
