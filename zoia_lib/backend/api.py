@@ -248,4 +248,4 @@ class PatchStorage:
         )
 
         # Return the total minus the number of questions found.
-        return int(zoia[:3]) - len(soup_ques.find_all(class_="card"))
+        return int(zoia.split("<")[0]) - len(soup_ques.find_all(class_="card"))
