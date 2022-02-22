@@ -1,17 +1,15 @@
 import glob
 import json
 import os
+import signal
 
 from NodeGraphQt import (
     NodeGraph,
     BaseNode,
-    PropertiesBinWidget,
-    NodeTreeWidget,
     setup_context_menu
 )
 
 from PySide2 import QtCore
-from PySide2.QtGui import QIcon
 from PySide2.QtCore import QEvent, QThread
 from PySide2.QtWidgets import (
     QMainWindow,
@@ -19,7 +17,6 @@ from PySide2.QtWidgets import (
     QInputDialog,
     QPushButton,
     QSpinBox,
-    QWidget,
 )
 
 from zoia_lib.backend.patch_update import PatchUpdate
@@ -27,6 +24,26 @@ from zoia_lib.backend.utilities import hide_dotted_files
 from zoia_lib.common import errors
 
 update = PatchUpdate()
+
+
+class Timeout:
+    """Timeout class using ALARM signal"""
+
+    class Timeout(Exception):
+        pass
+
+    def __init__(self, sec):
+        self.sec = sec
+
+    def __enter__(self):
+        signal.signal(signal.SIGALRM, self.raise_timeout)
+        signal.alarm(self.sec)
+
+    def __exit__(self, *args):
+        signal.alarm(0)  # disable alarm
+
+    def raise_timeout(self, *args):
+        raise Timeout.Timeout()
 
 
 class ZOIALibrarianLocal(QMainWindow):
@@ -762,33 +779,6 @@ class ZOIALibrarianLocal(QMainWindow):
         Currently triggered via a button press.
         """
 
-        class MyNode(BaseNode):
-            """
-            example test node.
-            """
-
-            # set a unique node identifier.
-            __identifier__ = 'com.chantasticvfx'
-
-            # set the initial default node name.
-            NODE_NAME = 'my node'
-
-            def __init__(self):
-                super(MyNode, self).__init__()
-                self.set_color(25, 58, 51)
-
-        # QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
-        # win = QtWidgets.QApplication([])
-
-        win = QWidget()
-        win.setWindowTitle(
-            "Interactive Patch Routing: {}".format(self.curr_viz["name"])
-        )
-        win.setWindowIcon(QIcon(
-            os.path.join(os.getcwd(), "zoia_lib", "UI", "resources",
-                         "logo.ico")))
-        win.setFixedSize(540, 540)
-
         # create node graph.
         graph = NodeGraph()
 
@@ -800,47 +790,18 @@ class ZOIALibrarianLocal(QMainWindow):
         graph_widget.resize(1100, 800)
         graph_widget.show()
 
-        # show the properties bin when a node is "double clicked" in the graph.
-        properties_bin = PropertiesBinWidget(node_graph=graph)
-        properties_bin.setWindowFlags(QtCore.Qt.Tool)
-
-        def show_prop_bin(node):
-            if not properties_bin.isVisible():
-                properties_bin.show()
-
-        graph.node_double_clicked.connect(show_prop_bin)
-
-        # show the nodes list when a node is "double clicked" in the graph.
-        node_tree = NodeTreeWidget(node_graph=graph)
-
-        def show_nodes_list(node):
-            if not node_tree.isVisible():
-                node_tree.update()
-                node_tree.show()
-
-        graph.node_double_clicked.connect(show_nodes_list)
-
         # registered nodes.
-        nodes_to_reg = [
-            # BackdropNode,
-            MyNode,
-            # basic_nodes.FooNode,
-            # basic_nodes.BarNode,
-            # widget_nodes.DropdownMenuNode,
-            # widget_nodes.TextInputNode,
-            # widget_nodes.CheckboxNode
-        ]
+        nodes_to_reg = [BaseNode]
         graph.register_nodes(nodes_to_reg)
 
         pch = self.curr_viz
-
         nodes = {}
         for module in pch['modules']:
             my_node = graph.create_node(
-                'com.chantasticvfx.MyNode',
-                name=(module['type'] if module['name'] == '' else module['name']) + str(module["number"]),
-                color='#0a1e20',
-                text_color='#feab20'
+                'nodeGraphQt.nodes.BaseNode',
+                name=(module['type'] if module['name'] == '' else module['name']),
+                color=self._get_color_hex(module['color']),
+                text_color="000000" if module["color"] != "Blue" else "ffffff"
             )
             inp, outp, in_pos, out_pos = [], [], [], []
             for key, param in module['blocks'].items():
@@ -877,32 +838,48 @@ class ZOIALibrarianLocal(QMainWindow):
         for key, node in nodes.items():
             data.append(node_pos_map(node))
 
-        for conn in pch['connections']:
-            mod, block = conn['source'].split('.')
-            nmod, nblock = conn['destination'].split('.')
-            src = data[int(mod)]
-            dest = data[int(nmod)]
-            try:
-                nodes[int(mod)][0].set_output(
-                    src[int(block)],
-                    nodes[int(nmod)][0].input(dest[int(nblock)])
-                )
-            except KeyError as e:
-                print(conn, e)
-            except IndexError as e:
-                print(conn, e)
+        with Timeout(5):
+            for conn in pch['connections']:
+                mod, block = conn['source'].split('.')
+                nmod, nblock = conn['destination'].split('.')
+                src = data[int(mod)]
+                dest = data[int(nmod)]
+                try:
+                    nodes[int(mod)][0].set_output(
+                        src[int(block)],
+                        nodes[int(nmod)][0].input(dest[int(nblock)])
+                    )
+                except KeyError as e:
+                    print(conn, e)
+                except IndexError as e:
+                    print(conn, e)
+                except Timeout.Timeout:
+                    self.ui.statusbar.showMessage("Expand incomplete.", timeout=5000)
+                    self.msg.setWindowTitle("Patch Expand Failed")
+                    self.msg.setText("During construction of the expanded view of the patch, "
+                                     "certain connections could not be made.")
+                    self.msg.setIcon(QMessageBox.Warning)
+                    self.msg.setStandardButtons(QMessageBox.Ok)
+                    self.msg.exec_()
+                    self.msg.setInformativeText(None)
+                    self.msg.setDetailedText(None)
+                    break
         print('done making connections')
 
         # auto layout nodes.
-        graph.auto_layout_nodes()
-
-        # wrap a backdrop node.
-        # backdrop_node = graph.create_node('nodeGraphQt.nodes.BackdropNode')
-        # backdrop_node.wrap_nodes([text_node, checkbox_node])
-
+        try:
+            graph.auto_layout_nodes()
+        except RecursionError as e:
+            self.ui.statusbar.showMessage("Expand incomplete.", timeout=5000)
+            self.msg.setWindowTitle("Auto Layout Failed")
+            self.msg.setText("During construction of the expanded view of the patch, "
+                             "the automated layout failed.")
+            self.msg.setIcon(QMessageBox.Warning)
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+            self.msg.setInformativeText(None)
+            self.msg.setDetailedText(None)
         graph.fit_to_selection()
-
-        win.exec_()
 
     def viz_page(self):
         """Either increases or decreases the current visualizer page,

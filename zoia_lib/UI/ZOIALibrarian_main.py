@@ -126,8 +126,8 @@ class ZOIALibrarianMain(QMainWindow):
         self.worker_version_sd = ImportVersionSDWorker(self)
         self.worker_version_sd.signal.connect(self._version_import_done)
 
-        self.worker_expander = DisplayExpandedRouting(self)
-        self.worker_expander.signal.connect(self.expand_patch_done)
+        # self.worker_expander = DisplayExpandedRouting(self)
+        # self.worker_expander.signal.connect(self.expand_patch_done)
 
         # Get the data necessary for the PS tab.
         self.ps.metadata_init()
@@ -1341,27 +1341,27 @@ class ZOIALibrarianMain(QMainWindow):
             # Reload the table to show the new patches.
             self.local.get_local_patches()
 
-    def expand_patch_thread(self):
-        """Initializes a Worker thread to load the expanded display
-        of a given binary patch.
-        """
-
-        # Disable the necessary buttons and start the thread.
-        self.ui.btn_show_routing.setEnabled(False)
-        self.ui.check_for_updates_btn.setEnabled(False)
-        self.ui.refresh_pch_btn.setEnabled(False)
-        self.ui.btn_dwn_all.setEnabled(False)
-        self.ui.statusbar.showMessage("Generating the expanded view...")
-        self.worker_expander.start()
-
-    def expand_patch_done(self, msg):
-        """"""
-
-        # Re-enable the buttons now that the thread is done.
-        self.ui.btn_show_routing.setEnabled(True)
-        self.ui.check_for_updates_btn.setEnabled(True)
-        self.ui.refresh_pch_btn.setEnabled(True)
-        self.ui.btn_dwn_all.setEnabled(True)
+    # def expand_patch_thread(self):
+    #     """Initializes a Worker thread to load the expanded display
+    #     of a given binary patch.
+    #     """
+    #
+    #     # Disable the necessary buttons and start the thread.
+    #     self.ui.btn_show_routing.setEnabled(False)
+    #     self.ui.check_for_updates_btn.setEnabled(False)
+    #     self.ui.refresh_pch_btn.setEnabled(False)
+    #     self.ui.btn_dwn_all.setEnabled(False)
+    #     self.ui.statusbar.showMessage("Generating the expanded view...")
+    #     self.worker_expander.start()
+    #
+    # def expand_patch_done(self, msg):
+    #     """"""
+    #
+    #     # Re-enable the buttons now that the thread is done.
+    #     self.ui.btn_show_routing.setEnabled(True)
+    #     self.ui.check_for_updates_btn.setEnabled(True)
+    #     self.ui.refresh_pch_btn.setEnabled(True)
+    #     self.ui.btn_dwn_all.setEnabled(True)
 
     def eventFilter(self, o, e):
         """Deals with events that originate from various widgets
@@ -1630,27 +1630,27 @@ class ImportVersionSDWorker(QThread):
         self.signal.emit(count, fail_cnt, fails)
 
 
-class DisplayExpandedRouting(QThread):
-    """The DisplayExpandedRouting class runs as a separate thread in the
-    application to prevent application snag. This thread will attempt
-    to display the expanded routing for a given binary file on the
-    Local Storage tab.
-    """
-
-    # UI communication
-    signal = QtCore.Signal(str)
-
-    def __init__(self, window):
-        """Initializes the thread."""
-
-        QThread.__init__(self)
-        self.window = window
-
-    def run(self):
-        """Attempts to display the expanded patch for a given binary file.
-        Currently triggered by a button press.
-        """
-
-        curr_viz = self.window.local.get_viz()
-        self.window.local.setup_exp(curr_viz)
-        self.signal.emit("Pass")
+# class DisplayExpandedRouting(QThread):
+#     """The DisplayExpandedRouting class runs as a separate thread in the
+#     application to prevent application snag. This thread will attempt
+#     to display the expanded routing for a given binary file on the
+#     Local Storage tab.
+#     """
+#
+#     # UI communication
+#     signal = QtCore.Signal(str)
+#
+#     def __init__(self, window):
+#         """Initializes the thread."""
+#
+#         QThread.__init__(self)
+#         self.window = window
+#
+#     def run(self):
+#         """Attempts to display the expanded patch for a given binary file.
+#         Currently triggered by a button press.
+#         """
+#
+#         curr_viz = self.window.local.get_viz()
+#         setup_exp(curr_viz)
+#         self.signal.emit()
