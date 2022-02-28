@@ -1,7 +1,6 @@
 import glob
 import json
 import os
-import signal
 
 from NodeGraphQt import (
     NodeGraph,
@@ -20,30 +19,10 @@ from PySide2.QtWidgets import (
 )
 
 from zoia_lib.backend.patch_update import PatchUpdate
-from zoia_lib.backend.utilities import hide_dotted_files
+from zoia_lib.backend.utilities import hide_dotted_files, exit_after
 from zoia_lib.common import errors
 
 update = PatchUpdate()
-
-
-class Timeout:
-    """Timeout class using ALARM signal"""
-
-    class Timeout(Exception):
-        pass
-
-    def __init__(self, sec):
-        self.sec = sec
-
-    def __enter__(self):
-        signal.signal(signal.SIGALRM, self.raise_timeout)
-        signal.alarm(self.sec)
-
-    def __exit__(self, *args):
-        signal.alarm(0)  # disable alarm
-
-    def raise_timeout(self, *args):
-        raise Timeout.Timeout()
 
 
 class ZOIALibrarianLocal(QMainWindow):
@@ -838,33 +817,37 @@ class ZOIALibrarianLocal(QMainWindow):
         for key, node in nodes.items():
             data.append(node_pos_map(node))
 
-        with Timeout(5):
-            for conn in pch['connections']:
-                mod, block = conn['source'].split('.')
-                nmod, nblock = conn['destination'].split('.')
-                src = data[int(mod)]
-                dest = data[int(nmod)]
-                try:
-                    nodes[int(mod)][0].set_output(
-                        src[int(block)],
-                        nodes[int(nmod)][0].input(dest[int(nblock)])
-                    )
-                except KeyError as e:
-                    print(conn, e)
-                except IndexError as e:
-                    print(conn, e)
-                except Timeout.Timeout:
-                    self.ui.statusbar.showMessage("Expand incomplete.", timeout=5000)
-                    self.msg.setWindowTitle("Patch Expand Failed")
-                    self.msg.setText("During construction of the expanded view of the patch, "
-                                     "certain connections could not be made.")
-                    self.msg.setIcon(QMessageBox.Warning)
-                    self.msg.setStandardButtons(QMessageBox.Ok)
-                    self.msg.exec_()
-                    self.msg.setInformativeText(None)
-                    self.msg.setDetailedText(None)
-                    break
-        print('done making connections')
+        @exit_after(3)
+        def make_connections(mod, block, nmod, nblock, src, dest):
+            try:
+                nodes[int(mod)][0].set_output(
+                    src[int(block)],
+                    nodes[int(nmod)][0].input(dest[int(nblock)])
+                )
+            except KeyError as e:
+                print(conn, e)
+            except IndexError as e:
+                print(conn, e)
+
+        for conn in pch['connections']:
+            mod, block = conn['source'].split('.')
+            nmod, nblock = conn['destination'].split('.')
+            src = data[int(mod)]
+            dest = data[int(nmod)]
+            try:
+                make_connections(mod, block, nmod, nblock, src, dest)
+            except KeyboardInterrupt:
+                graph.fit_to_selection()
+                self.ui.statusbar.showMessage("Expand incomplete.", timeout=5000)
+                self.msg.setWindowTitle("Patch Expand Failed")
+                self.msg.setText("During construction of the expanded view of the patch, "
+                                 "certain connections could not be made.")
+                self.msg.setIcon(QMessageBox.Warning)
+                self.msg.setStandardButtons(QMessageBox.Ok)
+                self.msg.exec_()
+                self.msg.setInformativeText(None)
+                self.msg.setDetailedText(None)
+                return
 
         # auto layout nodes.
         try:

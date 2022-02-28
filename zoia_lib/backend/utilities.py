@@ -2,6 +2,9 @@ import json
 import os
 import re
 import sys
+# import signal
+import _thread as thread
+import threading
 
 from zoia_lib.common import errors
 
@@ -236,3 +239,58 @@ def add_test_patch(name, idx, path):
     name_json = os.path.join(pch, "{}.json".format(name))
     with open(name_json, "w") as jf:
         json.dump({"id": idx, "title": "Test", "created_at": "test"}, jf)
+
+
+def quit_function(fn_name):
+    # print to stderr, unbuffered in Python 2.
+    print('{0} took too long'.format(fn_name), file=sys.stderr)
+    sys.stderr.flush()  # Python 3 stderr is likely buffered.
+    thread.interrupt_main()  # raises KeyboardInterrupt
+
+
+def exit_after(s):
+    """Use as decorator to exit process if
+    function takes longer than s seconds.
+    """
+    def outer(fn):
+        def inner(*args, **kwargs):
+            timer = threading.Timer(s, quit_function, args=[fn.__name__])
+            timer.start()
+            try:
+                result = fn(*args, **kwargs)
+            finally:
+                timer.cancel()
+            return result
+        return inner
+    return outer
+
+
+# class Timeout:
+#     """Timeout class using ALARM signal.
+#
+#     UNIX only, does not work on Windows
+#     See exit_after decorator above for cross-plat
+#
+#     Usage:
+#     with Timeout(3):
+#         try:
+#             func()
+#         except Timeout.Timeout:
+#             break
+#     """
+#
+#     class Timeout(Exception):
+#         pass
+#
+#     def __init__(self, sec):
+#         self.sec = sec
+#
+#     def __enter__(self):
+#         signal.signal(signal.SIGALRM, self.raise_timeout)
+#         signal.alarm(self.sec)
+#
+#     def __exit__(self, *args):
+#         signal.alarm(0)  # disable alarm
+#
+#     def raise_timeout(self, *args):
+#         raise Timeout.Timeout()
