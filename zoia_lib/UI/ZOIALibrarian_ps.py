@@ -74,14 +74,12 @@ class ZOIALibrarianPS(QMainWindow):
                 f.write(json.dumps(ps_data))
                 self.data_PS = ps_data
         except:
-            # Let the user know if an internet connect can't be established.
-            self.ui.statusbar.showMessage("No internet connection.", timeout=5000)
-            self.msg.setWindowTitle("No Internet Connection")
+            # Let the user know the API failed.
+            self.ui.statusbar.showMessage("API connection failed.", timeout=5000)
+            self.msg.setWindowTitle("API Error")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText(
-                "Failed to retrieve patches from PatchStorage.\n"
-                "Please check your internet connection and try "
-                "again."
+                "Failed to retrieve the patch metadata from PatchStorage."
             )
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
@@ -144,7 +142,8 @@ class ZOIALibrarianPS(QMainWindow):
         self.ui.statusbar.showMessage(
             "Trying to download patch #{} of {}".format(
                 i + 1, self.ui.table_PS.rowCount()
-            ), timeout=5000
+            ),
+            timeout=5000,
         )
 
     def _download_all_done(self, cnt, fails):
@@ -157,7 +156,9 @@ class ZOIALibrarianPS(QMainWindow):
         """
 
         # Notify the user via a popup.
-        self.ui.statusbar.showMessage("All patches successfully downloaded.", timeout=5000)
+        self.ui.statusbar.showMessage(
+            "All patches successfully downloaded.", timeout=5000
+        )
         self.msg.setWindowTitle("Download Complete")
         self.msg.setIcon(QMessageBox.Information)
         self.msg.setText("Successfully downloaded {} patch(es)." "".format(cnt))
@@ -212,15 +213,11 @@ class ZOIALibrarianPS(QMainWindow):
             self.msg.exec_()
             self.msg.setInformativeText(None)
         except:
-            # Let the user know if an internet connect can't be established.
-            self.ui.statusbar.showMessage("No internet connection.", timeout=5000)
-            self.msg.setWindowTitle("No Internet Connection")
+            # Let the user know the API failed.
+            self.ui.statusbar.showMessage("API connection failed.", timeout=5000)
+            self.msg.setWindowTitle("API Error")
             self.msg.setIcon(QMessageBox.Information)
-            self.msg.setText(
-                "Failed to retrieve patches from PatchStorage.\n"
-                "Please check your internet connection and try "
-                "again."
-            )
+            self.msg.setText("Failed to download the patch from PatchStorage.")
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
             self.msg.setInformativeText(None)
@@ -303,15 +300,11 @@ class DownloadAllWorker(QThread):
                     self.signal_2.emit(i)
             self.signal.emit(self.cnt, self.fails)
         except:
-            # Let the user know if an internet connect can't be established.
-            self.ui.statusbar.showMessage("No internet connection.", timeout=5000)
-            self.msg.setWindowTitle("No Internet Connection")
+            # Let the user know the API failed.
+            self.ui.statusbar.showMessage("API connection failed.", timeout=5000)
+            self.msg.setWindowTitle("API Error")
             self.msg.setIcon(QMessageBox.Information)
-            self.msg.setText(
-                "Failed to download patches from PatchStorage.\n"
-                "Please check your internet connection and try"
-                "again."
-            )
+            self.msg.setText("Failed to download the patch from PatchStorage.")
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
             self.msg.setInformativeText(None)
@@ -349,15 +342,11 @@ class ReloadPSWorker(QThread):
                 f.write(json.dumps(self.api.get_all_patch_data_init()))
             self.signal.emit()
         except:
-            # Let the user know if an internet connect can't be established.
-            self.ui.statusbar.showMessage("No internet connection.", timeout=5000)
-            self.msg.setWindowTitle("No Internet Connection")
+            # Let the user know the API failed.
+            self.ui.statusbar.showMessage("API connection failed.", timeout=5000)
+            self.msg.setWindowTitle("API Error")
             self.msg.setIcon(QMessageBox.Information)
-            self.msg.setText(
-                "Failed to download the patch from "
-                "PatchStorage.\nPlease check your internet "
-                "connection and try again."
-            )
+            self.msg.setText("Failed to download the patch from PatchStorage.")
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
             self.msg.setInformativeText(None)

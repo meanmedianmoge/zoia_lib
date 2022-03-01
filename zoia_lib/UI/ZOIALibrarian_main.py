@@ -113,6 +113,8 @@ class ZOIALibrarianMain(QMainWindow):
         self.bank_sizes = None
         self.font = None
         self.local_pch_count = -1
+        self.tab_1 = -1
+        self.tab_3 = -1
         self.add_rating = None
 
         # Threads
@@ -417,7 +419,22 @@ class ZOIALibrarianMain(QMainWindow):
                 )
                 or self.local_pch_count == -1
                 or self.local_pch_count != len(os.listdir(self.path))
+                or self.tab_1 != self.tab_3
             ):
+                # tab toggle to allow other table to refresh
+                if (
+                    self.local_pch_count != len(os.listdir(self.path))
+                    and self.local_pch_count != -1
+                ) or self.tab_1 != self.tab_3:
+                    if self.ui.tabs.currentIndex() == 1:
+                        self.tab_1 = 0
+                    if self.ui.tabs.currentIndex() == 3:
+                        self.tab_3 = 0
+
+                    if self.tab_1 == self.tab_3:
+                        self.tab_1 = -1
+                        self.tab_3 = -1
+
                 self.local.get_local_patches()
                 self.local_pch_count = len(os.listdir(self.path))
             # Context cleanup
@@ -797,15 +814,15 @@ class ZOIALibrarianMain(QMainWindow):
                         # Add it to the cache for next time.
                         self.patch_cache.append(content)
                     except:
-                        # Let the user know they aren't connected to the
-                        # internet.
-                        self.ui.statusbar.showMessage("No internet connection.", timeout=5000)
-                        self.msg.setWindowTitle("No Internet Connection")
+                        # Let the user know the API failed.
+                        self.ui.statusbar.showMessage(
+                            "API connection failed.", timeout=5000
+                        )
+                        self.msg.setWindowTitle("API Error")
                         self.msg.setIcon(QMessageBox.Information)
                         self.msg.setText(
                             "Failed to retrieve the patch metadata "
-                            "from PatchStorage.\nPlease check your internet "
-                            "connection and try again."
+                            "from PatchStorage."
                         )
                         self.msg.setStandardButtons(QMessageBox.Ok)
                         self.msg.exec_()
@@ -1133,14 +1150,15 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setText("The patch has been successfully imported.")
             self.msg.exec_()
             # Reload the tables if we are currently displaying them.
-            if (
-                self.ui.tabs.currentIndex() == 1
-                and not self.ui.back_btn_local.isEnabled()
-            ) or (
-                self.ui.tabs.currentIndex() == 3
-                and not self.ui.back_btn_bank.isEnabled()
-            ):
-                self.local.get_local_patches()
+            self.tab_switch()
+            # if (
+            #     self.ui.tabs.currentIndex() == 1
+            #     and not self.ui.back_btn_local.isEnabled()
+            # ) or (
+            #     self.ui.tabs.currentIndex() == 3
+            #     and not self.ui.back_btn_bank.isEnabled()
+            # ):
+            #     self.local.get_local_patches()
         # Let the user know of any errors that occurred.
         except errors.BadPathError:
             self.ui.statusbar.showMessage("Import failed.", timeout=5000)
@@ -1236,13 +1254,14 @@ class ZOIALibrarianMain(QMainWindow):
         self.msg.exec_()
         self.msg.setInformativeText(None)
         self.msg.setDetailedText(None)
-        if (
-            self.ui.tabs.currentIndex() == 1 and not self.ui.back_btn_local.isEnabled()
-        ) or (
-            self.ui.tabs.currentIndex() == 3 and not self.ui.back_btn_bank.isEnabled()
-        ):
-            # Reload the table to show the new patches.
-            self.local.get_local_patches()
+        self.tab_switch()
+        # if (
+        #     self.ui.tabs.currentIndex() == 1 and not self.ui.back_btn_local.isEnabled()
+        # ) or (
+        #     self.ui.tabs.currentIndex() == 3 and not self.ui.back_btn_bank.isEnabled()
+        # ):
+        #     # Reload the table to show the new patches.
+        #     self.local.get_local_patches()
 
     def _version_import_thread(self):
         """Initializes a Worker thread to manage the importing of
@@ -1333,13 +1352,14 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.exec_()
             self.msg.setInformativeText(None)
             self.msg.setDetailedText(None)
-        if (
-            self.ui.tabs.currentIndex() == 1 and not self.ui.back_btn_local.isEnabled()
-        ) or (
-            self.ui.tabs.currentIndex() == 3 and not self.ui.back_btn_bank.isEnabled()
-        ):
-            # Reload the table to show the new patches.
-            self.local.get_local_patches()
+        self.tab_switch()
+        # if (
+        #     self.ui.tabs.currentIndex() == 1 and not self.ui.back_btn_local.isEnabled()
+        # ) or (
+        #     self.ui.tabs.currentIndex() == 3 and not self.ui.back_btn_bank.isEnabled()
+        # ):
+        #     # Reload the table to show the new patches.
+        #     self.local.get_local_patches()
 
     # def expand_patch_thread(self):
     #     """Initializes a Worker thread to load the expanded display

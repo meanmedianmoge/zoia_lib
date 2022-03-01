@@ -2,11 +2,7 @@ import glob
 import json
 import os
 
-from NodeGraphQt import (
-    NodeGraph,
-    BaseNode,
-    setup_context_menu
-)
+from NodeGraphQt import NodeGraph, BaseNode, setup_context_menu
 
 from PySide2 import QtCore
 from PySide2.QtCore import QEvent, QThread
@@ -237,6 +233,8 @@ class ZOIALibrarianLocal(QMainWindow):
             self.ui.back_btn_local.setEnabled(False)
             self.ui.searchbar_local.setText("")
 
+        # self.window.tab_switch()
+
     def initiate_export(self):
         """Attempts to export a patch saved in the backend to an SD
         card. This requires that the user has previously set their SD
@@ -374,7 +372,9 @@ class ZOIALibrarianLocal(QMainWindow):
                             (len(os.listdir(os.path.join(self.path, idx))) / 2) - 1
                         )
                         if slot + pch_num > 63:
-                            self.ui.statusbar.showMessage("Export failed.", timeout=5000)
+                            self.ui.statusbar.showMessage(
+                                "Export failed.", timeout=5000
+                            )
                             self.msg.setWindowTitle("No Space")
                             self.msg.setIcon(QMessageBox.Information)
                             self.msg.setText(
@@ -419,7 +419,9 @@ class ZOIALibrarianLocal(QMainWindow):
                                                 "Export complete.", timeout=5000
                                             )
                                             slot += 1
-                                    self.ui.statusbar.showMessage("Export complete.", timeout=5000)
+                                    self.ui.statusbar.showMessage(
+                                        "Export complete.", timeout=5000
+                                    )
                                     # self.msg.setIcon(QMessageBox.Information)
                                     # self.msg.setWindowTitle("Export Complete")
                                     # self.msg.setText(
@@ -437,7 +439,9 @@ class ZOIALibrarianLocal(QMainWindow):
                                             ver, export_path, slot
                                         )
                                         slot += 1
-                                self.ui.statusbar.showMessage("Export complete.", timeout=5000)
+                                self.ui.statusbar.showMessage(
+                                    "Export complete.", timeout=5000
+                                )
                                 # self.msg.setIcon(QMessageBox.Information)
                                 # self.msg.setWindowTitle("Export Complete")
                                 # self.msg.setText(
@@ -579,11 +583,10 @@ class ZOIALibrarianLocal(QMainWindow):
             for ver in sorted(os.listdir(os.path.join(self.path, idx))):
                 if ver.endswith(".json"):
                     update.update_data(ver.split(".")[0], value, 6)
-        if not self.ui.back_btn_local.isEnabled():
-            self.get_local_patches()
-        else:
-            self.get_version_patches(True)
-        self.ui.statusbar.showMessage("Successfully updated patch rating.", timeout=5000)
+        self.window.tab_3 = 0
+        self.ui.statusbar.showMessage(
+            "Successfully updated patch rating.", timeout=5000
+        )
 
     def update_patch_notes(self):
         """Updates the patch notes for a patch that has been previously
@@ -650,7 +653,9 @@ class ZOIALibrarianLocal(QMainWindow):
             else:
                 self.get_version_patches(True)
         self.prev_tag_cat = None
-        self.ui.statusbar.showMessage("Successfully updated patch tags/cats.", timeout=5000)
+        self.ui.statusbar.showMessage(
+            "Successfully updated patch tags/cats.", timeout=5000
+        )
 
     def events(self, e):
         """Handles events that relate updating the tags/categories
@@ -775,16 +780,16 @@ class ZOIALibrarianLocal(QMainWindow):
 
         pch = self.curr_viz
         nodes = {}
-        for module in pch['modules']:
+        for module in pch["modules"]:
             my_node = graph.create_node(
-                'nodeGraphQt.nodes.BaseNode',
-                name=(module['type'] if module['name'] == '' else module['name']),
-                color=self._get_color_hex(module['color']),
-                text_color="000000" if module["color"] != "Blue" else "ffffff"
+                "nodeGraphQt.nodes.BaseNode",
+                name=(module["type"] if module["name"] == "" else module["name"]),
+                color=self._get_color_hex(module["color"]),
+                text_color="000000" if module["color"] != "Blue" else "ffffff",
             )
             inp, outp, in_pos, out_pos = [], [], [], []
-            for key, param in module['blocks'].items():
-                if 'in' in key:
+            for key, param in module["blocks"].items():
+                if "in" in key:
                     my_node.add_input(key)
                     inp.append(key)
                     in_pos.append(int(param["position"]))
@@ -792,7 +797,7 @@ class ZOIALibrarianLocal(QMainWindow):
                     my_node.add_input(key)
                     inp.append(key)
                     in_pos.append(int(param["position"]))
-                elif 'out' in key:
+                elif "out" in key:
                     my_node.add_output(key)
                     outp.append(key)
                     out_pos.append(int(param["position"]))
@@ -821,17 +826,16 @@ class ZOIALibrarianLocal(QMainWindow):
         def make_connections(mod, block, nmod, nblock, src, dest):
             try:
                 nodes[int(mod)][0].set_output(
-                    src[int(block)],
-                    nodes[int(nmod)][0].input(dest[int(nblock)])
+                    src[int(block)], nodes[int(nmod)][0].input(dest[int(nblock)])
                 )
             except KeyError as e:
                 print(conn, e)
             except IndexError as e:
                 print(conn, e)
 
-        for conn in pch['connections']:
-            mod, block = conn['source'].split('.')
-            nmod, nblock = conn['destination'].split('.')
+        for conn in pch["connections"]:
+            mod, block = conn["source"].split(".")
+            nmod, nblock = conn["destination"].split(".")
             src = data[int(mod)]
             dest = data[int(nmod)]
             try:
@@ -840,8 +844,10 @@ class ZOIALibrarianLocal(QMainWindow):
                 graph.fit_to_selection()
                 self.ui.statusbar.showMessage("Expand incomplete.", timeout=5000)
                 self.msg.setWindowTitle("Patch Expand Failed")
-                self.msg.setText("During construction of the expanded view of the patch, "
-                                 "certain connections could not be made.")
+                self.msg.setText(
+                    "During construction of the expanded view of the patch, "
+                    "certain connections could not be made."
+                )
                 self.msg.setIcon(QMessageBox.Warning)
                 self.msg.setStandardButtons(QMessageBox.Ok)
                 self.msg.exec_()
@@ -855,8 +861,10 @@ class ZOIALibrarianLocal(QMainWindow):
         except RecursionError as e:
             self.ui.statusbar.showMessage("Expand incomplete.", timeout=5000)
             self.msg.setWindowTitle("Auto Layout Failed")
-            self.msg.setText("During construction of the expanded view of the patch, "
-                             "the automated layout failed.")
+            self.msg.setText(
+                "During construction of the expanded view of the patch, "
+                "the automated layout failed."
+            )
             self.msg.setIcon(QMessageBox.Warning)
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
