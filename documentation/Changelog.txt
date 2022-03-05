@@ -25,6 +25,7 @@ Fixes
 - Fixed an issue related to creating new versions of a patch (would cause Folders to index the wrong file).
 - Fixed an issue with sorting related to version histories.
 - Fixed an issue where the theme toggle would break, also adjusted CSS for Windows.
+- Fixed an issue where deleting all besides one patch in a version history would disable the back button.
 - Fixed an issue related to patch deletion (file would remain due to an error).
 - Re-resolved issues with compiling the app (Mac Big Sur).
 

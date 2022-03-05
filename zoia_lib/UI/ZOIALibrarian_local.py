@@ -230,7 +230,7 @@ class ZOIALibrarianLocal(QMainWindow):
         # a deletion.
         if self.ui.back_btn_local.isEnabled() and self.ui.table_local.rowCount() == 1:
             self.get_local_patches()
-            self.ui.back_btn_local.setEnabled(False)
+            self.go_back()
             self.ui.searchbar_local.setText("")
 
         # self.window.tab_switch()
@@ -549,7 +549,12 @@ class ZOIALibrarianLocal(QMainWindow):
         """
 
         # Do the necessary cleanup depending on the context.
-        if self.sender().objectName() == "back_btn_local":
+        if self.sender().objectName() == "back_btn_bank":
+            self.ui.searchbar_bank.setText(self.prev_search)
+            self.ui.text_browser_bank.setText("")
+            self.ui.back_btn_bank.setEnabled(False)
+        else:
+            # self.sender().objectName() == "back_btn_local":
             self.ui.searchbar_local.setText(self.prev_search)
             self.ui.text_browser_local.setText("")
             self.ui.page_label.setText("")
@@ -560,10 +565,7 @@ class ZOIALibrarianLocal(QMainWindow):
             self.ui.btn_prev_page.setEnabled(False)
             self.ui.btn_next_page.setEnabled(False)
             self.viz_disable()
-        elif self.sender().objectName() == "back_btn_bank":
-            self.ui.searchbar_bank.setText(self.prev_search)
-            self.ui.text_browser_bank.setText("")
-            self.ui.back_btn_bank.setEnabled(False)
+
         # Sort and display the data.
         self.sort_and_set()
 

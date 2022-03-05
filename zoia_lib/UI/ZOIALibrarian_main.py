@@ -1308,7 +1308,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-        elif count > fail_cnt > 1:
+        elif count > fail_cnt >= 1:
             self.ui.statusbar.showMessage("Import partially complete.", timeout=5000)
             self.msg.setWindowTitle("Warning")
             word = "was" if fail_cnt == 1 else "were"
