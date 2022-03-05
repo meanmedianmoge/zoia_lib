@@ -1,3 +1,41 @@
+Version 1.2 (March 2022)
+
+New Features
+- Added a Patch Expander view, which displays the full routing of each patch in a separate UI window.
+    - This is accessed by selecting a patch in the Local Storage tab and clicking "Expand".
+    - Routing goes from left to right.
+- With the release of the ZOIA Euroburo, new modules were added, so the app now supports those.
+    - This resolves any issues with viewing, importing, exporting, etc patches that originated on Zebu.
+- Thanks to an API update, PS author search is now possible.
+- Table views are now automatically refreshed upon certain actions (patch download, rating update, etc).
+    - This avoids needing to re-enter a tab or hit enter in the search bar to force a refresh.
+- Added support for importing zipped files.
+- You can now sort within version histories: default is descending version #.
+- Updated the module index to reflect a few firmware changes.
+- Included the option to sort tables by Tags and Categories.
+- Improved message text and UI display.
+
+Fixes
+- Fixed an issue where a user could not connect to PS even with internet.
+- Fixed an issue with fetching PS patches (only the recent 100 would show once 1k patches were uploaded).
+- Fixed an issue with the Update Patches function where it would fail without warning.
+- Fixed an issue with the PS webscraper related to urllib (Windows).
+- Fixed an issue with SD folder selection and exporting.
+- Fixed an issue when trying to import a patch into a version history.
+- Fixed an issue related to creating new versions of a patch (would cause Folders to index the wrong file).
+- Fixed an issue with sorting related to version histories.
+- Fixed an issue where the theme toggle would break, also adjusted CSS for Windows.
+- Fixed an issue related to patch deletion (file would remain due to an error).
+- Re-resolved issues with compiling the app (Mac Big Sur).
+
+Known Issues
+- The expander can sometimes fail to fully construct patches due to memory constraints.
+    - Optimizations will be coming in future updates to the app.
+
+Future Plans
+- Optimize the Patch Expander, by adding color-coding, variable views, and other useful features.
+- Continue development on patch editing and creation tools.
+
 Version 1.1 (July 2021)
 
 New Features
@@ -52,7 +90,6 @@ Known Issues
 Future Plans
 - Fully implement the Patch Expander view and improve its features.
 - Provide patch editing and patch creation.
-- An iPadOS version is coming soon! There are no plans for an Android release at this time.
 
 _________________________________________
 

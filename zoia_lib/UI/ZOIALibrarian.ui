@@ -2997,6 +2997,10 @@
     <addaction name="actionSort_by_author_Z_A"/>
     <addaction name="actionSort_by_rating_high_low"/>
     <addaction name="actionSort_by_rating_low_high"/>
+    <addaction name="actionSort_by_category_high_low"/>
+    <addaction name="actionSort_by_category_low_high"/>
+    <addaction name="actionSort_by_tag_high_low"/>
+    <addaction name="actionSort_by_tag_low_high"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
@@ -3481,6 +3485,38 @@
   <action name="actionSpecify_Default_Export_Directory">
    <property name="text">
     <string>Specify Default Export Directory</string>
+   </property>
+  </action>
+  <action name="actionSort_by_category_high_low">
+   <property name="text">
+    <string>Sort by category (high-low)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+1</string>
+   </property>
+  </action>
+  <action name="actionSort_by_category_low_high">
+   <property name="text">
+    <string>Sort by category (low-high)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+2</string>
+   </property>
+  </action>
+  <action name="actionSort_by_tag_high_low">
+   <property name="text">
+    <string>Sort by tag (high-low)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+9</string>
+   </property>
+  </action>
+  <action name="actionSort_by_tag_low_high">
+   <property name="text">
+    <string>Sort by tag (low-high)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+0</string>
    </property>
   </action>
  </widget>

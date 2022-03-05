@@ -21,6 +21,8 @@ def sort_metadata(mode, data, rev):
           - 6 -> Sort by date modified
           - 7 -> Sort by revision
           - 8 -> Sort by rating (local and folder tabs only)
+          - 9 -> Sort by category
+          - 10 -> Sort by tag
     data: An array of metadata that is to be sorted.
     inc: True if the data should be sorted in reverse,
          false otherwise.
@@ -34,7 +36,7 @@ def sort_metadata(mode, data, rev):
     # Input checking.
     if mode is None or data is None or rev is None:
         raise errors.SortingError(mode, 903)
-    if mode < 1 or mode > 8:
+    if mode < 1 or mode > 10:
         raise errors.SortingError(mode, 901)
     if not isinstance(data, list):
         raise errors.SortingError(data, 902)
@@ -73,6 +75,21 @@ def sort_metadata(mode, data, rev):
     elif mode == 8:
         # Sort by rating (local and folder tabs only)
         data.sort(key=lambda x: x["rating"] if "rating" in x else 0, reverse=rev)
+    elif mode == 9:
+        # Sort by category
+        data.sort(
+            key=lambda x: [", ".join(y["name"] for y in x["categories"])], reverse=rev
+        )
+        # [[', '.join(y['name'] for y in x['categories'])] for x in data]
+    elif mode == 10:
+        # Sort by tag
+        data.sort(
+            key=lambda x: [
+                ", ".join(y["name"].lower().replace("#", "") for y in x["tags"])
+            ],
+            reverse=rev,
+        )
+        # [[', '.join(y['name'].lower() for y in x['tags'])] for x in data]
 
 
 def search_patches(data, query):
@@ -207,7 +224,9 @@ def meipass(resource, is_ui=False):
 
     if is_ui:
         resource = str(resource).split("/")[-1]
-        bundle_dir = getattr(sys, "_MEIPASS", os.path.abspath(os.path.dirname(__file__)))
+        bundle_dir = getattr(
+            sys, "_MEIPASS", os.path.abspath(os.path.dirname(__file__))
+        )
         file_path = os.path.abspath(os.path.join(bundle_dir, resource))
         return file_path
     else:
@@ -243,7 +262,7 @@ def add_test_patch(name, idx, path):
 
 def quit_function(fn_name):
     # print to stderr, unbuffered in Python 2.
-    print('{0} took too long'.format(fn_name), file=sys.stderr)
+    print("{0} took too long".format(fn_name), file=sys.stderr)
     sys.stderr.flush()  # Python 3 stderr is likely buffered.
     thread.interrupt_main()  # raises KeyboardInterrupt
 
@@ -252,6 +271,7 @@ def exit_after(s):
     """Use as decorator to exit process if
     function takes longer than s seconds.
     """
+
     def outer(fn):
         def inner(*args, **kwargs):
             timer = threading.Timer(s, quit_function, args=[fn.__name__])

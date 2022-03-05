@@ -254,6 +254,10 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.actionSort_by_author_Z_A.triggered.connect(self.sort_and_set)
         self.ui.actionSort_by_rating_high_low.triggered.connect(self.sort_and_set)
         self.ui.actionSort_by_rating_low_high.triggered.connect(self.sort_and_set)
+        self.ui.actionSort_by_category_high_low.triggered.connect(self.sort_and_set)
+        self.ui.actionSort_by_category_low_high.triggered.connect(self.sort_and_set)
+        self.ui.actionSort_by_tag_high_low.triggered.connect(self.sort_and_set)
+        self.ui.actionSort_by_tag_low_high.triggered.connect(self.sort_and_set)
         self.ui.actionSpecify_SD_Card_Location.triggered.connect(
             lambda: self.sd.sd_path(False, self.width())
         )
@@ -1023,6 +1027,10 @@ class ZOIALibrarianMain(QMainWindow):
                 "actionSort_by_author_Z_A": (2, True),
                 "actionSort_by_rating_high_low": (8, True),
                 "actionSort_by_rating_low_high": (8, False),
+                "actionSort_by_category_high_low": (9, False),
+                "actionSort_by_category_low_high": (9, True),
+                "actionSort_by_tag_high_low": (10, False),
+                "actionSort_by_tag_low_high": (10, True),
             }[self.sender().objectName()]
             self.prev_sort = curr_sort
         except KeyError:

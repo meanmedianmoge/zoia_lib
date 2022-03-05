@@ -236,7 +236,7 @@ class SortingError(ZoiaLibError):
             try:
                 error_msg = {
                     901: f"Sorting mode {info} is invalid. Valid sorting "
-                    f"modes occur between 1 and 6 inclusive.",
+                    f"modes occur between 1 and 10 inclusive.",
                     902: f"The supplied metadata {info} is not a list. "
                     f"Sorting can only occur on valid lists.",
                     903: f"The parameter list was invalid. Ensure that no "
