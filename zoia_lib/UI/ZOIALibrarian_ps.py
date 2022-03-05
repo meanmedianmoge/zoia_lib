@@ -73,7 +73,7 @@ class ZOIALibrarianPS(QMainWindow):
             with open(os.path.join(self.path, "data.json"), "w") as f:
                 f.write(json.dumps(ps_data))
                 self.data_PS = ps_data
-        except:
+        except Exception as e:
             # Let the user know the API failed.
             self.ui.statusbar.showMessage("API connection failed.", timeout=5000)
             self.msg.setWindowTitle("API Error")
@@ -81,10 +81,11 @@ class ZOIALibrarianPS(QMainWindow):
             self.msg.setText(
                 "Failed to retrieve the patch metadata from PatchStorage."
             )
+            self.msg.setDetailedText(e)
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-            self.msg.setInformativeText(None)
-            self.ui.tabs.setCurrentIndex(2)
+            self.msg.setDetailedText(None)
+            self.ui.tabs.setCurrentIndex(1)
 
     def reload_ps_thread(self):
         """Initializes a Worker thread to manage the refreshing of
@@ -212,15 +213,16 @@ class ZOIALibrarianPS(QMainWindow):
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
             self.msg.setInformativeText(None)
-        except:
+        except Exception as e:
             # Let the user know the API failed.
             self.ui.statusbar.showMessage("API connection failed.", timeout=5000)
             self.msg.setWindowTitle("API Error")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText("Failed to download the patch from PatchStorage.")
+            self.msg.setDetailedText(e)
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-            self.msg.setInformativeText(None)
+            self.msg.setDetailedText(None)
 
     def create_dwn_btn(self, i, idx):
         """Creates a download button for patches on the PatchStorage
@@ -299,15 +301,16 @@ class DownloadAllWorker(QThread):
                         self.fails += 1
                     self.signal_2.emit(i)
             self.signal.emit(self.cnt, self.fails)
-        except:
+        except Exception as e:
             # Let the user know the API failed.
             self.ui.statusbar.showMessage("API connection failed.", timeout=5000)
             self.msg.setWindowTitle("API Error")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText("Failed to download the patch from PatchStorage.")
+            self.msg.setDetailedText(e)
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-            self.msg.setInformativeText(None)
+            self.msg.setDetailedText(None)
 
 
 class ReloadPSWorker(QThread):
@@ -341,12 +344,13 @@ class ReloadPSWorker(QThread):
             with open(os.path.join(self.path, "data.json"), "w") as f:
                 f.write(json.dumps(self.api.get_all_patch_data_init()))
             self.signal.emit()
-        except:
+        except Exception as e:
             # Let the user know the API failed.
             self.ui.statusbar.showMessage("API connection failed.", timeout=5000)
             self.msg.setWindowTitle("API Error")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText("Failed to download the patch from PatchStorage.")
+            self.msg.setDetailedText(e)
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-            self.msg.setInformativeText(None)
+            self.msg.setDetailedText(None)

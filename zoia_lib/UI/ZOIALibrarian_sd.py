@@ -205,7 +205,6 @@ class ZOIALibrarianSD(QMainWindow):
             self.msg.setText("Export directory has been set to {}.".format(e))
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-            self.msg.setInformativeText(None)
 
     def _import_patch_sd(self):
         """Imports a single patch from an SD card into the Librarian.

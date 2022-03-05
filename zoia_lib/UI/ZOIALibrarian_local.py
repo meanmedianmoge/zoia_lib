@@ -264,7 +264,6 @@ class ZOIALibrarianLocal(QMainWindow):
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
             self.sd.sd_path(False, self.window.width())
-            self.msg.setInformativeText(None)
         else:
             export_path = self.sd.get_export_path()
             export_dir = self.sd.get_export_path().split("/")[-1]
@@ -853,8 +852,6 @@ class ZOIALibrarianLocal(QMainWindow):
                 self.msg.setIcon(QMessageBox.Warning)
                 self.msg.setStandardButtons(QMessageBox.Ok)
                 self.msg.exec_()
-                self.msg.setInformativeText(None)
-                self.msg.setDetailedText(None)
                 return
 
         # auto layout nodes.
@@ -870,8 +867,6 @@ class ZOIALibrarianLocal(QMainWindow):
             self.msg.setIcon(QMessageBox.Warning)
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-            self.msg.setInformativeText(None)
-            self.msg.setDetailedText(None)
         graph.fit_to_selection()
 
     def viz_page(self):

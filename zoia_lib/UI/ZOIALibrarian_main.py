@@ -460,7 +460,6 @@ class ZOIALibrarianMain(QMainWindow):
                 self.msg.setText("Please specify your SD card path.")
                 self.msg.setStandardButtons(QMessageBox.Ok)
                 self.msg.exec_()
-                self.msg.setInformativeText(None)
                 self.sd.sd_path(False, self.width())
                 if self.sd.get_sd_root() is None:
                     # user cancelled without providing a path
@@ -817,7 +816,7 @@ class ZOIALibrarianMain(QMainWindow):
                         content = api.get_patch_meta(name)
                         # Add it to the cache for next time.
                         self.patch_cache.append(content)
-                    except:
+                    except Exception as e:
                         # Let the user know the API failed.
                         self.ui.statusbar.showMessage(
                             "API connection failed.", timeout=5000
@@ -828,9 +827,10 @@ class ZOIALibrarianMain(QMainWindow):
                             "Failed to retrieve the patch metadata "
                             "from PatchStorage."
                         )
+                        self.msg.setDetailedText(e)
                         self.msg.setStandardButtons(QMessageBox.Ok)
                         self.msg.exec_()
-                        self.msg.setInformativeText(None)
+                        self.msg.setDetailedText(None)
             else:
                 # Get the context.
                 viz_browser = None
@@ -1147,16 +1147,18 @@ class ZOIALibrarianMain(QMainWindow):
         Currently triggered via a menu action.
         """
 
-        pch = QFileDialog.getOpenFileName()[0]
+        pch = QFileDialog.getOpenFileName(
+            None, "Select a file", expanduser("~")
+        )[0]
         # Didn't make a selection.
         if pch == "":
             return
         try:
             save.import_to_backend(pch)
             self.ui.statusbar.showMessage("Import complete.", timeout=5000)
-            self.msg.setWindowTitle("Import Complete")
-            self.msg.setText("The patch has been successfully imported.")
-            self.msg.exec_()
+            # self.msg.setWindowTitle("Import Complete")
+            # self.msg.setText("The patch has been successfully imported.")
+            # self.msg.exec_()
             # Reload the tables if we are currently displaying them.
             self.tab_switch()
             # if (
@@ -1198,13 +1200,14 @@ class ZOIALibrarianMain(QMainWindow):
         input_dir = QFileDialog.getExistingDirectory(
             None, "Select a directory", expanduser("~")
         )
-        if input_dir == "" or not os.path.isdir(input_dir):
+        if input_dir == "":
+            return None
+        elif not os.path.isdir(input_dir):
             self.msg.setWindowTitle("Invalid Selection")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText("Please select a directory.")
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-            return None
         return input_dir
 
     def _mass_import_thread(self):
@@ -1458,6 +1461,9 @@ class ZOIALibrarianMain(QMainWindow):
 
         input_dir = self.directory_select()
 
+        if not input_dir:
+            return
+
         for pch in os.listdir(input_dir):
             if pch.split(".")[-1] == "bin":
                 # Try to save the binary.
@@ -1479,6 +1485,9 @@ class ZOIALibrarianMain(QMainWindow):
 
     def import_version_menu(self):
         input_dir = self.directory_select()
+        if not input_dir:
+            return
+
         count, fail_cnt, fails = save.import_to_backend(input_dir, True)
 
         return self._version_import_done(count, fail_cnt, fails)
