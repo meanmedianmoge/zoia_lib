@@ -1,7 +1,7 @@
 import platform
 
 from PySide2.QtGui import QFont
-from PySide2.QtWidgets import QFontDialog, QApplication
+from PySide2.QtWidgets import QFontDialog, QApplication, QFileDialog
 import os
 import json
 
@@ -302,6 +302,14 @@ class ZOIALibrarianUtil:
     def set_font(self, f):
         """Setter method to specify the font to be used for the app."""
         self.font = f
+
+    def open_local_backend(self):
+        """Opens a FileBrowser showing the app's local backend."""
+
+        QFileDialog.getExistingDirectory(
+            None, "Local Backend", self.window.path
+            # QFileDialog.DontUseNativeDialog
+        )
 
     def documentation(self):
         """Passes documentation to the front-end PS tab."""

@@ -282,6 +282,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.actionImport_Version_History_directory.triggered.connect(
             self.import_version_menu
         )
+        self.ui.actionNavigate_to_local_backend.triggered.connect(self.util.open_local_backend)
         self.ui.refresh_pch_btn.clicked.connect(self.ps.reload_ps_thread)
         self.ui.update_patch_notes.clicked.connect(self.local.update_patch_notes)
         self.ui.actionImport_A_Patch.triggered.connect(self.import_patch)
@@ -787,6 +788,18 @@ class ZOIALibrarianMain(QMainWindow):
             self.ui.table_local.setColumnWidth(3, self.width() * 0.075)
             self.ui.table_local.setColumnWidth(4, self.width() * 0.045)
             self.ui.table_local.setColumnWidth(5, self.width() * 0.065)
+
+            # Reset bank sizes
+            self.ui.splitter_bank.setSizes(
+                [self.width() * 0.535, self.width() * 0.465, self.width() * 0]
+            )
+            self.ui.splitter_bank_tables.setSizes([self.width() * 0.5, self.width() * 0.5])
+            self.ui.table_bank_left.setColumnWidth(0, self.width() * 0.14)
+            self.ui.table_bank_right.setColumnWidth(0, self.width() * 0.14)
+            self.ui.table_bank_local.setColumnWidth(0, self.width() * 0.16)
+            self.ui.table_bank_local.setColumnWidth(1, self.width() * 0.11)
+            self.ui.table_bank_local.setColumnWidth(2, self.width() * 0.0625)
+            self.ui.table_bank_local.setColumnWidth(3, self.width() * 0.035)
 
         self.showMaximized()
 

@@ -2977,6 +2977,7 @@
     <addaction name="actionImport_Multiple_Patches"/>
     <addaction name="actionImport_Version_History_directory"/>
     <addaction name="separator"/>
+    <addaction name="actionNavigate_to_local_backend"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuSort">
@@ -3517,6 +3518,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+0</string>
+   </property>
+  </action>
+  <action name="actionNavigate_to_local_backend">
+   <property name="text">
+    <string>Navigate to Local Backend</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
    </property>
   </action>
  </widget>

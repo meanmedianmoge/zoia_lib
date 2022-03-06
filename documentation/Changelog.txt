@@ -14,6 +14,7 @@ New Features
 - You can now sort within Version Histories: default is descending version number.
 - Updated the module index to reflect a few firmware changes.
 - Included the option to sort tables by Tags and Categories.
+- Added a menu option and shortcut to navigate to the app's local backend.
 - Improved message text and UI display.
 
 Fixes
