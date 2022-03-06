@@ -1,33 +1,31 @@
 Version 1.2 (March 2022)
 
 New Features
-- Added a Patch Expander view, which displays the full routing of each patch in a separate UI window.
-    - This is accessed by selecting a patch in the Local Storage tab and clicking "Expand".
-    - Routing goes from left to right.
-- With the release of the ZOIA Euroburo, new modules were added, so the app now supports those.
-    - This resolves any issues with viewing, importing, exporting, etc patches that originated on Zebu.
-- Thanks to an API update, PS author search is now possible.
-- Table views are now automatically refreshed upon certain actions (patch download, rating update, etc).
+- Added a Patch Expander view, which displays the full routing of a given patch in a separate UI window:
+    - This is accessed by selecting a patch in the Local Storage tab and clicking “Expand” (next to the page +/- and clear buttons).
+    - Routing goes from left to right, is color-coded, and shows all connections.
+    - You can adjust the auto-layout, move modules and connections around, and save the resulting graph for future reference.
+- With the release of the ZOIA Euroburo (Zebu), new modules were added, so the app now supports those.
+    - This resolves any issues with viewing, importing, and exporting any patches that originated on Zebu.
+- Thanks to an API update, PS tab author search and sort is now possible.
+- Table views are now automatically refreshed upon new patch download, import, and deletion.
     - This avoids needing to re-enter a tab or hit enter in the search bar to force a refresh.
 - Added support for importing zipped files.
-- You can now sort within version histories: default is descending version #.
+- You can now sort within Version Histories: default is descending version number.
 - Updated the module index to reflect a few firmware changes.
 - Included the option to sort tables by Tags and Categories.
 - Improved message text and UI display.
 
 Fixes
-- Fixed an issue where a user could not connect to PS even with internet.
-- Fixed an issue with fetching PS patches (only the recent 100 would show once 1k patches were uploaded).
+- Fixed an issue where a user could not connect to PS even with internet access.
+- Fixed an issue with fetching PS patches (only the recent 100 would show once 1k patches were uploaded to the site).
 - Fixed an issue with the Update Patches function where it would fail without warning.
-- Fixed an issue with the PS webscraper related to urllib (Windows).
+- Fixed an issue with the PS web-scraper related to urllib (Windows).
 - Fixed an issue with SD folder selection and exporting.
-- Fixed an issue when trying to import a patch into a version history.
+- Fixed an issue when trying to import a patch into a Version History.
 - Fixed an issue related to creating new versions of a patch (would cause Folders to index the wrong file).
-- Fixed an issue with sorting related to version histories.
-- Fixed an issue where the theme toggle would break, also adjusted CSS for Windows.
-- Fixed an issue where deleting all besides one patch in a version history would disable the back button.
-- Fixed an issue related to patch deletion (file would remain due to an error).
-- Re-resolved issues with compiling the app (Mac Big Sur).
+- Fixed an issue with sorting related to Version Histories.
+- Fixed an issue with the theme toggle, also updated CSS for Windows for better contrast in dark mode.
 
 Known Issues
 - The expander can sometimes fail to fully construct patches due to memory constraints.
