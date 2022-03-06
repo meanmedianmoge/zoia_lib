@@ -26,6 +26,10 @@ Fixes
 - Fixed an issue related to creating new versions of a patch (would cause Folders to index the wrong file).
 - Fixed an issue with sorting related to Version Histories.
 - Fixed an issue with the theme toggle, also updated CSS for Windows for better contrast in dark mode.
+- Fixed an issue with the Local splitter not snapping to default values on startup (Mac).
+- Fixed an issue where deleting all besides one patch in a Version History would disable the back button.
+- Fixed an issue related to patch deletion (file would remain due to an error).
+- Re-resolved issues with compiling the app (Big Sur).
 
 Known Issues
 - The expander can sometimes fail to fully construct patches due to memory constraints.

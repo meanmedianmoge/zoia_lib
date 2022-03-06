@@ -472,6 +472,12 @@ class ZOIALibrarianMain(QMainWindow):
                 self.ui, api_2, self.path, self.msg, save, self.sort_and_set
             )
             self.ps.metadata_init()
+
+        # Local splitter fix, need to add set_ui for when using preferred
+        # ui values instead of the default
+        if self.ui.tabs.currentIndex() == 1:
+            self.reset_ui(tab=1)
+
         self.sort_and_set()
 
     def set_data(self, search=False, version=False):
@@ -720,52 +726,67 @@ class ZOIALibrarianMain(QMainWindow):
 
         curr_table.resizeRowsToContents()
 
-    def reset_ui(self):
+    def reset_ui(self, tab=None):
         """Resets the UI panels and tables to their default positions.
         Upon closing the application, pref.json will include the defaults.
         Currently triggered via a menu action.
         """
 
-        # Reset PS sizes
-        self.ui.splitter_PS.setSizes([self.width() * 0.55, self.width() * 0.45])
-        self.ui.table_PS.resizeColumnsToContents()
-        self.ui.table_PS.setColumnWidth(0, self.width() * 0.165)
-        self.ui.table_PS.setColumnWidth(1, self.width() * 0.135)
-        self.ui.table_PS.setColumnWidth(2, self.width() * 0.075)
-        self.ui.table_PS.setColumnWidth(3, self.width() * 0.075)
+        if not tab:
+            # Reset PS sizes
+            self.ui.splitter_PS.setSizes([self.width() * 0.55, self.width() * 0.45])
+            self.ui.table_PS.resizeColumnsToContents()
+            self.ui.table_PS.setColumnWidth(0, self.width() * 0.165)
+            self.ui.table_PS.setColumnWidth(1, self.width() * 0.135)
+            self.ui.table_PS.setColumnWidth(2, self.width() * 0.075)
+            self.ui.table_PS.setColumnWidth(3, self.width() * 0.075)
 
-        # Reset local sizes
-        self.ui.splitter_local.setSizes([self.width() * 0.6, self.width() * 0.4])
-        self.ui.splitter_local_hori.setSizes(
-            [self.height() * 0.55, self.height() * 0.45]
-        )
-        self.ui.table_local.resizeColumnsToContents()
-        self.ui.table_local.setColumnWidth(0, self.width() * 0.165)
-        self.ui.table_local.setColumnWidth(1, self.width() * 0.125)
-        self.ui.table_local.setColumnWidth(2, self.width() * 0.065)
-        self.ui.table_local.setColumnWidth(3, self.width() * 0.075)
-        self.ui.table_local.setColumnWidth(4, self.width() * 0.045)
-        self.ui.table_local.setColumnWidth(5, self.width() * 0.065)
+            # Reset local sizes
+            self.ui.splitter_local.setSizes([self.width() * 0.6, self.width() * 0.4])
+            self.ui.splitter_local_hori.setSizes(
+                [self.height() * 0.55, self.height() * 0.45]
+            )
+            self.ui.table_local.resizeColumnsToContents()
+            self.ui.table_local.setColumnWidth(0, self.width() * 0.165)
+            self.ui.table_local.setColumnWidth(1, self.width() * 0.125)
+            self.ui.table_local.setColumnWidth(2, self.width() * 0.065)
+            self.ui.table_local.setColumnWidth(3, self.width() * 0.075)
+            self.ui.table_local.setColumnWidth(4, self.width() * 0.045)
+            self.ui.table_local.setColumnWidth(5, self.width() * 0.065)
 
-        # Reset SD sizes
-        self.ui.splitter_sd_hori.setSizes([self.width() * 0.5, self.width() * 0.5])
-        self.ui.splitter_sd_vert.setSizes([self.height() * 0.4, self.height() * 0.6])
-        self.ui.table_sd_left.setColumnWidth(0, self.width() * 0.25)
-        self.ui.table_sd_left.setColumnWidth(1, self.width() * 0.125)
-        self.ui.table_sd_right.setColumnWidth(0, self.width() * 0.25)
-        self.ui.table_sd_right.setColumnWidth(1, self.width() * 0.125)
+            # Reset SD sizes
+            self.ui.splitter_sd_hori.setSizes([self.width() * 0.5, self.width() * 0.5])
+            self.ui.splitter_sd_vert.setSizes([self.height() * 0.4, self.height() * 0.6])
+            self.ui.table_sd_left.setColumnWidth(0, self.width() * 0.25)
+            self.ui.table_sd_left.setColumnWidth(1, self.width() * 0.125)
+            self.ui.table_sd_right.setColumnWidth(0, self.width() * 0.25)
+            self.ui.table_sd_right.setColumnWidth(1, self.width() * 0.125)
 
-        # Reset bank sizes
-        self.ui.splitter_bank.setSizes(
-            [self.width() * 0.535, self.width() * 0.465, self.width() * 0]
-        )
-        self.ui.splitter_bank_tables.setSizes([self.width() * 0.5, self.width() * 0.5])
-        self.ui.table_bank_left.setColumnWidth(0, self.width() * 0.14)
-        self.ui.table_bank_right.setColumnWidth(0, self.width() * 0.14)
-        self.ui.table_bank_local.setColumnWidth(0, self.width() * 0.16)
-        self.ui.table_bank_local.setColumnWidth(1, self.width() * 0.11)
-        self.ui.table_bank_local.setColumnWidth(2, self.width() * 0.0625)
-        self.ui.table_bank_local.setColumnWidth(3, self.width() * 0.035)
+            # Reset bank sizes
+            self.ui.splitter_bank.setSizes(
+                [self.width() * 0.535, self.width() * 0.465, self.width() * 0]
+            )
+            self.ui.splitter_bank_tables.setSizes([self.width() * 0.5, self.width() * 0.5])
+            self.ui.table_bank_left.setColumnWidth(0, self.width() * 0.14)
+            self.ui.table_bank_right.setColumnWidth(0, self.width() * 0.14)
+            self.ui.table_bank_local.setColumnWidth(0, self.width() * 0.16)
+            self.ui.table_bank_local.setColumnWidth(1, self.width() * 0.11)
+            self.ui.table_bank_local.setColumnWidth(2, self.width() * 0.0625)
+            self.ui.table_bank_local.setColumnWidth(3, self.width() * 0.035)
+
+        else:
+            # Reset local sizes
+            self.ui.splitter_local.setSizes([self.width() * 0.6, self.width() * 0.4])
+            self.ui.splitter_local_hori.setSizes(
+                [self.height() * 0.55, self.height() * 0.45]
+            )
+            self.ui.table_local.resizeColumnsToContents()
+            self.ui.table_local.setColumnWidth(0, self.width() * 0.165)
+            self.ui.table_local.setColumnWidth(1, self.width() * 0.125)
+            self.ui.table_local.setColumnWidth(2, self.width() * 0.065)
+            self.ui.table_local.setColumnWidth(3, self.width() * 0.075)
+            self.ui.table_local.setColumnWidth(4, self.width() * 0.045)
+            self.ui.table_local.setColumnWidth(5, self.width() * 0.065)
 
         self.showMaximized()
 
