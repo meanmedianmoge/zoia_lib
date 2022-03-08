@@ -1,7 +1,6 @@
 import glob
 import json
 import os
-import sys
 
 from NodeGraphQt import NodeGraph, BaseNode, setup_context_menu
 
