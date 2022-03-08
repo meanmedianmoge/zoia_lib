@@ -1,6 +1,7 @@
 import glob
 import json
 import os
+import sys
 
 from NodeGraphQt import NodeGraph, BaseNode, setup_context_menu
 
@@ -764,22 +765,26 @@ class ZOIALibrarianLocal(QMainWindow):
         Currently triggered via a button press.
         """
 
+        # get current patch viz for processing
+        pch = self.curr_viz
+
         # create node graph.
         graph = NodeGraph()
+        graph.set_acyclic()
 
         # set up default menu and commands.
         setup_context_menu(graph)
 
         # widget used for the node graph.
         graph_widget = graph.widget
-        graph_widget.resize(1100, 800)
+        graph_widget.setWindowTitle(pch["name"])
+        # graph_widget.resize(1100, 800)
         graph_widget.show()
 
         # registered nodes.
         nodes_to_reg = [BaseNode]
         graph.register_nodes(nodes_to_reg)
 
-        pch = self.curr_viz
         nodes = {}
         for module in pch["modules"]:
             my_node = graph.create_node(
@@ -791,11 +796,11 @@ class ZOIALibrarianLocal(QMainWindow):
             inp, outp, in_pos, out_pos = [], [], [], []
             for key, param in module["blocks"].items():
                 if "in" in key:
-                    my_node.add_input(key)
+                    my_node.add_input(key, multi_input=True)
                     inp.append(key)
                     in_pos.append(int(param["position"]))
                 elif param["isParam"]:
-                    my_node.add_input(key)
+                    my_node.add_input(key, multi_input=True)
                     inp.append(key)
                     in_pos.append(int(param["position"]))
                 elif "out" in key:
@@ -803,8 +808,6 @@ class ZOIALibrarianLocal(QMainWindow):
                     outp.append(key)
                     out_pos.append(int(param["position"]))
             nodes[module["number"]] = my_node, inp, outp, in_pos, out_pos
-
-        # print(nodes)
 
         # map pos from nodes to connections
         def node_pos_map(node):
@@ -858,6 +861,7 @@ class ZOIALibrarianLocal(QMainWindow):
         try:
             graph.auto_layout_nodes()
         except RecursionError as e:
+            graph.fit_to_selection()
             self.ui.statusbar.showMessage("Expand incomplete.", timeout=5000)
             self.msg.setWindowTitle("Auto Layout Failed")
             self.msg.setText(
@@ -867,6 +871,7 @@ class ZOIALibrarianLocal(QMainWindow):
             self.msg.setIcon(QMessageBox.Warning)
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
+
         graph.fit_to_selection()
 
     def viz_page(self):
