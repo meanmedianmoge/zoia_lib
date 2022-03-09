@@ -8,7 +8,7 @@ If you would like to leave a tip, we are accepting donations here
 [![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=UUQ3SW5VMV3X4&currency_code=USD&source=url).
 Thank you for your support!
 
-This project depends heavily on the PatchStorage API, developed by Blokas: https://patchstorage.com/docs/
+This project depends heavily on the PatchStorage API, developed by Blokas: https://patchstorage.com/docs/.
 
 This software is distributed under GNU General Public License 3.0.
 Please familiarize yourself with the Terms & Conditions of copyleft licenses like GPL (and others) here:
@@ -20,19 +20,17 @@ modification of this application. By installing the application you agree to the
 
 ## How to Install
 Application can be installed in one of two ways:
-- (For general users) - Use the pre-bundled build, available on Windows, Mac, and Linux (Ubuntu) here:
+- (For general users) - Use the pre-bundled build; available on Windows, Mac, and Linux (Ubuntu) here:
 https://github.com/meanmedianmoge/zoia_lib/releases.
 
 - (For developers/contributors) - Build from source; requires Python 3.7+.
 ```
-# Download source code from Github (either directly from the site or cloning the repo)
+# Download source code
 git clone https://github.com/meanmedianmoge/zoia_lib.git
-# Make sure you're in the right directory
-cd Downloads/zoia_lib
-# Install Python 3.7+, make sure you have pip
-pip help
-# Install the dependencies that allow the app to run
-pip install -r requirements.txt
+
+# Single-line dependency install
+sh setup.sh
+
 # Load the application
 python -m zoia_lib.backend.startup
 ```
@@ -40,11 +38,12 @@ python -m zoia_lib.backend.startup
 ## Documentation
 - Overview video and tutorial: https://www.youtube.com/watch?v=JLOUrWtG1Pk
 - Supplemental 1.1 video: https://www.youtube.com/watch?v=nP9oRLtXMUE
+- Supplemental 1.2 video: https://www.youtube.com/watch?v=zR8XSI_Unlk
 - You'll find the following in `/documentation`: <br>
-    - Current version of the manual (pdf)
+    - Current version of the user manual
     - Overall changelog - lists new features, bug fixes, and known issues for each release
     - Initial app frameworks and discussions among the dev team
-    - Binary format
+    - Binary format (updated by marcuslupinus, thanks!)
 
 ## Features
 - Browse PatchStorage uploads and local patches within the UI
@@ -53,7 +52,7 @@ python -m zoia_lib.backend.startup
 - Download patches from PatchStorage
 - Import patches from local storage or SD card
 - Version control and local/PS patch merging
-- Preview patches with the patch visualizer
+- Preview patches with the patch visualizer and expander
 - View and edit patch notes
 - Customized category and tag labels for all patches
 - Manage your SD card folders quickly
