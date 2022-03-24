@@ -859,6 +859,8 @@ class ZOIALibrarianLocal(QMainWindow):
         # auto layout nodes.
         try:
             graph.auto_layout_nodes()
+        except KeyError:
+            graph.reset_zoom()
         except RecursionError as e:
             graph.fit_to_selection()
             self.ui.statusbar.showMessage("Expand incomplete.", timeout=5000)

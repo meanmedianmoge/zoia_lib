@@ -30,14 +30,16 @@ Fixes
 - Fixed an issue with the Local splitter not snapping to default values on startup (Mac).
 - Fixed an issue where deleting all besides one patch in a Version History would disable the back button.
 - Fixed an issue related to patch deletion (file would remain due to an error).
+- Fixed a minor issue with the Visualizer (updated module index option positions).
 - Re-resolved issues with compiling the app (Big Sur).
 
 Known Issues
-- The expander can sometimes fail to fully construct patches due to memory constraints.
-    - Optimizations will be coming in future updates to the app.
+- Feedback loops/recursive patches will not fully show within the expander.
+    - This is due to complexities with the auto-layout algorithm.
+    - Optimizations will be coming in the next version.
 
 Future Plans
-- Optimize the Patch Expander, by adding color-coding, variable views, and other useful features.
+- Further optimize the Patch Expander with variable views and other useful features.
 - Continue development on patch editing and creation tools.
 
 Version 1.1 (July 2021)

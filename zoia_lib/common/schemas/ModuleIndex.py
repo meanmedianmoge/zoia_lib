@@ -1579,7 +1579,7 @@ module_index = {
         },
         "options": {
             "cv_output": ["disabled", "enabled"],
-            "range": ["extended", "basic"],
+            "range": ["basic", "extended"],
         },
     },
     57: {

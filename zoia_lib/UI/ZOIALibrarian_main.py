@@ -861,7 +861,7 @@ class ZOIALibrarianMain(QMainWindow):
                             "Failed to retrieve the patch metadata "
                             "from PatchStorage."
                         )
-                        self.msg.setDetailedText(e)
+                        self.msg.setDetailedText(str(e))
                         self.msg.setStandardButtons(QMessageBox.Ok)
                         self.msg.exec_()
                         self.msg.setDetailedText(None)

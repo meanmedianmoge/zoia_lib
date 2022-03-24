@@ -73,15 +73,36 @@ class ZOIALibrarianPS(QMainWindow):
             with open(os.path.join(self.path, "data.json"), "w") as f:
                 f.write(json.dumps(ps_data))
                 self.data_PS = ps_data
+
+        except json.JSONDecodeError:
+            # Existing data.json was empty, replace it
+            ps_data = self.api.get_all_patch_data_init()
+            # Create/update the data file with the new data.
+            with open(os.path.join(self.path, "data.json"), "w") as f:
+                f.write(json.dumps(ps_data))
+                self.data_PS = ps_data
+
+        except AttributeError:
+            # Could not connect to API to determine patch count
+            self.ui.statusbar.showMessage("API connection failed.", timeout=5000)
+            self.msg.setWindowTitle("API Error")
+            self.msg.setIcon(QMessageBox.Information)
+            self.msg.setText(
+                "Failed to retrieve the patch count from PatchStorage."
+            )
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+            self.ui.tabs.setCurrentIndex(1)
+
         except Exception as e:
-            # Let the user know the API failed.
+            # Other unknown API connection error.
             self.ui.statusbar.showMessage("API connection failed.", timeout=5000)
             self.msg.setWindowTitle("API Error")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText(
                 "Failed to retrieve the patch metadata from PatchStorage."
             )
-            self.msg.setDetailedText(e)
+            self.msg.setDetailedText(str(e))
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
             self.msg.setDetailedText(None)
@@ -219,7 +240,7 @@ class ZOIALibrarianPS(QMainWindow):
             self.msg.setWindowTitle("API Error")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText("Failed to download the patch from PatchStorage.")
-            self.msg.setDetailedText(e)
+            self.msg.setDetailedText(str(e))
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
             self.msg.setDetailedText(None)
@@ -307,7 +328,7 @@ class DownloadAllWorker(QThread):
             self.msg.setWindowTitle("API Error")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText("Failed to download the patch from PatchStorage.")
-            self.msg.setDetailedText(e)
+            self.msg.setDetailedText(str(e))
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
             self.msg.setDetailedText(None)
@@ -350,7 +371,7 @@ class ReloadPSWorker(QThread):
             self.msg.setWindowTitle("API Error")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText("Failed to download the patch from PatchStorage.")
-            self.msg.setDetailedText(e)
+            self.msg.setDetailedText(str(e))
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
             self.msg.setDetailedText(None)
