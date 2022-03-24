@@ -34,7 +34,7 @@ Fixes
 - Re-resolved issues with compiling the app (Big Sur).
 
 Known Issues
-- Feedback loops/recursive patches will not fully show within the expander.
+- Feedback loops/recursive patches will not fully show within the Expander.
     - This is due to complexities with the auto-layout algorithm.
     - Optimizations will be coming in the next version.
 
