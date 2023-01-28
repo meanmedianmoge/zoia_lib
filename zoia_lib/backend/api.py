@@ -88,7 +88,11 @@ class PatchStorage:
         url = str(furl(endpoint).add(params))
         r = http.request("GET", url)
 
-        return json.loads(r.data)
+        # remove invalid entries/keys from HTTP return
+        unfiltered = json.loads(r.data)
+        filtered = filter(lambda x: type(x) == dict, unfiltered)
+        return list(filtered)
+
 
     def get_patch_meta(self, idx: str):
         """Get the metadata associated with a specific
@@ -142,7 +146,8 @@ class PatchStorage:
 
         for page in range(1, math.ceil(self.patch_count / per_page) + 1):
             # Get all the patches on the current page.
-            all_patches.extend(self._search({**search, **{"page": page}}))
+            patch_data = self._search({**search, **{"page": page}})
+            all_patches.extend(patch_data)
 
         return all_patches
 
