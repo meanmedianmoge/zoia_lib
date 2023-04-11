@@ -3,15 +3,25 @@
 ################################################################################
 ## Form generated from reading UI file 'ZOIALibrarian.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.2
+## Created by: Qt User Interface Compiler version 6.4.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
-
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
+    QCursor, QFont, QFontDatabase, QGradient,
+    QIcon, QImage, QKeySequence, QLinearGradient,
+    QPainter, QPalette, QPixmap, QRadialGradient,
+    QTransform)
+from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplication, QFrame,
+    QGridLayout, QHBoxLayout, QHeaderView, QLabel,
+    QLayout, QLineEdit, QMainWindow, QMenu,
+    QMenuBar, QPushButton, QSizePolicy, QSplitter,
+    QStatusBar, QTabWidget, QTableWidget, QTableWidgetItem,
+    QTextBrowser, QTreeView, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -75,69 +85,68 @@ class Ui_MainWindow(object):
         self.actionArial = QAction(MainWindow)
         self.actionArial.setObjectName(u"actionArial")
         font = QFont()
-        font.setFamily(u"Arial")
+        font.setFamilies([u"Arial"])
         self.actionArial.setFont(font)
         self.actionArial_Black = QAction(MainWindow)
         self.actionArial_Black.setObjectName(u"actionArial_Black")
         font1 = QFont()
-        font1.setFamily(u"Arial Black")
+        font1.setFamilies([u"Arial Black"])
         font1.setBold(True)
-        font1.setWeight(75)
         self.actionArial_Black.setFont(font1)
         self.actionComic_Sans_MS = QAction(MainWindow)
         self.actionComic_Sans_MS.setObjectName(u"actionComic_Sans_MS")
         font2 = QFont()
-        font2.setFamily(u"Comic Sans MS")
+        font2.setFamilies([u"Comic Sans MS"])
         self.actionComic_Sans_MS.setFont(font2)
         self.actionCourier_New = QAction(MainWindow)
         self.actionCourier_New.setObjectName(u"actionCourier_New")
         font3 = QFont()
-        font3.setFamily(u"Courier New")
+        font3.setFamilies([u"Courier New"])
         self.actionCourier_New.setFont(font3)
         self.actionGeorgia = QAction(MainWindow)
         self.actionGeorgia.setObjectName(u"actionGeorgia")
         font4 = QFont()
-        font4.setFamily(u"Georgia")
+        font4.setFamilies([u"Georgia"])
         self.actionGeorgia.setFont(font4)
         self.actionLucida_Console = QAction(MainWindow)
         self.actionLucida_Console.setObjectName(u"actionLucida_Console")
         font5 = QFont()
-        font5.setFamily(u"Lucida Console")
+        font5.setFamilies([u"Lucida Console"])
         self.actionLucida_Console.setFont(font5)
         self.actionLucida_Sans_Unicode = QAction(MainWindow)
         self.actionLucida_Sans_Unicode.setObjectName(u"actionLucida_Sans_Unicode")
         font6 = QFont()
-        font6.setFamily(u"Lucida Sans Unicode")
+        font6.setFamilies([u"Lucida Sans Unicode"])
         self.actionLucida_Sans_Unicode.setFont(font6)
         self.actionPalatino_Linotype = QAction(MainWindow)
         self.actionPalatino_Linotype.setObjectName(u"actionPalatino_Linotype")
         font7 = QFont()
-        font7.setFamily(u"Palatino Linotype")
+        font7.setFamilies([u"Palatino Linotype"])
         self.actionPalatino_Linotype.setFont(font7)
         self.actionTahoma = QAction(MainWindow)
         self.actionTahoma.setObjectName(u"actionTahoma")
         font8 = QFont()
-        font8.setFamily(u"Tahoma")
+        font8.setFamilies([u"Tahoma"])
         self.actionTahoma.setFont(font8)
         self.actionTimes_New_Roman = QAction(MainWindow)
         self.actionTimes_New_Roman.setObjectName(u"actionTimes_New_Roman")
         font9 = QFont()
-        font9.setFamily(u"Times New Roman")
+        font9.setFamilies([u"Times New Roman"])
         self.actionTimes_New_Roman.setFont(font9)
         self.actionTrebuchet_MS = QAction(MainWindow)
         self.actionTrebuchet_MS.setObjectName(u"actionTrebuchet_MS")
         font10 = QFont()
-        font10.setFamily(u"Trebuchet MS")
+        font10.setFamilies([u"Trebuchet MS"])
         self.actionTrebuchet_MS.setFont(font10)
         self.actionVerdana = QAction(MainWindow)
         self.actionVerdana.setObjectName(u"actionVerdana")
         font11 = QFont()
-        font11.setFamily(u"Verdana")
+        font11.setFamilies([u"Verdana"])
         self.actionVerdana.setFont(font11)
         self.actionPapyrus = QAction(MainWindow)
         self.actionPapyrus.setObjectName(u"actionPapyrus")
         font12 = QFont()
-        font12.setFamily(u"Papyrus")
+        font12.setFamilies([u"Papyrus"])
         self.actionPapyrus.setFont(font12)
         self.actionWingdings = QAction(MainWindow)
         self.actionWingdings.setObjectName(u"actionWingdings")

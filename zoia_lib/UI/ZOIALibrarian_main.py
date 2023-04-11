@@ -2,15 +2,15 @@ import json
 import os
 from os.path import expanduser
 
-from PySide2 import QtCore
-from PySide2.QtCore import QEvent, Qt, QThread
-from PySide2.QtGui import QIcon, QFont
-from PySide2.QtWidgets import (
+from PySide6 import QtCore
+from PySide6.QtCore import QEvent, Qt, QThread
+from PySide6.QtGui import QIcon, QFont, QScreen
+from PySide6.QtWidgets import (
+    QApplication,
     QMainWindow,
     QMessageBox,
     QTableWidgetItem,
     QRadioButton,
-    QDesktopWidget,
     QFileDialog,
 )
 
@@ -42,7 +42,7 @@ class ZOIALibrarianMain(QMainWindow):
     and exporting patches; among other functions.
     Any changes made to the .ui file will not be reflected unless the
     following command is run from the UI directory:
-        pyside2-uic.exe ZOIALibrarian.ui -o ZOIALibrarian.py
+        PySide6-uic.exe ZOIALibrarian.ui -o ZOIALibrarian.py
     Known issues:
      - Certain UI elements do not like font changes (headers, tabs, etc).
      - Deleting items in the Folders table will always delete the first entry
@@ -398,7 +398,7 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Center the application on launch.
         frame = self.frameGeometry()
-        center = QDesktopWidget().availableGeometry().center()
+        center = QScreen.availableGeometry(QApplication.primaryScreen()).center()
         frame.moveCenter(center)
         self.move(frame.topLeft())
 

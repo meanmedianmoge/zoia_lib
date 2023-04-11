@@ -1,6 +1,7 @@
 import json
 import math
 import os
+# import requests
 
 import certifi
 import urllib3
@@ -24,13 +25,32 @@ class PatchStorage:
         """Initializes the PatchStorage class."""
 
         # Set defaults for query params
-        self.url = "https://patchstorage.com/api/alpha/"
+        self.url = "https://patchstorage.com/api/beta/"
         self.platform = 3003  # ZOIA
+        # self.api_token = None
         try:
             self.patch_count = self._determine_patch_count()
         except:
             # No internet connection.
             pass
+
+    # def auth(self, username: str, password: str) -> None:
+    #     assert username
+    #     assert password
+    #
+    #     url = self.url + '/auth/token'
+    #
+    #     # click.echo(f'Authenticating: {username} ({url})')
+    #
+    #     r = requests.post(url, data={
+    #         'username': username,
+    #         'password': password
+    #     }, headers={'User-Agent': 'patchbot-1.0'})
+    #
+    #     if not r.ok:
+    #         raise ValueError('Failed to authenticate')
+    #
+    #     self.api_token = r.json()['token']
 
     def _search(self, more_params=None):
         """Make a query to the PS API.
@@ -87,6 +107,10 @@ class PatchStorage:
         # make request
         url = str(furl(endpoint).add(params))
         r = http.request("GET", url)
+        # , headers={
+        #     'Authorization': 'Bearer ' + self.api_token,
+        #     'User-Agent': 'patchbot-1.0'
+        # })
 
         return json.loads(r.data)
 
@@ -126,6 +150,36 @@ class PatchStorage:
         except KeyError:
             # No patch with the supplied id was found.
             return None
+
+    # def upload_file(path: str, target_id: int = None) -> str:
+    #     assert isinstance(path, str)
+    #     assert isinstance(target_id, int) or target_id is None
+    #
+    #     if Patchstorage.PS_API_TOKEN is None:
+    #         raise click.ClickException('Not authenticated')
+    #
+    #     click.echo(f'  Uploading file {path}')
+    #
+    #     data = {}
+    #
+    #     if target_id is not None:
+    #         data['target'] = target_id
+    #
+    #     r = requests.post(PS_API_URL + '/files', data=data, files={
+    #         'file': open(path, 'rb')
+    #     },
+    #                       headers={
+    #                           'Authorization': 'Bearer ' + Patchstorage.PS_API_TOKEN,
+    #                           'User-Agent': 'patchbot-1.0'
+    #                       })
+    #
+    #     if not r.ok:
+    #         click.echo(r.status_code)
+    #         click.echo(r.request.body)
+    #         click.echo(r.json())
+    #         raise Exception(f'Failed to upload file {path}')
+    #
+    #     return r.json()['id']
 
     def get_all_patch_data_init(self):
         """Retrieves the initial amount of information needed for

@@ -4,9 +4,9 @@ import os
 
 from NodeGraphQt import NodeGraph, BaseNode, setup_context_menu
 
-from PySide2 import QtCore
-from PySide2.QtCore import QEvent, QThread
-from PySide2.QtWidgets import (
+from PySide6 import QtCore
+from PySide6.QtCore import QEvent, QThread
+from PySide6.QtWidgets import (
     QMainWindow,
     QMessageBox,
     QInputDialog,
@@ -215,12 +215,15 @@ class ZOIALibrarianLocal(QMainWindow):
                 self.delete.delete_full_patch_directory(self.sender().objectName())
             else:
                 self.delete.delete_patch(self.sender().objectName())
-            self.get_local_patches()
+            # self.get_local_patches()
         else:
             self.delete.delete_patch(
                 os.path.join(self.curr_ver, self.sender().objectName())
             )
-            self.get_version_patches(self.ui.tabs.currentIndex() == 1)
+            # self.get_version_patches(self.ui.tabs.currentIndex() == 1)
+        self.window.tab_3 = 0
+
+        #https://stackoverflow.com/questions/37786299/how-to-delete-row-rows-from-a-qtableview-in-pyqt
 
         # Reset the text browser.
         self.ui.text_browser_local.setText("")
@@ -661,6 +664,8 @@ class ZOIALibrarianLocal(QMainWindow):
     def events(self, e):
         """Handles events that relate updating the tags/categories
         for patches located in the Local Storage View tab's table.
+
+        TODO: add event for multi-delete, delete w/o table reset
 
         e: The event that was initiated.
         """

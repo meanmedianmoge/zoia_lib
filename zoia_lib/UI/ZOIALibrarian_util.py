@@ -1,7 +1,7 @@
 import platform
 
-from PySide2.QtGui import QFont
-from PySide2.QtWidgets import QFontDialog, QApplication, QFileDialog
+from PySide6.QtGui import QFont
+from PySide6.QtWidgets import QFontDialog, QApplication, QFileDialog
 import os
 import json
 

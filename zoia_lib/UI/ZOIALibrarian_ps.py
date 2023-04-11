@@ -1,9 +1,9 @@
 import json
 import os
 
-from PySide2 import QtCore
-from PySide2.QtCore import QThread
-from PySide2.QtWidgets import QMainWindow, QMessageBox, QPushButton
+from PySide6 import QtCore
+from PySide6.QtCore import QThread
+from PySide6.QtWidgets import QMainWindow, QMessageBox, QPushButton
 
 from zoia_lib.common import errors
 

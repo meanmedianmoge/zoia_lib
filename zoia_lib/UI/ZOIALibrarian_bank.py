@@ -2,8 +2,8 @@ import json
 import os
 import platform
 
-from PySide2.QtCore import QEvent
-from PySide2.QtWidgets import (
+from PySide6.QtCore import QEvent
+from PySide6.QtWidgets import (
     QTableWidgetItem,
     QPushButton,
     QFileDialog,
@@ -178,7 +178,7 @@ class ZOIALibrarianBank(QMainWindow):
         Currently triggered via a button press.
         """
 
-        # PySide2 file selectors are bad and occasionally wrong, so try
+        # PySide6 file selectors are bad and occasionally wrong, so try
         # all of them to be safe.
         bnk_file = QFileDialog.getOpenFileName(
             None, "Select a Patch Folder:", os.path.join(self.path, "Folders")

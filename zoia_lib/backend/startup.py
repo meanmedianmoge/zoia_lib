@@ -12,8 +12,8 @@
 import os
 import sys
 
-from PySide2.QtGui import QPixmap, Qt
-from PySide2.QtWidgets import QApplication, QSplashScreen, QStyleFactory
+from PySide6.QtGui import QPixmap, Qt
+from PySide6.QtWidgets import QApplication, QSplashScreen, QStyleFactory
 
 from zoia_lib.backend.utilities import meipass
 from zoia_lib.UI.ZOIALibrarian_main import ZOIALibrarianMain
@@ -39,4 +39,4 @@ if __name__ == "__main__":
     window.show()
     splash.finish(window)
 
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

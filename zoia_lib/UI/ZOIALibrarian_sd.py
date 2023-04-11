@@ -2,8 +2,8 @@ import os
 import platform
 from os.path import expanduser
 
-from PySide2.QtCore import QEvent
-from PySide2.QtWidgets import (
+from PySide6.QtCore import QEvent
+from PySide6.QtWidgets import (
     QTableWidgetItem,
     QPushButton,
     QFileDialog,
