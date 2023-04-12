@@ -236,7 +236,7 @@ class ZOIALibrarianLocal(QMainWindow):
             self.go_back()
             self.ui.searchbar_local.setText("")
 
-        # self.window.tab_switch()
+        self.window.tab_switch()
 
     def initiate_export(self):
         """Attempts to export a patch saved in the backend to an SD

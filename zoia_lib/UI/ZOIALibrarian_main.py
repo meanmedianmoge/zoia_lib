@@ -350,7 +350,7 @@ class ZOIALibrarianMain(QMainWindow):
         if self.local_sizes is None:
             self.ui.splitter_local.setSizes([self.width() * 0.6, self.width() * 0.4])
             self.ui.splitter_local_hori.setSizes(
-                [self.height() * 0.55, self.height() * 0.45]
+                [self.height() * 0.65, self.height() * 0.35]
             )
         else:
             self.ui.splitter_local.setSizes(
@@ -745,7 +745,7 @@ class ZOIALibrarianMain(QMainWindow):
             # Reset local sizes
             self.ui.splitter_local.setSizes([self.width() * 0.6, self.width() * 0.4])
             self.ui.splitter_local_hori.setSizes(
-                [self.height() * 0.55, self.height() * 0.45]
+                [self.height() * 0.65, self.height() * 0.35]
             )
             self.ui.table_local.resizeColumnsToContents()
             self.ui.table_local.setColumnWidth(0, self.width() * 0.165)
@@ -779,7 +779,7 @@ class ZOIALibrarianMain(QMainWindow):
             # Reset local sizes
             self.ui.splitter_local.setSizes([self.width() * 0.6, self.width() * 0.4])
             self.ui.splitter_local_hori.setSizes(
-                [self.height() * 0.55, self.height() * 0.45]
+                [self.height() * 0.65, self.height() * 0.35]
             )
             self.ui.table_local.resizeColumnsToContents()
             self.ui.table_local.setColumnWidth(0, self.width() * 0.165)

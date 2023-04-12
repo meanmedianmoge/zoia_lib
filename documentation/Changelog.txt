@@ -1,9 +1,29 @@
 Version 1.3 (April 2023)
 
 New Features
-- Updated the PS API endpoint to coincide with their internal changes.
-- New modules were added (Sampler, Logic Gate), so the app now supports those.
-- Upgraded backend UI to PySide6.
+- Updated the PatchStorage API endpoint to coincide with their new beta version.
+    - This future-proofs the app for a while and provides some additional functionality (to be added shortly!)
+- New modules were added (Sampler, Logic Gate), so the app now supports those in the Visualizer and Expander views.
+- Upgraded backend UI to Pyside6.
+- Edited the Expander actions to make them easier to use.
+    - Moving around the patch only requires a mouse click + drag (opposed to Alt + click + drag).
+    - Disabled the ability to accidentally remove connections.
+    - Updated some key-command shortcut actions.
+
+Fixes
+- Fixed a couple crashes related to error dialog.
+- Fixed an issue with importing renamed patches.
+- Fixed an issue with deleting patches from local.
+- Resolved some API issues with the PatchStorage team.
+
+Known Issues
+- Feedback loops/recursive patches will not fully show within the Expander.
+    - This is due to complexities with the auto-layout algorithm and to avoid crashes.
+
+Future Plans
+- Optimize the Patch Expander by adding color-coding, variable views, and other useful features.
+- Continue development on patch editing and creation tools.
+- Utilize the new PatchStorage beta API to upload patches from the application.
 
 Version 1.2 (March 2022)
 
