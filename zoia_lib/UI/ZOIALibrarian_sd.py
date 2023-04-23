@@ -64,10 +64,11 @@ class ZOIALibrarianSD(QMainWindow):
             )
             if input_dir != "" and os.path.isdir(input_dir):
                 if "/" in input_dir and platform.system().lower() == "windows":
-                    # THIS IS NEEDED FOR WINDOWS.
+                    # This is (no longer needed) for Windows.
                     # This comes from a bug with QFileDialog returning the
                     # wrong path separator on Windows for some odd reason.
-                    input_dir = input_dir.split("/")[0]
+                    # input_dir = input_dir.split("/")[0]
+                    pass
                 elif "/" in input_dir:
                     # OSX case.
                     pass
@@ -190,7 +191,8 @@ class ZOIALibrarianSD(QMainWindow):
                 # THIS IS NEEDED FOR WINDOWS.
                 # This comes from a bug with QFileDialog returning the
                 # wrong path separator on Windows for some odd reason.
-                input_dir = input_dir.split("/")[0]
+                # input_dir = input_dir.split("/")[0]
+                pass
             elif "/" in input_dir:
                 # OSX case.
                 pass
@@ -263,6 +265,7 @@ class ZOIALibrarianSD(QMainWindow):
         # Give the user a chance to cancel if they hit the button by
         # mistake.
         if os.path.isdir(self.sd_path_full):
+            # TODO: this confirmation window does work
             self.msg.setWindowTitle("Warning")
             self.msg.setIcon(QMessageBox.Warning)
             self.msg.setText(

@@ -164,12 +164,13 @@ class ZOIALibrarianUtil:
                     for i in range(self.ui.table_bank_local.rowCount()):
                         self.ui.table_bank_local.cellWidget(i, 0).setFont(new_font)
 
-    def save_pref(self, w, h, sd, path):
+    def save_pref(self, w, h, sd, exp, path):
         """Saves and writes the state of a UI window to pref.json
 
         w: The width of the main window.
         h: The height of the main window.
-        sd: The path to an the root of a specified SD card.
+        sd: The path to the root of a specified SD card.
+        exp: The path to the export dir.
         path: The path to the backend .ZoiaLibraryApp directory.
         """
 
@@ -180,6 +181,7 @@ class ZOIALibrarianUtil:
             "font": self.ui.table_PS.horizontalHeader().font().toString().split(",")[0],
             "font_size": self.ui.table_PS.horizontalHeader().font().pointSize(),
             "sd_root": "" if sd is None else sd,
+            "export_dir": "" if sd is None or exp is None else exp,
         }
         ps_sizes = {
             "col_0": self.ui.table_PS.columnWidth(0),

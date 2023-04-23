@@ -9,11 +9,15 @@ New Features
     - Moving around the patch only requires a mouse click + drag (opposed to Alt + click + drag).
     - Disabled the ability to accidentally remove connections.
     - Updated some key-command shortcut actions.
+- Added the export directory path to the saved preferences file.
+    - It will default to the last used path for the session.
 
 Fixes
 - Fixed a couple crashes related to error dialog.
 - Fixed an issue with importing renamed patches.
 - Fixed an issue with deleting patches from local.
+- Fixed an issue with the export directory path on Windows.
+- Fixed some issues with confirmation windows not confirming the decision.
 - Resolved some API issues with the PatchStorage team.
 
 Known Issues

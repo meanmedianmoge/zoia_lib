@@ -160,7 +160,12 @@ class ZOIALibrarianMain(QMainWindow):
                 data = json.loads(f.read())
             if data[0]["sd_root"] != "" and os.path.exists(data[0]["sd_root"]):
                 self.sd.set_sd_root(data[0]["sd_root"])
-                self.sd.set_export_path(os.path.join(self.sd.sd_root, "to_zoia"))
+                if ("export_dir" in data[0] and data[0]["sd_root"] != "" and
+                    os.path.exists(data[0]["export_dir"])
+                ):
+                    self.sd.set_export_path(data[0]["export_dir"])
+                else:
+                    self.sd.set_export_path(os.path.join(self.sd.sd_root, "to_zoia"))
                 self.ui.tab_sd.setEnabled(True)
                 self.sd.sd_path(True, self.width())
 
@@ -913,15 +918,21 @@ class ZOIALibrarianMain(QMainWindow):
                     )
 
                 # Direct link to PS
+                if "link" not in content and "url" in content:
+                    obj = "url"
+                elif "link" in content and "url" not in content:
+                    obj = "link"
+                else:
+                    raise errors.JSONError(content, 801)
                 if (
-                    "link" not in content
-                    or content["link"] is None
-                    or content["link"] == ""
+                    obj not in content
+                    or content[obj] is None
+                    or content[obj] == ""
                 ):
                     content["self"] = content["title"]
                 else:
                     content["self"] = """<a href="{}">{}</a>""".format(
-                        content["link"], content["title"]
+                        content[obj], content["title"]
                     )
 
             if (
@@ -1532,7 +1543,7 @@ class ZOIALibrarianMain(QMainWindow):
         """
 
         self.util.save_pref(
-            self.width(), self.height(), self.sd.get_sd_root(), self.path
+            self.width(), self.height(), self.sd.get_sd_root(), self.sd.get_export_path(), self.path
         )
 
     def _try_quit(self):

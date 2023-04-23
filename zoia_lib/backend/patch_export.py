@@ -86,6 +86,10 @@ class PatchExport(Patch):
                 name = name[4:]
             except ValueError:
                 pass
+        # Need to get rid of extra characters in the filename
+        if "-" in name and len(name.split("-")[1].split(".")[0]) == 13:
+            remove = "-" + name.split("-")[1].split(".")[0]
+            name = name.replace(remove, "")
         try:
             if -1 < slot < 10:
                 # one digit

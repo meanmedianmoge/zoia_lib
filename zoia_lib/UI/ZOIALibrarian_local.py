@@ -341,8 +341,10 @@ class ZOIALibrarianLocal(QMainWindow):
                                 .split(",")[0]
                                 .replace("'", "")
                             )
+                            # TODO: figure out why this confirmation window isn't working
+                            # It defaults to the No option and passes
                             self.msg.setWindowTitle("Slot Exists")
-                            self.msg.setIcon(QMessageBox.Information)
+                            self.msg.setIcon(QMessageBox.Warning)
                             self.msg.setText(
                                 "That slot is occupied by {}. "
                                 "Would you like to overwrite it?".format(e)
@@ -398,6 +400,8 @@ class ZOIALibrarianLocal(QMainWindow):
                                         count += 1
                             if count > 0:
                                 # Remove all of the patches that are in the way.
+                                # TODO: figure out why this confirmation window isn't working
+                                # It defaults to the No option and passes
                                 self.msg.setWindowTitle("Slot Exists")
                                 self.msg.setIcon(QMessageBox.Information)
                                 self.msg.setText(
