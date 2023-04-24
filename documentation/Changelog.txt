@@ -4,6 +4,7 @@ New Features
 - Updated the PatchStorage API endpoint to coincide with their new beta version.
     - This future-proofs the app for a while and provides some additional functionality (to be added shortly!)
 - New modules were added (Sampler, Logic Gate), so the app now supports those in the Visualizer and Expander views.
+- Added a dedicated "Samples" folder in the backend to store and reference saved samples from downloaded or imported patches.
 - Upgraded backend UI to Pyside6.
 - Edited the Expander actions to make them easier to use.
     - Moving around the patch only requires a mouse click + drag (opposed to Alt + click + drag).

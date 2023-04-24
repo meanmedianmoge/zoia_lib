@@ -63,6 +63,9 @@ class PatchDelete(Patch):
                 # Special case: There are no more patches left in the
                 # patch directory. As such, the directory should be removed.
                 os.rmdir(new_path)
+                # Need to delete samples as well
+                if os.path.exists(os.path.join(self.back_path, "Samples", patch)):
+                    shutil.rmtree(os.path.join(self.back_path, "Samples", patch))
         except FileNotFoundError:
             raise errors.BadPathError(patch, 301)
 
@@ -85,6 +88,8 @@ class PatchDelete(Patch):
 
         try:
             shutil.rmtree(os.path.join(self.back_path, patch_dir))
+            if os.path.exists(os.path.join(self.back_path, "Samples", patch_dir)):
+                shutil.rmtree(os.path.join(self.back_path, "Samples", patch_dir))
         except FileNotFoundError:
             # Couldn't find the patch directory that was passed.
             raise errors.BadPathError(patch_dir, 301)

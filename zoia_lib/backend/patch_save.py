@@ -1,4 +1,5 @@
 import datetime
+import glob
 import json
 import os
 import platform
@@ -75,6 +76,7 @@ class PatchSave(Patch):
                     and fld != "Folders"
                     and fld != "sample_files"
                     and fld != ".DS_Store"
+                    and fld != "Samples"
                 ):
                     for files in os.listdir(os.path.join(self.back_path, fld)):
                         # Check every .bin file only.
@@ -521,25 +523,32 @@ class PatchSave(Patch):
             raise errors.SavingError(patch[1]["title"], 501)
 
         # Get to the uncompressed directory.
+        new_dir = False
         for file in os.listdir(pch):
             if os.path.isdir(os.path.join(pch, file)) and len(os.listdir(pch)) == 1:
                 to_delete = os.path.join(pch, file)
                 pch = os.path.join(pch, file)
             elif os.path.isdir(os.path.join(pch, file)):
-                # Oh boy they compressed it with a directory and some
-                # stray files because they hate us.
-                shutil.rmtree(os.path.join(pch, file))
+                # Case where a sample folder was included in the download.
+                # shutil.rmtree(os.path.join(pch, file))
+                new_dir = file
+                pass
 
-        if len(os.listdir(pch)) == 1:
+        # Get count of filetypes in the compressed file dir.
+        bin_files = glob.glob(os.path.join(pch, "*.bin"))
+        wav_files = glob.glob(os.path.join(pch, "*.WAV")) + glob.glob(os.path.join(pch, "*.wav"))
+
+        if len(bin_files) == 1:
             # The compressed file only contained 1 patch.
             for file in os.listdir(pch):
-                name = file
-                os.rename(
-                    os.path.join(pch, file),
-                    os.path.join(pch, "{}.bin".format(patch_id)),
-                )
-                patch[1]["files"][0]["filename"] = name
-                self.save_metadata_json(patch[1])
+                if file.split(".")[-1] == "bin":
+                    name = file
+                    os.rename(
+                        os.path.join(pch, file),
+                        os.path.join(pch, "{}.bin".format(patch_id)),
+                    )
+                    patch[1]["files"][0]["filename"] = name
+                    self.save_metadata_json(patch[1])
         else:
             # The compressed file contained more than 1 patch.
             i = 0
@@ -563,6 +572,35 @@ class PatchSave(Patch):
                     #  additional files. Especially .txt, would want to
                     #  add that to the content attribute in the JSON.
                     os.remove(os.path.join(pch, file))
+
+        if len(wav_files) > 0:
+            os.makedirs(os.path.join(self.back_path, "Samples", patch_id), exist_ok=True)
+            # The compressed file included some samples.
+            for file in wav_files:
+                if file.split(".")[-1] == "wav" or file.split(".")[-1] == "WAV":
+                    try:
+                        name = file.split("/")[-1].split(".")[0]
+                        with open(
+                                os.path.join(self.back_path, "Samples", patch_id,
+                                             "{}.wav".format(name)), "w"
+                        ) as f:
+                            f.write(file)
+                        os.remove(os.path.join(pch, file))
+                    except FileNotFoundError or FileExistsError:
+                        raise errors.SavingError(patch, 501)
+                else:
+                    os.remove(os.path.join(pch, file))
+
+        # case for extra directory with samples inside
+        if new_dir:
+            try:
+                shutil.copytree(os.path.join(pch, new_dir),
+                                os.path.join(self.back_path, "Samples", patch_id),
+                                dirs_exist_ok=True)
+                shutil.rmtree(os.path.join(pch, new_dir))
+            except FileNotFoundError or FileExistsError:
+                raise errors.SavingError(patch, 501)
+
         if to_delete is not None:
             # We need to cleanup.
             for file in os.listdir(to_delete):

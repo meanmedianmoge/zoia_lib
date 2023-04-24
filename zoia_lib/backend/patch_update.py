@@ -88,6 +88,7 @@ class PatchUpdate(Patch):
                 and patch != "Banks"
                 and patch != "Folders"
                 and patch != ".DS_Store"
+                and patch != "Samples"
             ):
                 # Split on number of versions in the dir.
                 if (

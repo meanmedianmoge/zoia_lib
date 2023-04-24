@@ -339,7 +339,7 @@ class ZOIALibrarianBank(QMainWindow):
                 # want to overwrite it.
                 # TODO: figure out why this confirmation window isn't working
                 # It defaults to the No option and passes
-                self.msg.setWindowTitle("Folder exists")
+                self.msg.setWindowTitle("Folder Exists")
                 self.msg.setIcon(QMessageBox.Warning)
                 self.msg.setText("A Folder with that name already exists.")
                 self.msg.setInformativeText("Would you like to overwrite it?")

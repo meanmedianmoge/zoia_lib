@@ -86,10 +86,12 @@ class PatchExport(Patch):
                 name = name[4:]
             except ValueError:
                 pass
+
         # Need to get rid of extra characters in the filename
         if "-" in name and len(name.split("-")[1].split(".")[0]) == 13:
             remove = "-" + name.split("-")[1].split(".")[0]
             name = name.replace(remove, "")
+
         try:
             if -1 < slot < 10:
                 # one digit
@@ -119,6 +121,11 @@ class PatchExport(Patch):
             shutil.copy(
                 os.path.join(self.back_path, idx, patch), os.path.join(dest, name)
             )
+            if os.path.exists(os.path.join(self.back_path, "Samples", idx)):
+                shutil.copytree(
+                    os.path.join(self.back_path, "Samples", idx), os.path.join(os.path.dirname(dest), idx),
+                    dirs_exist_ok=True
+                )
         except FileNotFoundError or FileExistsError:
             raise errors.ExportingError(patch)
 

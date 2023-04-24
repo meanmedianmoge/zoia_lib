@@ -92,6 +92,7 @@ class ZOIALibrarianLocal(QMainWindow):
                 and patch != "Banks"
                 and patch != "Folders"
                 and patch != "temp"
+                and patch != "Samples"
             ):
                 # Need to update all versions
                 for version in glob.glob(os.path.join(self.path, patch, "*json")):
@@ -190,6 +191,7 @@ class ZOIALibrarianLocal(QMainWindow):
                 and patches != "temp"
                 and patches != "temp.zip"
                 and patches != "patch.html"
+                and patches != "Samples"
             ):
                 for pch in os.listdir(os.path.join(self.path, patches)):
                     # Read the metadata so that we can set up the tables.
