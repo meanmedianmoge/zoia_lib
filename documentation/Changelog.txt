@@ -12,6 +12,7 @@ New Features
     - Updated some key-command shortcut actions.
 - Added the export directory path to the saved preferences file.
     - It will default to the last used path for the session.
+- Added a check-for-update procedure to retrieve the latest app version from Github.
 
 Fixes
 - Fixed a couple crashes related to error dialog.
