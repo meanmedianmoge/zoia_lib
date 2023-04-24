@@ -2956,7 +2956,7 @@
      <x>0</x>
      <y>0</y>
      <width>1567</width>
-     <height>22</height>
+     <height>37</height>
     </rect>
    </property>
    <property name="contextMenuPolicy">
@@ -2977,6 +2977,7 @@
     <addaction name="actionImport_Multiple_Patches"/>
     <addaction name="actionImport_Version_History_directory"/>
     <addaction name="separator"/>
+    <addaction name="actionCheck_for_Updates"/>
     <addaction name="actionNavigate_to_local_backend"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -3526,6 +3527,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionCheck_for_Updates">
+   <property name="text">
+    <string>Check for Updates</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+G</string>
    </property>
   </action>
  </widget>

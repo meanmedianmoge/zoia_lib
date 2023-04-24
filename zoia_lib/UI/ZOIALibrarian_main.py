@@ -1,5 +1,7 @@
 import json
 import os
+import platform
+import requests
 from os.path import expanduser
 
 from PySide6 import QtCore
@@ -42,7 +44,7 @@ class ZOIALibrarianMain(QMainWindow):
     and exporting patches; among other functions.
     Any changes made to the .ui file will not be reflected unless the
     following command is run from the UI directory:
-        PySide6-uic.exe ZOIALibrarian.ui -o ZOIALibrarian.py
+        pyside6-uic.exe ZOIALibrarian.ui -o ZOIALibrarian.py
     Known issues:
      - Certain UI elements do not like font changes (headers, tabs, etc).
      - Deleting items in the Folders table will always delete the first entry
@@ -116,6 +118,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.tab_1 = -1
         self.tab_3 = -1
         self.add_rating = None
+        self._version = "1.3"
 
         # Threads
         self.worker_mass = ImportMassWorker(self)
@@ -292,6 +295,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.update_patch_notes.clicked.connect(self.local.update_patch_notes)
         self.ui.actionImport_A_Patch.triggered.connect(self.import_patch)
         self.ui.actionReset_Sizes.triggered.connect(self.reset_ui)
+        self.ui.actionCheck_for_Updates.triggered.connect(self.check_for_updates)
         self.ui.actionDocumentation.triggered.connect(self.util.documentation)
         self.ui.actionFAQ.triggered.connect(self.util.faq)
         self.ui.actionTips_Tricks.triggered.connect(self.util.tips)
@@ -406,6 +410,9 @@ class ZOIALibrarianMain(QMainWindow):
         center = QScreen.availableGeometry(QApplication.primaryScreen()).center()
         frame.moveCenter(center)
         self.move(frame.topLeft())
+
+        # Check for any app updates
+        self.check_for_updates()
 
     def tab_switch(self):
         """Actions performed whenever a tab is switched to within the
@@ -1232,6 +1239,34 @@ class ZOIALibrarianMain(QMainWindow):
             )
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
+
+    def check_for_updates(self):
+        """Checks Github to see if there has been an app update."""
+
+        url = 'https://github.com/meanmedianmoge/zoia_lib/releases/latest'
+        r = requests.get(url)
+        latest = r.url.split('/')[-1]
+
+        curr_os = platform.system().lower()
+        choices = {"windows": "Windows", "darwin": "Mac", "linux": "Linux"}
+
+        if float(self._version) < float(latest):
+            self.msg.setWindowTitle("App Update")
+            self.msg.setIcon(QMessageBox.Information)
+            self.msg.setText(
+                "A new version of the app is available. "
+                "Would you like to download it?"
+            )
+            self.msg.setStandardButtons(
+                QMessageBox.Yes | QMessageBox.No
+            )
+            value = self.msg.exec_()
+            if value == QMessageBox.Yes:
+                filename = "ZOIALibrarian-{}-{}.zip".format(choices.get(curr_os), self._version)
+                r = requests.get(url + "/download/{}".format(filename))
+
+                with open(filename, "wb") as f:
+                    f.write(r.content)
 
     def directory_select(self):
         """Allows the user to select a directory via their OS specific

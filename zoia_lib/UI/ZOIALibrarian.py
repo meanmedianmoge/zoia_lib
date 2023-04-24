@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'ZOIALibrarian.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.4.1
+## Created by: Qt User Interface Compiler version 6.5.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -197,6 +197,8 @@ class Ui_MainWindow(object):
         self.actionSort_by_tag_low_high.setObjectName(u"actionSort_by_tag_low_high")
         self.actionNavigate_to_local_backend = QAction(MainWindow)
         self.actionNavigate_to_local_backend.setObjectName(u"actionNavigate_to_local_backend")
+        self.actionCheck_for_Updates = QAction(MainWindow)
+        self.actionCheck_for_Updates.setObjectName(u"actionCheck_for_Updates")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.centralwidget.setStyleSheet(u"")
@@ -1475,7 +1477,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1567, 22))
+        self.menubar.setGeometry(QRect(0, 0, 1567, 37))
         self.menubar.setContextMenuPolicy(Qt.ActionsContextMenu)
         self.menubar.setAcceptDrops(False)
         self.menubar.setNativeMenuBar(True)
@@ -1501,6 +1503,7 @@ class Ui_MainWindow(object):
         self.menuFile.addAction(self.actionImport_Multiple_Patches)
         self.menuFile.addAction(self.actionImport_Version_History_directory)
         self.menuFile.addSeparator()
+        self.menuFile.addAction(self.actionCheck_for_Updates)
         self.menuFile.addAction(self.actionNavigate_to_local_backend)
         self.menuFile.addAction(self.actionQuit)
         self.menuSort.addAction(self.actionSort_by_title_A_Z)
@@ -1701,6 +1704,10 @@ class Ui_MainWindow(object):
         self.actionNavigate_to_local_backend.setText(QCoreApplication.translate("MainWindow", u"Navigate to Local Backend", None))
 #if QT_CONFIG(shortcut)
         self.actionNavigate_to_local_backend.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+N", None))
+#endif // QT_CONFIG(shortcut)
+        self.actionCheck_for_Updates.setText(QCoreApplication.translate("MainWindow", u"Check for Updates", None))
+#if QT_CONFIG(shortcut)
+        self.actionCheck_for_Updates.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+G", None))
 #endif // QT_CONFIG(shortcut)
 #if QT_CONFIG(tooltip)
         self.tabs.setToolTip("")
