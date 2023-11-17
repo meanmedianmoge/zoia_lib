@@ -79,7 +79,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.msg.setWindowIcon(self.icon)
 
         # Helper classes init
-        self.util = ZOIALibrarianUtil(self.ui, self)
+        self.util = ZOIALibrarianUtil(self.ui, api, self)
         self.sd = ZOIALibrarianSD(self.ui, save, self.msg, delete, self.util)
         self.bank = ZOIALibrarianBank(
             self.ui, self.path, self.sd, self.msg, self.util, self
@@ -89,6 +89,7 @@ class ZOIALibrarianMain(QMainWindow):
         )
         self.local = ZOIALibrarianLocal(
             self.ui,
+            api,
             self.path,
             self.sd,
             self.msg,
@@ -143,6 +144,7 @@ class ZOIALibrarianMain(QMainWindow):
         # Disabling widgets the user doesn't have access to on startup.
         self.ui.tab_sd.setEnabled(False)
         self.ui.update_patch_notes.setEnabled(False)
+        self.ui.upload_patch.setEnabled(False)
         self.ui.import_all_btn.setEnabled(False)
         self.ui.import_all_ver_btn.setEnabled(False)
         self.ui.back_btn_local.setEnabled(False)
@@ -171,6 +173,9 @@ class ZOIALibrarianMain(QMainWindow):
                     self.sd.set_export_path(os.path.join(self.sd.sd_root, "to_zoia"))
                 self.ui.tab_sd.setEnabled(True)
                 self.sd.sd_path(True, self.width())
+
+            # Set API token as last saved
+            api.api_token = data[0]["api_token"]
 
             self.resize(data[0]["width"], data[0]["height"])
 
@@ -293,6 +298,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.actionNavigate_to_local_backend.triggered.connect(self.util.open_local_backend)
         self.ui.refresh_pch_btn.clicked.connect(self.ps.reload_ps_thread)
         self.ui.update_patch_notes.clicked.connect(self.local.update_patch_notes)
+        self.ui.upload_patch.clicked.connect(self.local.upload_patch)
         self.ui.actionImport_A_Patch.triggered.connect(self.import_patch)
         self.ui.actionReset_Sizes.triggered.connect(self.reset_ui)
         self.ui.actionCheck_for_Updates.triggered.connect(self.check_for_updates)
@@ -461,6 +467,7 @@ class ZOIALibrarianMain(QMainWindow):
                 self.ui.text_browser_local.setText("")
                 self.ui.page_label.setText("")
                 self.ui.update_patch_notes.setEnabled(False)
+                self.ui.upload_patch.setEnabled(False)
                 self.ui.text_browser_viz.setText("")
                 self.ui.btn_prev_page.setEnabled(False)
                 self.ui.btn_next_page.setEnabled(False)
@@ -884,6 +891,9 @@ class ZOIALibrarianMain(QMainWindow):
                     curr_browser = self.ui.text_browser_local
                     viz_browser = self.ui.page_label
                     self.ui.update_patch_notes.setEnabled(True)
+                    self.ui.upload_patch.setEnabled(False)
+                    if len(name) == 5:
+                        self.ui.upload_patch.setEnabled(True)
                     self.ui.text_browser_viz.setText("")
                 elif self.ui.tabs.currentIndex() == 3:
                     curr_browser = self.ui.text_browser_bank
@@ -930,7 +940,7 @@ class ZOIALibrarianMain(QMainWindow):
                 elif "link" in content and "url" not in content:
                     obj = "link"
                 else:
-                    raise errors.JSONError(content, 801)
+                    obj = "link"
                 if (
                     obj not in content
                     or content[obj] is None
@@ -995,6 +1005,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.ui.page_label.setText("")
             self.ui.searchbar_local.setText("")
             self.ui.update_patch_notes.setEnabled(False)
+            self.ui.upload_patch.setEnabled(False)
             self.ui.back_btn_local.setEnabled(True)
             self.ui.back_btn.setEnabled(False)
             self.ui.btn_prev_page.setEnabled(False)
@@ -1200,7 +1211,7 @@ class ZOIALibrarianMain(QMainWindow):
         """
 
         pch = QFileDialog.getOpenFileName(
-            None, "Select a file", expanduser("~")
+            None, "Select a file", expanduser("~"), filter="PatchFiles (*.bin *.zip)"
         )[0]
         # Didn't make a selection.
         if pch == "":
@@ -1243,9 +1254,22 @@ class ZOIALibrarianMain(QMainWindow):
     def check_for_updates(self):
         """Checks Github to see if there has been an app update."""
 
-        url = 'https://github.com/meanmedianmoge/zoia_lib/releases/latest'
-        r = requests.get(url)
-        latest = r.url.split('/')[-1]
+        try:
+            url = 'https://github.com/meanmedianmoge/zoia_lib/releases/latest'
+            r = requests.get(url)
+            latest = r.url.split('/')[-1]
+        except Exception as e:
+            # Other unknown API connection error.
+            self.ui.statusbar.showMessage("Github connection failed.", timeout=5000)
+            self.msg.setWindowTitle("Github Error")
+            self.msg.setIcon(QMessageBox.Information)
+            self.msg.setText(
+                "Failed to retrieve the repo metadata from Github."
+            )
+            self.msg.setDetailedText(str(e))
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+            self.msg.setDetailedText(None)
 
         curr_os = platform.system().lower()
         choices = {"windows": "Windows", "darwin": "Mac", "linux": "Linux"}

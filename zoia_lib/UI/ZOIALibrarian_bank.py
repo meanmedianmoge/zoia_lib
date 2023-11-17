@@ -280,8 +280,6 @@ class ZOIALibrarianBank(QMainWindow):
             self._get_bank_data()
             if "{}.json".format(name) in os.listdir(os.path.join(self.path, "Folders")):
                 # There's already a bank with that name.
-                # TODO: figure out why this confirmation window isn't working
-                # It defaults to the No option and passes
                 self.msg.setWindowTitle("Folder Exists")
                 self.msg.setIcon(QMessageBox.Warning)
                 self.msg.setText("A Folder with that name already exists.")
@@ -337,8 +335,6 @@ class ZOIALibrarianBank(QMainWindow):
             elif ok and name in os.listdir(sd.get_sd_root()):
                 # Already have that directory on the SD, need to check if they
                 # want to overwrite it.
-                # TODO: figure out why this confirmation window isn't working
-                # It defaults to the No option and passes
                 self.msg.setWindowTitle("Folder Exists")
                 self.msg.setIcon(QMessageBox.Warning)
                 self.msg.setText("A Folder with that name already exists.")

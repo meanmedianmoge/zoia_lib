@@ -265,7 +265,6 @@ class ZOIALibrarianSD(QMainWindow):
         # Give the user a chance to cancel if they hit the button by
         # mistake.
         if os.path.isdir(self.sd_path_full):
-            # TODO: this confirmation window does work
             self.msg.setWindowTitle("Warning")
             self.msg.setIcon(QMessageBox.Warning)
             self.msg.setText(

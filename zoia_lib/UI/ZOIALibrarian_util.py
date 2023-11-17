@@ -14,7 +14,7 @@ class ZOIALibrarianUtil:
     classes.
     """
 
-    def __init__(self, ui, window):
+    def __init__(self, ui, api, window):
         """Initializes the class with the required parameters.
 
         ui: The UI component of ZOIALibrarianMain
@@ -23,6 +23,7 @@ class ZOIALibrarianUtil:
 
         # Get the ui reference
         self.ui = ui
+        self.api = api
         self.window = window
 
         self.dark = True
@@ -80,6 +81,7 @@ class ZOIALibrarianUtil:
             self.ui.back_btn_local.setFont(new_font)
             self.ui.check_for_updates_btn.setFont(new_font)
             self.ui.update_patch_notes.setFont(new_font)
+            self.ui.upload_patch.setFont(new_font)
             self.ui.btn_show_routing.setFont(new_font)
             self.ui.page_label.setFont(new_font)
             self.ui.back_btn.setFont(new_font)
@@ -182,6 +184,7 @@ class ZOIALibrarianUtil:
             "font_size": self.ui.table_PS.horizontalHeader().font().pointSize(),
             "sd_root": "" if sd is None else sd,
             "export_dir": "" if sd is None or exp is None else exp,
+            "api_token": self.api.api_token
         }
         ps_sizes = {
             "col_0": self.ui.table_PS.columnWidth(0),

@@ -653,32 +653,61 @@
                   <enum>QLayout::SetMinimumSize</enum>
                  </property>
                  <item>
-                  <widget class="QPushButton" name="update_patch_notes">
-                   <property name="cursor">
-                    <cursorShape>PointingHandCursor</cursorShape>
-                   </property>
-                   <property name="mouseTracking">
-                    <bool>true</bool>
-                   </property>
-                   <property name="toolTip">
-                    <string>Click here to update the patch notes for the currently selected patch.</string>
-                   </property>
-                   <property name="statusTip">
-                    <string>Click here to update the patch notes for the currently selected patch.</string>
-                   </property>
-                   <property name="accessibleName">
-                    <string>Update Patch Notes button</string>
-                   </property>
-                   <property name="accessibleDescription">
-                    <string>When clicked, updates the patch notes for the currently selected patch. Patch notes can be add directly below in the Additional Patch Notes Display. </string>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true"/>
-                   </property>
-                   <property name="text">
-                    <string>Update Patch Notes</string>
-                   </property>
-                  </widget>
+                  <layout class="QHBoxLayout" name="horizontalLayout_21" stretch="0,0">
+                   <item>
+                    <widget class="QPushButton" name="update_patch_notes">
+                     <property name="cursor">
+                      <cursorShape>PointingHandCursor</cursorShape>
+                     </property>
+                     <property name="mouseTracking">
+                      <bool>true</bool>
+                     </property>
+                     <property name="toolTip">
+                      <string>Click here to update the patch notes for the currently selected patch.</string>
+                     </property>
+                     <property name="statusTip">
+                      <string>Click here to update the patch notes for the currently selected patch.</string>
+                     </property>
+                     <property name="accessibleName">
+                      <string>Update Patch Notes button</string>
+                     </property>
+                     <property name="accessibleDescription">
+                      <string>When clicked, updates the patch notes for the currently selected patch. Patch notes can be add directly below in the Additional Patch Notes Display. </string>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true"/>
+                     </property>
+                     <property name="text">
+                      <string>Update Patch Notes</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="upload_patch">
+                     <property name="cursor">
+                      <cursorShape>PointingHandCursor</cursorShape>
+                     </property>
+                     <property name="mouseTracking">
+                      <bool>true</bool>
+                     </property>
+                     <property name="toolTip">
+                      <string>Click here to upload this patch to PatchStorage.</string>
+                     </property>
+                     <property name="statusTip">
+                      <string>Click here to upload this patch to PatchStorage.</string>
+                     </property>
+                     <property name="accessibleName">
+                      <string>Upload Patch Button</string>
+                     </property>
+                     <property name="accessibleDescription">
+                      <string>When clicked, prompts the API to start a request to upload the selected patch.</string>
+                     </property>
+                     <property name="text">
+                      <string>Upload to PatchStorage</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
                  </item>
                  <item>
                   <widget class="QSplitter" name="splitter_local_hori">

@@ -1,18 +1,25 @@
-Version 1.3 (April 2023)
+Version 1.3 (December 2023)
 
 New Features
 - Updated the PatchStorage API endpoint to coincide with their new beta version.
-    - This future-proofs the app for a while and provides some additional functionality (to be added shortly!)
-- New modules were added (Sampler, Logic Gate), so the app now supports those in the Visualizer and Expander views.
+    - This provides the additional ability to upload patches to the PatchStorage site!
+    - Currently, only newly user-imported patches will be able to be uploaded.
+    - It requires an active PS account and credentials - this information is only used to authenticate a user-token for enabling POST requests.
+    - Further improvements and additions will be coming in future versions.
+- New modules were added (Sampler, Logic Gate), so the app now includes those in the Visualizer and Expander views.
 - Added a dedicated "Samples" folder in the backend to store and reference saved samples from downloaded or imported patches.
-- Upgraded backend UI to Pyside6.
+    - When exporting patches that utilize samples, those files will also be exported to the SD card.
 - Edited the Expander actions to make them easier to use.
     - Moving around the patch only requires a mouse click + drag (opposed to Alt + click + drag).
     - Disabled the ability to accidentally remove connections.
     - Updated some key-command shortcut actions.
 - Added the export directory path to the saved preferences file.
     - It will default to the last used path for the session.
+- (TODO) Adjusted the version import process to be simpler for management of ZOIA folder banks.
+    - When importing as a Version History, no checks are made against local or PS data, and it is uploaded fully as-is and also saved as a Folder.
+    - Importing multiple or individual patches with the same name will continue to create a Version History.
 - Added a check-for-update procedure to retrieve the latest app version from Github.
+- Upgraded backend UI to Pyside6.
 
 Fixes
 - Fixed a couple crashes related to error dialog.
@@ -23,13 +30,14 @@ Fixes
 - Resolved some API issues with the PatchStorage team.
 
 Known Issues
+- With the old alpha API endpoint being phased out, older versions of the application will no longer support PS-related functions.
 - Feedback loops/recursive patches will not fully show within the Expander.
     - This is due to complexities with the auto-layout algorithm and to avoid crashes.
 
 Future Plans
-- Optimize the Patch Expander by adding color-coding, variable views, and other useful features.
+- Optimize the Patch Expander with a new layout algorithm, variable views, and other useful features.
 - Continue development on patch editing and creation tools.
-- Utilize the new PatchStorage beta API to upload patches from the application.
+- Support PUT requests for making updates to patches hosted on PS.
 
 Version 1.2 (March 2022)
 

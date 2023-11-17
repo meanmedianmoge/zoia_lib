@@ -8,7 +8,7 @@ If you would like to leave a tip, we are accepting donations here
 [![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=UUQ3SW5VMV3X4&currency_code=USD&source=url).
 Thank you for your support!
 
-This project depends heavily on the PatchStorage API, developed by Blokas: https://patchstorage.com/docs/.
+This project depends heavily on the PatchStorage API, developed by Blokas: https://patchstorage.com/docs/api/beta/.
 
 This software is distributed under GNU General Public License 3.0.
 Please familiarize yourself with the Terms & Conditions of copyleft licenses like GPL (and others) here:
@@ -21,9 +21,9 @@ modification of this application. By installing the application you agree to the
 ## How to Install
 Application can be installed in one of two ways:
 - (For general users) - Use the pre-bundled build; available on Windows, Mac, and Linux (Ubuntu) here:
-https://github.com/meanmedianmoge/zoia_lib/releases.
+https://github.com/meanmedianmoge/zoia_lib/releases/latest.
 
-- (For developers/contributors) - Build from source; requires Python 3.7+.
+- (For developers/contributors) - Build from source; requires Python 3.8+.
 ```
 # Download source code
 git clone https://github.com/meanmedianmoge/zoia_lib.git
@@ -39,6 +39,7 @@ python -m zoia_lib.backend.startup
 - Overview video and tutorial: https://www.youtube.com/watch?v=JLOUrWtG1Pk
 - Supplemental 1.1 video: https://www.youtube.com/watch?v=nP9oRLtXMUE
 - Supplemental 1.2 video: https://www.youtube.com/watch?v=zR8XSI_Unlk
+- Supplemental 1.3 video: 
 - You'll find the following in `/documentation`: <br>
     - Current version of the user manual
     - Overall changelog - lists new features, bug fixes, and known issues for each release
@@ -49,23 +50,25 @@ python -m zoia_lib.backend.startup
 - Browse PatchStorage uploads and local patches within the UI
 - Search for specific patches, authors, tags, and more
 - Sort the results by author, title, date modified, likes, views, or downloads
-- Download patches from PatchStorage
+- Download & upload patches from/to PatchStorage
 - Import patches from local storage or SD card
-- Version control and local/PS patch merging
-- Preview patches with the patch visualizer and expander
+- Version control and patch merging
+- Preview patches with the patch visualizer
+- Expose the internal routing and connections with the patch expander
 - View and edit patch notes
 - Customized category and tag labels for all patches
 - Manage your SD card folders quickly
 - Drag & drop patches into folders, configured automatically into a ZOIA-readable format
+- Organize sample files from patches using the new Sampler module
 - Help toolbar for app documentation and ZOIA resources
 - Dark and light themes
 
 ## Contributing
 We welcome all contributions! If you want to see something added, 
 either fork or clone the repo to get started. Some useful tools include:
-- QtDesigner - https://build-system.fman.io/qt-designer-download
+- Python 3 - https://www.python.org/downloads/
 - PyCharm Community Edition - https://www.jetbrains.com/pycharm/download
-- Python 3.9.X - https://www.python.org/downloads/release/python-394/
+- QtDesigner - https://build-system.fman.io/qt-designer-download
 
 ## Authors
 - Mike Moger - app owner, primary dev after Beta 3 release, initial Python implementation
