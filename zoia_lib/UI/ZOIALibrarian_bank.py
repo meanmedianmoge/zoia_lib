@@ -582,10 +582,10 @@ class ZOIALibrarianBank(QMainWindow):
                         for i in range(drop_index, drop_index + pch_num):
                             if pch["slot"] == i:
                                 self.data_banks.remove(pch)
-                # Add all of the version patches
-                for i in range(1, pch_num + 2):
+                # Add all versioned patches (in reverse order)
+                for i in range(pch_num + 2 - 1, 0, -1):
                     self.data_banks.append(
-                        {"slot": drop_index + i - 1, "id": "{}_v{}".format(idx, i)}
+                        {"slot": drop_index + (pch_num-i+2) - 1, "id": "{}_v{}".format(idx, i)}
                     )
 
         self._set_data_bank()

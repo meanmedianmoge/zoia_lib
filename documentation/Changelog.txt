@@ -15,8 +15,8 @@ New Features
     - Updated some key-command shortcut actions.
 - Added the export directory path to the saved preferences file.
     - It will default to the last used path for the session.
-- (TODO) Adjusted the version import process to be simpler for management of ZOIA folder banks.
-    - When importing as a Version History, no checks are made against local or PS data, and it is uploaded fully as-is and also saved as a Folder.
+- Adjusted the version import process to be simpler for management of ZOIA folder banks.
+    - When importing as a Version History, no checks are made against local or PS data, and it is uploaded fully as-is.
     - Importing multiple or individual patches with the same name will continue to create a Version History.
 - Added a check-for-update procedure to retrieve the latest app version from Github.
 - Upgraded backend UI to Pyside6.
