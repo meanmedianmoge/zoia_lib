@@ -451,9 +451,10 @@ class PatchStorage:
             }
         )
 
-        if r.status == 201:
-            idx = json.loads(r.data)['id']
-            return idx
+        return r
+        # if r.status == 201:
+        #     idx = json.loads(r.data)['id']
+        #     return idx
 
     def upload_patch(self, path: str, artwork_file_id: int, patch_file_id: int, lic_id: int):
 
@@ -490,10 +491,11 @@ class PatchStorage:
             }
         )
 
-        if r.status == 201:
-            return json.loads(r.data)['id']
-        else:
-            return vars(r)
+        return r
+        # if r.status == 201:
+        #     return json.loads(r.data)['id']
+        # else:
+        #     return vars(r)
 
     def get_all_patch_data_init(self):
         """Retrieves the initial amount of information needed for

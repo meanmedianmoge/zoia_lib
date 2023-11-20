@@ -730,7 +730,21 @@ class ZOIALibrarianLocal(QMainWindow):
         )
         if ok:
             try:
-                art_id = self.api.upload_file(art, file_type=0)
+                r = self.api.upload_file(art, file_type=0)
+                if r.status == 201:
+                    art_id = json.loads(r.data)['id']
+                else:
+                    e = json.loads(r._body)['message']
+                    self.ui.statusbar.showMessage(
+                        "Upload failed.", timeout=5000
+                    )
+                    self.msg.setWindowTitle("Upload Failed")
+                    self.msg.setIcon(QMessageBox.Warning)
+                    self.msg.setText("Could not upload the artwork to the PS API.")
+                    self.msg.setDetailedText(str(e))
+                    self.msg.setStandardButtons(QMessageBox.Ok)
+                    self.msg.exec_()
+                    self.msg.setDetailedText(None)
             except errors.UploadError(art, 1101):
                 self.ui.statusbar.showMessage(
                     "Upload failed.", timeout=5000
@@ -744,7 +758,21 @@ class ZOIALibrarianLocal(QMainWindow):
         # Next is the patch file, which is retrieved from the backend
         file = os.path.join(self.path, self.local_selected, self.local_selected)
         try:
-            file_id = self.api.upload_file(file, file_type=1)
+            r = self.api.upload_file(file, file_type=1)
+            if r.status == 201:
+                file_id = json.loads(r.data)['id']
+            else:
+                e = json.loads(r._body)['message']
+                self.ui.statusbar.showMessage(
+                    "Upload failed.", timeout=5000
+                )
+                self.msg.setWindowTitle("Upload Failed")
+                self.msg.setIcon(QMessageBox.Warning)
+                self.msg.setText("Could not upload the file to the PS API.")
+                self.msg.setDetailedText(str(e))
+                self.msg.setStandardButtons(QMessageBox.Ok)
+                self.msg.exec_()
+                self.msg.setDetailedText(None)
         except errors.UploadError(file, 1101):
             self.ui.statusbar.showMessage(
                 "Upload failed.", timeout=5000
@@ -783,7 +811,21 @@ class ZOIALibrarianLocal(QMainWindow):
 
         # Finally, we upload the whole patch, referencing the art and file IDs
         try:
-            pch_id = self.api.upload_patch(file, art_id, file_id, lic_id)
+            r = self.api.upload_patch(file, art_id, file_id, lic_id)
+            if r.status == 201:
+                pch_id = json.loads(r.data)['id']
+            else:
+                e = json.loads(r._body)['message']
+                self.ui.statusbar.showMessage(
+                    "Upload failed.", timeout=5000
+                )
+                self.msg.setWindowTitle("Upload Failed")
+                self.msg.setIcon(QMessageBox.Warning)
+                self.msg.setText("Could not upload the patch to the PS API.")
+                self.msg.setDetailedText(str(e))
+                self.msg.setStandardButtons(QMessageBox.Ok)
+                self.msg.exec_()
+                self.msg.setDetailedText(None)
         except errors.UploadError((art_id, file_id, lic_id), 1102):
             self.ui.statusbar.showMessage(
                 "Upload failed.", timeout=5000
