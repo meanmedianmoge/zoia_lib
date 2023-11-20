@@ -722,10 +722,11 @@ class ZOIALibrarianLocal(QMainWindow):
         # Now start the upload process
         # First we need artwork
         art, ok = QFileDialog.getOpenFileName(
-            None,
+            self,
             "Select an artwork file for this patch",
             expanduser("~"),
-            filter="Images (*.jpg *.jpeg *.gif *.png * bmp)"
+            filter="Images (*.jpg *.jpeg *.gif *.png *.bmp)",
+            options=QFileDialog.DontUseNativeDialog
         )
         if ok:
             try:

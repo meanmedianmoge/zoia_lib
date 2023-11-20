@@ -60,7 +60,8 @@ class ZOIALibrarianSD(QMainWindow):
 
         if not startup:
             input_dir = QFileDialog.getExistingDirectory(
-                None, "Select an SD Card:", expanduser("~")
+                None, "Select an SD Card:", expanduser("~"),
+                options=QFileDialog.DontUseNativeDialog
             )
             if input_dir != "" and os.path.isdir(input_dir):
                 if "/" in input_dir and platform.system().lower() == "windows":
@@ -184,7 +185,8 @@ class ZOIALibrarianSD(QMainWindow):
         """
 
         input_dir = QFileDialog.getExistingDirectory(
-            None, "Select a directory:", expanduser(self.sd_root)
+            None, "Select a directory:", expanduser(self.sd_root),
+            options=QFileDialog.DontUseNativeDialog
         )
         if input_dir != "" and os.path.isdir(input_dir):
             if "/" in input_dir and platform.system().lower() == "windows":

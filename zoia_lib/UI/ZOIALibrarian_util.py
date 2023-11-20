@@ -312,8 +312,8 @@ class ZOIALibrarianUtil:
         """Opens a FileBrowser showing the app's local backend."""
 
         QFileDialog.getExistingDirectory(
-            None, "Local Backend", self.window.path
-            # QFileDialog.DontUseNativeDialog
+            None, "Local Backend", self.window.path,
+            options=QFileDialog.DontUseNativeDialog
         )
 
     def documentation(self):

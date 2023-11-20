@@ -186,7 +186,8 @@ class ZOIALibrarianBank(QMainWindow):
         # PySide6 file selectors are bad and occasionally wrong, so try
         # all of them to be safe.
         bnk_file = QFileDialog.getOpenFileName(
-            None, "Select a Patch Folder:", os.path.join(self.path, "Folders")
+            self, "Select a Patch Folder:", os.path.join(self.path, "Folders"),
+            filter="JSON (*.json)", options=QFileDialog.DontUseNativeDialog
         )[0]
         if bnk_file != "":
             if "/" in bnk_file and platform.system().lower() == "windows":

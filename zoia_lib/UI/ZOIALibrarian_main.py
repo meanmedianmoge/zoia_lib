@@ -1211,7 +1211,9 @@ class ZOIALibrarianMain(QMainWindow):
         """
 
         pch = QFileDialog.getOpenFileName(
-            None, "Select a file", expanduser("~"), filter="PatchFiles (*.bin *.zip)"
+            self, "Select a file", expanduser("~"),
+            filter="PatchFiles (*.bin *.zip)",
+            options=QFileDialog.DontUseNativeDialog
         )[0]
         # Didn't make a selection.
         if pch == "":
@@ -1302,7 +1304,8 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Let the user specify a directory.
         input_dir = QFileDialog.getExistingDirectory(
-            None, "Select a directory", expanduser("~")
+            None, "Select a directory", expanduser("~"),
+            options=QFileDialog.DontUseNativeDialog
         )
         if input_dir == "":
             return None
