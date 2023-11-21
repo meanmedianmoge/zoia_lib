@@ -175,7 +175,8 @@ class ZOIALibrarianMain(QMainWindow):
                 self.sd.sd_path(True, self.width())
 
             # Set API token as last saved
-            api.api_token = data[0]["api_token"]
+            if "api_token" in data[0]:
+                api.api_token = data[0]["api_token"]
 
             self.resize(data[0]["width"], data[0]["height"])
 
