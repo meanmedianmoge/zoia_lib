@@ -68,8 +68,8 @@ class ZOIALibrarianSD(QMainWindow):
                     # This is (no longer needed) for Windows.
                     # This comes from a bug with QFileDialog returning the
                     # wrong path separator on Windows for some odd reason.
-                    # input_dir = input_dir.split("/")[0]
-                    pass
+                    input_dir = input_dir.split("/")[0]
+                    # pass
                 elif "/" in input_dir:
                     # OSX case.
                     pass

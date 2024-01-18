@@ -206,7 +206,7 @@ class PatchSave(Patch):
                 return
 
             # If we get here, we are working with a .bin, so we
-            # need to to see if the binary is already saved.
+            # need to see if the binary is already saved.
             for file in os.listdir(os.path.join(pch)):
                 if file.split(".")[-1] == "bin":
                     with open(os.path.join(pch, file), "rb") as f:
@@ -331,12 +331,9 @@ class PatchSave(Patch):
             if patch_name[1] == ":":
                 patch_name = patch_name.split(":")[-1]
             ext = "bin"
-        # PySide6 bug where the path separator is incorrect on Windows :')
-        if platform.system().lower() == "windows":
-            patch_name = patch_name.split("\\")[-1]
-        else:
-            patch_name = patch_name.split(os.path.sep)[-1]
 
+        # Get rid of any separators
+        patch_name = patch_name.split(os.path.sep)[-1]
         title = patch_name
 
         # Strip ### if it exists.
@@ -431,7 +428,7 @@ class PatchSave(Patch):
                 js_data["updated_at"] = "{:%Y-%m-%dT%H:%M:%S+00:00}".format(
                     datetime.datetime.now()
                 )
-                js_data["files"][0]["filename"] = files[i].split("/")[-1]
+                js_data["files"][0]["filename"] = files[i].split(os.path.sep)[-1]
 
             # Try to save the patch.
             if not version:
