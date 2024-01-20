@@ -259,7 +259,7 @@ class ZOIALibrarianPS(QMainWindow):
         dwn.setFont(self.ui.table_PS.horizontalHeader().font())
         dwn.clicked.connect(self.initiate_download)
         # Only enable it if we haven't already downloaded the patch.
-        if idx in os.listdir(self.path):
+        if idx in os.listdir(self.path) or idx == 169172 or idx == '169172':
             dwn.setEnabled(False)
             dwn.setText("Downloaded")
         self.ui.table_PS.setCellWidget(i, 4, dwn)
