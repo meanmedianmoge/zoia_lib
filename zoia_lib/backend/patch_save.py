@@ -462,6 +462,7 @@ class PatchSave(Patch):
         raise: RenamingError should the contents fail to be renamed.
         """
 
+        accepted_files = ['.bin', '.WAV', '.wav', '.txt']
         patch_id = str(patch[1]["id"])
 
         pch = os.path.join(self.back_path, "{}".format(patch_id))
@@ -470,15 +471,31 @@ class PatchSave(Patch):
 
         if patch[1]["files"][0]["filename"].split(".")[-1] == "zip":
             # .zip files
+            name_zip_tmp = os.path.join(pch, "{}_x.zip".format(patch_id))
             name_zip = os.path.join(pch, "{}.zip".format(patch_id))
-            with open(name_zip, "wb") as f:
+            with open(name_zip_tmp, "wb") as f:
                 f.write(patch[0])
+            self._remove_bad_filename(name_zip_tmp, name_zip)
+            os.remove(name_zip_tmp)
+
             with zipfile.ZipFile(
                 os.path.join(pch, "{}.zip".format(patch_id)), "r"
             ) as zip_obj:
-                # Extract all the contents into the patch directory
-                zip_obj.extractall(pch)
+                # Extract the contents into the patch directory
+                for item in zip_obj.namelist():
+                    if item.endswith(tuple(accepted_files)):
+                        zip_obj.extract(item, pch)
+                        try:
+                            shutil.copy(os.path.join(pch, item), os.path.join(pch, item.split('/')[-1]))
+                            os.remove(os.path.join(pch, item))
+                        except shutil.SameFileError:
+                            pass
+                # zip_obj.extractall(pch)
             # Ditch the zip
+            try:
+                shutil.rmtree(os.path.join(pch, item.split('/')[0]))
+            except FileNotFoundError:
+                pass
             os.remove(name_zip)
             to_delete = None
         elif (
@@ -522,6 +539,14 @@ class PatchSave(Patch):
             raise errors.SavingError(patch[1]["title"], 501)
 
         # Get to the uncompressed directory.
+
+        # Special case if there's a macosx dir left-over from zipping
+        for file in os.listdir(pch):
+            if os.path.isdir(os.path.join(pch, file)) and file == "__MACOSX":
+                shutil.rmtree(os.path.join(pch, file))
+            if file == '.DS_Store' or file == '._.DS_Store':
+                os.remove(file)
+
         new_dir = False
         for file in os.listdir(pch):
             if os.path.isdir(os.path.join(pch, file)) and len(os.listdir(pch)) == 1:
@@ -548,7 +573,7 @@ class PatchSave(Patch):
                     )
                     patch[1]["files"][0]["filename"] = name
                     self.save_metadata_json(patch[1])
-        else:
+        elif len(bin_files) > 1:
             # The compressed file contained more than 1 patch.
             i = 0
             for file in os.listdir(pch):
@@ -571,6 +596,9 @@ class PatchSave(Patch):
                     #  additional files. Especially .txt, would want to
                     #  add that to the content attribute in the JSON.
                     os.remove(os.path.join(pch, file))
+        else:
+            # The compressed file contained no patches, delete everything.
+            to_delete = pch
 
         if len(wav_files) > 0:
             os.makedirs(os.path.join(self.back_path, "Samples", patch_id), exist_ok=True)
@@ -629,3 +657,29 @@ class PatchSave(Patch):
             while len(patch_id) < 5:
                 patch_id += "0"
         return int(patch_id)
+
+    @staticmethod
+    def _check_for_bad_filename(file):
+        zf = zipfile.ZipFile(file, 'r')
+        for fname in zf.namelist():
+            if fname.startswith('__MACOSX/') or fname.endswith('.DS_Store'):
+                return True
+
+    @staticmethod
+    def _remove_bad_filename(original_file, temporary_file):
+        accepted_files = ['.bin', '.WAV', '.wav', '.txt']
+
+        zf = zipfile.ZipFile(original_file, 'r')
+        for item in zf.namelist():
+            buffer = zf.read(item)
+            if item.endswith(tuple(accepted_files)):
+                if not os.path.exists(temporary_file):
+                    new_zip = zipfile.ZipFile(temporary_file, 'w')
+                    new_zip.writestr(item, buffer)
+                    new_zip.close()
+                else:
+                    append_zip = zipfile.ZipFile(temporary_file, 'a')
+                    append_zip.writestr(item, buffer)
+                    append_zip.close()
+
+        zf.close()
