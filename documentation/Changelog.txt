@@ -1,4 +1,4 @@
-Version 1.3 (December 2023)
+Version 1.3 (January 2024)
 
 New Features
 - Updated the PatchStorage API endpoint to coincide with their new beta version.
@@ -26,6 +26,7 @@ Fixes
 - Fixed an issue with importing renamed patches.
 - Fixed an issue with deleting patches from local.
 - Fixed an issue with the export directory path on Windows.
+- Rewrote decompression steps for zipped patches.
 - Fixed some issues with confirmation windows not confirming the decision.
 - Resolved some API issues with the PatchStorage team.
 
