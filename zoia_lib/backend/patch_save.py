@@ -462,7 +462,7 @@ class PatchSave(Patch):
         raise: RenamingError should the contents fail to be renamed.
         """
 
-        accepted_files = ['.bin', '.WAV', '.wav', '.txt']
+        accepted_files = ['.bin', '.WAV', '.wav']
         patch_id = str(patch[1]["id"])
 
         pch = os.path.join(self.back_path, "{}".format(patch_id))
@@ -494,7 +494,7 @@ class PatchSave(Patch):
             # Ditch the zip
             try:
                 shutil.rmtree(os.path.join(pch, item.split('/')[0]))
-            except FileNotFoundError:
+            except (FileNotFoundError, NotADirectoryError):
                 pass
             os.remove(name_zip)
             to_delete = None
@@ -667,7 +667,7 @@ class PatchSave(Patch):
 
     @staticmethod
     def _remove_bad_filename(original_file, temporary_file):
-        accepted_files = ['.bin', '.WAV', '.wav', '.txt']
+        accepted_files = ['.bin', '.WAV', '.wav']
 
         zf = zipfile.ZipFile(original_file, 'r')
         for item in zf.namelist():
