@@ -1289,11 +1289,20 @@ class ZOIALibrarianMain(QMainWindow):
             )
             value = self.msg.exec_()
             if value == QMessageBox.Yes:
-                filename = "ZOIALibrarian-{}-{}.zip".format(choices.get(curr_os), self._version)
+                if choices.get(curr_os) == 'Mac':
+                    filename = "ZOIALibrarian-{}-{}-{}.zip".format('{}', choices.get(curr_os), float(latest))
+                    if platform.machine() == 'arm64':
+                        filename = filename.format('ARM')
+                    else:
+                        filename = filename.format('Intel')
+                else:
+                    filename = "ZOIALibrarian-{}-{}.zip".format(choices.get(curr_os), float(latest))
                 r = requests.get(url + "/download/{}".format(filename))
 
                 with open(filename, "wb") as f:
                     f.write(r.content)
+        else:
+            self.ui.statusbar.showMessage("You are already using the latest version!", timeout=5000)
 
     def directory_select(self):
         """Allows the user to select a directory via their OS specific

@@ -284,7 +284,7 @@ class UploadError(ZoiaLibError):
 
     Possible error codes:
      - 1101:  File could not be uploaded to the PS API.
-     - 1102: Patch could not be uploaded to the PS API,.
+     - 1102: Patch could not be uploaded to the PS API.
     """
 
     def __init__(self, info, error_code_zoia=0):
