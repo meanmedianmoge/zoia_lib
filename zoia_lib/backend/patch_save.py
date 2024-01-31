@@ -1,4 +1,5 @@
 import datetime
+import glob
 import json
 import os
 import platform
@@ -29,7 +30,7 @@ class PatchSave(Patch):
 
         super().__init__()
 
-    def save_to_backend(self, patch):
+    def save_to_backend(self, patch, version=False):
         """Attempts to save a simple binary patch and its metadata
         to the backend ZoiaLibraryApp directory. This method is meant
         to work for patches retrieved via the PS API. As such, it should
@@ -41,6 +42,8 @@ class PatchSave(Patch):
         patch: A tuple containing the downloaded file
                data and the patch metadata, comes from ps.download(IDX).
                patch[0] is raw binary data, while patch[1] is json data.
+        version: Boolean flag to determine if a check against the
+                current set of patches is necessary.
 
         raise: SavingError should the patch fail to save.
         raise: RenamingError should the patch fail to be renamed.
@@ -64,7 +67,7 @@ class PatchSave(Patch):
             raise errors.JSONError(patch[1], 801)
 
         pch_id = str(patch[1]["id"])
-        if len(pch_id) == 5:
+        if len(pch_id) == 5 and not version:
             # This is an imported patch. Unfortunately, we need to make sure
             # that its a unique binary by checking every patch currently
             # stored.
@@ -75,6 +78,7 @@ class PatchSave(Patch):
                     and fld != "Folders"
                     and fld != "sample_files"
                     and fld != ".DS_Store"
+                    and fld != "Samples"
                 ):
                     for files in os.listdir(os.path.join(self.back_path, fld)):
                         # Check every .bin file only.
@@ -202,7 +206,7 @@ class PatchSave(Patch):
                 return
 
             # If we get here, we are working with a .bin, so we
-            # need to to see if the binary is already saved.
+            # need to see if the binary is already saved.
             for file in os.listdir(os.path.join(pch)):
                 if file.split(".")[-1] == "bin":
                     with open(os.path.join(pch, file), "rb") as f:
@@ -327,12 +331,9 @@ class PatchSave(Patch):
             if patch_name[1] == ":":
                 patch_name = patch_name.split(":")[-1]
             ext = "bin"
-        # PySide2 bug where the path separator is incorrect on Windows :')
-        if platform.system().lower() == "windows":
-            patch_name = patch_name.split("\\")[-1]
-        else:
-            patch_name = patch_name.split(os.path.sep)[-1]
 
+        # Get rid of any separators
+        patch_name = patch_name.split(os.path.sep)[-1]
         title = patch_name
 
         # Strip ### if it exists.
@@ -427,14 +428,14 @@ class PatchSave(Patch):
                 js_data["updated_at"] = "{:%Y-%m-%dT%H:%M:%S+00:00}".format(
                     datetime.datetime.now()
                 )
-                js_data["files"][0]["filename"] = files[i].split("/")[-1]
+                js_data["files"][0]["filename"] = files[i].split(os.path.sep)[-1]
 
             # Try to save the patch.
             if not version:
                 self.save_to_backend((temp_data, js_data))
             else:
                 try:
-                    self.save_to_backend((temp_data, js_data))
+                    self.save_to_backend((temp_data, js_data), version=True)
                 except errors.SavingError as e:
                     fails += 1
                     e = (
@@ -461,6 +462,7 @@ class PatchSave(Patch):
         raise: RenamingError should the contents fail to be renamed.
         """
 
+        accepted_files = ['.bin', '.WAV', '.wav']
         patch_id = str(patch[1]["id"])
 
         pch = os.path.join(self.back_path, "{}".format(patch_id))
@@ -469,15 +471,31 @@ class PatchSave(Patch):
 
         if patch[1]["files"][0]["filename"].split(".")[-1] == "zip":
             # .zip files
+            name_zip_tmp = os.path.join(pch, "{}_x.zip".format(patch_id))
             name_zip = os.path.join(pch, "{}.zip".format(patch_id))
-            with open(name_zip, "wb") as f:
+            with open(name_zip_tmp, "wb") as f:
                 f.write(patch[0])
+            self._remove_bad_filename(name_zip_tmp, name_zip)
+            os.remove(name_zip_tmp)
+
             with zipfile.ZipFile(
                 os.path.join(pch, "{}.zip".format(patch_id)), "r"
             ) as zip_obj:
-                # Extract all the contents into the patch directory
-                zip_obj.extractall(pch)
+                # Extract the contents into the patch directory
+                for item in zip_obj.namelist():
+                    if item.endswith(tuple(accepted_files)):
+                        zip_obj.extract(item, pch)
+                        try:
+                            shutil.copy(os.path.join(pch, item), os.path.join(pch, item.split('/')[-1]))
+                            os.remove(os.path.join(pch, item))
+                        except shutil.SameFileError:
+                            pass
+                # zip_obj.extractall(pch)
             # Ditch the zip
+            try:
+                shutil.rmtree(os.path.join(pch, item.split('/')[0]))
+            except (FileNotFoundError, NotADirectoryError):
+                pass
             os.remove(name_zip)
             to_delete = None
         elif (
@@ -521,26 +539,41 @@ class PatchSave(Patch):
             raise errors.SavingError(patch[1]["title"], 501)
 
         # Get to the uncompressed directory.
+
+        # Special case if there's a macosx dir left-over from zipping
+        for file in os.listdir(pch):
+            if os.path.isdir(os.path.join(pch, file)) and file == "__MACOSX":
+                shutil.rmtree(os.path.join(pch, file))
+            if file == '.DS_Store' or file == '._.DS_Store':
+                os.remove(file)
+
+        new_dir = False
         for file in os.listdir(pch):
             if os.path.isdir(os.path.join(pch, file)) and len(os.listdir(pch)) == 1:
                 to_delete = os.path.join(pch, file)
                 pch = os.path.join(pch, file)
             elif os.path.isdir(os.path.join(pch, file)):
-                # Oh boy they compressed it with a directory and some
-                # stray files because they hate us.
-                shutil.rmtree(os.path.join(pch, file))
+                # Case where a sample folder was included in the download.
+                # shutil.rmtree(os.path.join(pch, file))
+                new_dir = file
+                pass
 
-        if len(os.listdir(pch)) == 1:
+        # Get count of filetypes in the compressed file dir.
+        bin_files = glob.glob(os.path.join(pch, "*.bin"))
+        wav_files = glob.glob(os.path.join(pch, "*.WAV")) + glob.glob(os.path.join(pch, "*.wav"))
+
+        if len(bin_files) == 1:
             # The compressed file only contained 1 patch.
             for file in os.listdir(pch):
-                name = file
-                os.rename(
-                    os.path.join(pch, file),
-                    os.path.join(pch, "{}.bin".format(patch_id)),
-                )
-                patch[1]["files"][0]["filename"] = name
-                self.save_metadata_json(patch[1])
-        else:
+                if file.split(".")[-1] == "bin":
+                    name = file
+                    os.rename(
+                        os.path.join(pch, file),
+                        os.path.join(pch, "{}.bin".format(patch_id)),
+                    )
+                    patch[1]["files"][0]["filename"] = name
+                    self.save_metadata_json(patch[1])
+        elif len(bin_files) > 1:
             # The compressed file contained more than 1 patch.
             i = 0
             for file in os.listdir(pch):
@@ -563,6 +596,38 @@ class PatchSave(Patch):
                     #  additional files. Especially .txt, would want to
                     #  add that to the content attribute in the JSON.
                     os.remove(os.path.join(pch, file))
+        else:
+            # The compressed file contained no patches, delete everything.
+            to_delete = pch
+
+        if len(wav_files) > 0:
+            os.makedirs(os.path.join(self.back_path, "Samples", patch_id), exist_ok=True)
+            # The compressed file included some samples.
+            for file in wav_files:
+                if file.split(".")[-1] == "wav" or file.split(".")[-1] == "WAV":
+                    try:
+                        name = file.split("/")[-1].split(".")[0]
+                        with open(
+                                os.path.join(self.back_path, "Samples", patch_id,
+                                             "{}.wav".format(name)), "w"
+                        ) as f:
+                            f.write(file)
+                        os.remove(os.path.join(pch, file))
+                    except FileNotFoundError or FileExistsError:
+                        raise errors.SavingError(patch, 501)
+                else:
+                    os.remove(os.path.join(pch, file))
+
+        # case for extra directory with samples inside
+        if new_dir:
+            try:
+                shutil.copytree(os.path.join(pch, new_dir),
+                                os.path.join(self.back_path, "Samples", patch_id),
+                                dirs_exist_ok=True)
+                shutil.rmtree(os.path.join(pch, new_dir))
+            except FileNotFoundError or FileExistsError:
+                raise errors.SavingError(patch, 501)
+
         if to_delete is not None:
             # We need to cleanup.
             for file in os.listdir(to_delete):
@@ -592,3 +657,29 @@ class PatchSave(Patch):
             while len(patch_id) < 5:
                 patch_id += "0"
         return int(patch_id)
+
+    @staticmethod
+    def _check_for_bad_filename(file):
+        zf = zipfile.ZipFile(file, 'r')
+        for fname in zf.namelist():
+            if fname.startswith('__MACOSX/') or fname.endswith('.DS_Store'):
+                return True
+
+    @staticmethod
+    def _remove_bad_filename(original_file, temporary_file):
+        accepted_files = ['.bin', '.WAV', '.wav']
+
+        zf = zipfile.ZipFile(original_file, 'r')
+        for item in zf.namelist():
+            buffer = zf.read(item)
+            if item.endswith(tuple(accepted_files)):
+                if not os.path.exists(temporary_file):
+                    new_zip = zipfile.ZipFile(temporary_file, 'w')
+                    new_zip.writestr(item, buffer)
+                    new_zip.close()
+                else:
+                    append_zip = zipfile.ZipFile(temporary_file, 'a')
+                    append_zip.writestr(item, buffer)
+                    append_zip.close()
+
+        zf.close()

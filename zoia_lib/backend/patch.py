@@ -36,7 +36,7 @@ class Patch:
         self._create_backend_directories()
 
         # Library version
-        self._version = 1.1
+        self._version = 1.3
 
     def _create_backend_directories(self):
         """Creates the necessary directories that will store
@@ -65,6 +65,12 @@ class Patch:
             os.path.join(self.back_path, "Folders")
         ):
             os.mkdir(os.path.join(self.back_path, "Folders"))
+
+        # Case 3: 1.3 adds Samples
+        if self.back_path is not None and not os.path.exists(
+            os.path.join(self.back_path, "Samples")
+        ):
+            os.mkdir(os.path.join(self.back_path, "Samples"))
 
     def get_backend_path(self):
         """Getter method to retrieve the backend path as

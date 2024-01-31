@@ -2,8 +2,8 @@ import os
 import platform
 from os.path import expanduser
 
-from PySide2.QtCore import QEvent
-from PySide2.QtWidgets import (
+from PySide6.QtCore import QEvent
+from PySide6.QtWidgets import (
     QTableWidgetItem,
     QPushButton,
     QFileDialog,
@@ -60,14 +60,16 @@ class ZOIALibrarianSD(QMainWindow):
 
         if not startup:
             input_dir = QFileDialog.getExistingDirectory(
-                None, "Select an SD Card:", expanduser("~")
+                None, "Select an SD Card:", expanduser("~"),
+                # options=QFileDialog.DontUseNativeDialog
             )
             if input_dir != "" and os.path.isdir(input_dir):
                 if "/" in input_dir and platform.system().lower() == "windows":
-                    # THIS IS NEEDED FOR WINDOWS.
+                    # This is (no longer needed) for Windows.
                     # This comes from a bug with QFileDialog returning the
                     # wrong path separator on Windows for some odd reason.
                     input_dir = input_dir.split("/")[0]
+                    # pass
                 elif "/" in input_dir:
                     # OSX case.
                     pass
@@ -183,14 +185,16 @@ class ZOIALibrarianSD(QMainWindow):
         """
 
         input_dir = QFileDialog.getExistingDirectory(
-            None, "Select a directory:", expanduser(self.sd_root)
+            None, "Select a directory:", expanduser(self.sd_root),
+            options=QFileDialog.DontUseNativeDialog
         )
         if input_dir != "" and os.path.isdir(input_dir):
             if "/" in input_dir and platform.system().lower() == "windows":
                 # THIS IS NEEDED FOR WINDOWS.
                 # This comes from a bug with QFileDialog returning the
                 # wrong path separator on Windows for some odd reason.
-                input_dir = input_dir.split("/")[0]
+                # input_dir = input_dir.split("/")[0]
+                pass
             elif "/" in input_dir:
                 # OSX case.
                 pass

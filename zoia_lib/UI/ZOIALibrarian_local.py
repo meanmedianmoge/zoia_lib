@@ -1,17 +1,23 @@
 import glob
 import json
 import os
+from os.path import expanduser
 
 from NodeGraphQt import NodeGraph, BaseNode, setup_context_menu
 
-from PySide2 import QtCore
-from PySide2.QtCore import QEvent, QThread
-from PySide2.QtWidgets import (
+from PySide6 import QtCore
+from PySide6.QtCore import QEvent, QThread
+from PySide6.QtWidgets import (
     QMainWindow,
     QMessageBox,
+    QComboBox,
+    QDialog,
+    QFileDialog,
     QInputDialog,
+    QLineEdit,
     QPushButton,
     QSpinBox,
+    QVBoxLayout
 )
 
 from zoia_lib.backend.patch_update import PatchUpdate
@@ -31,7 +37,7 @@ class ZOIALibrarianLocal(QMainWindow):
     this class.
     """
 
-    def __init__(self, ui, path, sd, msg, window, expt, delete, f1):
+    def __init__(self, ui, api, path, sd, msg, window, expt, delete, f1):
         """Initializes the class with the required parameters.
 
         ui: The UI component of ZOIALibrarianMain
@@ -50,6 +56,7 @@ class ZOIALibrarianLocal(QMainWindow):
 
         # Variable init.
         self.ui = ui
+        self.api = api
         self.path = path
         self.sd = sd
         self.msg = msg
@@ -92,6 +99,7 @@ class ZOIALibrarianLocal(QMainWindow):
                 and patch != "Banks"
                 and patch != "Folders"
                 and patch != "temp"
+                and patch != "Samples"
             ):
                 # Need to update all versions
                 for version in glob.glob(os.path.join(self.path, patch, "*json")):
@@ -190,6 +198,7 @@ class ZOIALibrarianLocal(QMainWindow):
                 and patches != "temp"
                 and patches != "temp.zip"
                 and patches != "patch.html"
+                and patches != "Samples"
             ):
                 for pch in os.listdir(os.path.join(self.path, patches)):
                     # Read the metadata so that we can set up the tables.
@@ -215,12 +224,15 @@ class ZOIALibrarianLocal(QMainWindow):
                 self.delete.delete_full_patch_directory(self.sender().objectName())
             else:
                 self.delete.delete_patch(self.sender().objectName())
-            self.get_local_patches()
+            # self.get_local_patches()
         else:
             self.delete.delete_patch(
                 os.path.join(self.curr_ver, self.sender().objectName())
             )
-            self.get_version_patches(self.ui.tabs.currentIndex() == 1)
+            # self.get_version_patches(self.ui.tabs.currentIndex() == 1)
+        self.window.tab_3 = 0
+
+        #https://stackoverflow.com/questions/37786299/how-to-delete-row-rows-from-a-qtableview-in-pyqt
 
         # Reset the text browser.
         self.ui.text_browser_local.setText("")
@@ -233,7 +245,7 @@ class ZOIALibrarianLocal(QMainWindow):
             self.go_back()
             self.ui.searchbar_local.setText("")
 
-        # self.window.tab_switch()
+        self.window.tab_switch()
 
     def initiate_export(self):
         """Attempts to export a patch saved in the backend to an SD
@@ -339,7 +351,7 @@ class ZOIALibrarianLocal(QMainWindow):
                                 .replace("'", "")
                             )
                             self.msg.setWindowTitle("Slot Exists")
-                            self.msg.setIcon(QMessageBox.Information)
+                            self.msg.setIcon(QMessageBox.Warning)
                             self.msg.setText(
                                 "That slot is occupied by {}. "
                                 "Would you like to overwrite it?".format(e)
@@ -485,6 +497,7 @@ class ZOIALibrarianLocal(QMainWindow):
 
         # Reload the table.
         self.ui.update_patch_notes.setEnabled(not context)
+        self.ui.upload_patch.setEnabled(not context)
         self.ui.text_browser_viz.setText("")
         self.ui.btn_show_routing.setEnabled(False)
         self.sort_and_set()
@@ -561,6 +574,7 @@ class ZOIALibrarianLocal(QMainWindow):
             self.ui.back_btn_local.setEnabled(False)
             self.ui.btn_show_routing.setEnabled(False)
             self.ui.update_patch_notes.setEnabled(False)
+            self.ui.upload_patch.setEnabled(False)
             self.ui.btn_prev_page.setEnabled(False)
             self.ui.btn_next_page.setEnabled(False)
             self.viz_disable()
@@ -618,6 +632,9 @@ class ZOIALibrarianLocal(QMainWindow):
         idx: The id number associated with this row.
         """
 
+        cats = self.api.categories
+        cats = [x['name'] for x in cats]
+
         # Case 1 - The text is empty (i.e., delete everything)
         if text == "":
             update.update_data(idx, [], 1 if mode else 2)
@@ -642,6 +659,9 @@ class ZOIALibrarianLocal(QMainWindow):
                 elif "and " in curr and curr[0:3] == "and":
                     curr = curr.split("and ")[1]
                 done.append({"name": curr})
+            # Remove any cats not in the PS list
+            if not mode:
+                done = [x for x in done if x['name'] in cats]
             # Determine the context and update the metadata.
             if mode:
                 update.update_data(idx, done, 1)
@@ -658,9 +678,177 @@ class ZOIALibrarianLocal(QMainWindow):
             "Successfully updated patch tags/cats.", timeout=5000
         )
 
+    def upload_patch(self):
+        """"""
+
+        art_id = None
+        file_id = None
+        pch_id = None
+
+        usr = QLineEdit()
+        usr.setPlaceholderText("Username:")
+        pwd = QLineEdit()
+        pwd.setPlaceholderText("Password:")
+        pwd.setEchoMode(QLineEdit.Password)
+
+        button = QPushButton("Ok")
+        button.setEnabled(True)
+        button.clicked.connect(self.exit_usr_pwd)
+
+        layout = QVBoxLayout()
+        layout.addWidget(usr)
+        layout.addWidget(pwd)
+        layout.addWidget(button)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
+        self.userpass = QDialog()
+        self.userpass.setLayout(layout)
+        self.userpass.resize(300, 100)
+        self.userpass.setWindowTitle("PatchStorage Credentials")
+
+        if self.api.api_token is None:
+            self.userpass.exec_()
+            self.api.generate_token(usr.text(), pwd.text())
+            assert self.api.api_token is not None
+            assert self.api.auth_token() == 200
+        else:
+            if self.api.auth_token() != 200:
+                self.userpass.exec_()
+                self.api.generate_token(usr.text(), pwd.text())
+                assert self.api.api_token is not None
+                assert self.api.auth_token() == 200
+
+        # Now start the upload process
+        # First we need artwork
+        art, ok = QFileDialog.getOpenFileName(
+            self,
+            "Select an artwork file for this patch",
+            expanduser("~"),
+            filter="Images (*.jpg *.jpeg *.gif *.png *.bmp)",
+            options=QFileDialog.DontUseNativeDialog
+        )
+        if ok:
+            try:
+                r = self.api.upload_file(art, file_type=0)
+                if r.status == 201:
+                    art_id = json.loads(r.data)['id']
+                else:
+                    e = json.loads(r._body)['message']
+                    self.ui.statusbar.showMessage(
+                        "Upload failed.", timeout=5000
+                    )
+                    self.msg.setWindowTitle("Upload Failed")
+                    self.msg.setIcon(QMessageBox.Warning)
+                    self.msg.setText("Could not upload the artwork to the PS API.")
+                    self.msg.setDetailedText(str(e))
+                    self.msg.setStandardButtons(QMessageBox.Ok)
+                    self.msg.exec_()
+                    self.msg.setDetailedText(None)
+            except errors.UploadError(art, 1101):
+                self.ui.statusbar.showMessage(
+                    "Upload failed.", timeout=5000
+                )
+                self.msg.setWindowTitle("Upload Failed")
+                self.msg.setIcon(QMessageBox.Warning)
+                self.msg.setText("Could not upload the patch to the PS API.")
+                self.msg.setStandardButtons(QMessageBox.Ok)
+                self.msg.exec_()
+
+        # Next is the patch file, which is retrieved from the backend
+        file = os.path.join(self.path, self.local_selected, self.local_selected)
+        try:
+            r = self.api.upload_file(file, file_type=1)
+            if r.status == 201:
+                file_id = json.loads(r.data)['id']
+            else:
+                e = json.loads(r._body)['message']
+                self.ui.statusbar.showMessage(
+                    "Upload failed.", timeout=5000
+                )
+                self.msg.setWindowTitle("Upload Failed")
+                self.msg.setIcon(QMessageBox.Warning)
+                self.msg.setText("Could not upload the file to the PS API.")
+                self.msg.setDetailedText(str(e))
+                self.msg.setStandardButtons(QMessageBox.Ok)
+                self.msg.exec_()
+                self.msg.setDetailedText(None)
+        except errors.UploadError(file, 1101):
+            self.ui.statusbar.showMessage(
+                "Upload failed.", timeout=5000
+            )
+            self.msg.setWindowTitle("Upload Failed")
+            self.msg.setIcon(QMessageBox.Warning)
+            self.msg.setText("Could not upload the patch to the PS API.")
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+
+        # We also need a license
+        cb = QComboBox()
+        for opt in self.api.licenses:
+            cb.addItem(opt['name'])
+        cb.setCurrentIndex(-1)
+        cb.setPlaceholderText("Select the License for this patch")
+
+        button = QPushButton("Ok")
+        button.setEnabled(True)
+        button.clicked.connect(self.exit_dropdown)
+
+        layout = QVBoxLayout()
+        layout.addWidget(cb)
+        layout.addWidget(button)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
+        self.container = QDialog()
+        self.container.setLayout(layout)
+        self.container.resize(300, 100)
+        self.container.setWindowTitle("License Selection")
+        self.container.exec_()
+
+        lic_id = [x["id"] for x in self.api.licenses if x["name"] == cb.currentText()][0]
+        print(art_id, file_id, lic_id)
+
+        # Finally, we upload the whole patch, referencing the art and file IDs
+        try:
+            r = self.api.upload_patch(file, art_id, file_id, lic_id)
+            if r.status == 201:
+                pch_id = json.loads(r.data)['id']
+            else:
+                e = json.loads(r._body)['message']
+                self.ui.statusbar.showMessage(
+                    "Upload failed.", timeout=5000
+                )
+                self.msg.setWindowTitle("Upload Failed")
+                self.msg.setIcon(QMessageBox.Warning)
+                self.msg.setText("Could not upload the patch to the PS API.")
+                self.msg.setDetailedText(str(e))
+                self.msg.setStandardButtons(QMessageBox.Ok)
+                self.msg.exec_()
+                self.msg.setDetailedText(None)
+        except errors.UploadError((art_id, file_id, lic_id), 1102):
+            self.ui.statusbar.showMessage(
+                "Upload failed.", timeout=5000
+            )
+            self.msg.setWindowTitle("Upload Failed")
+            self.msg.setIcon(QMessageBox.Warning)
+            self.msg.setText("Could not upload the patch to the PS API.")
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+
+        print(pch_id)
+
+    def exit_usr_pwd(self):
+        self.userpass.close()
+
+    def exit_dropdown(self):
+        self.container.close()
+
     def events(self, e):
         """Handles events that relate updating the tags/categories
         for patches located in the Local Storage View tab's table.
+
+        TODO: add event for multi-delete, delete w/o table reset
 
         e: The event that was initiated.
         """
@@ -1141,6 +1329,11 @@ class ZOIALibrarianLocal(QMainWindow):
         """Gets the version data for a patch in the Folders tab table."""
 
         return self.data_bank_version
+
+    def get_ps_api_token(self):
+        """"Gets the API token."""
+        assert self.api.api_token is not None
+        return self.api.api_token
 
     def get_prev_tag_cat(self):
         """Gets the previous tag/category text.

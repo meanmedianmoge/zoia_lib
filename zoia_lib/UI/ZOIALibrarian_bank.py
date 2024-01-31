@@ -2,8 +2,8 @@ import json
 import os
 import platform
 
-from PySide2.QtCore import QEvent
-from PySide2.QtWidgets import (
+from PySide6.QtCore import QEvent
+from PySide6.QtWidgets import (
     QTableWidgetItem,
     QPushButton,
     QFileDialog,
@@ -131,6 +131,11 @@ class ZOIALibrarianBank(QMainWindow):
                 except ValueError:
                     pass
 
+            # Need to get rid of extra characters in the filename
+            if "-" in name and len(name.split("-")[1].split(".")[0]) == 13:
+                remove = "-" + name.split("-")[1].split(".")[0]
+                name = name.replace(remove, "")
+
             # Drop the zoia_ prefix some users have been using.
             if "zoia_" == name[:5]:
                 name = name[5:]
@@ -178,10 +183,11 @@ class ZOIALibrarianBank(QMainWindow):
         Currently triggered via a button press.
         """
 
-        # PySide2 file selectors are bad and occasionally wrong, so try
+        # PySide6 file selectors are bad and occasionally wrong, so try
         # all of them to be safe.
         bnk_file = QFileDialog.getOpenFileName(
-            None, "Select a Patch Folder:", os.path.join(self.path, "Folders")
+            self, "Select a Patch Folder:", os.path.join(self.path, "Folders"),
+            filter="JSON (*.json)", options=QFileDialog.DontUseNativeDialog
         )[0]
         if bnk_file != "":
             if "/" in bnk_file and platform.system().lower() == "windows":
@@ -330,7 +336,7 @@ class ZOIALibrarianBank(QMainWindow):
             elif ok and name in os.listdir(sd.get_sd_root()):
                 # Already have that directory on the SD, need to check if they
                 # want to overwrite it.
-                self.msg.setWindowTitle("Folder exists")
+                self.msg.setWindowTitle("Folder Exists")
                 self.msg.setIcon(QMessageBox.Warning)
                 self.msg.setText("A Folder with that name already exists.")
                 self.msg.setInformativeText("Would you like to overwrite it?")
@@ -577,10 +583,10 @@ class ZOIALibrarianBank(QMainWindow):
                         for i in range(drop_index, drop_index + pch_num):
                             if pch["slot"] == i:
                                 self.data_banks.remove(pch)
-                # Add all of the version patches
-                for i in range(1, pch_num + 2):
+                # Add all versioned patches (in reverse order)
+                for i in range(pch_num + 2 - 1, 0, -1):
                     self.data_banks.append(
-                        {"slot": drop_index + i - 1, "id": "{}_v{}".format(idx, i)}
+                        {"slot": drop_index + (pch_num-i+2) - 1, "id": "{}_v{}".format(idx, i)}
                     )
 
         self._set_data_bank()

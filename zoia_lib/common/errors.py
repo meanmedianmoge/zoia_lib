@@ -201,7 +201,7 @@ class ExportingError(ZoiaLibError):
 
 
 class JSONError(ZoiaLibError):
-    """Class raised when a file could not be exported correctly.
+    """Class raised when the data.json file was not formed correctly.
 
     Possible error codes:
      - 801: The JSON data was malformed.
@@ -269,6 +269,32 @@ class SearchingError(ZoiaLibError):
                     f"Searching can only occur on valid lists.",
                     1002: f"The parameter list was invalid. Ensure that no "
                     f"parameters contain None as a value.",
+                }[error_code_zoia]
+            except KeyError:
+                error_msg = (
+                    f"Could not process {info} correctly due to an "
+                    f"unexpected error."
+                )
+        print(error_msg)
+
+
+class UploadError(ZoiaLibError):
+    """Class raised when upload to PS API could not be completed
+    successfully.
+
+    Possible error codes:
+     - 1101:  File could not be uploaded to the PS API.
+     - 1102: Patch could not be uploaded to the PS API.
+    """
+
+    def __init__(self, info, error_code_zoia=0):
+        if info is None:
+            error_msg = f"Expected information but got None instead."
+        else:
+            try:
+                error_msg = {
+                    1101: f"The supplied file {info} could not be uploaded. ",
+                    1102: f"The supplied patch {info} could not be uploaded. ",
                 }[error_code_zoia]
             except KeyError:
                 error_msg = (

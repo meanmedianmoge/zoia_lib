@@ -3,15 +3,25 @@
 ################################################################################
 ## Form generated from reading UI file 'ZOIALibrarian.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.2
+## Created by: Qt User Interface Compiler version 6.5.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
-
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
+    QCursor, QFont, QFontDatabase, QGradient,
+    QIcon, QImage, QKeySequence, QLinearGradient,
+    QPainter, QPalette, QPixmap, QRadialGradient,
+    QTransform)
+from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplication, QFrame,
+    QGridLayout, QHBoxLayout, QHeaderView, QLabel,
+    QLayout, QLineEdit, QMainWindow, QMenu,
+    QMenuBar, QPushButton, QSizePolicy, QSplitter,
+    QStatusBar, QTabWidget, QTableWidget, QTableWidgetItem,
+    QTextBrowser, QTreeView, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -75,69 +85,68 @@ class Ui_MainWindow(object):
         self.actionArial = QAction(MainWindow)
         self.actionArial.setObjectName(u"actionArial")
         font = QFont()
-        font.setFamily(u"Arial")
+        font.setFamilies([u"Arial"])
         self.actionArial.setFont(font)
         self.actionArial_Black = QAction(MainWindow)
         self.actionArial_Black.setObjectName(u"actionArial_Black")
         font1 = QFont()
-        font1.setFamily(u"Arial Black")
+        font1.setFamilies([u"Arial Black"])
         font1.setBold(True)
-        font1.setWeight(75)
         self.actionArial_Black.setFont(font1)
         self.actionComic_Sans_MS = QAction(MainWindow)
         self.actionComic_Sans_MS.setObjectName(u"actionComic_Sans_MS")
         font2 = QFont()
-        font2.setFamily(u"Comic Sans MS")
+        font2.setFamilies([u"Comic Sans MS"])
         self.actionComic_Sans_MS.setFont(font2)
         self.actionCourier_New = QAction(MainWindow)
         self.actionCourier_New.setObjectName(u"actionCourier_New")
         font3 = QFont()
-        font3.setFamily(u"Courier New")
+        font3.setFamilies([u"Courier New"])
         self.actionCourier_New.setFont(font3)
         self.actionGeorgia = QAction(MainWindow)
         self.actionGeorgia.setObjectName(u"actionGeorgia")
         font4 = QFont()
-        font4.setFamily(u"Georgia")
+        font4.setFamilies([u"Georgia"])
         self.actionGeorgia.setFont(font4)
         self.actionLucida_Console = QAction(MainWindow)
         self.actionLucida_Console.setObjectName(u"actionLucida_Console")
         font5 = QFont()
-        font5.setFamily(u"Lucida Console")
+        font5.setFamilies([u"Lucida Console"])
         self.actionLucida_Console.setFont(font5)
         self.actionLucida_Sans_Unicode = QAction(MainWindow)
         self.actionLucida_Sans_Unicode.setObjectName(u"actionLucida_Sans_Unicode")
         font6 = QFont()
-        font6.setFamily(u"Lucida Sans Unicode")
+        font6.setFamilies([u"Lucida Sans Unicode"])
         self.actionLucida_Sans_Unicode.setFont(font6)
         self.actionPalatino_Linotype = QAction(MainWindow)
         self.actionPalatino_Linotype.setObjectName(u"actionPalatino_Linotype")
         font7 = QFont()
-        font7.setFamily(u"Palatino Linotype")
+        font7.setFamilies([u"Palatino Linotype"])
         self.actionPalatino_Linotype.setFont(font7)
         self.actionTahoma = QAction(MainWindow)
         self.actionTahoma.setObjectName(u"actionTahoma")
         font8 = QFont()
-        font8.setFamily(u"Tahoma")
+        font8.setFamilies([u"Tahoma"])
         self.actionTahoma.setFont(font8)
         self.actionTimes_New_Roman = QAction(MainWindow)
         self.actionTimes_New_Roman.setObjectName(u"actionTimes_New_Roman")
         font9 = QFont()
-        font9.setFamily(u"Times New Roman")
+        font9.setFamilies([u"Times New Roman"])
         self.actionTimes_New_Roman.setFont(font9)
         self.actionTrebuchet_MS = QAction(MainWindow)
         self.actionTrebuchet_MS.setObjectName(u"actionTrebuchet_MS")
         font10 = QFont()
-        font10.setFamily(u"Trebuchet MS")
+        font10.setFamilies([u"Trebuchet MS"])
         self.actionTrebuchet_MS.setFont(font10)
         self.actionVerdana = QAction(MainWindow)
         self.actionVerdana.setObjectName(u"actionVerdana")
         font11 = QFont()
-        font11.setFamily(u"Verdana")
+        font11.setFamilies([u"Verdana"])
         self.actionVerdana.setFont(font11)
         self.actionPapyrus = QAction(MainWindow)
         self.actionPapyrus.setObjectName(u"actionPapyrus")
         font12 = QFont()
-        font12.setFamily(u"Papyrus")
+        font12.setFamilies([u"Papyrus"])
         self.actionPapyrus.setFont(font12)
         self.actionWingdings = QAction(MainWindow)
         self.actionWingdings.setObjectName(u"actionWingdings")
@@ -188,6 +197,8 @@ class Ui_MainWindow(object):
         self.actionSort_by_tag_low_high.setObjectName(u"actionSort_by_tag_low_high")
         self.actionNavigate_to_local_backend = QAction(MainWindow)
         self.actionNavigate_to_local_backend.setObjectName(u"actionNavigate_to_local_backend")
+        self.actionCheck_for_Updates = QAction(MainWindow)
+        self.actionCheck_for_Updates.setObjectName(u"actionCheck_for_Updates")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.centralwidget.setStyleSheet(u"")
@@ -440,13 +451,25 @@ class Ui_MainWindow(object):
         self.verticalLayout_22 = QVBoxLayout(self.layoutWidget_7)
         self.verticalLayout_22.setObjectName(u"verticalLayout_22")
         self.verticalLayout_22.setSizeConstraint(QLayout.SetMinimumSize)
+        self.horizontalLayout_21 = QHBoxLayout()
+        self.horizontalLayout_21.setObjectName(u"horizontalLayout_21")
         self.update_patch_notes = QPushButton(self.layoutWidget_7)
         self.update_patch_notes.setObjectName(u"update_patch_notes")
         self.update_patch_notes.setCursor(QCursor(Qt.PointingHandCursor))
         self.update_patch_notes.setMouseTracking(True)
         self.update_patch_notes.setStyleSheet(u"")
 
-        self.verticalLayout_22.addWidget(self.update_patch_notes)
+        self.horizontalLayout_21.addWidget(self.update_patch_notes)
+
+        self.upload_patch = QPushButton(self.layoutWidget_7)
+        self.upload_patch.setObjectName(u"upload_patch")
+        self.upload_patch.setCursor(QCursor(Qt.PointingHandCursor))
+        self.upload_patch.setMouseTracking(True)
+
+        self.horizontalLayout_21.addWidget(self.upload_patch)
+
+
+        self.verticalLayout_22.addLayout(self.horizontalLayout_21)
 
         self.splitter_local_hori = QSplitter(self.layoutWidget_7)
         self.splitter_local_hori.setObjectName(u"splitter_local_hori")
@@ -1466,7 +1489,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1567, 22))
+        self.menubar.setGeometry(QRect(0, 0, 1567, 37))
         self.menubar.setContextMenuPolicy(Qt.ActionsContextMenu)
         self.menubar.setAcceptDrops(False)
         self.menubar.setNativeMenuBar(True)
@@ -1492,6 +1515,7 @@ class Ui_MainWindow(object):
         self.menuFile.addAction(self.actionImport_Multiple_Patches)
         self.menuFile.addAction(self.actionImport_Version_History_directory)
         self.menuFile.addSeparator()
+        self.menuFile.addAction(self.actionCheck_for_Updates)
         self.menuFile.addAction(self.actionNavigate_to_local_backend)
         self.menuFile.addAction(self.actionQuit)
         self.menuSort.addAction(self.actionSort_by_title_A_Z)
@@ -1535,7 +1559,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"ZOIA Librarian - Version 1.2", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"ZOIA Librarian - Version 1.3", None))
         self.actionSpecify_SD_Card_Location.setText(QCoreApplication.translate("MainWindow", u"Specify SD Card Location", None))
 #if QT_CONFIG(shortcut)
         self.actionSpecify_SD_Card_Location.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+S", None))
@@ -1692,6 +1716,10 @@ class Ui_MainWindow(object):
         self.actionNavigate_to_local_backend.setText(QCoreApplication.translate("MainWindow", u"Navigate to Local Backend", None))
 #if QT_CONFIG(shortcut)
         self.actionNavigate_to_local_backend.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+N", None))
+#endif // QT_CONFIG(shortcut)
+        self.actionCheck_for_Updates.setText(QCoreApplication.translate("MainWindow", u"Check for Updates", None))
+#if QT_CONFIG(shortcut)
+        self.actionCheck_for_Updates.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+G", None))
 #endif // QT_CONFIG(shortcut)
 #if QT_CONFIG(tooltip)
         self.tabs.setToolTip("")
@@ -1855,6 +1883,19 @@ class Ui_MainWindow(object):
         self.update_patch_notes.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"When clicked, updates the patch notes for the currently selected patch. Patch notes can be add directly below in the Additional Patch Notes Display. ", None))
 #endif // QT_CONFIG(accessibility)
         self.update_patch_notes.setText(QCoreApplication.translate("MainWindow", u"Update Patch Notes", None))
+#if QT_CONFIG(tooltip)
+        self.upload_patch.setToolTip(QCoreApplication.translate("MainWindow", u"Click here to upload this patch to PatchStorage.", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.upload_patch.setStatusTip(QCoreApplication.translate("MainWindow", u"Click here to upload this patch to PatchStorage.", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(accessibility)
+        self.upload_patch.setAccessibleName(QCoreApplication.translate("MainWindow", u"Upload Patch Button", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.upload_patch.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"When clicked, prompts the API to start a request to upload the selected patch.", None))
+#endif // QT_CONFIG(accessibility)
+        self.upload_patch.setText(QCoreApplication.translate("MainWindow", u"Upload to PatchStorage", None))
 #if QT_CONFIG(statustip)
         self.text_browser_local.setStatusTip(QCoreApplication.translate("MainWindow", u"Click on a patch to view its metadata.", None))
 #endif // QT_CONFIG(statustip)

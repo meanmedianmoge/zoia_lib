@@ -1,16 +1,18 @@
 import json
 import os
+import platform
+import requests
 from os.path import expanduser
 
-from PySide2 import QtCore
-from PySide2.QtCore import QEvent, Qt, QThread
-from PySide2.QtGui import QIcon, QFont
-from PySide2.QtWidgets import (
+from PySide6 import QtCore
+from PySide6.QtCore import QEvent, Qt, QThread
+from PySide6.QtGui import QIcon, QFont, QScreen
+from PySide6.QtWidgets import (
+    QApplication,
     QMainWindow,
     QMessageBox,
     QTableWidgetItem,
     QRadioButton,
-    QDesktopWidget,
     QFileDialog,
 )
 
@@ -42,7 +44,7 @@ class ZOIALibrarianMain(QMainWindow):
     and exporting patches; among other functions.
     Any changes made to the .ui file will not be reflected unless the
     following command is run from the UI directory:
-        pyside2-uic.exe ZOIALibrarian.ui -o ZOIALibrarian.py
+        pyside6-uic.exe ZOIALibrarian.ui -o ZOIALibrarian.py
     Known issues:
      - Certain UI elements do not like font changes (headers, tabs, etc).
      - Deleting items in the Folders table will always delete the first entry
@@ -77,7 +79,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.msg.setWindowIcon(self.icon)
 
         # Helper classes init
-        self.util = ZOIALibrarianUtil(self.ui, self)
+        self.util = ZOIALibrarianUtil(self.ui, api, self)
         self.sd = ZOIALibrarianSD(self.ui, save, self.msg, delete, self.util)
         self.bank = ZOIALibrarianBank(
             self.ui, self.path, self.sd, self.msg, self.util, self
@@ -87,6 +89,7 @@ class ZOIALibrarianMain(QMainWindow):
         )
         self.local = ZOIALibrarianLocal(
             self.ui,
+            api,
             self.path,
             self.sd,
             self.msg,
@@ -116,6 +119,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.tab_1 = -1
         self.tab_3 = -1
         self.add_rating = None
+        self._version = "1.3"
 
         # Threads
         self.worker_mass = ImportMassWorker(self)
@@ -140,6 +144,7 @@ class ZOIALibrarianMain(QMainWindow):
         # Disabling widgets the user doesn't have access to on startup.
         self.ui.tab_sd.setEnabled(False)
         self.ui.update_patch_notes.setEnabled(False)
+        self.ui.upload_patch.setEnabled(False)
         self.ui.import_all_btn.setEnabled(False)
         self.ui.import_all_ver_btn.setEnabled(False)
         self.ui.back_btn_local.setEnabled(False)
@@ -160,9 +165,18 @@ class ZOIALibrarianMain(QMainWindow):
                 data = json.loads(f.read())
             if data[0]["sd_root"] != "" and os.path.exists(data[0]["sd_root"]):
                 self.sd.set_sd_root(data[0]["sd_root"])
-                self.sd.set_export_path(os.path.join(self.sd.sd_root, "to_zoia"))
+                if ("export_dir" in data[0] and data[0]["sd_root"] != "" and
+                    os.path.exists(data[0]["export_dir"])
+                ):
+                    self.sd.set_export_path(data[0]["export_dir"])
+                else:
+                    self.sd.set_export_path(os.path.join(self.sd.sd_root, "to_zoia"))
                 self.ui.tab_sd.setEnabled(True)
                 self.sd.sd_path(True, self.width())
+
+            # Set API token as last saved
+            if "api_token" in data[0]:
+                api.api_token = data[0]["api_token"]
 
             self.resize(data[0]["width"], data[0]["height"])
 
@@ -285,8 +299,10 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.actionNavigate_to_local_backend.triggered.connect(self.util.open_local_backend)
         self.ui.refresh_pch_btn.clicked.connect(self.ps.reload_ps_thread)
         self.ui.update_patch_notes.clicked.connect(self.local.update_patch_notes)
+        self.ui.upload_patch.clicked.connect(self.local.upload_patch)
         self.ui.actionImport_A_Patch.triggered.connect(self.import_patch)
         self.ui.actionReset_Sizes.triggered.connect(self.reset_ui)
+        self.ui.actionCheck_for_Updates.triggered.connect(self.check_for_updates)
         self.ui.actionDocumentation.triggered.connect(self.util.documentation)
         self.ui.actionFAQ.triggered.connect(self.util.faq)
         self.ui.actionTips_Tricks.triggered.connect(self.util.tips)
@@ -350,7 +366,7 @@ class ZOIALibrarianMain(QMainWindow):
         if self.local_sizes is None:
             self.ui.splitter_local.setSizes([self.width() * 0.6, self.width() * 0.4])
             self.ui.splitter_local_hori.setSizes(
-                [self.height() * 0.55, self.height() * 0.45]
+                [self.height() * 0.65, self.height() * 0.35]
             )
         else:
             self.ui.splitter_local.setSizes(
@@ -398,9 +414,12 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Center the application on launch.
         frame = self.frameGeometry()
-        center = QDesktopWidget().availableGeometry().center()
+        center = QScreen.availableGeometry(QApplication.primaryScreen()).center()
         frame.moveCenter(center)
         self.move(frame.topLeft())
+
+        # Check for any app updates
+        self.check_for_updates()
 
     def tab_switch(self):
         """Actions performed whenever a tab is switched to within the
@@ -449,6 +468,7 @@ class ZOIALibrarianMain(QMainWindow):
                 self.ui.text_browser_local.setText("")
                 self.ui.page_label.setText("")
                 self.ui.update_patch_notes.setEnabled(False)
+                self.ui.upload_patch.setEnabled(False)
                 self.ui.text_browser_viz.setText("")
                 self.ui.btn_prev_page.setEnabled(False)
                 self.ui.btn_next_page.setEnabled(False)
@@ -745,7 +765,7 @@ class ZOIALibrarianMain(QMainWindow):
             # Reset local sizes
             self.ui.splitter_local.setSizes([self.width() * 0.6, self.width() * 0.4])
             self.ui.splitter_local_hori.setSizes(
-                [self.height() * 0.55, self.height() * 0.45]
+                [self.height() * 0.65, self.height() * 0.35]
             )
             self.ui.table_local.resizeColumnsToContents()
             self.ui.table_local.setColumnWidth(0, self.width() * 0.165)
@@ -779,7 +799,7 @@ class ZOIALibrarianMain(QMainWindow):
             # Reset local sizes
             self.ui.splitter_local.setSizes([self.width() * 0.6, self.width() * 0.4])
             self.ui.splitter_local_hori.setSizes(
-                [self.height() * 0.55, self.height() * 0.45]
+                [self.height() * 0.65, self.height() * 0.35]
             )
             self.ui.table_local.resizeColumnsToContents()
             self.ui.table_local.setColumnWidth(0, self.width() * 0.165)
@@ -872,6 +892,9 @@ class ZOIALibrarianMain(QMainWindow):
                     curr_browser = self.ui.text_browser_local
                     viz_browser = self.ui.page_label
                     self.ui.update_patch_notes.setEnabled(True)
+                    self.ui.upload_patch.setEnabled(False)
+                    if len(name) == 5:
+                        self.ui.upload_patch.setEnabled(True)
                     self.ui.text_browser_viz.setText("")
                 elif self.ui.tabs.currentIndex() == 3:
                     curr_browser = self.ui.text_browser_bank
@@ -913,15 +936,21 @@ class ZOIALibrarianMain(QMainWindow):
                     )
 
                 # Direct link to PS
+                if "link" not in content and "url" in content:
+                    obj = "url"
+                elif "link" in content and "url" not in content:
+                    obj = "link"
+                else:
+                    obj = "link"
                 if (
-                    "link" not in content
-                    or content["link"] is None
-                    or content["link"] == ""
+                    obj not in content
+                    or content[obj] is None
+                    or content[obj] == ""
                 ):
                     content["self"] = content["title"]
                 else:
                     content["self"] = """<a href="{}">{}</a>""".format(
-                        content["link"], content["title"]
+                        content[obj], content["title"]
                     )
 
             if (
@@ -977,6 +1006,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.ui.page_label.setText("")
             self.ui.searchbar_local.setText("")
             self.ui.update_patch_notes.setEnabled(False)
+            self.ui.upload_patch.setEnabled(False)
             self.ui.back_btn_local.setEnabled(True)
             self.ui.back_btn.setEnabled(False)
             self.ui.btn_prev_page.setEnabled(False)
@@ -1182,7 +1212,9 @@ class ZOIALibrarianMain(QMainWindow):
         """
 
         pch = QFileDialog.getOpenFileName(
-            None, "Select a file", expanduser("~")
+            self, "Select a file", expanduser("~"),
+            filter="PatchFiles (*.bin *.zip)",
+            options=QFileDialog.DontUseNativeDialog
         )[0]
         # Didn't make a selection.
         if pch == "":
@@ -1222,6 +1254,56 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
 
+    def check_for_updates(self):
+        """Checks Github to see if there has been an app update."""
+
+        try:
+            url = 'https://github.com/meanmedianmoge/zoia_lib/releases/latest'
+            r = requests.get(url)
+            latest = r.url.split('/')[-1]
+        except Exception as e:
+            # Other unknown API connection error.
+            self.ui.statusbar.showMessage("Github connection failed.", timeout=5000)
+            self.msg.setWindowTitle("Github Error")
+            self.msg.setIcon(QMessageBox.Information)
+            self.msg.setText(
+                "Failed to retrieve the repo metadata from Github."
+            )
+            self.msg.setDetailedText(str(e))
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+            self.msg.setDetailedText(None)
+
+        curr_os = platform.system().lower()
+        choices = {"windows": "Windows", "darwin": "Mac", "linux": "Linux"}
+
+        if float(self._version) < float(latest):
+            self.msg.setWindowTitle("App Update")
+            self.msg.setIcon(QMessageBox.Information)
+            self.msg.setText(
+                "A new version of the app is available. "
+                "Would you like to download it?"
+            )
+            self.msg.setStandardButtons(
+                QMessageBox.Yes | QMessageBox.No
+            )
+            value = self.msg.exec_()
+            if value == QMessageBox.Yes:
+                if choices.get(curr_os) == 'Mac':
+                    filename = "ZOIALibrarian-{}-{}-{}.zip".format('{}', choices.get(curr_os), float(latest))
+                    if platform.machine() == 'arm64':
+                        filename = filename.format('ARM')
+                    else:
+                        filename = filename.format('Intel')
+                else:
+                    filename = "ZOIALibrarian-{}-{}.zip".format(choices.get(curr_os), float(latest))
+                r = requests.get(url + "/download/{}".format(filename))
+
+                with open(filename, "wb") as f:
+                    f.write(r.content)
+        else:
+            self.ui.statusbar.showMessage("You are already using the latest version!", timeout=5000)
+
     def directory_select(self):
         """Allows the user to select a directory via their OS specific
         file explorer.
@@ -1232,7 +1314,8 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Let the user specify a directory.
         input_dir = QFileDialog.getExistingDirectory(
-            None, "Select a directory", expanduser("~")
+            None, "Select a directory", expanduser("~"),
+            options=QFileDialog.DontUseNativeDialog
         )
         if input_dir == "":
             return None
@@ -1532,7 +1615,7 @@ class ZOIALibrarianMain(QMainWindow):
         """
 
         self.util.save_pref(
-            self.width(), self.height(), self.sd.get_sd_root(), self.path
+            self.width(), self.height(), self.sd.get_sd_root(), self.sd.get_export_path(), self.path
         )
 
     def _try_quit(self):

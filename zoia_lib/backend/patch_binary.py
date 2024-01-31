@@ -988,16 +988,22 @@ class PatchBinary(Patch):
                 blocks.append(d[2])
             blocks.append(d[3])
         elif idx == 102:
-            blocks = [d[0]]
-            if opt[0][1] == "enabled":
+            blocks = []
+            if opt[0][1] != "disabled":
+                blocks.append(d[0])
                 blocks.append(d[1])
-            blocks.append(d[2])
+                blocks.append(d[2])
             blocks.append(d[3])
             blocks.append(d[4])
-            blocks.append(d[5])
             if opt[2][1] == "on":
-                blocks.append(d[6])
+                blocks.append(d[5])
+            blocks.append(d[6])
             blocks.append(d[7])
+            if opt[3][1] == "on":
+                blocks.append(d[8])
+                blocks.append(d[9])
+            blocks.append(d[10])
+            blocks.append(d[11])
         elif idx == 103:
             if opt[0][1] == "bypass":
                 blocks = [d[0]]
@@ -1012,6 +1018,18 @@ class PatchBinary(Patch):
             for i in range(1, opt[0][1] + 1):
                 blocks.append(d[i + 7])
             blocks.append(d[16])
+        elif idx == 105:
+            blocks = [d[0]]
+            if opt[0][1] != "NOT":
+                for i in range(2, opt[1][1] + 1):
+                    blocks.append(d[i - 1])
+                if opt[2][1] == "on":
+                    blocks.append(d[38])
+                blocks.append(d[39])
+            else:
+                if opt[2][1] == "on":
+                    blocks.append(d[38])
+                blocks.append(d[39])
         else:
             blocks = d
 

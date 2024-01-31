@@ -24,8 +24,11 @@ class PatchStorage:
         """Initializes the PatchStorage class."""
 
         # Set defaults for query params
-        self.url = "https://patchstorage.com/api/alpha/"
+        self.url = "https://patchstorage.com/api/beta/"
         self.platform = 3003  # ZOIA
+        self.api_token = None
+        self.licenses = self._get_license_data()
+        self.categories = self._get_categories_data()
         try:
             self.patch_count = self._determine_patch_count()
         except:
@@ -126,6 +129,373 @@ class PatchStorage:
         except KeyError:
             # No patch with the supplied id was found.
             return None
+
+    def _get_license_data(self):
+        """Get list of licenses."""
+        # r = http.request(
+        #     "GET",
+        #     self.url + 'licenses?per_page=100',
+        #     headers={
+        #         'Content-Type': 'application/json'
+        #     }
+        # )
+        # if r.status == 200:
+        #     return json.loads(r.data)
+
+        return [
+            {
+                "id": 4184,
+                "description": "",
+                "slug": "afl-3-0",
+                "name": "Academic Free License v3.0"
+            },
+            {
+                "id": 4173,
+                "description": "",
+                "slug": "apache-2-0",
+                "name": "Apache License 2.0"
+            },
+            {
+                "id": 4185,
+                "description": "",
+                "slug": "artistic-2-0",
+                "name": "Artistic license 2.0"
+            },
+            {
+                "id": 4186,
+                "description": "",
+                "slug": "bsl-1-0",
+                "name": "Boost Software License 1.0"
+            },
+            {
+                "id": 4174,
+                "description": "",
+                "slug": "bsd-2-clause",
+                "name": "BSD 2-Clause \"Simplified\" License"
+            },
+            {
+                "id": 4175,
+                "description": "",
+                "slug": "bsd-3-clause",
+                "name": "BSD 3-Clause \"New\" or \"Revised\" License"
+            },
+            {
+                "id": 4187,
+                "description": "",
+                "slug": "bsd-3-clause-clear",
+                "name": "BSD 3-clause Clear license"
+            },
+            {
+                "id": 4190,
+                "description": "",
+                "slug": "cc-by-4-0",
+                "name": "Creative Commons Attribution 4.0"
+            },
+            {
+                "id": 4191,
+                "description": "",
+                "slug": "cc-by-sa-4-0",
+                "name": "Creative Commons Attribution Share Alike 4.0"
+            },
+            {
+                "id": 4188,
+                "description": "",
+                "slug": "cc",
+                "name": "Creative Commons license family"
+            },
+            {
+                "id": 4189,
+                "description": "",
+                "slug": "cc0-1-0",
+                "name": "Creative Commons Zero v1.0 Universal"
+            },
+            {
+                "id": 4201,
+                "description": "",
+                "slug": "custom",
+                "name": "Custom License"
+            },
+            {
+                "id": 4192,
+                "description": "",
+                "slug": "wtfpl",
+                "name": "Do What The F*ck You Want To Public License"
+            },
+            {
+                "id": 4176,
+                "description": "",
+                "slug": "epl-2-0",
+                "name": "Eclipse Public License 2.0"
+            },
+            {
+                "id": 4193,
+                "description": "",
+                "slug": "ecl-2-0",
+                "name": "Educational Community License v2.0"
+            },
+            {
+                "id": 4194,
+                "description": "",
+                "slug": "eupl-1-1",
+                "name": "European Union Public License 1.1"
+            },
+            {
+                "id": 4172,
+                "description": "",
+                "slug": "agpl-3-0",
+                "name": "GNU Affero General Public License v3.0"
+            },
+            {
+                "id": 4195,
+                "description": "",
+                "slug": "gpl",
+                "name": "GNU General Public License family"
+            },
+            {
+                "id": 4177,
+                "description": "",
+                "slug": "gpl-2-0",
+                "name": "GNU General Public License v2.0"
+            },
+            {
+                "id": 4178,
+                "description": "",
+                "slug": "gpl-3-0",
+                "name": "GNU General Public License v3.0"
+            },
+            {
+                "id": 4196,
+                "description": "",
+                "slug": "lgpl",
+                "name": "GNU Lesser General Public License family"
+            },
+            {
+                "id": 4179,
+                "description": "",
+                "slug": "lgpl-2-1",
+                "name": "GNU Lesser General Public License v2.1"
+            },
+            {
+                "id": 4180,
+                "description": "",
+                "slug": "lgpl-3-0",
+                "name": "GNU Lesser General Public License v3.0"
+            },
+            {
+                "id": 4197,
+                "description": "",
+                "slug": "isc",
+                "name": "ISC"
+            },
+            {
+                "id": 4199,
+                "description": "",
+                "slug": "ms-pl",
+                "name": "Microsoft Public License"
+            },
+            {
+                "id": 4181,
+                "description": "",
+                "slug": "mit",
+                "name": "MIT License"
+            },
+            {
+                "id": 4182,
+                "description": "",
+                "slug": "mpl-2-0",
+                "name": "Mozilla Public License 2.0"
+            },
+            {
+                "id": 4200,
+                "description": "",
+                "slug": "osl-3-0",
+                "name": "Open Software License 3.0"
+            },
+            {
+                "id": 4183,
+                "description": "",
+                "slug": "unlicense",
+                "name": "The Unlicense"
+            }
+        ]
+
+    def _get_categories_data(self):
+        """Get list of categories."""
+        # r = http.request(
+        #     "GET",
+        #     self.url + 'categories',
+        #     headers={
+        #         'Content-Type': 'application/json'
+        #     }
+        # )
+        # if r.status == 200:
+        #     return json.loads(r.data)
+
+        return [
+            {
+                "id": 378,
+                "description": "",
+                "slug": "composition",
+                "name": "Composition"
+            },
+            {
+                "id": 77,
+                "description": "",
+                "slug": "effect",
+                "name": "Effect"
+            },
+            {
+                "id": 3317,
+                "description": "",
+                "slug": "game",
+                "name": "Game"
+            },
+            {
+                "id": 1,
+                "description": "",
+                "slug": "other",
+                "name": "Other"
+            },
+            {
+                "id": 75,
+                "description": "",
+                "slug": "sampler",
+                "name": "Sampler"
+            },
+            {
+                "id": 76,
+                "description": "",
+                "slug": "sequencer",
+                "name": "Sequencer"
+            },
+            {
+                "id": 372,
+                "description": "",
+                "slug": "sound",
+                "name": "Sound"
+            },
+            {
+                "id": 74,
+                "description": "",
+                "slug": "synthesizer",
+                "name": "Synthesizer"
+            },
+            {
+                "id": 117,
+                "description": "",
+                "slug": "utility",
+                "name": "Utility"
+            },
+            {
+                "id": 91,
+                "description": "",
+                "slug": "video",
+                "name": "Video"
+            }
+        ]
+
+    def generate_token(self, username: str, password: str):
+        """Authentication process for PS API upload access."""
+        r = http.request(
+            "POST",
+            self.url + 'auth/token',
+            headers={'Content-Type': 'application/json'},
+            body=json.dumps({'username': username, 'password': password})
+        )
+        if r.status == 200:
+            self.api_token = json.loads(r.data)['token']
+
+    def auth_token(self):
+        """Checks if current token is still valid."""
+        assert self.api_token is not None
+
+        r = http.request(
+            "POST",
+            self.url + 'auth/token/validate',
+            headers={
+                'Authorization': 'Bearer ' + self.api_token,
+                'Content-Type': 'application/json'
+            }
+        )
+
+        return r.status
+
+    def upload_file(self, path: str, file_type=0):
+        """Attempts to upload a file to the PS API.
+        Used as a reference input for the patch upload."""
+
+        if file_type == 0:
+            assert path.endswith(tuple([".jpg", ".jpeg", ".gif", ".png", ".bmp"]))
+        elif file_type == 1:
+            # Need a ZOIA-readable filename
+            with open(path + '.json', 'rb') as f:
+                meta = json.load(f)
+            name = meta['files'][0]['filename']
+            path = path + ".bin"
+        else:
+            raise ValueError
+
+        with open(path, 'rb') as f:
+            data = f.read()
+
+        if file_type == 1:
+            path = name
+
+        # Upload and save the ID
+        r = http.request(
+            "POST",
+            self.url + 'files',
+            fields={"file": (path, data)},
+            headers={
+                'Authorization': 'Bearer ' + self.api_token,
+            }
+        )
+
+        return r
+        # if r.status == 201:
+        #     idx = json.loads(r.data)['id']
+        #     return idx
+
+    def upload_patch(self, path: str, artwork_file_id: int, patch_file_id: int, lic_id: int):
+
+        if self.api_token is None:
+            raise ValueError('Not authenticated')
+
+        with open(path + '.json', 'rb') as f:
+            meta = json.load(f)
+
+        # Assign category ID if it's not there
+        for cat in meta['categories']:
+            if "id" not in cat.keys():
+                cat['id'] = [x['id'] for x in self.categories if x['name'] == cat['name']][0]
+
+        # Patch upload, combines previous POSTs into final request
+        r = http.request(
+            "POST",
+            self.url + 'patches',
+            body=json.dumps({
+                "title": meta['title'],
+                "content": meta['content'],
+                "revision": "1.0",
+                "files": [patch_file_id],
+                "artwork": artwork_file_id,
+                "categories": [x['id'] for x in meta['categories']],
+                "tags": [x['name'].replace(' ', '-') for x in meta['tags']],
+                "license": lic_id,
+                "platform": 3003,
+                "state": 151,
+            }),
+            headers={
+              'Authorization': 'Bearer ' + self.api_token,
+              'Content-Type': 'application/json'
+            }
+        )
+
+        return r
+        # if r.status == 201:
+        #     return json.loads(r.data)['id']
+        # else:
+        #     return vars(r)
 
     def get_all_patch_data_init(self):
         """Retrieves the initial amount of information needed for

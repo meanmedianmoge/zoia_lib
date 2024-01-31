@@ -1,7 +1,7 @@
 import platform
 
-from PySide2.QtGui import QFont
-from PySide2.QtWidgets import QFontDialog, QApplication, QFileDialog
+from PySide6.QtGui import QFont
+from PySide6.QtWidgets import QFontDialog, QApplication, QFileDialog
 import os
 import json
 
@@ -14,7 +14,7 @@ class ZOIALibrarianUtil:
     classes.
     """
 
-    def __init__(self, ui, window):
+    def __init__(self, ui, api, window):
         """Initializes the class with the required parameters.
 
         ui: The UI component of ZOIALibrarianMain
@@ -23,6 +23,7 @@ class ZOIALibrarianUtil:
 
         # Get the ui reference
         self.ui = ui
+        self.api = api
         self.window = window
 
         self.dark = True
@@ -80,6 +81,7 @@ class ZOIALibrarianUtil:
             self.ui.back_btn_local.setFont(new_font)
             self.ui.check_for_updates_btn.setFont(new_font)
             self.ui.update_patch_notes.setFont(new_font)
+            self.ui.upload_patch.setFont(new_font)
             self.ui.btn_show_routing.setFont(new_font)
             self.ui.page_label.setFont(new_font)
             self.ui.back_btn.setFont(new_font)
@@ -164,12 +166,13 @@ class ZOIALibrarianUtil:
                     for i in range(self.ui.table_bank_local.rowCount()):
                         self.ui.table_bank_local.cellWidget(i, 0).setFont(new_font)
 
-    def save_pref(self, w, h, sd, path):
+    def save_pref(self, w, h, sd, exp, path):
         """Saves and writes the state of a UI window to pref.json
 
         w: The width of the main window.
         h: The height of the main window.
-        sd: The path to an the root of a specified SD card.
+        sd: The path to the root of a specified SD card.
+        exp: The path to the export dir.
         path: The path to the backend .ZoiaLibraryApp directory.
         """
 
@@ -180,6 +183,8 @@ class ZOIALibrarianUtil:
             "font": self.ui.table_PS.horizontalHeader().font().toString().split(",")[0],
             "font_size": self.ui.table_PS.horizontalHeader().font().pointSize(),
             "sd_root": "" if sd is None else sd,
+            "export_dir": "" if sd is None or exp is None else exp,
+            "api_token": self.api.api_token
         }
         ps_sizes = {
             "col_0": self.ui.table_PS.columnWidth(0),
@@ -307,8 +312,8 @@ class ZOIALibrarianUtil:
         """Opens a FileBrowser showing the app's local backend."""
 
         QFileDialog.getExistingDirectory(
-            None, "Local Backend", self.window.path
-            # QFileDialog.DontUseNativeDialog
+            None, "Local Backend", self.window.path,
+            options=QFileDialog.DontUseNativeDialog
         )
 
     def documentation(self):

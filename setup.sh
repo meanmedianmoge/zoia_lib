@@ -1,5 +1,5 @@
 #!/bin/bash
-git clone -b zgraph https://github.com/meanmedianmoge/NodeGraphQt.git
+git clone -b zgraph6 https://github.com/meanmedianmoge/NodeGraphQt.git
 
 cd NodeGraphQt
 python setup.py install
