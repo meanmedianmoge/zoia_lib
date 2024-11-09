@@ -61,6 +61,10 @@ class ZOIALibrarianPS(QMainWindow):
                     # Assume no new patches; allow the user to refresh manually.
                     self.data_PS = data
                     return
+                elif 'data' in data:
+                    # Maligned data.json, need to remove
+                    ps_data = [x for x in data if 'data' not in x and 'code'
+                               not in x and 'message' not in x]
                 elif len(data) > self.api.patch_count:
                     # Uh oh, some patches got deleted on PatchStorage.
                     ps_data = self.api.get_all_patch_data_init()

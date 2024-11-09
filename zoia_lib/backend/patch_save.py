@@ -607,11 +607,11 @@ class PatchSave(Patch):
                 if file.split(".")[-1] == "wav" or file.split(".")[-1] == "WAV":
                     try:
                         name = file.split("/")[-1].split(".")[0]
-                        with open(
-                                os.path.join(self.back_path, "Samples", patch_id,
-                                             "{}.wav".format(name)), "w"
-                        ) as f:
-                            f.write(file)
+                        shutil.copy(
+                            file,
+                            os.path.join(self.back_path, "Samples", patch_id,
+                                             "{}.wav".format(name))
+                        )
                         os.remove(os.path.join(pch, file))
                     except FileNotFoundError or FileExistsError:
                         raise errors.SavingError(patch, 501)

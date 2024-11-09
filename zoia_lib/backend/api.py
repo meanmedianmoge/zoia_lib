@@ -91,7 +91,7 @@ class PatchStorage:
         url = str(furl(endpoint).add(params))
         r = http.request("GET", url)
 
-        return json.loads(r.data)
+        return json.loads(r.data) if r.status == 200 else []
 
     def get_patch_meta(self, idx: str):
         """Get the metadata associated with a specific
