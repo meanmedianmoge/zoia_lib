@@ -119,7 +119,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.tab_1 = -1
         self.tab_3 = -1
         self.add_rating = None
-        self._version = "1.3.1"
+        self._version = "1.31"
 
         # Threads
         self.worker_mass = ImportMassWorker(self)
@@ -1299,7 +1299,8 @@ class ZOIALibrarianMain(QMainWindow):
                     filename = "ZOIALibrarian-{}-{}.zip".format(choices.get(curr_os), float(latest))
                 r = requests.get(url + "/download/{}".format(filename))
 
-                with open(filename, "wb") as f:
+                path = os.path.join(os.path.expanduser('~'), 'Downloads', filename)
+                with open(path, "wb") as f:
                     f.write(r.content)
         else:
             self.ui.statusbar.showMessage("You are already using the latest version!", timeout=5000)
