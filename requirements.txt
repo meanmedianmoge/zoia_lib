@@ -5,7 +5,7 @@ furl==2.1.3
 certifi==2024.7.4
 numpy>=1.19.0
 requests==2.32.2
-beautifulsoup4==4.12.2
+# beautifulsoup4==4.12.2
 jsonschema==4.17.3
 rarfile~=4.0
 nodegraphqt==0.1.7

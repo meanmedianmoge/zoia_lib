@@ -4,9 +4,9 @@ import os
 
 import certifi
 import urllib3
-from bs4 import BeautifulSoup
+# from bs4 import BeautifulSoup
 from furl import furl
-from numpy.compat import unicode
+# from numpy.compat import unicode
 
 http = urllib3.PoolManager(cert_reqs="CERT_REQUIRED", ca_certs=certifi.where())
 
@@ -30,7 +30,7 @@ class PatchStorage:
         self.licenses = self._get_license_data()
         self.categories = self._get_categories_data()
         try:
-            self.patch_count = self._determine_patch_count()
+            self.patch_count = self._patch_count()
         except:
             # No internet connection.
             pass
@@ -572,50 +572,72 @@ class PatchStorage:
                 new_patches.extend(self._search({**search, **{"page": i}}))
             return new_patches
 
-    @staticmethod
-    def _determine_patch_count():
-        """Determines the number of ZOIA patches that
-        are currently being stored on PS.
-        Does not count questions as patches.
+    def _patch_count(self):
+        endpoint = os.path.join(self.url, "patches/")
 
-        return: An integer representing the total of ZOIA patches.
-        """
+        # get param dict
+        params = {
+            "page": 1,
+            "per_page": 1,
+            "order": "desc",
+            "orderby": "date",
+            "platforms": self.platform,
+        }
 
-        # Hi PS, yes we are a normal Firefox browser and not a program.
-        soup_patch = BeautifulSoup(
-            http.request(
-                "GET",
-                "https://patchstorage.com/",
-                headers={"User-Agent": "Mozilla/5.0"}
-            ).data,
-            features="html.parser",
-        )
-        found_pedals = soup_patch.find_all(
-            class_="d-flex flex-column " "justify-content-center"
-        )
+        # make request
+        url = str(furl(endpoint).add(params))
+        r = http.request("GET", url)
 
-        """ Convert the ResultSet to a string so we can split on what we are 
-        looking for. The PS website does not have unique div names, so this
-        is to workaround that.
-        """
-        zoia = (
-            unicode.join(u"\n", map(unicode, found_pedals))
-            .split("ZOIA", 1)[1]
-            .split("<strong>", 1)[1]
-        )
+        # int(r.headers['X-WP-TotalPages'])
+        return int(r.headers['X-WP-Total'])
 
-        # For some reason, questions posted on PS count as "patches",
-        # so we need to figure out the # of questions.
-        soup_ques = BeautifulSoup(
-            http.request(
-                "GET",
-                "https://patchstorage.com/platform/zoia/?search_query=&ptype"
-                "%5B%5D=question&tax_platform=zoia&tax_post_tag=&orderby"
-                "=modified&wpas_id=search_form&wpas_submit=1",
-                headers={"User-Agent": "Mozilla/5.0"},
-            ).data,
-            features="html.parser",
-        )
-
-        # Return the total minus the number of questions found.
-        return int(zoia.split("<")[0]) - len(soup_ques.find_all(class_="card"))
+    # @staticmethod
+    # def _determine_patch_count():
+    #     """
+    #     Deprecated, see _patch_count function above for new method.
+    #
+    #     Determines the number of ZOIA patches that
+    #     are currently being stored on PS.
+    #     Does not count questions as patches.
+    #
+    #     return: An integer representing the total of ZOIA patches.
+    #     """
+    #
+    #     # Hi PS, yes we are a normal Firefox browser and not a program.
+    #     soup_patch = BeautifulSoup(
+    #         http.request(
+    #             "GET",
+    #             "https://patchstorage.com/",
+    #             headers={"User-Agent": "Mozilla/5.0"}
+    #         ).data,
+    #         features="html.parser",
+    #     )
+    #     found_pedals = soup_patch.find_all(
+    #         class_="d-flex flex-column " "justify-content-center"
+    #     )
+    #
+    #     """ Convert the ResultSet to a string so we can split on what we are
+    #     looking for. The PS website does not have unique div names, so this
+    #     is to workaround that.
+    #     """
+    #     zoia = (
+    #         unicode.join(u"\n", map(unicode, found_pedals))
+    #         .split("ZOIA", 1)[1]
+    #         .split("<strong>", 1)[1]
+    #     )
+    #
+    #     # For some reason, questions posted on PS count as "patches",
+    #     # so we need to figure out the # of questions.
+    #     soup_ques = BeautifulSoup(
+    #         http.request(
+    #             "GET",
+    #             "https://patchstorage.com/platform/zoia/?search_query=&ptype"
+    #             "%5B%5D=question&tax_platform=zoia&tax_post_tag=&orderby"
+    #             "=modified&wpas_id=search_form&wpas_submit=1",
+    #             headers={"User-Agent": "Mozilla/5.0"},
+    #         ).data,
+    #         features="html.parser",
+    #     )
+    #
+    #     # Return the total minus the number of questions found.
+    #     return int(zoia.split("<")[0]) - len(soup_ques.find_all(class_="card"))

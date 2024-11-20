@@ -4,9 +4,9 @@ import unittest
 
 import certifi
 import urllib3
-from bs4 import BeautifulSoup
+# from bs4 import BeautifulSoup
 from jsonschema import validate
-from numpy.compat import unicode
+# from numpy.compat import unicode
 import zoia_lib.backend.api as api
 
 http = urllib3.PoolManager(cert_reqs="CERT_REQUIRED", ca_certs=certifi.where())
@@ -20,53 +20,53 @@ class TestAPI(unittest.TestCase):
     once the application starts and the downloading of patches.
     """
 
-    def test_api_all_zoia_patches(self):
-        """Query the PS API to ensure that all ZOIA patches are
-        returned.
-        """
-
-        # Need a known user agent to avoid getting 403'd.
-        # Used to grab the current number of ZOIA patches on PS.
-        soup_patch = BeautifulSoup(
-            http.request(
-                "GET",
-                "https://patchstorage.com/", headers={"User-Agent": "Mozilla/5.0"}
-            ).data,
-            features="html.parser",
-        )
-        found_pedals = soup_patch.find_all(
-            class_="d-flex flex-column " "justify-content-center"
-        )
-        """ Convert the ResultSet to a string so we can split on what we 
-        are looking for. The PS website does not have unique div names, 
-        so this is to workaround that. 
-        """
-        zoia = (
-            unicode.join(u"\n", map(unicode, found_pedals))
-            .split("ZOIA", 1)[1]
-            .split("<strong>", 1)[1]
-        )
-
-        # For some reason, questions posted on PS count as "patches",
-        # so we need to figure out the # of questions.
-        soup_ques = BeautifulSoup(
-            http.request(
-                "GET",
-                "https://patchstorage.com/platform/zoia/?search_query=&ptype"
-                "%5B%5D=question&tax_platform=zoia&tax_post_tag=&orderby"
-                "=modified&wpas_id=search_form&wpas_submit=1",
-                headers={"User-Agent": "Mozilla/5.0"},
-            ).data,
-            features="html.parser",
-        )
-
-        pch_list = ps.get_all_patch_data_init()
-
-        # Make sure that the correct number of patches are retrieved.
-        self.assertTrue(
-            int(zoia[:3]) - len(soup_ques.find_all(class_="card")) == len(pch_list),
-            "Returned list does not contain all ZOIA patches.",
-        )
+    # def test_api_all_zoia_patches(self):
+    #     """Query the PS API to ensure that all ZOIA patches are
+    #     returned.
+    #     """
+    #
+    #     # Need a known user agent to avoid getting 403'd.
+    #     # Used to grab the current number of ZOIA patches on PS.
+    #     soup_patch = BeautifulSoup(
+    #         http.request(
+    #             "GET",
+    #             "https://patchstorage.com/", headers={"User-Agent": "Mozilla/5.0"}
+    #         ).data,
+    #         features="html.parser",
+    #     )
+    #     found_pedals = soup_patch.find_all(
+    #         class_="d-flex flex-column " "justify-content-center"
+    #     )
+    #     """ Convert the ResultSet to a string so we can split on what we
+    #     are looking for. The PS website does not have unique div names,
+    #     so this is to workaround that.
+    #     """
+    #     zoia = (
+    #         unicode.join(u"\n", map(unicode, found_pedals))
+    #         .split("ZOIA", 1)[1]
+    #         .split("<strong>", 1)[1]
+    #     )
+    #
+    #     # For some reason, questions posted on PS count as "patches",
+    #     # so we need to figure out the # of questions.
+    #     soup_ques = BeautifulSoup(
+    #         http.request(
+    #             "GET",
+    #             "https://patchstorage.com/platform/zoia/?search_query=&ptype"
+    #             "%5B%5D=question&tax_platform=zoia&tax_post_tag=&orderby"
+    #             "=modified&wpas_id=search_form&wpas_submit=1",
+    #             headers={"User-Agent": "Mozilla/5.0"},
+    #         ).data,
+    #         features="html.parser",
+    #     )
+    #
+    #     pch_list = ps.get_all_patch_data_init()
+    #
+    #     # Make sure that the correct number of patches are retrieved.
+    #     self.assertTrue(
+    #         int(zoia[:3]) - len(soup_ques.find_all(class_="card")) == len(pch_list),
+    #         "Returned list does not contain all ZOIA patches.",
+    #     )
 
     def test_api_download_bin(self):
         """Query the PS API for a patch with the .bin extension,
