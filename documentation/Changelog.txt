@@ -1,6 +1,7 @@
-Version 1.3.1 (November 2024)
+Version 1.3.2 & 1.3.1 (November 2024)
 Fixes
-- Fixed a bug with the data.json format, related to page counts in the API return. (Major, app would not open otherwise)
+- Removed bs4 requirement for html parsing, using API instead.
+- Fixed a bug with the data.json format, related to page counts in the API return.
 - Fixed an issue with downloading samples from zipped patches.
 - Bumped versions of various libraries.
 

@@ -119,7 +119,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.tab_1 = -1
         self.tab_3 = -1
         self.add_rating = None
-        self._version = "1.31"
+        self._version = "1.32"
 
         # Threads
         self.worker_mass = ImportMassWorker(self)
