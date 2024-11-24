@@ -118,8 +118,9 @@ class ZOIALibrarianMain(QMainWindow):
         self.local_pch_count = -1
         self.tab_1 = -1
         self.tab_3 = -1
-        self.add_rating = None
-        self._version = "1.32"
+        # self.add_rating = None
+        # self.add_download_date = None
+        self._version = "1.4"
 
         # Threads
         self.worker_mass = ImportMassWorker(self)
@@ -192,7 +193,7 @@ class ZOIALibrarianMain(QMainWindow):
             # Version check
             if "col_5" not in self.local_sizes or "col_5" not in self.bank_sizes:
                 os.remove(os.path.join(self.path, "pref.json"))
-                self.add_rating = True
+                # self.add_rating = True
                 self.reset_ui()
                 break
 
@@ -244,12 +245,11 @@ class ZOIALibrarianMain(QMainWindow):
             break
         else:
             # No pref.json, use default values.
-            self.add_rating = True
+            # self.add_rating = True
             self.reset_ui()
 
         # Update local patches if necessary
-        if self.add_rating:
-            self.local.metadata_init()
+        self.local.metadata_init()
 
         # Connect buttons and items to methods.
         self.ui.tabs.currentChanged.connect(self.tab_switch)

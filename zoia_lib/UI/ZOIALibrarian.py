@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'ZOIALibrarian.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.5.0
+## Created by: Qt User Interface Compiler version 6.6.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -199,6 +199,10 @@ class Ui_MainWindow(object):
         self.actionNavigate_to_local_backend.setObjectName(u"actionNavigate_to_local_backend")
         self.actionCheck_for_Updates = QAction(MainWindow)
         self.actionCheck_for_Updates.setObjectName(u"actionCheck_for_Updates")
+        self.actionSort_by_download_date_new_old = QAction(MainWindow)
+        self.actionSort_by_download_date_new_old.setObjectName(u"actionSort_by_download_date_new_old")
+        self.actionSort_by_download_date_old_new = QAction(MainWindow)
+        self.actionSort_by_download_date_old_new.setObjectName(u"actionSort_by_download_date_old_new")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.centralwidget.setStyleSheet(u"")
@@ -1559,7 +1563,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"ZOIA Librarian - Version 1.3", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"ZOIA Librarian - Version 1.4", None))
         self.actionSpecify_SD_Card_Location.setText(QCoreApplication.translate("MainWindow", u"Specify SD Card Location", None))
 #if QT_CONFIG(shortcut)
         self.actionSpecify_SD_Card_Location.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+S", None))
@@ -1720,6 +1724,14 @@ class Ui_MainWindow(object):
         self.actionCheck_for_Updates.setText(QCoreApplication.translate("MainWindow", u"Check for Updates", None))
 #if QT_CONFIG(shortcut)
         self.actionCheck_for_Updates.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+G", None))
+#endif // QT_CONFIG(shortcut)
+        self.actionSort_by_download_date_new_old.setText(QCoreApplication.translate("MainWindow", u"Sort by download date (new-old)", None))
+#if QT_CONFIG(shortcut)
+        self.actionSort_by_download_date_new_old.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+\\", None))
+#endif // QT_CONFIG(shortcut)
+        self.actionSort_by_download_date_old_new.setText(QCoreApplication.translate("MainWindow", u"Sort by download date (old-new)", None))
+#if QT_CONFIG(shortcut)
+        self.actionSort_by_download_date_old_new.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+/", None))
 #endif // QT_CONFIG(shortcut)
 #if QT_CONFIG(tooltip)
         self.tabs.setToolTip("")

@@ -548,8 +548,11 @@ class PatchBinary(Patch):
             blocks.append(d[32])
             if opt[2][1] == "on":
                 blocks.append(d[33])
+            if opt[4][1] != "off":
+                blocks.append(d[34])
+                blocks.append(d[35])
             for i in range(1, opt[1][1] + 1):
-                blocks.append(d[i + 33])
+                blocks.append(d[i + 35])
         elif idx == 5:
             blocks = []
             if opt[3][1] != "tap":
@@ -1030,6 +1033,37 @@ class PatchBinary(Patch):
                 if opt[2][1] == "on":
                     blocks.append(d[38])
                 blocks.append(d[39])
+        elif idx == 106:
+            blocks = [d[0]]
+            if opt[0][1] == "stereo":
+                blocks.append(d[1])
+            if opt[1][1] == "rate":
+                blocks.append(d[2])
+            else:
+                blocks.append(d[3])
+                blocks.append(d[4])
+            blocks.append(d[5])
+            blocks.append(d[6])
+            blocks.append(d[7])
+            blocks.append(d[8])
+            if opt[0][1] == "stereo":
+                blocks.append(d[9])
+        elif idx == 107:
+            blocks = [d[0]]
+            if opt[0][1] == "stereo":
+                blocks.append(d[1])
+            if opt[1][1] == "rate":
+                blocks.append(d[2])
+            elif opt[1][1] == "tap_tempo":
+                blocks.append(d[3])
+            else:
+                blocks.append(d[4])
+            blocks.append(d[5])
+            blocks.append(d[6])
+            blocks.append(d[7])
+            blocks.append(d[8])
+            if opt[0][1] != "1in->1out":
+                blocks.append(d[9])
         else:
             blocks = d
 

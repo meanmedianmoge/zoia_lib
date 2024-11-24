@@ -14,7 +14,7 @@
    <enum>Qt::StrongFocus</enum>
   </property>
   <property name="windowTitle">
-   <string>ZOIA Librarian - Version 1.3</string>
+   <string>ZOIA Librarian - Version 1.4</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -3564,6 +3564,22 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+G</string>
+   </property>
+  </action>
+  <action name="actionSort_by_download_date_new_old">
+   <property name="text">
+    <string>Sort by download date (new-old)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+\</string>
+   </property>
+  </action>
+  <action name="actionSort_by_download_date_old_new">
+   <property name="text">
+    <string>Sort by download date (old-new)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+/</string>
    </property>
   </action>
  </widget>

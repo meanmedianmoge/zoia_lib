@@ -105,13 +105,14 @@ class ZOIALibrarianLocal(QMainWindow):
                 for version in glob.glob(os.path.join(self.path, patch, "*json")):
                     with open(version, "r") as f:
                         temp = json.loads(f.read())
-                        if "rating" in temp:
-                            continue
-                        else:
-                            # Overwrite existing json if no rating key
-                            temp["rating"] = 0
-                            with open(version, "w") as f_new:
-                                json.dump(temp, f_new)
+                        for key in ["rating", "downloaded_at"]:
+                            if key in temp:
+                                continue
+                            else:
+                                # Overwrite existing json if no rating key
+                                temp[key] = 0 if key == "rating" else temp["updated_at"]
+                                with open(version, "w") as f_new:
+                                    json.dump(temp, f_new)
 
     def create_rating_ticker(self, i, rating):
         """Creates the rating ticker that is displayed on the Local Storage

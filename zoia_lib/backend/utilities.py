@@ -68,7 +68,10 @@ def sort_metadata(mode, data, rev):
         )
     elif mode == 6:
         # Sort by date modified
-        data.sort(key=lambda x: x["updated_at"].upper(), reverse=rev)
+        try:
+            data.sort(key=lambda x: x["downloaded_at"].upper(), reverse=rev)
+        except KeyError:
+            data.sort(key=lambda x: x["updated_at"].upper(), reverse=rev)
     elif mode == 7:
         # Sort by revision #
         data.sort(key=lambda x: x["revision"] if "revision" in x else 0, reverse=rev)
@@ -207,6 +210,23 @@ def hide_dotted_files(path, sd: bool = False):
         return files[::-1]
     else:
         return sorted(files[::-1])
+
+
+def remove_empty_patches(path):
+    """Removes empty ZOIA patches from a list of files in a directory.
+
+    directory: List of files.
+    sd: Option to exclude preceding path in list of files.
+
+    return: List of files without empty patches.
+    """
+
+    files = []
+    for item in sorted(path):
+        if not item.endswith('_zoia_.bin'):
+            files.append(item)
+
+    return files[::-1]
 
 
 def generate_blank_patch():
