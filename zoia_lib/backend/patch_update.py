@@ -1,10 +1,13 @@
 import json
 import os
+import shutil
 
-from zoia_lib.backend import api
+from zoia_lib.backend.api import PatchStorage
 from zoia_lib.backend.patch import Patch
 from zoia_lib.backend.patch_save import PatchSave
 from zoia_lib.common import errors
+
+ps = PatchStorage()
 
 
 class PatchUpdate(Patch):
@@ -113,7 +116,6 @@ class PatchUpdate(Patch):
 
         # Get a list of binary/metadata for all files that have been updated
         # on PatchStorage.
-        ps = api.PatchStorage()
         pch_list = ps.get_potential_updates(meta)
 
         # Try to save the new binaries to the backend.
@@ -141,3 +143,19 @@ class PatchUpdate(Patch):
 
         # Pass the number of updates and titles of patches updated.
         return len(pch_list), pchs
+
+    def convert_local_to_ps(self, src: str, dest: str):
+        """Converts 5-digit local file to 6-digit PS file after a successful upload."""
+
+        # Move files to new dir
+        shutil.move(os.path.join(self.back_path, src),
+                    os.path.join(self.back_path, dest))
+
+        # Rename bin
+        os.rename(os.path.join(self.back_path, dest, "{}.bin".format(src)),
+                  os.path.join(self.back_path, dest, "{}.bin".format(dest)))
+
+        # Drop the json, we'll grab it from the API
+        os.remove(os.path.join(self.back_path, dest, "{}.json".format(src)))
+
+        return ps.get_patch_meta(dest)

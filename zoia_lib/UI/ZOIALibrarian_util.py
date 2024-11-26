@@ -184,7 +184,8 @@ class ZOIALibrarianUtil:
             "font_size": self.ui.table_PS.horizontalHeader().font().pointSize(),
             "sd_root": "" if sd is None else sd,
             "export_dir": "" if sd is None or exp is None else exp,
-            "api_token": self.api.api_token
+            "api_token": self.api.api_token,
+            "api_user": self.api.api_usr
         }
         ps_sizes = {
             "col_0": self.ui.table_PS.columnWidth(0),

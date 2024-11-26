@@ -1,7 +1,10 @@
 import glob
 import json
 import os
+import shutil
 from os.path import expanduser
+
+import urllib3.exceptions
 
 from NodeGraphQt import NodeGraph, BaseNode, setup_context_menu
 
@@ -114,6 +117,41 @@ class ZOIALibrarianLocal(QMainWindow):
                                 with open(version, "w") as f_new:
                                     json.dump(temp, f_new)
 
+    def alpha_to_beta(self):
+        """Refresh metadata for all local patches."""
+
+        for patch in os.listdir(self.path):
+            if (
+                os.path.isdir(os.path.join(self.path, patch))
+                and len(os.listdir(os.path.join(self.path, patch))) >= 2
+                and patch != "Banks"
+                and patch != "Folders"
+                and patch != "temp"
+                and patch != "Samples"
+                and len(patch) == 6
+            ):
+                # All json files.
+                flag = False
+                versions = glob.glob(os.path.join(self.path, patch, "*json"))
+                with open(versions[0], "r") as f:
+                    # Check the first patch.
+                    temp = json.loads(f.read())
+                if 'url' not in temp['files'][0]:
+                    flag = True
+                else:
+                    if 'alpha' in temp['files'][0]['url']:
+                        flag = True
+                if flag:
+                    # Still has alpha data, overwrite with the newest content.
+                    meta = self.api.get_patch_meta(patch)
+                    if 'code' in meta or 'data' in meta:
+                        # Get rid of any maligned/removed patches.
+                        shutil.rmtree(os.path.join(self.path, patch))
+                        continue
+                    for v in versions:
+                        with open(v, "w") as f_new:
+                            json.dump(meta, f_new)
+
     def create_rating_ticker(self, i, rating):
         """Creates the rating ticker that is displayed on the Local Storage
         View tab's QTableView. Each QSpinBox is mapped to a row, representing
@@ -208,6 +246,7 @@ class ZOIALibrarianLocal(QMainWindow):
                             temp = json.loads(f.read())
                         curr_data.append(temp)
                         break
+
         self.sort_and_set()
 
     def initiate_delete(self):
@@ -682,43 +721,21 @@ class ZOIALibrarianLocal(QMainWindow):
     def upload_patch(self):
         """"""
 
+        # If patch id length is 6, we're working with a PS patch.
+        # Do an update instead and return.
+        if len(self.local_selected) == 6:
+            self.update_patch()
+            return
+
         art_id = None
         file_id = None
         pch_id = None
 
-        usr = QLineEdit()
-        usr.setPlaceholderText("Username:")
-        pwd = QLineEdit()
-        pwd.setPlaceholderText("Password:")
-        pwd.setEchoMode(QLineEdit.Password)
+        usr = self.usr_pwd()
 
-        button = QPushButton("Ok")
-        button.setEnabled(True)
-        button.clicked.connect(self.exit_usr_pwd)
-
-        layout = QVBoxLayout()
-        layout.addWidget(usr)
-        layout.addWidget(pwd)
-        layout.addWidget(button)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-
-        self.userpass = QDialog()
-        self.userpass.setLayout(layout)
-        self.userpass.resize(300, 100)
-        self.userpass.setWindowTitle("PatchStorage Credentials")
-
-        if self.api.api_token is None:
-            self.userpass.exec_()
-            self.api.generate_token(usr.text(), pwd.text())
-            assert self.api.api_token is not None
-            assert self.api.auth_token() == 200
-        else:
-            if self.api.auth_token() != 200:
-                self.userpass.exec_()
-                self.api.generate_token(usr.text(), pwd.text())
-                assert self.api.api_token is not None
-                assert self.api.auth_token() == 200
+        file = os.path.join(self.path, self.local_selected, self.local_selected)
+        with open(file + ".json", "r") as f:
+            data = json.loads(f.read())
 
         # Now start the upload process
         # First we need artwork
@@ -785,36 +802,21 @@ class ZOIALibrarianLocal(QMainWindow):
             self.msg.exec_()
 
         # We also need a license
-        cb = QComboBox()
-        for opt in self.api.licenses:
-            cb.addItem(opt['name'])
-        cb.setCurrentIndex(-1)
-        cb.setPlaceholderText("Select the License for this patch")
-
-        button = QPushButton("Ok")
-        button.setEnabled(True)
-        button.clicked.connect(self.exit_dropdown)
-
-        layout = QVBoxLayout()
-        layout.addWidget(cb)
-        layout.addWidget(button)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-
-        self.container = QDialog()
-        self.container.setLayout(layout)
-        self.container.resize(300, 100)
-        self.container.setWindowTitle("License Selection")
-        self.container.exec_()
-
-        lic_id = [x["id"] for x in self.api.licenses if x["name"] == cb.currentText()][0]
-        print(art_id, file_id, lic_id)
+        lic = self.license()
+        lic_id = [x["id"] for x in self.api.licenses if x["name"] == lic][0]
 
         # Finally, we upload the whole patch, referencing the art and file IDs
         try:
             r = self.api.upload_patch(file, art_id, file_id, lic_id)
             if r.status == 201:
-                pch_id = json.loads(r.data)['id']
+                pch_id = str(json.loads(r.data)['id'])
+                # Convert the upload to a 6-digit PS patch
+                meta = update.convert_local_to_ps(self.local_selected, pch_id)
+                with open(os.path.join(self.path, pch_id, "{}.json".format(pch_id)), "w") as f:
+                    meta["rating"] = data["rating"]
+                    meta["downloaded_at"] = data["downloaded_at"]
+                    json.dump(meta, f)
+                self.get_local_patches()
             else:
                 e = json.loads(r._body)['message']
                 self.ui.statusbar.showMessage(
@@ -837,7 +839,214 @@ class ZOIALibrarianLocal(QMainWindow):
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
 
-        print(pch_id)
+    def update_patch(self):
+        """"""
+
+        art_id = None
+        file_id = None
+        lic_id = None
+        pch_id = None
+
+        usr = self.usr_pwd()
+
+        # For updates, only allow if username matches the author.
+        file = os.path.join(self.path, self.local_selected, self.local_selected)
+        with open(file + ".json", "r") as f:
+            data = json.loads(f.read())
+        author = data['author']['name']
+
+        if usr != author:
+            self.ui.statusbar.showMessage(
+                "Invalid User.", timeout=5000
+            )
+            self.msg.setWindowTitle("Upload Failed")
+            self.msg.setIcon(QMessageBox.Warning)
+            self.msg.setText("You can only modify patches you created.")
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+            return
+
+        # Check for artwork file
+        if 'id' not in data['artwork']:
+            art, ok = QFileDialog.getOpenFileName(
+                self,
+                "Select an artwork file for this patch",
+                expanduser("~"),
+                filter="Images (*.jpg *.jpeg *.gif *.png *.bmp)",
+                options=QFileDialog.DontUseNativeDialog
+            )
+            if ok:
+                try:
+                    r = self.api.upload_file(art, file_type=0)
+                    if r.status == 201:
+                        art_id = json.loads(r.data)['id']
+                    else:
+                        e = json.loads(r._body)['message']
+                        self.ui.statusbar.showMessage(
+                            "Upload failed.", timeout=5000
+                        )
+                        self.msg.setWindowTitle("Upload Failed")
+                        self.msg.setIcon(QMessageBox.Warning)
+                        self.msg.setText("Could not upload the artwork to the PS API.")
+                        self.msg.setDetailedText(str(e))
+                        self.msg.setStandardButtons(QMessageBox.Ok)
+                        self.msg.exec_()
+                        self.msg.setDetailedText(None)
+                except errors.UploadError(art, 1101):
+                    self.ui.statusbar.showMessage(
+                        "Upload failed.", timeout=5000
+                    )
+                    self.msg.setWindowTitle("Upload Failed")
+                    self.msg.setIcon(QMessageBox.Warning)
+                    self.msg.setText("Could not upload the patch to the PS API.")
+                    self.msg.setStandardButtons(QMessageBox.Ok)
+                    self.msg.exec_()
+
+        # Upload the new file.
+        try:
+            r = self.api.upload_file(file, file_type=1)
+            if r.status == 201:
+                file_id = json.loads(r.data)['id']
+            else:
+                e = json.loads(r._body)['message']
+                self.ui.statusbar.showMessage(
+                    "Upload failed.", timeout=5000
+                )
+                self.msg.setWindowTitle("Upload Failed")
+                self.msg.setIcon(QMessageBox.Warning)
+                self.msg.setText("Could not upload the file to the PS API.")
+                self.msg.setDetailedText(str(e))
+                self.msg.setStandardButtons(QMessageBox.Ok)
+                self.msg.exec_()
+                self.msg.setDetailedText(None)
+        except errors.UploadError(file, 1101):
+            self.ui.statusbar.showMessage(
+                "Upload failed.", timeout=5000
+            )
+            self.msg.setWindowTitle("Upload Failed")
+            self.msg.setIcon(QMessageBox.Warning)
+            self.msg.setText("Could not upload the patch to the PS API.")
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+
+        # Missing license info, need to pick one
+        if not data['license']:
+            # We also need a license
+            lic = self.license()
+            lic_id = [x["id"] for x in self.api.licenses if x["name"] == lic][0]
+
+        # Finally, we update the patch, referencing the art and file IDs
+        try:
+            r = self.api.update_patch(self.local_selected, file, art_id, file_id, lic_id)
+            if r.status == 201:
+                pch_id = json.loads(r.data)['id']
+                # Get the new meta
+                meta = self.api.get_patch_meta(pch_id)
+                with open(os.path.join(self.path, pch_id, "{}.json".format(pch_id)), "w") as f:
+                    meta["rating"] = data["rating"]
+                    meta["downloaded_at"] = data["downloaded_at"]
+                    json.dump(meta, f)
+            else:
+                e = json.loads(r._body)['message']
+                self.ui.statusbar.showMessage(
+                    "Update failed.", timeout=5000
+                )
+                self.msg.setWindowTitle("Update Failed")
+                self.msg.setIcon(QMessageBox.Warning)
+                self.msg.setText("Could not update the patch to the PS API.")
+                self.msg.setDetailedText(str(e))
+                self.msg.setStandardButtons(QMessageBox.Ok)
+                self.msg.exec_()
+                self.msg.setDetailedText(None)
+        except urllib3.exceptions.MaxRetryError:
+            self.ui.statusbar.showMessage(
+                "Update complete.", timeout=5000
+            )
+            self.msg.setWindowTitle("Update Complete")
+            self.msg.setIcon(QMessageBox.Information)
+            self.msg.setText("Patch was updated in PatchStorage.")
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+        except errors.UploadError((art_id, file_id, lic_id), 1102):
+            self.ui.statusbar.showMessage(
+                "Update failed.", timeout=5000
+            )
+            self.msg.setWindowTitle("Upload Failed")
+            self.msg.setIcon(QMessageBox.Warning)
+            self.msg.setText("Could not upload the patch to the PS API.")
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+
+    def usr_pwd(self):
+        usr = QLineEdit()
+        usr.setPlaceholderText("Username:")
+        pwd = QLineEdit()
+        pwd.setPlaceholderText("Password:")
+        pwd.setEchoMode(QLineEdit.Password)
+
+        button = QPushButton("Ok")
+        button.setEnabled(True)
+        button.clicked.connect(self.exit_usr_pwd)
+
+        layout = QVBoxLayout()
+        layout.addWidget(usr)
+        layout.addWidget(pwd)
+        layout.addWidget(button)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
+        self.userpass = QDialog()
+        self.userpass.setLayout(layout)
+        self.userpass.resize(300, 100)
+        self.userpass.setWindowTitle("PatchStorage Credentials")
+
+        if self.api.api_token is None:
+            # No token exists, create it.
+            self.userpass.exec_()
+            self.api.generate_token(usr.text(), pwd.text())
+            assert self.api.api_token is not None
+            assert self.api.auth_token() == 200
+            usr = usr.text()
+        else:
+            # Token is no longer authenticated, create another.
+            if self.api.auth_token() != 200:
+                self.userpass.exec_()
+                self.api.generate_token(usr.text(), pwd.text())
+                assert self.api.api_token is not None
+                assert self.api.auth_token() == 200
+                usr = usr.text()
+            # Token exists and is valid, need to get the username from prefs.
+            else:
+                with open(os.path.join(self.path, 'pref.json'), 'r') as f:
+                    prefs = json.loads(f.read())
+                usr = prefs[0]['api_user']
+
+        return usr
+
+    def license(self):
+        cb = QComboBox()
+        for opt in self.api.licenses:
+            cb.addItem(opt['name'])
+        cb.setCurrentIndex(-1)
+        cb.setPlaceholderText("Select the License for this patch")
+
+        button = QPushButton("Ok")
+        button.setEnabled(True)
+        button.clicked.connect(self.exit_dropdown)
+
+        layout = QVBoxLayout()
+        layout.addWidget(cb)
+        layout.addWidget(button)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
+        self.container = QDialog()
+        self.container.setLayout(layout)
+        self.container.resize(300, 100)
+        self.container.setWindowTitle("License Selection")
+        self.container.exec_()
+
+        return cb.currentText()
 
     def exit_usr_pwd(self):
         self.userpass.close()

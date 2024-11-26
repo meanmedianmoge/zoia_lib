@@ -179,6 +179,9 @@ class ZOIALibrarianMain(QMainWindow):
             if "api_token" in data[0]:
                 api.api_token = data[0]["api_token"]
 
+            if "api_user" in data[0]:
+                api.api_usr = data[0]["api_user"]
+
             self.resize(data[0]["width"], data[0]["height"])
 
             # Font
@@ -249,6 +252,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.reset_ui()
 
         # Update local patches if necessary
+        self.local.alpha_to_beta()
         self.local.metadata_init()
 
         # Connect buttons and items to methods.
@@ -892,8 +896,8 @@ class ZOIALibrarianMain(QMainWindow):
                     curr_browser = self.ui.text_browser_local
                     viz_browser = self.ui.page_label
                     self.ui.update_patch_notes.setEnabled(True)
-                    self.ui.upload_patch.setEnabled(False)
-                    if len(name) == 5:
+                    if not self.ui.back_btn_local.isEnabled():
+                        # Only enable for single version patches.
                         self.ui.upload_patch.setEnabled(True)
                     self.ui.text_browser_viz.setText("")
                 elif self.ui.tabs.currentIndex() == 3:
