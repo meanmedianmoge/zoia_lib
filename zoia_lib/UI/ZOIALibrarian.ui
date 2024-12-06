@@ -3520,7 +3520,7 @@
   </action>
   <action name="actionSort_by_category_high_low">
    <property name="text">
-    <string>Sort by category (high-low)</string>
+    <string>Sort by category (A-Z)</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+1</string>
@@ -3528,7 +3528,7 @@
   </action>
   <action name="actionSort_by_category_low_high">
    <property name="text">
-    <string>Sort by category (low-high)</string>
+    <string>Sort by category (Z-A)</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+2</string>
@@ -3536,7 +3536,7 @@
   </action>
   <action name="actionSort_by_tag_high_low">
    <property name="text">
-    <string>Sort by tag (high-low)</string>
+    <string>Sort by tag (A-Z)</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+9</string>
@@ -3544,7 +3544,7 @@
   </action>
   <action name="actionSort_by_tag_low_high">
    <property name="text">
-    <string>Sort by tag (low-high)</string>
+    <string>Sort by tag (Z-A)</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+0</string>
