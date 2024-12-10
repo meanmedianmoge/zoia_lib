@@ -36,7 +36,7 @@ class Patch:
         self._create_backend_directories()
 
         # Library version
-        self._version = 1.3
+        self._version = 1.4
 
     def _create_backend_directories(self):
         """Creates the necessary directories that will store

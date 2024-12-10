@@ -59,7 +59,7 @@ class PatchExport(Patch):
             for pch in os.listdir(dest):
                 if pch[:3] == "00{}".format(slot) or pch[:3] == "0{}".format(slot):
                     os.remove(os.path.join(dest, pch))
-                    break
+                    # break
 
         # Prepare the name of the patch. We need to access the metadata.
         # Extract the patch id from the supplied patch parameter.

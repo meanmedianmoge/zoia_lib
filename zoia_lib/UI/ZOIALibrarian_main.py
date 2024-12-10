@@ -118,8 +118,9 @@ class ZOIALibrarianMain(QMainWindow):
         self.local_pch_count = -1
         self.tab_1 = -1
         self.tab_3 = -1
-        self.add_rating = None
-        self._version = "1.32"
+        # self.add_rating = None
+        # self.add_download_date = None
+        self._version = "1.4"
 
         # Threads
         self.worker_mass = ImportMassWorker(self)
@@ -178,6 +179,9 @@ class ZOIALibrarianMain(QMainWindow):
             if "api_token" in data[0]:
                 api.api_token = data[0]["api_token"]
 
+            if "api_user" in data[0]:
+                api.api_usr = data[0]["api_user"]
+
             self.resize(data[0]["width"], data[0]["height"])
 
             # Font
@@ -192,7 +196,7 @@ class ZOIALibrarianMain(QMainWindow):
             # Version check
             if "col_5" not in self.local_sizes or "col_5" not in self.bank_sizes:
                 os.remove(os.path.join(self.path, "pref.json"))
-                self.add_rating = True
+                # self.add_rating = True
                 self.reset_ui()
                 break
 
@@ -244,12 +248,12 @@ class ZOIALibrarianMain(QMainWindow):
             break
         else:
             # No pref.json, use default values.
-            self.add_rating = True
+            # self.add_rating = True
             self.reset_ui()
 
         # Update local patches if necessary
-        if self.add_rating:
-            self.local.metadata_init()
+        self.local.alpha_to_beta()
+        self.local.metadata_init()
 
         # Connect buttons and items to methods.
         self.ui.tabs.currentChanged.connect(self.tab_switch)
@@ -297,6 +301,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.import_version_menu
         )
         self.ui.actionNavigate_to_local_backend.triggered.connect(self.util.open_local_backend)
+        self.ui.actionReset_API_Token.triggered.connect(self.util.reset_api_token)
         self.ui.refresh_pch_btn.clicked.connect(self.ps.reload_ps_thread)
         self.ui.update_patch_notes.clicked.connect(self.local.update_patch_notes)
         self.ui.upload_patch.clicked.connect(self.local.upload_patch)
@@ -892,8 +897,8 @@ class ZOIALibrarianMain(QMainWindow):
                     curr_browser = self.ui.text_browser_local
                     viz_browser = self.ui.page_label
                     self.ui.update_patch_notes.setEnabled(True)
-                    self.ui.upload_patch.setEnabled(False)
-                    if len(name) == 5:
+                    if not self.ui.back_btn_local.isEnabled():
+                        # Only enable for single version patches.
                         self.ui.upload_patch.setEnabled(True)
                     self.ui.text_browser_viz.setText("")
                 elif self.ui.tabs.currentIndex() == 3:

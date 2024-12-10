@@ -1,12 +1,11 @@
 import json
 import math
 import os
+import re
 
 import certifi
 import urllib3
-# from bs4 import BeautifulSoup
 from furl import furl
-# from numpy.compat import unicode
 
 http = urllib3.PoolManager(cert_reqs="CERT_REQUIRED", ca_certs=certifi.where())
 
@@ -27,6 +26,7 @@ class PatchStorage:
         self.url = "https://patchstorage.com/api/beta/"
         self.platform = 3003  # ZOIA
         self.api_token = None
+        self.api_usr = None
         self.licenses = self._get_license_data()
         self.categories = self._get_categories_data()
         try:
@@ -404,6 +404,7 @@ class PatchStorage:
         )
         if r.status == 200:
             self.api_token = json.loads(r.data)['token']
+            self.api_usr = username
 
     def auth_token(self):
         """Checks if current token is still valid."""
@@ -474,11 +475,61 @@ class PatchStorage:
             "POST",
             self.url + 'patches',
             body=json.dumps({
-                "title": meta['title'],
+                "title": meta['title'].ljust(5),
                 "content": meta['content'],
                 "revision": "1.0",
                 "files": [patch_file_id],
                 "artwork": artwork_file_id,
+                "categories": [x['id'] for x in meta['categories']],
+                "tags": [x['name'].replace(' ', '-') for x in meta['tags']],
+                "license": lic_id,
+                "platform": 3003,
+                "state": 151,
+            }),
+            headers={
+              'Authorization': 'Bearer ' + self.api_token,
+              'Content-Type': 'application/json'
+            }
+        )
+
+        return r
+        # if r.status == 201:
+        #     return json.loads(r.data)['id']
+        # else:
+        #     return vars(r)
+
+    def update_patch(self, idx: str, path: str, artwork_id=None, patch_id=None, license_id=None):
+
+        if self.api_token is None:
+            raise ValueError('Not authenticated')
+
+        with open(path + '.json', 'rb') as f:
+            meta = json.load(f)
+
+        # Assign category ID if it's not there
+        for cat in meta['categories']:
+            if "id" not in cat.keys():
+                cat['id'] = [x['id'] for x in self.categories if x['name'] == cat['name']][0]
+
+        # Revision nonsense
+        ver = max(re.findall(r'\d+', meta['revision']))
+        new_ver = str(float(ver) + 1)
+
+        # Get list of id's to update with
+        art_id = artwork_id if 'id' not in meta['artwork'] else meta['artwork']['id']
+        pch_id = [patch_id] if patch_id else [meta['files'][0]['id']]
+        lic_id = license_id if not meta['license'] else meta['license']['id']
+
+        # Patch upload, combines previous POSTs into final request
+        r = http.request(
+            "PUT",
+            self.url + 'patches/{}'.format(idx),
+            body=json.dumps({
+                "title": meta['title'].ljust(5),
+                "content": meta['content'],
+                "revision": new_ver,
+                "files": pch_id,
+                "artwork": art_id,
                 "categories": [x['id'] for x in meta['categories']],
                 "tags": [x['name'].replace(' ', '-') for x in meta['tags']],
                 "license": lic_id,

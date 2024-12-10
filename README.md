@@ -20,10 +20,10 @@ modification of this application. By installing the application you agree to the
 
 ## How to Install
 Application can be installed in one of two ways:
-- (For general users) - Use the pre-bundled build; available on Windows, Mac, and Linux (Ubuntu) here:
+- For general users - Use the pre-bundled build; available on Mac and Windows here:
 https://github.com/meanmedianmoge/zoia_lib/releases/latest.
 
-- (For developers/contributors) - Build from source; requires Python 3.8+.
+- For developers/contributors - Build from source; requires Python 3.11+.
 ```
 # Download source code
 git clone https://github.com/meanmedianmoge/zoia_lib.git
@@ -40,6 +40,7 @@ python -m zoia_lib.backend.startup
 - Supplemental 1.1 video: https://www.youtube.com/watch?v=nP9oRLtXMUE
 - Supplemental 1.2 video: https://www.youtube.com/watch?v=zR8XSI_Unlk
 - Supplemental 1.3 video: https://www.youtube.com/watch?v=Y4ILhtxdIvs
+- Supplemental 1.4 video: https://www.youtube.com/watch?v=ymLvRhC1GmI
 - You'll find the following in `/documentation`: <br>
     - Current version of the user manual
     - Overall changelog - lists new features, bug fixes, and known issues for each release

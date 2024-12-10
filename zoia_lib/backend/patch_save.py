@@ -12,7 +12,7 @@ from zoia_lib.backend.patch import Patch
 from zoia_lib.common import errors
 from zoia_lib.backend.api import PatchStorage
 from zoia_lib.backend.patch_binary import PatchBinary
-from zoia_lib.backend.utilities import hide_dotted_files, natural_key
+from zoia_lib.backend.utilities import hide_dotted_files, natural_key, remove_empty_patches
 
 pb = PatchBinary()
 ps = PatchStorage()
@@ -289,7 +289,12 @@ class PatchSave(Patch):
         # Update the revision number if need be.
         if version > 0:
             metadata["revision"] = version
+
+        # Add extra components to json
         metadata["rating"] = 0
+        metadata["downloaded_at"] = "{:%Y-%m-%dT%H:%M:%S+00:00}".format(
+                    datetime.datetime.now()
+                )
 
         with open(name_json, "w") as jf:
             json.dump(metadata, jf)
@@ -360,6 +365,7 @@ class PatchSave(Patch):
 
         if os.path.isdir(path):
             files = hide_dotted_files(path)
+            files = remove_empty_patches(files)
             count = len(files)
         else:
             files = [path]

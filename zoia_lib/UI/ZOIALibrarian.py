@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'ZOIALibrarian.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.5.0
+## Created by: Qt User Interface Compiler version 6.6.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -199,6 +199,12 @@ class Ui_MainWindow(object):
         self.actionNavigate_to_local_backend.setObjectName(u"actionNavigate_to_local_backend")
         self.actionCheck_for_Updates = QAction(MainWindow)
         self.actionCheck_for_Updates.setObjectName(u"actionCheck_for_Updates")
+        self.actionSort_by_download_date_new_old = QAction(MainWindow)
+        self.actionSort_by_download_date_new_old.setObjectName(u"actionSort_by_download_date_new_old")
+        self.actionSort_by_download_date_old_new = QAction(MainWindow)
+        self.actionSort_by_download_date_old_new.setObjectName(u"actionSort_by_download_date_old_new")
+        self.actionReset_API_Token = QAction(MainWindow)
+        self.actionReset_API_Token.setObjectName(u"actionReset_API_Token")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.centralwidget.setStyleSheet(u"")
@@ -1517,6 +1523,7 @@ class Ui_MainWindow(object):
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionCheck_for_Updates)
         self.menuFile.addAction(self.actionNavigate_to_local_backend)
+        self.menuFile.addAction(self.actionReset_API_Token)
         self.menuFile.addAction(self.actionQuit)
         self.menuSort.addAction(self.actionSort_by_title_A_Z)
         self.menuSort.addAction(self.actionSort_by_title_Z_A)
@@ -1559,7 +1566,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"ZOIA Librarian - Version 1.3", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"ZOIA Librarian - Version 1.4", None))
         self.actionSpecify_SD_Card_Location.setText(QCoreApplication.translate("MainWindow", u"Specify SD Card Location", None))
 #if QT_CONFIG(shortcut)
         self.actionSpecify_SD_Card_Location.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+S", None))
@@ -1697,19 +1704,19 @@ class Ui_MainWindow(object):
         self.actionSort_by_rating_low_high.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+]", None))
 #endif // QT_CONFIG(shortcut)
         self.actionSpecify_Default_Export_Directory.setText(QCoreApplication.translate("MainWindow", u"Specify Default Export Directory", None))
-        self.actionSort_by_category_high_low.setText(QCoreApplication.translate("MainWindow", u"Sort by category (high-low)", None))
+        self.actionSort_by_category_high_low.setText(QCoreApplication.translate("MainWindow", u"Sort by category (A-Z)", None))
 #if QT_CONFIG(shortcut)
         self.actionSort_by_category_high_low.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+Shift+1", None))
 #endif // QT_CONFIG(shortcut)
-        self.actionSort_by_category_low_high.setText(QCoreApplication.translate("MainWindow", u"Sort by category (low-high)", None))
+        self.actionSort_by_category_low_high.setText(QCoreApplication.translate("MainWindow", u"Sort by category (Z-A)", None))
 #if QT_CONFIG(shortcut)
         self.actionSort_by_category_low_high.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+Shift+2", None))
 #endif // QT_CONFIG(shortcut)
-        self.actionSort_by_tag_high_low.setText(QCoreApplication.translate("MainWindow", u"Sort by tag (high-low)", None))
+        self.actionSort_by_tag_high_low.setText(QCoreApplication.translate("MainWindow", u"Sort by tag (A-Z)", None))
 #if QT_CONFIG(shortcut)
         self.actionSort_by_tag_high_low.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+Shift+9", None))
 #endif // QT_CONFIG(shortcut)
-        self.actionSort_by_tag_low_high.setText(QCoreApplication.translate("MainWindow", u"Sort by tag (low-high)", None))
+        self.actionSort_by_tag_low_high.setText(QCoreApplication.translate("MainWindow", u"Sort by tag (Z-A)", None))
 #if QT_CONFIG(shortcut)
         self.actionSort_by_tag_low_high.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+Shift+0", None))
 #endif // QT_CONFIG(shortcut)
@@ -1720,6 +1727,18 @@ class Ui_MainWindow(object):
         self.actionCheck_for_Updates.setText(QCoreApplication.translate("MainWindow", u"Check for Updates", None))
 #if QT_CONFIG(shortcut)
         self.actionCheck_for_Updates.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+G", None))
+#endif // QT_CONFIG(shortcut)
+        self.actionSort_by_download_date_new_old.setText(QCoreApplication.translate("MainWindow", u"Sort by download date (new-old)", None))
+#if QT_CONFIG(shortcut)
+        self.actionSort_by_download_date_new_old.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+\\", None))
+#endif // QT_CONFIG(shortcut)
+        self.actionSort_by_download_date_old_new.setText(QCoreApplication.translate("MainWindow", u"Sort by download date (old-new)", None))
+#if QT_CONFIG(shortcut)
+        self.actionSort_by_download_date_old_new.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+/", None))
+#endif // QT_CONFIG(shortcut)
+        self.actionReset_API_Token.setText(QCoreApplication.translate("MainWindow", u"Reset API Token", None))
+#if QT_CONFIG(shortcut)
+        self.actionReset_API_Token.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+T", None))
 #endif // QT_CONFIG(shortcut)
 #if QT_CONFIG(tooltip)
         self.tabs.setToolTip("")
