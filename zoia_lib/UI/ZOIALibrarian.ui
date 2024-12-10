@@ -3008,6 +3008,7 @@
     <addaction name="separator"/>
     <addaction name="actionCheck_for_Updates"/>
     <addaction name="actionNavigate_to_local_backend"/>
+    <addaction name="actionReset_API_Token"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuSort">
@@ -3580,6 +3581,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+/</string>
+   </property>
+  </action>
+  <action name="actionReset_API_Token">
+   <property name="text">
+    <string>Reset API Token</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
    </property>
   </action>
  </widget>

@@ -301,6 +301,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.import_version_menu
         )
         self.ui.actionNavigate_to_local_backend.triggered.connect(self.util.open_local_backend)
+        self.ui.actionReset_API_Token.triggered.connect(self.util.reset_api_token)
         self.ui.refresh_pch_btn.clicked.connect(self.ps.reload_ps_thread)
         self.ui.update_patch_notes.clicked.connect(self.local.update_patch_notes)
         self.ui.upload_patch.clicked.connect(self.local.upload_patch)

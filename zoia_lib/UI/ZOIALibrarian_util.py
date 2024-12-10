@@ -317,6 +317,12 @@ class ZOIALibrarianUtil:
             options=QFileDialog.DontUseNativeDialog
         )
 
+    def reset_api_token(self):
+        """Resets the saved API token."""
+
+        self.api.api_token = None
+        self.api.api_usr = None
+
     def documentation(self):
         """Passes documentation to the front-end PS tab."""
 
