@@ -61,6 +61,8 @@ def iter_sources(src_root, project_root):
     schema_files = list((src_root / "common" / "schemas").glob("*.json"))
     doc_html_files = list((project_root / "documentation" / "resources").glob("*.html"))
     requirements_file = project_root / "requirements.txt"
+    build_files = list((project_root / "tools").glob("*.spec"))
+    orderedmultidict_dir = project_root / "tools" / "orderedmultidict"
 
     return (
         py_sources,
@@ -69,6 +71,8 @@ def iter_sources(src_root, project_root):
         schema_files,
         doc_html_files,
         requirements_file,
+        build_files,
+        orderedmultidict_dir,
     )
 
 
@@ -92,6 +96,8 @@ def build_distro(src_root, dest_root, project_root):
         schema_files,
         doc_html_files,
         requirements_file,
+        build_files,
+        orderedmultidict_dir,
     ) = iter_sources(src_root, project_root)
     dest_root.mkdir(parents=True, exist_ok=True)
 
@@ -115,6 +121,16 @@ def build_distro(src_root, dest_root, project_root):
 
     if requirements_file.exists():
         copy_file(requirements_file, dest_root)
+
+    for spec_path in build_files:
+        copy_file(spec_path, dest_root)
+
+    if orderedmultidict_dir.exists():
+        shutil.copytree(
+            orderedmultidict_dir,
+            dest_root / orderedmultidict_dir.name,
+            dirs_exist_ok=True,
+        )
 
 
 def main():
