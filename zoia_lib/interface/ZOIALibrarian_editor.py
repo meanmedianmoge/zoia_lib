@@ -32,13 +32,11 @@ from PySide6.QtCore import Qt
 from NodeGraphQt import NodeGraph, BaseNode, setup_context_menu
 from zoia_lib.backend.patch_binary import PatchBinary
 from zoia_lib.backend.patch_encode import PatchEncoder
-from zoia_lib.backend.patch_save import PatchSave
 from zoia_lib.backend.utilities import exit_after, meipass
-from zoia_lib.common import errors
 
 class PatchBuilderEditor(QMainWindow):
     """Separate window for building a patch by selecting modules and configuring them."""
-    def __init__(self, msg=None, window=None, patch_dict=None, patch_id=None):
+    def __init__(self, msg=None, save=None, window=None, patch_dict=None, patch_id=None, on_close=None):
         super().__init__(window)
         self.setWindowTitle("ZOIA Patch Builder")
         self.resize(1300, 700)
@@ -46,9 +44,11 @@ class PatchBuilderEditor(QMainWindow):
         self.window = window
         self.patch_dict = patch_dict  # For editing existing patches
         self.patch_id = patch_id
+        self.on_close = on_close
+        self._refreshed = False
         self.param_controls = {}  # Store references to parameter sliders/spinboxes
         self.current_module_index = None
-        self.patch_save = PatchSave()
+        self.patch_save = save
 
         # Load module index
         with open(meipass("zoia_lib/common/schemas/ModuleIndex.json")) as f:
@@ -386,6 +386,8 @@ class PatchBuilderEditor(QMainWindow):
             try:
                 self.patch_save.save_to_backend((bin_bytes, meta))
                 QMessageBox.information(self, "Export Success", "Patch saved to backend.")
+                self._notify_close_refresh()
+                self.close()
             except Exception as e:
                 QMessageBox.critical(self, "Export Failed", str(e))
             return
@@ -433,8 +435,24 @@ class PatchBuilderEditor(QMainWindow):
                     f.write(bin_bytes)
                 self.patch_save.save_metadata_json(meta)
             QMessageBox.information(self, "Export Success", "Patch saved to backend.")
+            self._notify_close_refresh()
+            self.close()
         except Exception as e:
             QMessageBox.critical(self, "Export Failed", str(e))
+
+    def closeEvent(self, event):
+        self._notify_close_refresh()
+        super().closeEvent(event)
+
+    def _notify_close_refresh(self):
+        if self._refreshed:
+            return
+        if callable(self.on_close):
+            try:
+                self.on_close()
+            except Exception:
+                pass
+        self._refreshed = True
 
     def _load_patch_modules(self):
         """Load modules from an existing patch dict into the editor."""
@@ -1381,7 +1399,7 @@ class PatchBuilderEditor(QMainWindow):
 
 class ZOIALibrarianEditor(QMainWindow):
     """Consistent class interface for launching the patch builder/editor."""
-    def __init__(self, ui, path, msg, window, local):
+    def __init__(self, ui, path, msg, save, window, local):
         """Initializes the class with the required parameters.
 
         ui: The UI component of ZOIALibrarianMain
@@ -1398,13 +1416,19 @@ class ZOIALibrarianEditor(QMainWindow):
         self.ui = ui
         self.path = path
         self.msg = msg
+        self.save = save
         self.window = window
         self.local = local
         self.widget = None
 
     def new_patch(self):
         """Launch the patch builder/editor window as a separate window."""
-        self.widget = PatchBuilderEditor(msg=self.msg, window=self.window)
+        self.widget = PatchBuilderEditor(
+            msg=self.msg,
+            save=self.save,
+            window=self.window,
+            on_close=self._refresh_local_patches,
+        )
         self.widget.show()
 
     def edit_patch(self):
@@ -1416,5 +1440,16 @@ class ZOIALibrarianEditor(QMainWindow):
 
         patch_dict = self.local.get_viz()
         patch_id = self.local.get_local_selected()
-        self.widget = PatchBuilderEditor(msg=self.msg, window=self.window, patch_dict=patch_dict, patch_id=patch_id)
+        self.widget = PatchBuilderEditor(
+            msg=self.msg,
+            save=self.save,
+            window=self.window,
+            patch_dict=patch_dict,
+            patch_id=patch_id,
+            on_close=self._refresh_local_patches,
+        )
         self.widget.show()
+
+    def _refresh_local_patches(self):
+        if self.local:
+            self.local.get_local_patches()

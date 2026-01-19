@@ -9,3 +9,6 @@ pip install pillow
 
 cd distro
 pyinstaller --clean --noconfirm zoia_lib_mac.spec
+
+cd ..
+source venv/bin/activate
