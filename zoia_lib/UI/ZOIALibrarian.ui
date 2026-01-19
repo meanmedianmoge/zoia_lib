@@ -539,7 +539,7 @@
                       <string notr="true"/>
                      </property>
                      <property name="text">
-                      <string>Check for updates</string>
+                      <string>Check for Updates</string>
                      </property>
                     </widget>
                    </item>

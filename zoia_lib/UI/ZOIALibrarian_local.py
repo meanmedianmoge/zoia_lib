@@ -187,10 +187,10 @@ class ZOIALibrarianLocal(QMainWindow):
         """
 
         if "[Multiple Versions]" in btn.text():
-            ext_btn = QPushButton("Export \n patches", self)
+            ext_btn = QPushButton("Export \n Patches", self)
             ext_btn.setEnabled(True)
         else:
-            ext_btn = QPushButton("Export \n patch", self)
+            ext_btn = QPushButton("Export \n Patch", self)
 
         del_btn = QPushButton("X", self)
 

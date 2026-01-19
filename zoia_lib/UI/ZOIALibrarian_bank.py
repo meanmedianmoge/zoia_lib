@@ -57,10 +57,10 @@ class ZOIALibrarianBank(QMainWindow):
 
         # Prepare the button.
         if "[Multiple Versions]" in btn.text():
-            mv_btn = QPushButton("Move patches \n to folder", self)
+            mv_btn = QPushButton("Add Patches \n to Folder", self)
             mv_btn.setEnabled(True)
         else:
-            mv_btn = QPushButton("Move patch \n to folder", self)
+            mv_btn = QPushButton("Add Patch \n to Folder", self)
 
         mv_btn.setObjectName(idx)
         mv_btn.setFont(self.ui.table_bank_local.horizontalHeader().font())

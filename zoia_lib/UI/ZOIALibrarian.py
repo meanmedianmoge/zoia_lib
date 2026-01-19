@@ -1877,7 +1877,7 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(accessibility)
         self.check_for_updates_btn.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Automatically checks for updates to any patches listed in the Local Storage View table when clicked. Should any be found, a popup will let you know how many patches were updated.", None))
 #endif // QT_CONFIG(accessibility)
-        self.check_for_updates_btn.setText(QCoreApplication.translate("MainWindow", u"Check for updates", None))
+        self.check_for_updates_btn.setText(QCoreApplication.translate("MainWindow", u"Check for Updates", None))
 #if QT_CONFIG(tooltip)
         self.new_patch_btn.setToolTip(QCoreApplication.translate("MainWindow", u"Click here to create a new patch.", None))
 #endif // QT_CONFIG(tooltip)

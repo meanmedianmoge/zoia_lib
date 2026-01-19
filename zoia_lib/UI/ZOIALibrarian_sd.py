@@ -158,7 +158,7 @@ class ZOIALibrarianSD(QMainWindow):
                 # Get the useful int index.
                 index = int(index[1:3])
 
-                import_btn = QPushButton("Import patch", self)
+                import_btn = QPushButton("Import Patch", self)
                 import_btn.setObjectName(str(index))
                 import_btn.setFont(self.ui.table_PS.horizontalHeader().font())
                 import_btn.clicked.connect(self._import_patch_sd)
