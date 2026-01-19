@@ -8,8 +8,6 @@ from zoia_lib.backend.patch_delete import PatchDelete
 
 test_path = os.path.join(os.getcwd(), "zoia_lib", "tests")
 
-delete_pch = PatchDelete()
-
 
 class TestDeletion(unittest.TestCase):
     """This class is responsible for testing the various deletion
@@ -22,18 +20,21 @@ class TestDeletion(unittest.TestCase):
     """
 
     def setUp(self):
+        self.delete_pch = PatchDelete()
+        self.delete_pch.back_path = test_path
+
         # Create a test patch to delete.
-        add_test_patch("22222", 22222, delete_pch.back_path)
+        add_test_patch("22222", 22222, self.delete_pch.back_path)
 
         # Create a secondary patch to ensure only the desired patch is deleted.
-        add_test_patch("22223", 22223, delete_pch.back_path)
+        add_test_patch("22223", 22223, self.delete_pch.back_path)
 
         # Create a version directory with 3 versions
         for i in range(1, 4):
             add_test_patch(
                 os.path.join("22224", "22224_v{}".format(i)),
                 22224,
-                delete_pch.back_path,
+                self.delete_pch.back_path,
             )
 
     def tearDown(self):
@@ -84,12 +85,12 @@ class TestDeletion(unittest.TestCase):
 
         # Try to break the method
         exc = (FileNotFoundError, errors.DeletionError, errors.BadPathError)
-        self.assertRaises(exc, delete_pch.delete_patch, "IamNotAPatch")
-        self.assertRaises(exc, delete_pch.delete_patch, None)
+        self.assertRaises(exc, self.delete_pch.delete_patch, "IamNotAPatch")
+        self.assertRaises(exc, self.delete_pch.delete_patch, None)
 
         # Try to delete a patch that exists.
         try:
-            delete_pch.delete_patch("22222")
+            self.delete_pch.delete_patch("22222")
         except errors.DeletionError:
             self.fail("Failed to find patch 22222 to delete.")
 
@@ -150,7 +151,7 @@ class TestDeletion(unittest.TestCase):
 
         # Try to delete a version.
         try:
-            delete_pch.delete_patch(os.path.join("22224", "22224_v1"))
+            self.delete_pch.delete_patch(os.path.join("22224", "22224_v1"))
         except errors.DeletionError:
             self.fail("Failed to find patch 22224_v1 to delete.")
 
@@ -164,7 +165,7 @@ class TestDeletion(unittest.TestCase):
 
         # Delete another version (which leaves only one version of the patch.
         try:
-            delete_pch.delete_patch("22224_v2")
+            self.delete_pch.delete_patch("22224_v2")
         except errors.DeletionError:
             self.fail("Failed to find patch 22224_v2 to delete.")
 
@@ -200,24 +201,24 @@ class TestDeletion(unittest.TestCase):
 
         # Try to break the method.
         exc = (FileNotFoundError, errors.DeletionError, errors.BadPathError)
-        self.assertRaises(exc, delete_pch.delete_full_patch_directory, "IamNotAPatch")
-        self.assertRaises(exc, delete_pch.delete_full_patch_directory, None)
-        self.assertRaises(exc, delete_pch.delete_full_patch_directory, "22222.bin")
-        self.assertRaises(exc, delete_pch.delete_full_patch_directory, "22224_v1.bin")
-        self.assertRaises(exc, delete_pch.delete_full_patch_directory, "22224_v1")
+        self.assertRaises(exc, self.delete_pch.delete_full_patch_directory, "IamNotAPatch")
+        self.assertRaises(exc, self.delete_pch.delete_full_patch_directory, None)
+        self.assertRaises(exc, self.delete_pch.delete_full_patch_directory, "22222.bin")
+        self.assertRaises(exc, self.delete_pch.delete_full_patch_directory, "22224_v1.bin")
+        self.assertRaises(exc, self.delete_pch.delete_full_patch_directory, "22224_v1")
 
         # Try to delete a patch directory.
-        delete_pch.delete_full_patch_directory("22222")
+        self.delete_pch.delete_full_patch_directory("22222")
         self.assertFalse(
             "22222" in os.listdir(test_path),
             "Deletion did not successfully remove patch " "directory 22222.",
         )
         # Try to delete it again.
-        self.assertRaises(exc, delete_pch.delete_full_patch_directory, "22222")
+        self.assertRaises(exc, self.delete_pch.delete_full_patch_directory, "22222")
 
         # Try to delete a patch directory with multiple patches
         # contained within.
-        delete_pch.delete_full_patch_directory("22224")
+        self.delete_pch.delete_full_patch_directory("22224")
         self.assertFalse(
             "22224" in os.listdir(test_path),
             "Deletion did not successfully remove patch " "directory 22224.",
@@ -255,21 +256,19 @@ class TestDeletion(unittest.TestCase):
 
         # Try to break the method.
         exc = (FileNotFoundError, errors.DeletionError, errors.BadPathError)
-        self.assertRaises(exc, delete_pch.delete_patch_sd, None)
-        self.assertRaises(exc, delete_pch.delete_patch_sd, "IamNotAPatch")
+        self.assertRaises(exc, PatchDelete.delete_patch_sd, "001", None)
+        self.assertRaises(exc, PatchDelete.delete_patch_sd, "Iam", "/path")
 
-        delete_pch.delete_patch_sd(22222, os.path.join(test_path, "22222", "22222.bin"))
+        PatchDelete.delete_patch_sd("222", os.path.join(test_path, "22222"))
         # Ensure it got deleted correctly.
         self.assertTrue("22222.bin" not in os.listdir(os.path.join(test_path, "22222")))
         # Try to delete it again.
         self.assertRaises(
             exc,
-            delete_pch.delete_patch_sd,
-            os.path.join(test_path, "22222", "22222.bin"),
+            PatchDelete.delete_patch_sd,
+            "222",
+            "/nonexistent",
         )
-        # Try to delete a patch without the file extension.
-        self.assertRaises(
-            exc, delete_pch.delete_patch_sd, os.path.join(test_path, "22222", "22222")
-        )
+        # Try to delete a patch without the file extension. But since it's by index, not relevant.
 
         self.tearDown()

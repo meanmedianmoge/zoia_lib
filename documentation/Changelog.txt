@@ -1,3 +1,29 @@
+Version 2.0 (February 2026)
+New Features
+- Patches can now be edited and created in the app!!!
+  - This feature is offered in a beta state. Without having the unit on hand to measure dynamic CPU loads,
+  there is no guarantee that patches edited with the app will run smoothly on ZOIA.
+- Updated the module index for block defaults and descriptions.
+  - Also, reflected the 5.3 change to Granular modules (new max grain size option).
+- Added images to the patch preview/notes pane.
+  - Artwork is locally cached for faster subsequent loads.
+- Overhauled unit tests and added Github actions CI/CD for smoother deployments and testing.
+- Condensed the user tags into a shorter list; all elements remain searchable.
+
+Fixes
+- Resolved the patch encoder-decoder round trip logic, which allowed for patch editing to exist!
+- Expander now has better handling for feedback loops and will now display them with red edges.
+- Updated drag and drop behavior to be less chaotic.
+  - Insert in-between is not supported as of right now, but is still planned.
+- Fixed a bug where Zebu patches would show as having 128 pages.
+- Fixed menu import threads on Mac.
+- Deleting a duplicate patch from the Folder list will no longer delete the first entry instead of the one chosen.
+- Bumped minor dependency versions.
+
+Plans
+- Support for Intel Macs is not something I can guarantee.
+  - I will still ship a version for release, but it won't have been tested on original hardware.
+
 Version 1.4 (December 2024)
 
 New Features

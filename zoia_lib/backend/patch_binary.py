@@ -14,6 +14,8 @@ class PatchBinary(Patch):
     responsible for ZOIA patch binary analysis.
     """
 
+    MAX_PAGES = 64
+
     def __init__(self):
         """"""
         super().__init__()
@@ -84,6 +86,8 @@ class PatchBinary(Patch):
         curr_step = 6
         for i in range(int(data[5])):
             size = data[curr_step]
+            page_raw = int(data[curr_step + 3])
+            page = page_raw if 0 <= page_raw < self.MAX_PAGES else 0
             curr_module = {
                 "number": i,
                 "category": self._get_module_data(data[curr_step + 1], "category"),
@@ -98,7 +102,7 @@ class PatchBinary(Patch):
                 "size": data[curr_step],
                 "size_of_saveable_data": data[curr_step + 7],
                 "version": data[curr_step + 2],
-                "page": int(data[curr_step + 3]),
+                "page": page,
                 "position": [
                     x
                     for x in range(
@@ -108,6 +112,7 @@ class PatchBinary(Patch):
                     )
                 ],
                 "old_color": data[curr_step + 4],
+                "header_color_id": data[curr_step + 4],
                 "new_color": "" if skip_real else self._get_color_name(colors[i]),
                 "options": {},
                 "options_binary": {},
@@ -129,10 +134,20 @@ class PatchBinary(Patch):
                         ],
                     )
                 ),
+                "parameters_raw": [
+                    int(data[curr_step + x + 10]) for x in range(data[curr_step + 6])
+                ],
+                "saved_data": [],
                 "blocks": [],
                 "connections": [],
                 "starred": [],
             }
+            params_count = int(data[curr_step + 6])
+            name_start = (curr_step + (size - 4)) * 4
+            saved_data_start = (curr_step + 10 + params_count) * 4
+            saved_data_end = name_start
+            if saved_data_end > saved_data_start:
+                curr_module["saved_data"] = list(bytearray(byt[saved_data_start:saved_data_end]))
 
             # TODO edit behavior of the options selector, since modules are versioned
             # Select appropriate options from list
@@ -176,6 +191,11 @@ class PatchBinary(Patch):
                     int(data[curr_step + 3]), int(data[curr_step + 4])
                 ),
                 "strength": int(data[curr_step + 5] / 100),
+                "source_raw": int(data[curr_step + 1]),
+                "source_block_raw": int(data[curr_step + 2]),
+                "dest_raw": int(data[curr_step + 3]),
+                "dest_block_raw": int(data[curr_step + 4]),
+                "strength_raw": int(data[curr_step + 5]),
             }
             connections.append(curr_connection)
             curr_step += 5
@@ -183,16 +203,22 @@ class PatchBinary(Patch):
         pages = []
         curr_step += 1
         # Extract the page data for each page in the patch.
-        for k in range(data[curr_step]):
-            curr_page = self._qc_name(
-                byt[(curr_step + 1) * 4: (curr_step + 1) * 4 + 16]
-            )
-            pages.append(curr_page)
+        pages_count_raw = int(data[curr_step])
+        for k in range(pages_count_raw):
+            if k < self.MAX_PAGES:
+                curr_page = self._qc_name(
+                    byt[(curr_step + 1) * 4: (curr_step + 1) * 4 + 16]
+                )
+                pages.append(curr_page)
             curr_step += 4
         # Get number of pages and fill with blank strings
-        n_pages = modules[-1]["page"] + 1 if len(modules) != 0 else 1
+        max_page = max((m["page"] for m in modules), default=0)
+        n_pages = min(max_page + 1, self.MAX_PAGES)
         while len(pages) < n_pages:
             pages += [""]
+        if len(pages) > n_pages:
+            pages = pages[:n_pages]
+        pages_count = n_pages
 
         starred = []
         curr_step += 1
@@ -240,6 +266,7 @@ class PatchBinary(Patch):
             "modules": modules,
             "connections": connections,
             "pages": pages,
+            "pages_count": pages_count,
             "starred": starred,
             "colors": colors,
             "meta": {

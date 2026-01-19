@@ -2,6 +2,7 @@ import json
 import os
 import platform
 import requests
+import hashlib
 from os.path import expanduser
 
 from PySide6 import QtCore
@@ -20,6 +21,7 @@ import zoia_lib.UI.ZOIALibrarian as ui_main
 import zoia_lib.backend.utilities as util
 import zoia_lib.common.errors as errors
 from zoia_lib.UI.ZOIALibrarian_bank import ZOIALibrarianBank
+from zoia_lib.UI.ZOIALibrarian_editor import ZOIALibrarianEditor
 from zoia_lib.UI.ZOIALibrarian_local import ZOIALibrarianLocal
 from zoia_lib.UI.ZOIALibrarian_ps import ZOIALibrarianPS
 from zoia_lib.UI.ZOIALibrarian_sd import ZOIALibrarianSD
@@ -98,6 +100,13 @@ class ZOIALibrarianMain(QMainWindow):
             delete,
             self.sort_and_set,
         )
+        self.editor = ZOIALibrarianEditor(
+            self.ui,
+            self.path,
+            self.msg,
+            self,
+            self.local
+        )
 
         # Instance variables.
         self.patch_cache = []
@@ -145,6 +154,8 @@ class ZOIALibrarianMain(QMainWindow):
         # Disabling widgets the user doesn't have access to on startup.
         self.ui.tab_sd.setEnabled(False)
         self.ui.update_patch_notes.setEnabled(False)
+        self.ui.edit_patch.setEnabled(False)
+        self.ui.new_patch_btn.setEnabled(True)
         self.ui.upload_patch.setEnabled(False)
         self.ui.import_all_btn.setEnabled(False)
         self.ui.import_all_ver_btn.setEnabled(False)
@@ -290,13 +301,9 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.check_for_updates_btn.clicked.connect(
             self.local.update_local_patches_thread
         )
-        # self.ui.actionImport_Multiple_Patches.triggered.connect(
-        #     self._mass_import_thread)
         self.ui.actionImport_Multiple_Patches.triggered.connect(
             self.import_multiple_menu
         )
-        # self.ui.actionImport_Version_History_directory.triggered.connect(
-        #     self._version_import_thread)
         self.ui.actionImport_Version_History_directory.triggered.connect(
             self.import_version_menu
         )
@@ -329,6 +336,8 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui.import_all_btn.clicked.connect(self._mass_import_thread_sd)
         self.ui.import_all_ver_btn.clicked.connect(self._version_import_thread_sd)
         self.ui.back_btn_local.clicked.connect(self.local.go_back)
+        self.ui.new_patch_btn.clicked.connect(self.editor.new_patch)
+        self.ui.edit_patch.clicked.connect(self.editor.edit_patch)
         self.ui.back_btn_bank.clicked.connect(self.local.go_back)
         self.ui.btn_load_bank.clicked.connect(self.bank.load_bank)
         self.ui.btn_save_bank.clicked.connect(lambda: self.bank.save_bank(self))
@@ -598,33 +607,54 @@ class ZOIALibrarianMain(QMainWindow):
 
             # Text for the headers "Tags" and "Categories"
             for j in range(2):
-                index = "tags" if j == 0 else "categories"
-                text = ""
-                length = len(data[i][index])
-                if length > 2:
-                    for k in range(0, length - 1):
-                        text += data[i][index][k]["name"] + ", "
-                    text += "and " + data[i][index][length - 1]["name"]
-                elif length == 2:
-                    text = (
-                        data[i][index][0]["name"] + " and " + data[i][index][1]["name"]
-                    )
+                if j == 0:
+                    # Tags: limit to 3
+                    tags = data[i]["tags"]
+                    length = len(tags)
+                    if length > 3:
+                        text = ""
+                        for k in range(3):
+                            text += tags[k]["name"] + ", "
+                        text += "and " + str(length - 3) + " more"
+                    elif length == 3:
+                        text = tags[0]["name"] + ", " + tags[1]["name"] + ", and " + tags[2]["name"]
+                    elif length == 2:
+                        text = tags[0]["name"] + " and " + tags[1]["name"]
+                    elif length == 1:
+                        text = tags[0]["name"]
+                    else:
+                        text = "No tags"
+                    text_item = QTableWidgetItem(text)
+                    text_item.setTextAlignment(Qt.AlignCenter)
+                    curr_table.setItem(i, 1, text_item)
                 else:
-                    try:
-                        text = data[i][index][0]["name"]
-                    except IndexError:
-                        text = "No " + index
+                    index = "categories"
+                    text = ""
+                    length = len(data[i][index])
+                    if length > 2:
+                        for k in range(0, length - 1):
+                            text += data[i][index][k]["name"] + ", "
+                        text += "and " + data[i][index][length - 1]["name"]
+                    elif length == 2:
+                        text = (
+                            data[i][index][0]["name"] + " and " + data[i][index][1]["name"]
+                        )
+                    else:
+                        try:
+                            text = data[i][index][0]["name"]
+                        except IndexError:
+                            text = "No " + index
 
-                text_item = QTableWidgetItem(text)
-                text_item.setTextAlignment(Qt.AlignCenter)
-                # Can only edit tags/cats in Local Storage View.
-                if (
-                    table_index == 1
-                    and not self.ui.back_btn_local.isEnabled()
-                    and len(os.listdir(os.path.join(self.path, idx))) > 2
-                ):
-                    text_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                curr_table.setItem(i, j + 1, text_item)
+                    text_item = QTableWidgetItem(text)
+                    text_item.setTextAlignment(Qt.AlignCenter)
+                    # Can only edit tags/cats in Local Storage View.
+                    if (
+                        table_index == 1
+                        and not self.ui.back_btn_local.isEnabled()
+                        and len(os.listdir(os.path.join(self.path, idx))) > 2
+                    ):
+                        text_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                    curr_table.setItem(i, j + 1, text_item)
 
             # Text for the header "Date Modified"
             if table_index == 0 or table_index == 1:
@@ -897,6 +927,7 @@ class ZOIALibrarianMain(QMainWindow):
                     curr_browser = self.ui.text_browser_local
                     viz_browser = self.ui.page_label
                     self.ui.update_patch_notes.setEnabled(True)
+                    self.ui.edit_patch.setEnabled(True)
                     if not self.ui.back_btn_local.isEnabled():
                         # Only enable for single version patches.
                         self.ui.upload_patch.setEnabled(True)
@@ -931,7 +962,7 @@ class ZOIALibrarianMain(QMainWindow):
                     self.local.setup_viz(viz)
                     self.ui.btn_show_routing.setEnabled(True)
 
-            # Oh boy HTML code for the patch preview.
+            # HTML code for the patch preview.
             if not skip:
                 if content["preview_url"] == "":
                     content["preview_url"] = "None provided"
@@ -969,33 +1000,74 @@ class ZOIALibrarianMain(QMainWindow):
 
             content["content"] = content["content"].replace("\n", "<br/>")
 
-            # TODO Add artwork to HTML view.
-            # Artwork needs to be downloaded ahead of time and then
-            # pointed to, as QTextViews don't support downloading from
-            # external sources. Maybe create a cache of images? Not
-            # easily implementable without speed hitch.
+            # Artwork
+            img_html = ""
+            if content.get("artwork"):
+                img_dir = os.path.join(self.path, "art_cache")
+                os.makedirs(img_dir, exist_ok=True)
+                img_hash = hashlib.md5(content["artwork"]["url"].encode()).hexdigest()
+                img_path = os.path.join(img_dir, img_hash + ".png")
+                try:
+                    if not os.path.exists(img_path):
+                        import urllib.request
+                        urllib.request.urlretrieve(content["artwork"]["url"], img_path)
+                except Exception:
+                    img_path = None
+                if img_path is not None and os.path.exists(img_path):
+                    img_src = img_path.replace("\\", "/")
+                    img_html = f'<img src="{img_src}" width="220" style="float:right; margin:8px; border-radius:8px; box-shadow:0 2px 8px #888;">'
 
-            curr_browser.setHtml(
-                """<html>
-                <h3>{}</h3>
-                <br/><u> Author:</u> {}
-                <br/><u> Likes:</u> {}
-                <br/><u> Downloads:</u> {}
-                <br/><u> Views:</u> {}
-                <br/><u> License:</u> {}
-                <br/><u> Preview:</u> {}
-                <br/><br/><u> Patch Notes:</u><br/> {}
-            </html>""".format(
-                    content["self"],
-                    content["author"]["name"],
-                    str(content["like_count"]),
-                    str(content["download_count"]),
-                    str(content["view_count"]),
-                    legal,
-                    content["preview_url"],
-                    content["content"],
-                )
-            )
+            html = f"""
+            <html>
+            <head>
+            <style>
+                .patch-header {{ font-size: 1.5em; font-weight: bold; margin-bottom: 4px; }}
+                .patch-meta {{ color: #666; font-size: 1em; margin-bottom: 8px; }}
+                .patch-label {{ font-weight: bold; }}
+                .patch-notes {{ margin-top: 12px; font-size: 1.05em; line-height: 1.5; }}
+                .patch-table td {{ padding: 2px 8px; vertical-align: top; }}
+            </style>
+            </head>
+            <body>
+            <div style="overflow:auto;">
+                {img_html}
+                <div class="patch-header">{content['self']}</div>
+                <table class="patch-table">
+                    <tr><td class="patch-label">Author:</td><td>{content['author']['name']}</td></tr>
+                    <tr><td class="patch-label">Likes:</td><td>{content['like_count']}</td></tr>
+                    <tr><td class="patch-label">Downloads:</td><td>{content['download_count']}</td></tr>
+                    <tr><td class="patch-label">Views:</td><td>{content['view_count']}</td></tr>
+                    <tr><td class="patch-label">License:</td><td>{legal}</td></tr>
+                    <tr><td class="patch-label">Preview:</td><td>{content['preview_url']}</td></tr>
+                </table>
+                <div class="patch-notes"><span class="patch-label">Patch Notes:</span><br>{content['content']}</div>
+            </div>
+            </body>
+            </html>
+            """
+            curr_browser.setHtml(html)
+
+            # curr_browser.setHtml(
+            #     """<html>
+            #     <h3>{}</h3>
+            #     <br/><u> Author:</u> {}
+            #     <br/><u> Likes:</u> {}
+            #     <br/><u> Downloads:</u> {}
+            #     <br/><u> Views:</u> {}
+            #     <br/><u> License:</u> {}
+            #     <br/><u> Preview:</u> {}
+            #     <br/><br/><u> Patch Notes:</u><br/> {}
+            # </html>""".format(
+            #         content["self"],
+            #         content["author"]["name"],
+            #         str(content["like_count"]),
+            #         str(content["download_count"]),
+            #         str(content["view_count"]),
+            #         legal,
+            #         content["preview_url"],
+            #         content["content"],
+            #     )
+            # )
 
     def display_patch_versions(self, context):
         """Displays the contents of a patch that has multiple versions.
@@ -1337,8 +1409,6 @@ class ZOIALibrarianMain(QMainWindow):
         """Initializes a Worker thread to manage the importing of
         patches as individual patches into the backend.
         Currently triggered via a menu action.
-        TODO fix the menu action imports
-        Fatal Python error: This thread state must be current when releasing
         """
 
         self.worker_mass.start()
@@ -1401,8 +1471,6 @@ class ZOIALibrarianMain(QMainWindow):
         """Initializes a Worker thread to manage the importing of
         patches as a version directory into the backend.
         Currently triggered via a menu action.
-        TODO fix the menu-action imports
-        Fatal Python error: This thread state must be current when releasing
         """
 
         self.worker_version.start()
@@ -1578,42 +1646,21 @@ class ZOIALibrarianMain(QMainWindow):
         return False
 
     def import_multiple_menu(self):
-        imp_cnt = 0
-        fail_cnt = 0
-        fails = []
-
         input_dir = self.directory_select()
 
         if not input_dir:
             return
 
-        for pch in os.listdir(input_dir):
-            if pch.split(".")[-1] == "bin":
-                # Try to save the binary.
-                try:
-                    save.import_to_backend(os.path.join(input_dir, pch))
-                    imp_cnt += 1
-                except errors.SavingError as e:
-                    fail_cnt += 1
-                    e = (
-                        str(e)
-                        .split("(")[1]
-                        .split(")")[0]
-                        .split(",")[0]
-                        .replace("'", "")
-                    )
-                    fails.append(e)
-
-        return self._mass_import_done(imp_cnt, fail_cnt, fails)
+        self.worker_mass.input_dir = input_dir
+        self.worker_mass.start()
 
     def import_version_menu(self):
         input_dir = self.directory_select()
         if not input_dir:
             return
 
-        count, fail_cnt, fails = save.import_to_backend(input_dir, True)
-
-        return self._version_import_done(count, fail_cnt, fails)
+        self.worker_version.input_dir = input_dir
+        self.worker_version.start()
 
     def closeEvent(self, event):
         """Override the default close operation so certain application
@@ -1649,6 +1696,7 @@ class ImportMassWorker(QThread):
 
         QThread.__init__(self)
         self.window = window
+        self.input_dir = None
 
     def run(self):
         """Attempts to mass import any patches found within a target
@@ -1662,7 +1710,7 @@ class ImportMassWorker(QThread):
         fail_cnt = 0
         fails = []
 
-        input_dir = self.window.directory_select()
+        input_dir = self.input_dir
 
         for pch in os.listdir(input_dir):
             if pch.split(".")[1] == "bin":
@@ -1699,6 +1747,7 @@ class ImportVersionWorker(QThread):
 
         QThread.__init__(self)
         self.window = window
+        self.input_dir = None
 
     def run(self):
         """Attempts to import a directory of patches as a version
@@ -1707,7 +1756,7 @@ class ImportVersionWorker(QThread):
         Currently triggered via a button press or a menu action.
         """
 
-        input_dir = self.window.directory_select()
+        input_dir = self.input_dir
         count, fail_cnt, fails = save.import_to_backend(input_dir, True)
         self.signal.emit(count, fail_cnt, fails)
 

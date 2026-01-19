@@ -293,42 +293,46 @@ class ZOIALibrarianSD(QMainWindow):
         """Attempts to move a patch from one SD card slot to another
         Currently triggered via a QTableWidget move event.
 
-        src: The index the item originated from.
+        src: The index the item originated from, or list of indices.
         dest: The index the item is being moved to.
         """
 
         self.ui.table_sd_left.clearSelection()
         self.ui.table_sd_right.clearSelection()
 
-        if dest > 63:
-            dest -= 64
+        if isinstance(src, int):
+            src = [src]
 
-        # We need to find out if we are just doing a simple move or a swap.
-        if dest < 10:
-            dest = str("00{}".format(dest))
-        else:
-            dest = str("0{}".format(dest))
-        if src < 10:
-            src = str("00{}".format(src))
-        else:
-            src = str("0{}".format(src))
-        src_pch = None
-        dest_pch = None
-        for pch in os.listdir(self.sd_path_full):
-            if pch[:3] == src:
-                src_pch = pch
-            if pch[:3] == dest:
-                dest_pch = pch
+        for i, s in enumerate(src):
+            dest_i = dest + i
+            if dest_i > 63:
+                dest_i -= 64
+
+            if dest_i < 10:
+                dest_str = "00{}".format(dest_i)
+            else:
+                dest_str = "0{}".format(dest_i)
+            if s < 10:
+                src_str = "00{}".format(s)
+            else:
+                src_str = "0{}".format(s)
+            src_pch = None
+            dest_pch = None
+            for pch in os.listdir(self.sd_path_full):
+                if pch[:3] == src_str:
+                    src_pch = pch
+                if pch[:3] == dest_str:
+                    dest_pch = pch
             if src_pch is not None and dest_pch is not None:
                 # We are doing a swap.
                 try:
                     os.rename(
                         os.path.join(self.sd_path_full, src_pch),
-                        os.path.join(self.sd_path_full, dest + src_pch[3:]),
+                        os.path.join(self.sd_path_full, dest_str + src_pch[3:]),
                     )
                     os.rename(
                         os.path.join(self.sd_path_full, dest_pch),
-                        os.path.join(self.sd_path_full, src + dest_pch[3:]),
+                        os.path.join(self.sd_path_full, src_str + dest_pch[3:]),
                     )
                 except FileExistsError:
                     # Swapping files that are named the same thing.
@@ -339,39 +343,25 @@ class ZOIALibrarianSD(QMainWindow):
                     # Swapping files that are named the same thing.
                     os.rename(
                         os.path.join(self.sd_path_full, dest_pch),
-                        os.path.join(self.sd_path_full, src + dest_pch[3:]),
+                        os.path.join(self.sd_path_full, src_str + dest_pch[3:]),
                     )
                     os.rename(
                         os.path.join(self.sd_path_full, "064" + src_pch[3:]),
-                        os.path.join(self.sd_path_full, dest + src_pch[3:]),
+                        os.path.join(self.sd_path_full, dest_str + src_pch[3:]),
                     )
-                self._set_data_sd()
-                dest = int(dest)
-                for i in range(64):
-                    if i == dest:
-                        if i > 31:
-                            self.ui.table_sd_right.setRangeSelected(
-                                QTableWidgetSelectionRange(i, 0, i, 0), True
-                            )
-                        else:
-                            self.ui.table_sd_left.setRangeSelected(
-                                QTableWidgetSelectionRange(i, 0, i, 0), True
-                            )
-                return
+            elif src_pch is not None:
+                # Just moving
+                os.rename(
+                    os.path.join(self.sd_path_full, src_pch),
+                    os.path.join(self.sd_path_full, dest_str + src_pch[3:]),
+                )
 
-        # We are doing a move.
-        if src_pch is None:
-            self._set_data_sd()
-            return
-        os.rename(
-            os.path.join(self.sd_path_full, src_pch),
-            os.path.join(self.sd_path_full, dest + src_pch[3:]),
-        )
-
-        # Clear the selections and reload the tables.
-        dest = int(dest)
+        self._set_data_sd()
+        dest_i = dest
+        if dest_i > 63:
+            dest_i -= 64
         for i in range(64):
-            if i == dest:
+            if i == dest_i:
                 if i > 31:
                     self.ui.table_sd_right.setRangeSelected(
                         QTableWidgetSelectionRange(i, 0, i, 0), True

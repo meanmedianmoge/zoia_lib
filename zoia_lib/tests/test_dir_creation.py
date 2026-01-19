@@ -9,7 +9,7 @@ from zoia_lib.backend.utilities import add_test_patch
 
 save = PatchSave()
 
-backend_path = util.determine_backend_path()
+backend_path = save.back_path
 
 
 class TestDirectoryCreation(unittest.TestCase):
@@ -48,8 +48,6 @@ class TestDirectoryCreation(unittest.TestCase):
         # Windows: C:/Users/${User}/AppData/Roaming
         # Linux: ~/.local/share
         # macOS: ~/.Library/Application Support
-        TODO Research Solaris, Chrome OS, and Java OS to
-             find out what directory path to use.
         """
 
         self.setUp()

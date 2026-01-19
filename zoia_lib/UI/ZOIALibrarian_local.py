@@ -1167,7 +1167,7 @@ class ZOIALibrarianLocal(QMainWindow):
 
         # create node graph.
         graph = NodeGraph()
-        graph.set_acyclic()
+        graph.set_acyclic(False)
 
         # set up default menu and commands.
         setup_context_menu(graph)
@@ -1223,12 +1223,33 @@ class ZOIALibrarianLocal(QMainWindow):
         for key, node in nodes.items():
             data.append(node_pos_map(node))
 
+        # Detect feedback loops (cycles)
+        feedback_connections = []
+        for conn in pch["connections"]:
+            mod, block = conn["source"].split(".")
+            nmod, nblock = conn["destination"].split(".")
+            if mod == nmod:
+                # Self-loop, always a feedback
+                feedback_connections.append(conn)
+            else:
+                # Check for reverse connection (simple cycle)
+                for c2 in pch["connections"]:
+                    if (
+                        c2["source"].split(".")[0] == nmod
+                        and c2["destination"].split(".")[0] == mod
+                    ):
+                        feedback_connections.append(conn)
+                        break
+
         @exit_after(3)
-        def make_connections(mod, block, nmod, nblock, src, dest):
+        def make_connections(mod, block, nmod, nblock, src, dest, is_feedback=False):
             try:
-                nodes[int(mod)][0].set_output(
+                edge = nodes[int(mod)][0].set_output(
                     src[int(block)], nodes[int(nmod)][0].input(dest[int(nblock)])
                 )
+                # Optionally, visually mark feedback edges
+                if is_feedback and edge:
+                    edge.set_color("#FF0000")  # Red for feedback
             except KeyError as e:
                 print(conn, e)
             except IndexError as e:
@@ -1253,6 +1274,13 @@ class ZOIALibrarianLocal(QMainWindow):
                 self.msg.setStandardButtons(QMessageBox.Ok)
                 self.msg.exec_()
                 return
+
+        # Optionally, warn if cycles detected
+        if feedback_connections:
+            self.ui.statusbar.showMessage(
+                f"Feedback loop(s) detected: {len(feedback_connections)}", timeout=5000
+            )
+            print(feedback_connections)
 
         # auto layout nodes.
         try:
@@ -1567,6 +1595,14 @@ class ZOIALibrarianLocal(QMainWindow):
         """
 
         self.local_selected = data
+
+    def get_local_selected(self):
+        """Gets the previous locally selected item.
+
+        return: The previous locally selected item.
+        """
+
+        return self.local_selected
 
     def set_prev_search(self, data):
         """Sets the previous search term.

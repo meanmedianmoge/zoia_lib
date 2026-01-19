@@ -405,6 +405,12 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_12.addWidget(self.check_for_updates_btn)
 
+        self.new_patch_btn = QPushButton(self.layoutWidget)
+        self.new_patch_btn.setObjectName(u"new_patch_btn")
+        self.new_patch_btn.setMouseTracking(True)
+
+        self.horizontalLayout_12.addWidget(self.new_patch_btn)
+
 
         self.verticalLayout_7.addLayout(self.horizontalLayout_12)
 
@@ -466,6 +472,12 @@ class Ui_MainWindow(object):
         self.update_patch_notes.setStyleSheet(u"")
 
         self.horizontalLayout_21.addWidget(self.update_patch_notes)
+
+        self.edit_patch = QPushButton(self.layoutWidget_7)
+        self.edit_patch.setObjectName(u"edit_patch")
+        self.edit_patch.setMouseTracking(True)
+
+        self.horizontalLayout_21.addWidget(self.edit_patch)
 
         self.upload_patch = QPushButton(self.layoutWidget_7)
         self.upload_patch.setObjectName(u"upload_patch")
@@ -1495,7 +1507,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1567, 37))
+        self.menubar.setGeometry(QRect(0, 0, 1567, 34))
         self.menubar.setContextMenuPolicy(Qt.ActionsContextMenu)
         self.menubar.setAcceptDrops(False)
         self.menubar.setNativeMenuBar(True)
@@ -1566,7 +1578,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"ZOIA Librarian - Version 1.4", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"ZOIA Librarian - Version 2.0", None))
         self.actionSpecify_SD_Card_Location.setText(QCoreApplication.translate("MainWindow", u"Specify SD Card Location", None))
 #if QT_CONFIG(shortcut)
         self.actionSpecify_SD_Card_Location.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+S", None))
@@ -1866,6 +1878,19 @@ class Ui_MainWindow(object):
         self.check_for_updates_btn.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"Automatically checks for updates to any patches listed in the Local Storage View table when clicked. Should any be found, a popup will let you know how many patches were updated.", None))
 #endif // QT_CONFIG(accessibility)
         self.check_for_updates_btn.setText(QCoreApplication.translate("MainWindow", u"Check for updates", None))
+#if QT_CONFIG(tooltip)
+        self.new_patch_btn.setToolTip(QCoreApplication.translate("MainWindow", u"Click here to create a new patch.", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.new_patch_btn.setStatusTip(QCoreApplication.translate("MainWindow", u"Click here to create a new patch.", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(accessibility)
+        self.new_patch_btn.setAccessibleName(QCoreApplication.translate("MainWindow", u"New Patch button Local Storage View", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.new_patch_btn.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"When clicked, the editor window opens to create a new patch.", None))
+#endif // QT_CONFIG(accessibility)
+        self.new_patch_btn.setText(QCoreApplication.translate("MainWindow", u"New Patch", None))
         ___qtablewidgetitem5 = self.table_local.horizontalHeaderItem(0)
         ___qtablewidgetitem5.setText(QCoreApplication.translate("MainWindow", u"Title", None));
         ___qtablewidgetitem6 = self.table_local.horizontalHeaderItem(1)
@@ -1902,6 +1927,19 @@ class Ui_MainWindow(object):
         self.update_patch_notes.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"When clicked, updates the patch notes for the currently selected patch. Patch notes can be add directly below in the Additional Patch Notes Display. ", None))
 #endif // QT_CONFIG(accessibility)
         self.update_patch_notes.setText(QCoreApplication.translate("MainWindow", u"Update Patch Notes", None))
+#if QT_CONFIG(tooltip)
+        self.edit_patch.setToolTip(QCoreApplication.translate("MainWindow", u"Click here to edit the patch.", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.edit_patch.setStatusTip(QCoreApplication.translate("MainWindow", u"Click here to edit the currently selected patch.", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(accessibility)
+        self.edit_patch.setAccessibleName(QCoreApplication.translate("MainWindow", u"Edit Patch Button", None))
+#endif // QT_CONFIG(accessibility)
+#if QT_CONFIG(accessibility)
+        self.edit_patch.setAccessibleDescription(QCoreApplication.translate("MainWindow", u"When clicked, this opens a new window to make changes and edits to the selected patch.", None))
+#endif // QT_CONFIG(accessibility)
+        self.edit_patch.setText(QCoreApplication.translate("MainWindow", u"Edit Patch", None))
 #if QT_CONFIG(tooltip)
         self.upload_patch.setToolTip(QCoreApplication.translate("MainWindow", u"Click here to upload this patch to PatchStorage.", None))
 #endif // QT_CONFIG(tooltip)

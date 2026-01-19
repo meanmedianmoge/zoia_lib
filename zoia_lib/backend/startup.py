@@ -25,6 +25,22 @@ if __name__ == "__main__":
     # Set style
     app.setStyle(QStyleFactory.create("Fusion"))
 
+    # Fix macOS secure coding warning
+    if sys.platform == 'darwin':
+        try:
+            from Foundation import NSObject
+            from AppKit import NSApplication
+
+            class AppDelegate(NSObject):
+                def applicationSupportsSecureRestorableState_(self, app):
+                    return True
+
+            delegate = AppDelegate.alloc().init()
+            nsapp = NSApplication.sharedApplication()
+            nsapp.setDelegate_(delegate)
+        except ImportError:
+            pass
+
     file_path = meipass(
         os.path.join(os.getcwd(), "zoia_lib", "UI", "resources", "splash.png")
     )

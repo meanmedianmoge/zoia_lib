@@ -41,6 +41,7 @@ python -m zoia_lib.backend.startup
 - Supplemental 1.2 video: https://www.youtube.com/watch?v=zR8XSI_Unlk
 - Supplemental 1.3 video: https://www.youtube.com/watch?v=Y4ILhtxdIvs
 - Supplemental 1.4 video: https://www.youtube.com/watch?v=ymLvRhC1GmI
+- Supplemental 2.0 video: 
 - You'll find the following in `/documentation`: <br>
     - Current version of the user manual
     - Overall changelog - lists new features, bug fixes, and known issues for each release
@@ -67,8 +68,9 @@ python -m zoia_lib.backend.startup
 ## Contributing
 We welcome all contributions! If you want to see something added, 
 either fork or clone the repo to get started. Some useful tools include:
-- Python 3 - https://www.python.org/downloads/
-- PyCharm Community Edition - https://www.jetbrains.com/pycharm/download
+- Python - https://www.python.org/downloads/
+- VS Code - https://code.visualstudio.com/download
+- PyCharm - https://www.jetbrains.com/pycharm/download
 - QtDesigner - https://build-system.fman.io/qt-designer-download
 
 ## Authors

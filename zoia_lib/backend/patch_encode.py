@@ -1,12 +1,16 @@
+import json
 import math
 import struct
 
 from zoia_lib.backend.patch import Patch
+from zoia_lib.backend.utilities import meipass
 from zoia_lib.common import errors
 
+with open(meipass("zoia_lib/common/schemas/ModuleIndex.json")) as f:
+    mod = json.load(f)
 
-class PatchBinEncoder(Patch):
-    """The PatchBinEncoder class is a child of the Patch class. It is
+class PatchEncoder(Patch):
+    """The PatchEncoder class is a child of the Patch class. It is
     responsible for ZOIA patch binary re-encoding.
     """
 
@@ -14,7 +18,7 @@ class PatchBinEncoder(Patch):
         """"""
         super().__init__()
 
-    def encode(self, pch):
+    def encode(self, pch, output_path=None):
         """
         pch: parsed .bin using PatchBinary
         ================================================================
@@ -35,7 +39,9 @@ class PatchBinEncoder(Patch):
         ================================================================
         """
 
-        file = open(r"output_test.bin", "w+b")
+        file = None
+        if output_path:
+            file = open(output_path, "w+b")
         color_dict = {
             "Blue": 1,
             "Green": 2,
@@ -73,15 +79,21 @@ class PatchBinEncoder(Patch):
             module_type = self.encode_value(module["mod_idx"], 4)
             module_version = self.encode_value(module["version"], 4)
             module_page = self.encode_value(module["page"], 4)
-            module_color = self.encode_value(color_dict[module["color"]], 4)
+            module_color_id = module.get("header_color_id")
+            if module_color_id is None:
+                module_color_id = color_dict[module["color"]]
+            module_color = self.encode_value(module_color_id, 4)
             module_position = self.encode_value(min(module["position"]), 4)
-            module_params_count = self.encode_value(len(module["parameters"]), 4)
+            module_params_count = self.encode_value(
+                module.get("params", len(module["parameters"])), 4
+            )
             module_size_bytes = self.encode_value(module["size_of_saveable_data"], 4)
 
             module_options = bytearray()
-            options_padding = 8 - len(module["options_binary"])
-            for option in module["options_binary"]:
-                module_options.extend(self.encode_byte(module["options_binary"][option], 1))
+            options_list = self._get_options_bytes(module)
+            options_padding = 8 - len(options_list)
+            for option_byte in options_list:
+                module_options.extend(self.encode_byte(option_byte, 1))
 
             if options_padding == 0:
                 pass
@@ -89,22 +101,29 @@ class PatchBinEncoder(Patch):
                 module_options.extend(self.encode_byte(0, options_padding))
 
             module_params = bytearray()
-            for param in module["parameters"]:
-                if module["parameters"][param] is None:
-                    module_params.extend(self.encode_value(0, 4))
-                else:
-                    param_value = int(round(module["parameters"][param] * 65535, 0))
-                    module_params.extend(self.encode_value(param_value, 4))
+            params_count = module.get("params", len(module["parameters"]))
+            params_raw = module.get("parameters_raw")
+            if isinstance(params_raw, list) and len(params_raw) >= params_count:
+                for value in params_raw[:params_count]:
+                    module_params.extend(self.encode_value(int(value), 4))
+            else:
+                param_names = self._get_param_order(module)
+                for param in param_names:
+                    if module["parameters"].get(param) is None:
+                        module_params.extend(self.encode_value(0, 4))
+                    else:
+                        param_value = int(
+                            round(module["parameters"][param] * 65535, 0)
+                        )
+                        module_params.extend(self.encode_value(param_value, 4))
 
-            for i in range(module["params"] - len(module["parameters"])):
-                module_params.extend(self.encode_value(0, 4))
+                for i in range(params_count - len(param_names)):
+                    module_params.extend(self.encode_value(0, 4))
 
             module_saved_data = bytearray()
-            nearest_int = self.round_up_to_nearest_int(module["size_of_saveable_data"])
-            if nearest_int == 0:
-                pass
-            else:
-                module_saved_data.extend(self.encode_value(0, nearest_int))
+            module_saved_data.extend(
+                self._get_saved_data_bytes(module, params_count)
+            )
 
             module_name = self.encode_text(module["name"], 16)
 
@@ -125,26 +144,43 @@ class PatchBinEncoder(Patch):
             # appending the size of the module, then the module pch
             modules_array.extend(module_array)
 
-            color_array = self.encode_value(color_dict[module["color"]], 4)
-            colors_array.extend(color_array)
+            # Colors array is encoded after modules to preserve original ordering.
 
         # Connections Encoding Section
         connections_array = bytearray()
         connection_count_array = self.encode_value(pch["meta"]["n_connections"], 4)
         connections_array.extend(connection_count_array)
+        for module, color_id in self._iter_colors(pch):
+            if isinstance(color_id, str):
+                color_value = color_dict[color_id]
+            else:
+                color_value = color_id
+            colors_array.extend(self.encode_value(color_value, 4))
 
         for connection in pch["connections"]:
             connection_array = bytearray()
 
-            source_values = connection["source"].split(".")
-            dest_values = connection["destination"].split(".")
+            if "strength_raw" in connection:
+                source_module = connection.get("source_raw", 0)
+                source_block = connection.get("source_block_raw", 0)
+                dest_module = connection.get("dest_raw", 0)
+                dest_block = connection.get("dest_block_raw", 0)
+                strength_value = connection.get("strength_raw", 0)
+            else:
+                source_values = connection["source"].split(".")
+                dest_values = connection["destination"].split(".")
 
-            source_module_number_array = self.encode_value(int(source_values[0]), 4)
-            source_output_number_array = self.encode_value(int(source_values[1]), 4)
-            dest_module_number_array = self.encode_value(int(dest_values[0]), 4)
-            dest_input_number_array = self.encode_value(int(dest_values[1]), 4)
-            strength_value = int(round(connection["strength"] * 100, 0))
-            connection_strength = self.encode_value(strength_value, 4)
+                source_module = int(source_values[0])
+                source_block = int(source_values[1])
+                dest_module = int(dest_values[0])
+                dest_block = int(dest_values[1])
+                strength_value = int(round(connection["strength"] * 100, 0))
+
+            source_module_number_array = self.encode_value(int(source_module), 4)
+            source_output_number_array = self.encode_value(int(source_block), 4)
+            dest_module_number_array = self.encode_value(int(dest_module), 4)
+            dest_input_number_array = self.encode_value(int(dest_block), 4)
+            connection_strength = self.encode_value(int(strength_value), 4)
 
             connection_array.extend(source_module_number_array)
             connection_array.extend(source_output_number_array)
@@ -157,12 +193,12 @@ class PatchBinEncoder(Patch):
         # Build out the byte array for the pages by first calculating the number of pages,
         # then looping over them and pulling out the names
         pages_array = bytearray()
-        pages_count_array = self.encode_value((pch["meta"]["n_pages"]), 4)
+        pages_count = pch.get("pages_count", pch["meta"]["n_pages"])
+        pages_count_array = self.encode_value(pages_count, 4)
         pages_array.extend(pages_count_array)
-        for page in pch["pages"]:
-            if len(page) > 0:
-                page_array = self.encode_text(page, 16)
-                pages_array.extend(page_array)
+        for page in pch["pages"][:pages_count]:
+            page_array = self.encode_text(page, 16)
+            pages_array.extend(page_array)
 
         # Build out the byte array for starred params by first calculating the number
         # of starred params, then looping over them and pulling out the values to be
@@ -203,10 +239,74 @@ class PatchBinEncoder(Patch):
         padding = bytearray(b"\x00" * int(padding_length))
         file_array.extend(padding)
 
-        file.write(file_array)
-        file.close()
+        if file:
+            file.write(file_array)
+            file.close()
 
         return file_array
+
+    @staticmethod
+    def _get_options_bytes(module):
+        options_binary = module.get("options_binary", {})
+        if isinstance(options_binary, (list, tuple)):
+            return list(options_binary)[:8]
+
+        options_def = None
+        try:
+            options_def = mod[str(module.get("mod_idx", 0))]["options"]
+        except (KeyError, TypeError):
+            options_def = None
+
+        if isinstance(options_def, dict):
+            options_order = list(options_def)
+        elif isinstance(options_def, list):
+            options_order = options_def
+        else:
+            options_order = list(options_binary)
+
+        return [options_binary.get(opt, 0) for opt in options_order][:8]
+
+    @staticmethod
+    def _get_param_order(module):
+        blocks = module.get("blocks", {})
+        if isinstance(blocks, dict):
+            return [name for name, meta in blocks.items() if meta.get("isParam")]
+        return list(module.get("parameters", {}).keys())
+
+    def _get_saved_data_bytes(self, module, params_count):
+        size_words = module.get("size", 0)
+        if not size_words:
+            return bytearray()
+
+        data_words = size_words - 4 - 10 - params_count
+        if data_words <= 0:
+            return bytearray()
+
+        expected_len = data_words * 4
+        saved_data = module.get("saved_data", [])
+        if isinstance(saved_data, (bytes, bytearray)):
+            raw = bytearray(saved_data)
+        else:
+            raw = bytearray(saved_data)
+
+        if len(raw) < expected_len:
+            raw.extend(b"\x00" * (expected_len - len(raw)))
+        elif len(raw) > expected_len:
+            raw = raw[:expected_len]
+
+        return raw
+
+    @staticmethod
+    def _iter_colors(pch):
+        colors = pch.get("colors", [])
+        modules = pch.get("modules", [])
+        if len(colors) == len(modules):
+            for module, color_id in zip(modules, colors):
+                yield module, color_id
+            return
+
+        for module in modules:
+            yield module, module.get("color", "")
 
     @staticmethod
     def round_up_to_nearest_int(n):
@@ -216,6 +316,10 @@ class PatchBinEncoder(Patch):
     def encode_text(text, byte_array_length):
         # Helper function used to handle text encoding,
         # which is sequential and left-aligned
+        if text is None:
+            text = ""
+        if len(text) > byte_array_length:
+            text = text[:byte_array_length]
         format_string = "{}B{}x".format(len(text), byte_array_length - len(text))
         data = list(text.encode())
 

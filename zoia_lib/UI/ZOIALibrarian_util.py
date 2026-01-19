@@ -85,6 +85,8 @@ class ZOIALibrarianUtil:
             self.ui.btn_show_routing.setFont(new_font)
             self.ui.page_label.setFont(new_font)
             self.ui.back_btn.setFont(new_font)
+            self.ui.new_patch_btn.setFont(new_font)
+            self.ui.edit_patch.setFont(new_font)
             self.ui.btn_next_page.setFont(new_font)
             self.ui.btn_prev_page.setFont(new_font)
 
@@ -433,62 +435,20 @@ class ZOIALibrarianUtil:
                     first_item_index += 32
                 break
         first_item_text = first_item.text()
+        dest_start = None
         for i in range(64):
             if i < 32:
-                temp_left = table_1.item(i, 0)
-                temp_right = None
+                temp = table_1.item(i, 0)
             else:
-                temp_right = table_2.item(i - 32, 0)
-                temp_left = None
-            if main_table == table_1:
-                temp_main = temp_left
-                temp_other = temp_right
-            else:
-                temp_main = temp_right
-                temp_other = temp_left
-            if (
-                temp_main is not None
-                and i != first_item_index
-                and temp_main.text() == first_item_text
-            ) or (temp_other is not None and temp_other.text() == first_item_text):
-                # We found the first item!
-                # row = sorted(curr_rows)[-1].row()
-                # row = int('%d' % row)
-                rows = [int(x.row()) for x in sorted(curr_rows)]
-                if curr_rows == rows_right:
-                    # row += 32
-                    rows = [32 + x for x in rows]
-                # for j in range(first_item_index, row + 1):
-                for j in rows:
-                    if j == first_item_index:
-                        i = i + (j - first_item_index)
-                    else:
-                        i += 1
-                    if i > 31:
-                        if curr_rows == rows_right:
-                            temp1 = main_table.item(j - 32, 0)
-                        else:
-                            temp1 = main_table.item(j, 0)
-                        temp2 = other_table.item(i - 32, 0)
-                    else:
-                        if curr_rows == rows_right:
-                            temp1 = main_table.item(j - 32, 0)
-                        else:
-                            temp1 = main_table.item(j, 0)
-                        temp2 = main_table.item(i, 0)
-                    if temp1 is None and temp2 is None:
-                        continue
-                    elif temp1 is None and temp2 is not None:
-                        f1(i, j)
-                    elif (
-                        temp1 is not None
-                        and temp2 is None
-                        or temp1 is not None
-                        and temp2 is not None
-                    ):
-                        f1(j, i)
-                    elif temp1 is None and temp2 is not None:
-                        f1(i, j)
+                temp = table_2.item(i - 32, 0)
+            if temp is not None and temp.text() == first_item_text:
+                dest_start = i
+                break
+        if dest_start is not None:
+            src_list = [int(x.row()) for x in sorted(curr_rows)]
+            if curr_rows == rows_right:
+                src_list = [32 + x for x in src_list]
+            f1(src_list, dest_start)
 
         # Delete phantom rows from row insertions.
         table_1.setRowCount(32)

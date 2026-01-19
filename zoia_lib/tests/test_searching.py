@@ -3,7 +3,8 @@ import os
 import shutil
 import unittest
 
-import zoia_lib.backend.utilities as util
+from zoia_lib.backend.patch_save import PatchSave
+from zoia_lib.backend import utilities as util
 from zoia_lib.common import errors
 
 test_path = os.path.join(os.getcwd(), "zoia_lib", "tests")
@@ -28,14 +29,16 @@ class TestSearching(unittest.TestCase):
 
     def setUp(self):
         global data
-        util.backend_path = test_path
+        self.save = PatchSave()
+        self.save.back_path = test_path
 
         # Get the JSON metadata
         with open(os.path.join(test_path, "sample_files", "sampleMeta.json"), "r") as f:
             data = json.loads(f.read())
 
         for meta in data:
-            util.save_to_backend((b"Test", meta))
+            if not os.path.exists(os.path.join(self.save.back_path, str(meta["id"]))):
+                self.save.save_to_backend((b"Test", meta))
 
     def tearDown(self):
         try:
@@ -67,25 +70,18 @@ class TestSearching(unittest.TestCase):
         # Try to break the method.
         exc = errors.SearchingError
 
-        self.assertTrue(
-            util.search_patches(None, None) is None,
-            "Expected None but got data in return.",
-        )
+        self.assertRaises(exc, util.search_patches, None, None)
         self.assertRaises(exc, util.search_patches, "Hi", "Yee")
-        self.assertTrue(
-            util.search_patches(None, "Hi") is None,
-            "Expected None but got data in return.",
-        )
-        self.assertTrue(
-            util.search_patches("", None) is None,
-            "Expected None but got data in return.",
-        )
+        self.assertRaises(exc, util.search_patches, None, "Hi")
+        self.assertRaises(exc, util.search_patches, "", None)
 
     def test_title_search(self):
         """Attempts to search a dataset for a title attribute.
         This data must be collected beforehand, but that specific
         functionality is not being tested here.
         """
+
+        self.setUp()
 
         global data
 
@@ -170,6 +166,8 @@ class TestSearching(unittest.TestCase):
         This data must be collected beforehand, but that specific
         functionality is not being tested here.
         """
+
+        self.setUp()
 
         global data
 

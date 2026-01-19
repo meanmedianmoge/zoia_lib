@@ -14,7 +14,7 @@
    <enum>Qt::StrongFocus</enum>
   </property>
   <property name="windowTitle">
-   <string>ZOIA Librarian - Version 1.4</string>
+   <string>ZOIA Librarian - Version 2.0</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -543,6 +543,28 @@
                      </property>
                     </widget>
                    </item>
+                   <item>
+                    <widget class="QPushButton" name="new_patch_btn">
+                     <property name="mouseTracking">
+                      <bool>true</bool>
+                     </property>
+                     <property name="toolTip">
+                      <string>Click here to create a new patch.</string>
+                     </property>
+                     <property name="statusTip">
+                      <string>Click here to create a new patch.</string>
+                     </property>
+                     <property name="accessibleName">
+                      <string>New Patch button Local Storage View</string>
+                     </property>
+                     <property name="accessibleDescription">
+                      <string>When clicked, the editor window opens to create a new patch.</string>
+                     </property>
+                     <property name="text">
+                      <string>New Patch</string>
+                     </property>
+                    </widget>
+                   </item>
                   </layout>
                  </item>
                  <item>
@@ -653,7 +675,7 @@
                   <enum>QLayout::SetMinimumSize</enum>
                  </property>
                  <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_21" stretch="0,0">
+                  <layout class="QHBoxLayout" name="horizontalLayout_21" stretch="0,0,0">
                    <item>
                     <widget class="QPushButton" name="update_patch_notes">
                      <property name="cursor">
@@ -679,6 +701,28 @@
                      </property>
                      <property name="text">
                       <string>Update Patch Notes</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="edit_patch">
+                     <property name="mouseTracking">
+                      <bool>true</bool>
+                     </property>
+                     <property name="toolTip">
+                      <string>Click here to edit the patch.</string>
+                     </property>
+                     <property name="statusTip">
+                      <string>Click here to edit the currently selected patch.</string>
+                     </property>
+                     <property name="accessibleName">
+                      <string>Edit Patch Button</string>
+                     </property>
+                     <property name="accessibleDescription">
+                      <string>When clicked, this opens a new window to make changes and edits to the selected patch.</string>
+                     </property>
+                     <property name="text">
+                      <string>Edit Patch</string>
                      </property>
                     </widget>
                    </item>
@@ -2985,7 +3029,7 @@
      <x>0</x>
      <y>0</y>
      <width>1567</width>
-     <height>37</height>
+     <height>34</height>
     </rect>
    </property>
    <property name="contextMenuPolicy">

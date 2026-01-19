@@ -417,79 +417,49 @@ class ZOIALibrarianBank(QMainWindow):
             if temp_right is not None:
                 self.data_banks.append({"slot": i + 32, "id": temp_right.objectName()})
 
-    def _move_patch_bank(self, src, dest):
-        """Attempts to move a patch from one bank slot to another
-        Currently triggered via a QTableWidget move event.
-
-        src: The index the item originated from.
-        dest: The index the item is being moved to.
+    def _move_patch_bank(self, src, dest, insert=True):
         """
-
+        Moves or swaps patch(es) in the bank tables, like SD table.
+        src: int or list of ints (indices to move)
+        dest: int (destination start position)
+        """
         self.ui.table_bank_left.clearSelection()
         self.ui.table_bank_right.clearSelection()
-
-        swap = False
 
         if dest > 63:
             dest -= 64
 
-        # Setup the new item.
-        try:
-            if src < 32:
-                idx = self.ui.table_bank_left.cellWidget(src, 1).objectName()
-            else:
-                idx = self.ui.table_bank_right.cellWidget(src - 32, 1).objectName()
-        except AttributeError:
-            # Got two empty rows, ignore them.
-            return
+        # Normalize src to a list
+        src_indices = src if isinstance(src, list) else [src]
 
-        for pch in self.data_banks:
-            if dest == pch["slot"]:
-                # We are doing a swap.
-                swap = True
-                break
-        if swap:
-            # Get the other item.
-            if dest < 32:
-                idx_dest = self.ui.table_bank_left.cellWidget(dest, 1).objectName()
-            else:
-                idx_dest = self.ui.table_bank_right.cellWidget(
-                    dest - 32, 1
-                ).objectName()
+        for i, s in enumerate(src_indices):
+            dest_i = dest + i
+            if dest_i > 63:
+                dest_i -= 64
 
-            # Get the old values out.
-            for pch in self.data_banks:
-                if pch["slot"] == src or pch["slot"] == dest:
-                    self.data_banks.remove(pch)
+            src_patch = None
+            dest_patch = None
+            for p in self.data_banks:
+                if p["slot"] == s:
+                    src_patch = p
+                if p["slot"] == dest_i:
+                    dest_patch = p
 
-            # Add the new values in.
-            self.data_banks.append({"slot": dest, "id": idx})
-            self.data_banks.append({"slot": src, "id": idx_dest})
-        else:
-            # We are doing a move.
-            self.data_banks.append({"slot": dest, "id": idx})
+            if src_patch and dest_patch:
+                # Swap slots
+                src_patch["slot"], dest_patch["slot"] = dest_i, s
+            elif src_patch:
+                # Move to dest
+                src_patch["slot"] = dest_i
 
-            # Remove the source copy of the patch.
-            for pch in self.data_banks:
-                if pch["slot"] == src:
-                    self.data_banks.remove(pch)
-                    break
+        # Remove any patches that are now out of bounds (>63)
+        self.data_banks = [pch for pch in self.data_banks if pch["slot"] <= 63]
 
-        # Set the data.
+        # Re-sort by slot
+        self.data_banks.sort(key=lambda x: x["slot"])
+
+        # Update the tables
         self._set_data_bank()
-
-        for i in range(64):
-            if i == dest:
-                if i > 31:
-                    self.ui.table_bank_right.setRangeSelected(
-                        QTableWidgetSelectionRange(i, 0, i, 0), True
-                    )
-                else:
-                    self.ui.table_bank_left.setRangeSelected(
-                        QTableWidgetSelectionRange(i, 0, i, 0), True
-                    )
-
-        # Reload the data in the tables.
         self._get_bank_data()
         self.ui.btn_save_bank.setEnabled(len(self.data_banks) > 0)
         self.ui.btn_export_bank.setEnabled(len(self.data_banks) > 0)
@@ -802,38 +772,24 @@ class ZOIALibrarianBank(QMainWindow):
         Currently triggered via a button press.
         """
 
-        # Figure out which table the item is located in.
-        # Known bug, this will always delete the first entry of an item
-        # if multiple exist. Correcting this breaks the tables on macOS,
-        # so best just to leave it alone for now.
-        self.ui.statusbar.showMessage("Patch removed from Folder.", timeout=5000)
-        for i in range(32):
-            item_left = self.ui.table_bank_left.cellWidget(i, 1)
-            item_right = self.ui.table_bank_right.cellWidget(i, 1)
-            if (
-                item_left is not None
-                and item_left.objectName() == self.sender().objectName()
-            ):
-                curr_table = self.ui.table_bank_left
-                break
-            elif (
-                item_right is not None
-                and item_right.objectName() == self.sender().objectName()
-            ):
-                curr_table = self.ui.table_bank_right
-                break
-
-        # Clear the item and determine if buttons need to be disabled.
-        curr_table.setItem(i, 0, QTableWidgetItem(None))
-        curr_table.setCellWidget(i, 1, None)
-        curr_table.clearSelection()
-
-        # Reload the tables.
-        item = self._has_item()
-        self.ui.btn_export_bank.setEnabled(item)
-        self.ui.btn_save_bank.setEnabled(item)
-        self.ui.btn_clear_bank.setEnabled(item)
-        self._get_bank_data()
+        # Find which table and row the sender button is in
+        sender = self.sender()
+        for table in [self.ui.table_bank_left, self.ui.table_bank_right]:
+            for row in range(table.rowCount()):
+                btn = table.cellWidget(row, 1)
+                if btn is sender:
+                    # Remove the item from the correct row
+                    table.setItem(row, 0, QTableWidgetItem(None))
+                    table.setCellWidget(row, 1, None)
+                    table.clearSelection()
+                    self.ui.statusbar.showMessage("Patch removed from Folder.", timeout=5000)
+                    # Reload the tables and update buttons
+                    item = self._has_item()
+                    self.ui.btn_export_bank.setEnabled(item)
+                    self.ui.btn_save_bank.setEnabled(item)
+                    self.ui.btn_clear_bank.setEnabled(item)
+                    self._get_bank_data()
+                    return
 
     def _has_item(self):
         """Determines whether the Bank tables contain an entry.
