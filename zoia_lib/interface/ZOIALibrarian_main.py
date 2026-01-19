@@ -17,15 +17,15 @@ from PySide6.QtWidgets import (
     QFileDialog,
 )
 
-import zoia_lib.UI.ZOIALibrarian as ui_main
+import zoia_lib.interface.ZOIALibrarian as ui_main
 import zoia_lib.backend.utilities as util
 import zoia_lib.common.errors as errors
-from zoia_lib.UI.ZOIALibrarian_bank import ZOIALibrarianBank
-from zoia_lib.UI.ZOIALibrarian_editor import ZOIALibrarianEditor
-from zoia_lib.UI.ZOIALibrarian_local import ZOIALibrarianLocal
-from zoia_lib.UI.ZOIALibrarian_ps import ZOIALibrarianPS
-from zoia_lib.UI.ZOIALibrarian_sd import ZOIALibrarianSD
-from zoia_lib.UI.ZOIALibrarian_util import ZOIALibrarianUtil
+from zoia_lib.interface.ZOIALibrarian_bank import ZOIALibrarianBank
+from zoia_lib.interface.ZOIALibrarian_editor import ZOIALibrarianEditor
+from zoia_lib.interface.ZOIALibrarian_local import ZOIALibrarianLocal
+from zoia_lib.interface.ZOIALibrarian_ps import ZOIALibrarianPS
+from zoia_lib.interface.ZOIALibrarian_sd import ZOIALibrarianSD
+from zoia_lib.interface.ZOIALibrarian_util import ZOIALibrarianUtil
 from zoia_lib.backend.api import PatchStorage
 from zoia_lib.backend.patch_binary import PatchBinary
 from zoia_lib.backend.patch_delete import PatchDelete
@@ -75,7 +75,7 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Message box init
         self.icon = QIcon(
-            os.path.join(os.getcwd(), "zoia_lib", "UI", "resources", "logo.ico")
+            util.meipass(os.path.join(os.getcwd(), "zoia_lib", "interface", "resources", "logo.ico"))
         )
         self.msg = QMessageBox()
         self.msg.setWindowIcon(self.icon)

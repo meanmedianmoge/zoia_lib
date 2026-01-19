@@ -32,6 +32,8 @@ MANIFEST
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
+distro/
+# tools/
 
 # Installer logs
 pip-log.txt
@@ -142,6 +144,6 @@ dmypy.json
 .xlsx
 
 # Specific paths
-documentation/Resources
+documentation/resources
 zoia_lib/beta
 .github/copilot-instructions.md

@@ -267,7 +267,7 @@ class ZOIALibrarianUtil:
             ("linux", False): "dark.css",
         }[(platform.system().lower(), self.dark)]
 
-        with open(meipass("zoia_lib/UI/resources/{}".format(sheet)), "r") as f:
+        with open(meipass("zoia_lib/interface/resources/{}".format(sheet)), "r") as f:
             data = f.read()
 
         self.dark = not self.dark
@@ -328,7 +328,7 @@ class ZOIALibrarianUtil:
     def documentation(self):
         """Passes documentation to the front-end PS tab."""
 
-        with open(meipass("documentation/Resources/manual.html"), "r", errors="ignore") as f:
+        with open(meipass("documentation/resources/manual.html"), "r", errors="ignore") as f:
             manual = f.read()
 
         self.ui.text_browser_PS.setText(
@@ -342,7 +342,7 @@ class ZOIALibrarianUtil:
     def faq(self):
         """Passes FAQ to the front-end PS tab."""
 
-        with open(meipass("documentation/Resources/faq.html"), "r", errors="ignore") as f:
+        with open(meipass("documentation/resources/faq.html"), "r", errors="ignore") as f:
             faq = f.read()
 
         self.ui.text_browser_PS.setText(
@@ -356,7 +356,7 @@ class ZOIALibrarianUtil:
     def tips(self):
         """Passes Tips & Tricks to front-end PS tab."""
 
-        with open(meipass("documentation/Resources/tips.html"), "r", errors="ignore") as f:
+        with open(meipass("documentation/resources/tips.html"), "r", errors="ignore") as f:
             tips = f.read()
 
         self.ui.text_browser_PS.setText(
@@ -370,7 +370,7 @@ class ZOIALibrarianUtil:
     def mod_idx(self):
         """Passes Module Index to front-end PS tab."""
 
-        with open(meipass("documentation/Resources/mod.html"), "r", errors="ignore") as f:
+        with open(meipass("documentation/resources/mod.html"), "r", errors="ignore") as f:
             mod = f.read()
 
         self.ui.text_browser_PS.setText(
@@ -384,7 +384,7 @@ class ZOIALibrarianUtil:
     def firmware(self):
         """Passes firmware changelog to front-end PS tab."""
 
-        with open(meipass("documentation/Resources/changelog.html"), "r", errors="ignore") as f:
+        with open(meipass("documentation/resources/changelog.html"), "r", errors="ignore") as f:
             logs = f.read()
 
         self.ui.text_browser_PS.setText(

@@ -16,7 +16,7 @@ from PySide6.QtGui import QPixmap, Qt
 from PySide6.QtWidgets import QApplication, QSplashScreen, QStyleFactory
 
 from zoia_lib.backend.utilities import meipass
-from zoia_lib.UI.ZOIALibrarian_main import ZOIALibrarianMain
+from zoia_lib.interface.ZOIALibrarian_main import ZOIALibrarianMain
 
 # Entry point for the application.
 if __name__ == "__main__":
@@ -42,7 +42,7 @@ if __name__ == "__main__":
             pass
 
     file_path = meipass(
-        os.path.join(os.getcwd(), "zoia_lib", "UI", "resources", "splash.png")
+        os.path.join(os.getcwd(), "zoia_lib", "interface", "resources", "splash.png")
     )
 
     # Create and display the splash screen

@@ -31,7 +31,7 @@ class PatchStorage:
         self.categories = self._get_categories_data()
         try:
             self.patch_count = self._patch_count()
-        except:
+        except Exception:
             # No internet connection.
             pass
 
