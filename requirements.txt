@@ -8,4 +8,4 @@ requests==2.32.4
 # beautifulsoup4==4.12.2
 jsonschema==4.17.3
 rarfile~=4.0
-nodegraphqt==0.1.7
+# nodegraphqt==0.1.7

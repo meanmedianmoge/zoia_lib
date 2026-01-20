@@ -49,19 +49,20 @@ python -m zoia_lib.backend.startup
     - Binary format (updated by marcuslupinus, thanks!)
 
 ## Features
-- Browse PatchStorage uploads and local patches within the UI
+- Browse PatchStorage uploads and local patches
 - Search for specific patches, authors, tags, and more
 - Sort the results by author, title, date modified, likes, views, or downloads
 - Download & upload patches from/to PatchStorage
 - Import patches from local storage or SD card
 - Version control and patch merging
+- Create and modify patches with the patch editor
 - Preview patches with the patch visualizer
 - Expose the internal routing and connections with the patch expander
 - View and edit patch notes
 - Customized category and tag labels for all patches
 - Manage your SD card folders quickly
 - Drag & drop patches into folders, configured automatically into a ZOIA-readable format
-- Organize sample files from patches using the new Sampler module
+- Organize sample files for patches using the Sampler module
 - Help toolbar for app documentation and ZOIA resources
 - Dark and light themes
 
@@ -70,7 +71,6 @@ We welcome all contributions! If you want to see something added,
 either fork or clone the repo to get started. Some useful tools include:
 - Python - https://www.python.org/downloads/
 - VS Code - https://code.visualstudio.com/download
-- PyCharm - https://www.jetbrains.com/pycharm/download
 - QtDesigner - https://build-system.fman.io/qt-designer-download
 
 ## Authors
