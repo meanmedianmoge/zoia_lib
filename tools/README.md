@@ -2,10 +2,11 @@
 ```
 # Download source code
 git clone https://github.com/meanmedianmoge/zoia_lib.git
+cd zoia_lib
 
-# Single-line dependency install
-sh zoia_lib/setup.sh
+# Install dependencies
+sh tools/env.sh
 
-# Single-line build
-sh zoia_lib/tools/setup.sh
+# Build the application
+sh tools/build.sh
 ```

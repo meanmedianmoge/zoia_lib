@@ -27,9 +27,10 @@ https://github.com/meanmedianmoge/zoia_lib/releases/latest.
 ```
 # Download source code
 git clone https://github.com/meanmedianmoge/zoia_lib.git
+cd zoia_lib
 
-# Single-line dependency install
-sh zoia_lib/setup.sh
+# Install dependencies
+sh tools/env.sh
 
 # Load the application
 python -m zoia_lib.backend.startup
