@@ -1057,6 +1057,9 @@ class PatchBuilderEditor(QMainWindow):
             config["options_binary"] = {}
         config["options"][option_name] = values[index]
         config["options_binary"][option_name] = index
+        self._recalc_module_blocks_and_params(module_index)
+        self._refresh_current_details()
+        self._refresh_routing_view()
 
     def _on_color_changed(self, module_index, colors, index):
         if module_index < 0 or module_index >= len(self.selected_modules):
