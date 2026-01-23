@@ -10,7 +10,7 @@ version = '2.0'
 
 a = Analysis(['startup.py'],
              pathex=['C:\\Users\\m.moger\\source\\Projects\\zoia_lib\env\\Lib\\site-packages'],
-             binaries=[('C:\\Users\m.moger\\source\\Projects\\zoia_lib\\zoia_distro_1.2\\orderedmultidict\\__version__.py', '.\\orderedmultidict\\')],
+             binaries=[('C:\\Users\m.moger\\source\\Projects\\zoia_lib\\distro\\orderedmultidict\\__version__.py', '.\\orderedmultidict\\')],
              datas=[('*.css', '.'), ('*.html', '.'), ('*.json', '.'), ('*.png', '.')],
              hiddenimports=[],
              hookspath=[],

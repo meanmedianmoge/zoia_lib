@@ -140,6 +140,10 @@ class ZOIALibrarianBank(QMainWindow):
             if "zoia_" == name[:5]:
                 name = name[5:]
 
+            base, ext = os.path.splitext(name)
+            if ext.lower() != ".bin":
+                name = base + ".bin"
+
             # Prepare the correct prefix depending on the slot.
             if slot < 10:
                 name = "00{}_zoia_".format(slot) + name
@@ -429,33 +433,76 @@ class ZOIALibrarianBank(QMainWindow):
         if dest > 63:
             dest -= 64
 
-        # Normalize src to a list
-        src_indices = src if isinstance(src, list) else [src]
+        if not self.data_banks:
+            self._set_data_bank()
+            return
 
-        for i, s in enumerate(src_indices):
-            dest_i = dest + i
-            if dest_i > 63:
-                dest_i -= 64
+        if not insert:
+            src_indices = src if isinstance(src, list) else [src]
+            for i, s in enumerate(src_indices):
+                dest_i = dest + i
+                if dest_i > 63:
+                    dest_i -= 64
 
-            src_patch = None
-            dest_patch = None
-            for p in self.data_banks:
-                if p["slot"] == s:
-                    src_patch = p
-                if p["slot"] == dest_i:
-                    dest_patch = p
+                src_patch = None
+                dest_patch = None
+                for p in self.data_banks:
+                    if p["slot"] == s:
+                        src_patch = p
+                    if p["slot"] == dest_i:
+                        dest_patch = p
 
-            if src_patch and dest_patch:
-                # Swap slots
-                src_patch["slot"], dest_patch["slot"] = dest_i, s
-            elif src_patch:
-                # Move to dest
-                src_patch["slot"] = dest_i
+                if src_patch and dest_patch:
+                    # Swap slots
+                    src_patch["slot"], dest_patch["slot"] = dest_i, s
+                elif src_patch:
+                    # Move to dest
+                    src_patch["slot"] = dest_i
+        else:
+            slot_items = [None] * 64
+            for pch in self.data_banks:
+                if 0 <= pch["slot"] < 64:
+                    slot_items[pch["slot"]] = pch
 
-        # Remove any patches that are now out of bounds (>63)
+            src_indices = src if isinstance(src, list) else [src]
+            src_indices = sorted(set(src_indices))
+            src_indices = [
+                i for i in src_indices if 0 <= i < 64 and slot_items[i] is not None
+            ]
+            if not src_indices or dest < 0 or dest > 63:
+                self._set_data_bank()
+                return
+
+            if src_indices[0] <= dest <= src_indices[-1]:
+                self._set_data_bank()
+                return
+
+            selected_items = [slot_items[i] for i in src_indices]
+            src_set = set(src_indices)
+            remaining = [slot_items[i] for i in range(64) if i not in src_set]
+            shift = sum(1 for i in src_indices if i < dest)
+            dest_adjusted = dest - shift
+            if dest_adjusted < 0 or dest_adjusted > len(remaining):
+                self._set_data_bank()
+                return
+
+            new_slots = (
+                remaining[:dest_adjusted]
+                + selected_items
+                + remaining[dest_adjusted:]
+            )
+            if len(new_slots) != 64:
+                self._set_data_bank()
+                return
+
+            self.data_banks = []
+            for idx, item in enumerate(new_slots):
+                if item is None:
+                    continue
+                item["slot"] = idx
+                self.data_banks.append(item)
+
         self.data_banks = [pch for pch in self.data_banks if pch["slot"] <= 63]
-
-        # Re-sort by slot
         self.data_banks.sort(key=lambda x: x["slot"])
 
         # Update the tables

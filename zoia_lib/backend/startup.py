@@ -13,6 +13,7 @@ import os
 import sys
 
 from PySide6.QtGui import QPixmap, Qt
+from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QApplication, QSplashScreen, QStyleFactory
 
 from zoia_lib.backend.utilities import meipass
@@ -36,7 +37,13 @@ if __name__ == "__main__":
 
     # Show the window after it finishes setting up and close the splash.
     window = ZOIALibrarianMain()
+    window.setUpdatesEnabled(False)
     window.show()
-    splash.finish(window)
+
+    def finalize_startup():
+        window.setUpdatesEnabled(True)
+        splash.finish(window)
+
+    QTimer.singleShot(0, finalize_startup)
 
     sys.exit(app.exec())

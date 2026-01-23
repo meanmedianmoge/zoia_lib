@@ -448,7 +448,7 @@ class ZOIALibrarianUtil:
             src_list = [int(x.row()) for x in sorted(curr_rows)]
             if curr_rows == rows_right:
                 src_list = [32 + x for x in src_list]
-            f1(src_list, dest_start)
+            f1(src_list, dest_start, insert=True)
 
         # Delete phantom rows from row insertions.
         table_1.setRowCount(32)

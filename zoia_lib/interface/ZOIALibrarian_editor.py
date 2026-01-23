@@ -1,7 +1,6 @@
 import datetime
 import json
 import os
-from PySide6.QtGui import QPalette
 from PySide6.QtWidgets import (
     QMainWindow,
     QComboBox,
@@ -11,22 +10,19 @@ from PySide6.QtWidgets import (
     QPushButton,
     QListWidget,
     QListWidgetItem,
-    QStyle,
-    QStylePainter,
-    QStyleOptionComboBox,
     QTreeWidget,
     QTreeWidgetItem,
     QWidget,
     QFileDialog,
     QInputDialog,
     QMessageBox,
+    QDialog,
     QSlider,
     QSpinBox,
     QDoubleSpinBox,
     QGroupBox,
     QScrollArea,
     QFormLayout,
-    QSplitter,
 )
 from PySide6.QtCore import Qt
 from NodeGraphQt import NodeGraph, BaseNode, setup_context_menu
@@ -38,7 +34,7 @@ class PatchBuilderEditor(QMainWindow):
     """Separate window for building a patch by selecting modules and configuring them."""
     def __init__(self, msg=None, save=None, window=None, patch_dict=None, patch_id=None, on_close=None):
         super().__init__(window)
-        self.setWindowTitle("ZOIA Patch Builder")
+        self.setWindowTitle("Patch Builder - New Patch")
         self.resize(1300, 700)
         self.msg = msg
         self.window = window
@@ -98,8 +94,6 @@ class PatchBuilderEditor(QMainWindow):
         self.selected_list = QListWidget()
         selected_layout.addWidget(selected_label)
         selected_layout.addWidget(self.selected_list)
-        self.order_audio_btn = QPushButton("Order by Audio Path")
-        selected_layout.addWidget(self.order_audio_btn)
         self.remove_module_btn = QPushButton("Remove Selected Module")
         selected_layout.addWidget(self.remove_module_btn)
         main_layout.addLayout(selected_layout)
@@ -117,33 +111,16 @@ class PatchBuilderEditor(QMainWindow):
         details_layout.addWidget(self.details_scroll)
         main_layout.addLayout(details_layout)
 
-        # Build routing view container
-        routing_container = QWidget()
-        self.routing_layout = QVBoxLayout(routing_container)
-        routing_header = QLabel("Patch Routing View")
-        self.routing_layout.addWidget(routing_header)
-        self.routing_placeholder = QLabel("No routing data to display.")
-        self.routing_layout.addWidget(self.routing_placeholder)
         self.routing_graph = None
-        self.routing_graph_widget = None
-        self.routing_container = routing_container
-        self.routing_container.setVisible(False)
-
-        # Split main layout and routing view
-        main_panel = QWidget()
-        main_panel.setLayout(main_layout)
-        self.splitter = QSplitter(Qt.Horizontal)
-        self.splitter.addWidget(main_panel)
-        self.splitter.addWidget(routing_container)
-        self.splitter.setStretchFactor(0, 2)
-        self.splitter.setStretchFactor(1, 3)
-
-        # Add splitter to container
-        container_layout.addWidget(self.splitter, 1)
+        self.routing_window = None
+        self.routing_window_layout = None
+        self.routing_window_placeholder = None
+        self.routing_window_graph_widget = None
+        container_layout.addLayout(main_layout, 1)
 
         # Bottom button layout
         bottom_layout = QHBoxLayout()
-        self.toggle_routing_btn = QPushButton("Toggle Routing View")
+        self.toggle_routing_btn = QPushButton("Show Expanded Patch")
         self.export_btn = QPushButton("Export Patch")
         bottom_layout.addStretch()
         bottom_layout.addWidget(self.toggle_routing_btn)
@@ -160,11 +137,10 @@ class PatchBuilderEditor(QMainWindow):
         self.selected_list.itemSelectionChanged.connect(self.on_module_selected)
         self.export_btn.clicked.connect(self.export_patch)
         self.toggle_routing_btn.clicked.connect(self.toggle_routing_view)
-        self.order_audio_btn.clicked.connect(self.order_by_audio_path)
         
         # If editing an existing patch, load its modules
         if self.patch_dict:
-            self.setWindowTitle("ZOIA Patch Editor")
+            self.setWindowTitle("Patch Editor - {}".format(self.patch_dict.get("name", "Untitled")))
             self.connections = list(self.patch_dict.get("connections", []))
             self._load_patch_modules()
         else:
@@ -376,7 +352,7 @@ class PatchBuilderEditor(QMainWindow):
                 "view_count": 0,
                 "author": {"name": ""},
                 "files": [
-                    {"id": patch_id, "filename": "{}.bin".format(file_base)}
+                    {"id": patch_id, "filename": "000_zoia_{}.bin".format(file_base)}
                 ],
                 "categories": [],
                 "tags": [],
@@ -392,22 +368,41 @@ class PatchBuilderEditor(QMainWindow):
                 QMessageBox.critical(self, "Export Failed", str(e))
             return
 
-        choice = QMessageBox(self)
+        choice = QDialog(self)
         choice.setWindowTitle("Export Patch")
-        choice.setText("How should this edited patch be saved?")
-        new_version_btn = choice.addButton("Create New Version", QMessageBox.AcceptRole)
-        overwrite_btn = choice.addButton("Overwrite Existing", QMessageBox.DestructiveRole)
-        choice.addButton(QMessageBox.Cancel)
+        choice.setModal(True)
+        layout = QVBoxLayout(choice)
+        layout.addWidget(QLabel("How should this edited patch be saved?"))
+        overwrite_btn = QPushButton("Overwrite Existing")
+        new_version_btn = QPushButton("Create New Version")
+        cancel_btn = QPushButton("Cancel")
+        layout.addWidget(overwrite_btn)
+        layout.addWidget(new_version_btn)
+        layout.addWidget(cancel_btn)
+        choice.setLayout(layout)
+
+        result = {"button": None}
+
+        def _choose(btn):
+            result["button"] = btn
+            choice.accept()
+
+        overwrite_btn.clicked.connect(lambda: _choose(overwrite_btn))
+        new_version_btn.clicked.connect(lambda: _choose(new_version_btn))
+        cancel_btn.clicked.connect(choice.reject)
         choice.exec()
 
-        if choice.clickedButton() not in (new_version_btn, overwrite_btn):
+        if result["button"] not in (new_version_btn, overwrite_btn):
             return
 
         patch_name = patch_dict.get("name", "UserPatch")
         patch_id = self.patch_id
+        version = None
+        if patch_id:
+            patch_id, version = self._split_versioned_patch_id(patch_id)
         meta = None
         if patch_id:
-            meta = self._load_backend_metadata(patch_id)
+            meta, version = self._load_backend_metadata(patch_id, version=version)
         if not meta:
             found = self._find_backend_patch_by_title(patch_name)
             if found:
@@ -425,15 +420,21 @@ class PatchBuilderEditor(QMainWindow):
         )
         bin_bytes = bytes(bin_data)
         try:
-            if choice.clickedButton() == new_version_btn:
+            if result["button"] == new_version_btn:
                 self.patch_save.save_to_backend((bin_bytes, meta), version=True)
             else:
                 target = os.path.join(self.patch_save.back_path, str(patch_id))
                 os.makedirs(target, exist_ok=True)
-                name_bin = os.path.join(target, "{}.bin".format(patch_id))
+                if version is not None:
+                    name_bin = os.path.join(target, "{}_v{}.bin".format(patch_id, version))
+                else:
+                    name_bin = os.path.join(target, "{}.bin".format(patch_id))
                 with open(name_bin, "wb") as f:
                     f.write(bin_bytes)
-                self.patch_save.save_metadata_json(meta)
+                if version is not None:
+                    self.patch_save.save_metadata_json(meta, version)
+                else:
+                    self.patch_save.save_metadata_json(meta)
             QMessageBox.information(self, "Export Success", "Patch saved to backend.")
             self._notify_close_refresh()
             self.close()
@@ -441,6 +442,8 @@ class PatchBuilderEditor(QMainWindow):
             QMessageBox.critical(self, "Export Failed", str(e))
 
     def closeEvent(self, event):
+        if self.routing_window and self.routing_window.isVisible():
+            self.routing_window.close()
         self._notify_close_refresh()
         super().closeEvent(event)
 
@@ -787,130 +790,6 @@ class PatchBuilderEditor(QMainWindow):
         mod = self.module_index.get(mod_id, {})
         return config.get("name") if config and config.get("name") else mod.get("name", "")
 
-    def order_by_audio_path(self):
-        if not self.selected_modules:
-            return
-
-        current_idx = self.current_module_index
-        audio_nodes = set()
-        edges = []
-        for conn in self.connections:
-            source_mod, source_block = conn["source"].split(".")
-            dest_mod, dest_block = conn["destination"].split(".")
-            source_idx = int(source_mod)
-            dest_idx = int(dest_mod)
-
-            if self._is_cv_connection(source_idx, int(source_block), dest_idx, int(dest_block)):
-                continue
-
-            edges.append((source_idx, dest_idx))
-            audio_nodes.add(source_idx)
-            audio_nodes.add(dest_idx)
-
-        order = self._toposort_indices(len(self.selected_modules), edges)
-        audio_order = [idx for idx in order if idx in audio_nodes]
-        tail = [idx for idx in order if idx not in audio_nodes]
-        new_order = audio_order + tail
-
-        if not new_order:
-            return
-
-        old_to_new = {old: new for new, old in enumerate(new_order)}
-        self.selected_modules = [self.selected_modules[i] for i in new_order]
-        self._remap_connections(old_to_new)
-        self._rebuild_selected_list()
-
-        if current_idx is not None and current_idx in old_to_new:
-            self.selected_list.setCurrentRow(old_to_new[current_idx])
-        else:
-            self.clear_module_details()
-
-        self._refresh_routing_view()
-
-    def _toposort_indices(self, count, edges):
-        indegree = {i: 0 for i in range(count)}
-        graph = {i: [] for i in range(count)}
-        for src, dst in edges:
-            if src == dst:
-                continue
-            graph[src].append(dst)
-            indegree[dst] += 1
-
-        order = []
-        queue = [i for i in range(count) if indegree[i] == 0]
-        queue.sort()
-        while queue:
-            node = queue.pop(0)
-            order.append(node)
-            for nxt in graph[node]:
-                indegree[nxt] -= 1
-                if indegree[nxt] == 0:
-                    queue.append(nxt)
-                    queue.sort()
-
-        if len(order) < count:
-            remaining = [i for i in range(count) if i not in order]
-            order.extend(remaining)
-        return order
-
-    def _is_cv_connection(self, source_idx, source_block, dest_idx, dest_block):
-        source_meta = self._block_meta_for_module(source_idx, source_block)
-        dest_meta = self._block_meta_for_module(dest_idx, dest_block)
-        if dest_meta.get("isParam"):
-            return True
-
-        source_name = source_meta.get("name", "").lower()
-        dest_name = dest_meta.get("name", "").lower()
-        if "cv" in source_name or "cv" in dest_name:
-            return True
-        return False
-
-    def _block_meta_for_module(self, module_index, block_index):
-        if module_index < 0 or module_index >= len(self.selected_modules):
-            return {"name": "", "isParam": False}
-        mod_id, config = self.selected_modules[module_index]
-        blocks = config.get("blocks") or self.module_index.get(str(mod_id), {}).get("blocks", {})
-        for name, meta in blocks.items():
-            position = meta.get("position")
-            if isinstance(position, list) and block_index in position:
-                data = dict(meta)
-                data["name"] = name
-                return data
-            if isinstance(position, int) and block_index == position:
-                data = dict(meta)
-                data["name"] = name
-                return data
-        return {"name": "", "isParam": False}
-
-    def _remap_connections(self, old_to_new):
-        updated = []
-        for conn in self.connections:
-            source_mod, source_block = conn["source"].split(".")
-            dest_mod, dest_block = conn["destination"].split(".")
-            source_mod = int(source_mod)
-            dest_mod = int(dest_mod)
-            if source_mod not in old_to_new or dest_mod not in old_to_new:
-                continue
-            source_mod = old_to_new[source_mod]
-            dest_mod = old_to_new[dest_mod]
-            conn["source"] = f"{source_mod}.{source_block}"
-            conn["destination"] = f"{dest_mod}.{dest_block}"
-            conn["source_raw"] = source_mod
-            conn["source_block_raw"] = int(source_block)
-            conn["dest_raw"] = dest_mod
-            conn["dest_block_raw"] = int(dest_block)
-            updated.append(conn)
-        self.connections = updated
-
-    def _rebuild_selected_list(self):
-        self.selected_list.blockSignals(True)
-        self.selected_list.clear()
-        for mod_id, config in self.selected_modules:
-            mod = self.module_index.get(str(mod_id), {})
-            display_name = config.get("name", mod.get("name", "")) or mod.get("name", "")
-            self.selected_list.addItem(f"{display_name} ({mod.get('category', '')})")
-        self.selected_list.blockSignals(False)
-
     def _module_span_length(self, config, mod_id):
         blocks = config.get("blocks", {})
         positions = []
@@ -1235,33 +1114,65 @@ class PatchBuilderEditor(QMainWindow):
                 self._assign_module_position(config, mod_id=mod_id, module_index=module_index)
 
     def toggle_routing_view(self):
-        self.routing_container.setVisible(not self.routing_container.isVisible())
+        if self.routing_window and self.routing_window.isVisible():
+            self.routing_window.close()
+            return
+        self._open_routing_window()
         self._refresh_routing_view()
 
-    def _refresh_routing_view(self):
-        if not self.routing_container.isVisible():
+    def _open_routing_window(self):
+        if self.routing_window and self.routing_window.isVisible():
+            self.routing_window.raise_()
+            self.routing_window.activateWindow()
             return
 
-        if self.routing_graph_widget:
-            self.routing_layout.removeWidget(self.routing_graph_widget)
-            self.routing_graph_widget.setParent(None)
-            self.routing_graph_widget.deleteLater()
-            self.routing_graph_widget = None
+        self.routing_window = QMainWindow(self)
+        self.routing_window.setWindowTitle("Patch Expander - {}".format(self.patch_dict.get("name", "Untitled")))
+        self.routing_window.setAttribute(Qt.WA_DeleteOnClose, True)
+        self.routing_window.destroyed.connect(self._on_routing_window_closed)
+
+        window_container = QWidget()
+        self.routing_window_layout = QVBoxLayout(window_container)
+        self.routing_window_placeholder = QLabel("No routing data to display.")
+        self.routing_window_layout.addWidget(self.routing_window_placeholder)
+        self.routing_window_graph_widget = None
+
+        self.routing_window.setCentralWidget(window_container)
+        self.routing_window.resize(900, 700)
+        self.routing_window.show()
+
+    def _on_routing_window_closed(self, _obj=None):
+        self.routing_window = None
+        self.routing_window_layout = None
+        self.routing_window_placeholder = None
+        self.routing_window_graph_widget = None
+
+    def _refresh_routing_view(self):
+        if not (self.routing_window and self.routing_window.isVisible()):
+            return
+
+        layout = self.routing_window_layout
+        placeholder = self.routing_window_placeholder
+        if self.routing_window_graph_widget:
+            layout.removeWidget(self.routing_window_graph_widget)
+            self.routing_window_graph_widget.setParent(None)
+            self.routing_window_graph_widget.deleteLater()
+            self.routing_window_graph_widget = None
 
         patch = self._build_patch_dict()
         if not patch["modules"]:
-            self.routing_placeholder.setText("No routing data to display.")
-            if self.routing_placeholder.parent() is None:
-                self.routing_layout.addWidget(self.routing_placeholder)
+            placeholder.setText("No routing data to display.")
+            if placeholder.parent() is None:
+                layout.addWidget(placeholder)
             return
 
-        self.routing_placeholder.setText("")
+        placeholder.setText("")
         self.routing_graph = NodeGraph()
         self.routing_graph.set_acyclic(False)
         setup_context_menu(self.routing_graph)
         self.routing_graph.register_nodes([BaseNode])
-        self.routing_graph_widget = self.routing_graph.widget
-        self.routing_layout.addWidget(self.routing_graph_widget)
+        self.routing_window_graph_widget = self.routing_graph.widget
+        layout.addWidget(self.routing_window_graph_widget)
 
         nodes = {}
         for module in patch["modules"]:
@@ -1358,23 +1269,64 @@ class PatchBuilderEditor(QMainWindow):
                     continue
         return None
 
-    def _load_backend_metadata(self, patch_id):
+    @staticmethod
+    def _split_versioned_patch_id(patch_id):
         if not patch_id:
-            return None
+            return patch_id, None
+        if "_v" not in patch_id:
+            return patch_id, None
+        base_id, suffix = patch_id.rsplit("_v", 1)
+        if not base_id or not suffix.isdigit():
+            return patch_id, None
+        return base_id, int(suffix)
+
+    def _load_backend_metadata(self, patch_id, version=None):
+        if not patch_id:
+            return None, version
         back_path = self.patch_save.back_path
         if not back_path or not os.path.isdir(back_path):
-            return None
+            return None, version
         patch_dir = os.path.join(back_path, str(patch_id))
         if not os.path.isdir(patch_dir):
-            return None
+            return None, version
+        if version is not None:
+            json_path = os.path.join(
+                patch_dir, "{}_v{}.json".format(patch_id, version)
+            )
+            if os.path.exists(json_path):
+                try:
+                    with open(json_path, "r") as f:
+                        return json.load(f), version
+                except (OSError, json.JSONDecodeError):
+                    return None, version
         json_path = os.path.join(patch_dir, "{}.json".format(patch_id))
         if os.path.exists(json_path):
             try:
                 with open(json_path, "r") as f:
-                    return json.load(f)
+                    return json.load(f), version
             except (OSError, json.JSONDecodeError):
-                return None
-        return None
+                return None, version
+        if version is None:
+            latest = None
+            for fname in os.listdir(patch_dir):
+                if not (fname.startswith("{}_v".format(patch_id)) and fname.endswith(".json")):
+                    continue
+                suffix = fname.split("_v")[-1].split(".")[0]
+                if not suffix.isdigit():
+                    continue
+                curr_version = int(suffix)
+                if latest is None or curr_version > latest:
+                    latest = curr_version
+            if latest is not None:
+                json_path = os.path.join(
+                    patch_dir, "{}_v{}.json".format(patch_id, latest)
+                )
+                try:
+                    with open(json_path, "r") as f:
+                        return json.load(f), latest
+                except (OSError, json.JSONDecodeError):
+                    return None, version
+        return None, version
 
     @staticmethod
     def _get_color_hex(color):

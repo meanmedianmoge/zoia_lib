@@ -88,6 +88,7 @@ class PatchUpdate(Patch):
             if (
                 os.path.isdir(os.path.join(self.back_path, patch))
                 and len(patch) > 5
+                and patch != "art_cache"
                 and patch != "Banks"
                 and patch != "Folders"
                 and patch != ".DS_Store"

@@ -5,24 +5,30 @@ New Features
   there is no guarantee that patches edited with the app will run smoothly on ZOIA.
 - Updated the module index for block defaults and descriptions.
   - Also, reflected the 5.3 change to Granular modules (new max grain size option).
+- Importing a ZOIA folder as a Version History will now automatically create a Folder list with those patches.
+  - This is to aid in quick import-export functions.
 - Added images to the patch preview/notes pane.
   - Artwork is locally cached for faster subsequent loads.
+- Updated drag and drop behavior to insert between slots instead of swapping slots.
 - Overhauled unit tests and added Github actions CI/CD for smoother deployments and testing.
-- Condensed the user tags into a shorter list; all elements remain searchable.
+- Included developer build tools for quicker environment and app bundling.
 
 Fixes
 - Resolved the patch encoder-decoder round trip logic, which allowed for patch editing to exist!
-- Expander now has better handling for feedback loops and will now display them with red edges.
-- Updated drag and drop behavior to be less chaotic.
-  - Insert in-between is not supported as of right now, but is still planned.
+- Expander now has better handling for feedback loops.
+- Fixed a bug where imported patches that merged with PS patches would get deleted upon app restart.
+- Fixed a bug in the Version History import where it would falsely flag non-duplicate folder names.
 - Fixed a bug where Zebu patches would show as having 128 pages.
+- Fixed tab switching UI size logic.
 - Fixed menu import threads on Mac.
+- When only one version remains in a version history after manual deletion, the local view will go back to the full list.
 - Deleting a duplicate patch from the Folder list will no longer delete the first entry instead of the one chosen.
 - Bumped minor dependency versions.
 
 Plans
-- Support for Intel Macs is not something I can guarantee.
-  - I will still ship a version for release, but it won't have been tested on original hardware.
+- Patch Editor optimizations, recipes, default options... lots to explore here.
+- Ongoing OS support and bug fixes.
+  - Support for Intel Macs will continue, but those versions won't have been tested on original hardware.
 
 Version 1.4 (December 2024)
 

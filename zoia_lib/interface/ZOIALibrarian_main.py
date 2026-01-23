@@ -6,7 +6,7 @@ import hashlib
 from os.path import expanduser
 
 from PySide6 import QtCore
-from PySide6.QtCore import QEvent, Qt, QThread
+from PySide6.QtCore import QEvent, Qt, QThread, QTimer
 from PySide6.QtGui import QIcon, QFont, QScreen
 from PySide6.QtWidgets import (
     QApplication,
@@ -118,6 +118,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.search_data_local_version = None
         self.search_data_bank_version = None
         self.table_title_size = None
+        self.last_folder_json = None
         self.table_local_title_size = None
         self.table_bank_local_title_size = None
         self.ps_sizes = None
@@ -443,17 +444,21 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Reset the previous tag/cat (if it existed).
         self.local.set_prev_tag_cat(None)
+        curr_index = self.ui.tabs.currentIndex()
+        if curr_index in (1, 3):
+            # Defer sizing until the tab layout is finalized.
+            QTimer.singleShot(0, lambda: self.reset_ui(tab=1))
 
         # Figure out what tab we switched to.
-        if self.ui.tabs.currentIndex() == 1 or self.ui.tabs.currentIndex() == 3:
+        if curr_index == 1 or curr_index == 3:
             # Only reload the table data if we need to (new # of patches).
             if (
                 (
-                    self.ui.tabs.currentIndex() == 1
+                    curr_index == 1
                     and self.ui.table_local.rowCount() == 1
                 )
                 or (
-                    self.ui.tabs.currentIndex() == 3
+                    curr_index == 3
                     and self.ui.table_bank_local.rowCount() == 1
                 )
                 or self.local_pch_count == -1
@@ -465,9 +470,9 @@ class ZOIALibrarianMain(QMainWindow):
                     self.local_pch_count != len(os.listdir(self.path))
                     and self.local_pch_count != -1
                 ) or self.tab_1 != self.tab_3:
-                    if self.ui.tabs.currentIndex() == 1:
+                    if curr_index == 1:
                         self.tab_1 = 0
-                    if self.ui.tabs.currentIndex() == 3:
+                    if curr_index == 3:
                         self.tab_3 = 0
 
                     if self.tab_1 == self.tab_3:
@@ -477,7 +482,7 @@ class ZOIALibrarianMain(QMainWindow):
                 self.local.get_local_patches()
                 self.local_pch_count = len(os.listdir(self.path))
             # Context cleanup
-            if self.ui.tabs.currentIndex() == 3:
+            if curr_index == 3:
                 self.ui.text_browser_bank.setText("")
             else:
                 self.ui.text_browser_local.setText("")
@@ -488,7 +493,7 @@ class ZOIALibrarianMain(QMainWindow):
                 self.ui.btn_prev_page.setEnabled(False)
                 self.ui.btn_next_page.setEnabled(False)
                 self.local.viz_disable()
-        elif self.ui.tabs.currentIndex() == 2:
+        elif curr_index == 2:
             # SD card tab, need to check if an SD card has been specified.
             if self.sd.get_sd_root() is None:
                 self.msg.setWindowTitle("No SD Path")
@@ -500,7 +505,7 @@ class ZOIALibrarianMain(QMainWindow):
                 if self.sd.get_sd_root() is None:
                     # user cancelled without providing a path
                     self.ui.tabs.setCurrentIndex(1)
-        elif self.ui.tabs.currentIndex() == 0 and self.ui.table_PS.rowCount() == 1:
+        elif curr_index == 0 and self.ui.table_PS.rowCount() == 1:
             # We started the app with no internet, need to check if there
             # is a connection now and retry to get the patches.
             api_2 = PatchStorage()
@@ -508,11 +513,6 @@ class ZOIALibrarianMain(QMainWindow):
                 self.ui, api_2, self.path, self.msg, save, self.sort_and_set
             )
             self.ps.metadata_init()
-
-        # Local splitter fix, need to add set_ui for when using preferred
-        # ui values instead of the default
-        if self.ui.tabs.currentIndex() == 1:
-            self.reset_ui(tab=1)
 
         self.sort_and_set()
 
@@ -608,54 +608,33 @@ class ZOIALibrarianMain(QMainWindow):
 
             # Text for the headers "Tags" and "Categories"
             for j in range(2):
-                if j == 0:
-                    # Tags: limit to 3
-                    tags = data[i]["tags"]
-                    length = len(tags)
-                    if length > 3:
-                        text = ""
-                        for k in range(3):
-                            text += tags[k]["name"] + ", "
-                        text += "and " + str(length - 3) + " more"
-                    elif length == 3:
-                        text = tags[0]["name"] + ", " + tags[1]["name"] + ", and " + tags[2]["name"]
-                    elif length == 2:
-                        text = tags[0]["name"] + " and " + tags[1]["name"]
-                    elif length == 1:
-                        text = tags[0]["name"]
-                    else:
-                        text = "No tags"
-                    text_item = QTableWidgetItem(text)
-                    text_item.setTextAlignment(Qt.AlignCenter)
-                    curr_table.setItem(i, 1, text_item)
+                index = "tags" if j == 0 else "categories"
+                text = ""
+                length = len(data[i][index])
+                if length > 2:
+                    for k in range(0, length - 1):
+                        text += data[i][index][k]["name"] + ", "
+                    text += "and " + data[i][index][length - 1]["name"]
+                elif length == 2:
+                    text = (
+                        data[i][index][0]["name"] + " and " + data[i][index][1]["name"]
+                    )
                 else:
-                    index = "categories"
-                    text = ""
-                    length = len(data[i][index])
-                    if length > 2:
-                        for k in range(0, length - 1):
-                            text += data[i][index][k]["name"] + ", "
-                        text += "and " + data[i][index][length - 1]["name"]
-                    elif length == 2:
-                        text = (
-                            data[i][index][0]["name"] + " and " + data[i][index][1]["name"]
-                        )
-                    else:
-                        try:
-                            text = data[i][index][0]["name"]
-                        except IndexError:
-                            text = "No " + index
+                    try:
+                        text = data[i][index][0]["name"]
+                    except IndexError:
+                        text = "No " + index
 
-                    text_item = QTableWidgetItem(text)
-                    text_item.setTextAlignment(Qt.AlignCenter)
-                    # Can only edit tags/cats in Local Storage View.
-                    if (
-                        table_index == 1
-                        and not self.ui.back_btn_local.isEnabled()
-                        and len(os.listdir(os.path.join(self.path, idx))) > 2
-                    ):
-                        text_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                    curr_table.setItem(i, j + 1, text_item)
+                text_item = QTableWidgetItem(text)
+                text_item.setTextAlignment(Qt.AlignCenter)
+                # Can only edit tags/cats in Local Storage View.
+                if (
+                    table_index == 1
+                    and not self.ui.back_btn_local.isEnabled()
+                    and len(os.listdir(os.path.join(self.path, idx))) > 2
+                ):
+                    text_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                curr_table.setItem(i, j + 1, text_item)
 
             # Text for the header "Date Modified"
             if table_index == 0 or table_index == 1:
@@ -1086,6 +1065,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.ui.update_patch_notes.setEnabled(False)
             self.ui.upload_patch.setEnabled(False)
             self.ui.back_btn_local.setEnabled(True)
+            self.ui.new_patch_btn.setEnabled(False)
             self.ui.back_btn.setEnabled(False)
             self.ui.btn_prev_page.setEnabled(False)
             self.ui.btn_next_page.setEnabled(False)
@@ -1474,6 +1454,7 @@ class ZOIALibrarianMain(QMainWindow):
         Currently triggered via a menu action.
         """
 
+        self.last_folder_json = None
         self.worker_version.start()
 
     def _version_import_thread_sd(self):
@@ -1482,6 +1463,7 @@ class ZOIALibrarianMain(QMainWindow):
         Currently triggered via a button press.
         """
 
+        self.last_folder_json = None
         self.worker_version_sd.start()
 
     def _version_import_done(self, count, fail_cnt, fails):
@@ -1555,6 +1537,11 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.exec_()
             self.msg.setInformativeText(None)
             self.msg.setDetailedText(None)
+        if self.last_folder_json:
+            self.ui.statusbar.showMessage(
+                "Folder saved as {}.".format(self.last_folder_json), timeout=5000
+            )
+            self.last_folder_json = None
         self.tab_switch()
         # if (
         #     self.ui.tabs.currentIndex() == 1 and not self.ui.back_btn_local.isEnabled()
@@ -1837,7 +1824,66 @@ class ImportVersionSDWorker(QThread):
 
         input_dir = self.window.sd.get_sd_path()
         count, fail_cnt, fails = save.import_to_backend(input_dir, True)
+        self.window.last_folder_json = self._save_version_folder_json(input_dir)
         self.signal.emit(count, fail_cnt, fails)
+
+    @staticmethod
+    def _save_version_folder_json(input_dir):
+        """Saves a Folder json for a newly imported version history."""
+
+        back_path = save.get_backend_path()
+        if back_path is None or input_dir is None:
+            return None
+
+        patch_id = save._generate_patch_id(input_dir)
+        patch_dir = os.path.join(back_path, str(patch_id))
+        if not os.path.isdir(patch_dir):
+            return None
+
+        version_ids = []
+        for entry in os.listdir(patch_dir):
+            if entry.endswith(".json"):
+                version_ids.append(entry[:-5])
+
+        if not version_ids:
+            return None
+
+        def version_key(item):
+            if "_v" in item:
+                try:
+                    return int(item.split("_v")[-1])
+                except ValueError:
+                    return 0
+            return 0
+
+        version_ids = sorted(set(version_ids), key=version_key, reverse=True)[:64]
+
+        folder_name = os.path.basename(os.path.normpath(input_dir))
+        if not folder_name:
+            folder_name = str(patch_id)
+
+        folder_dir = os.path.join(back_path, "Folders")
+        if not os.path.isdir(folder_dir):
+            os.mkdir(folder_dir)
+
+        folder_path = os.path.join(folder_dir, "{}.json".format(folder_name))
+        if os.path.exists(folder_path):
+            suffix = 1
+            while os.path.exists(
+                os.path.join(folder_dir, "{}_{}.json".format(folder_name, suffix))
+            ):
+                suffix += 1
+            folder_path = os.path.join(
+                folder_dir, "{}_{}.json".format(folder_name, suffix)
+            )
+
+        bank_data = [
+            {"slot": i, "id": version_id} for i, version_id in enumerate(version_ids)
+        ]
+        with open(folder_path, "w") as f:
+            json.dump(bank_data, f)
+
+        return os.path.basename(folder_path)
 
 
 # class DisplayExpandedRouting(QThread):

@@ -289,7 +289,7 @@ class ZOIALibrarianSD(QMainWindow):
         self.ui.sd_tree.clearSelection()
         self.ui.delete_folder_sd_btn.setEnabled(False)
 
-    def _move_patch_sd(self, src, dest):
+    def _move_patch_sd(self, src, dest, insert=True):
         """Attempts to move a patch from one SD card slot to another
         Currently triggered via a QTableWidget move event.
 
@@ -300,61 +300,137 @@ class ZOIALibrarianSD(QMainWindow):
         self.ui.table_sd_left.clearSelection()
         self.ui.table_sd_right.clearSelection()
 
+        if self.sd_path_full is None:
+            return
+
         if isinstance(src, int):
             src = [src]
 
-        for i, s in enumerate(src):
-            dest_i = dest + i
-            if dest_i > 63:
-                dest_i -= 64
+        if not insert:
+            for i, s in enumerate(src):
+                dest_i = dest + i
+                if dest_i > 63:
+                    dest_i -= 64
 
-            if dest_i < 10:
-                dest_str = "00{}".format(dest_i)
-            else:
-                dest_str = "0{}".format(dest_i)
-            if s < 10:
-                src_str = "00{}".format(s)
-            else:
-                src_str = "0{}".format(s)
-            src_pch = None
-            dest_pch = None
+                if dest_i < 10:
+                    dest_str = "00{}".format(dest_i)
+                else:
+                    dest_str = "0{}".format(dest_i)
+                if s < 10:
+                    src_str = "00{}".format(s)
+                else:
+                    src_str = "0{}".format(s)
+                src_pch = None
+                dest_pch = None
+                for pch in os.listdir(self.sd_path_full):
+                    if pch[:3] == src_str:
+                        src_pch = pch
+                    if pch[:3] == dest_str:
+                        dest_pch = pch
+                if src_pch is not None and dest_pch is not None:
+                    # We are doing a swap.
+                    try:
+                        os.rename(
+                            os.path.join(self.sd_path_full, src_pch),
+                            os.path.join(self.sd_path_full, dest_str + src_pch[3:]),
+                        )
+                        os.rename(
+                            os.path.join(self.sd_path_full, dest_pch),
+                            os.path.join(self.sd_path_full, src_str + dest_pch[3:]),
+                        )
+                    except FileExistsError:
+                        # Swapping files that are named the same thing.
+                        os.rename(
+                            os.path.join(self.sd_path_full, src_pch),
+                            os.path.join(self.sd_path_full, "064" + src_pch[3:]),
+                        )
+                        # Swapping files that are named the same thing.
+                        os.rename(
+                            os.path.join(self.sd_path_full, dest_pch),
+                            os.path.join(self.sd_path_full, src_str + dest_pch[3:]),
+                        )
+                        os.rename(
+                            os.path.join(self.sd_path_full, "064" + src_pch[3:]),
+                            os.path.join(self.sd_path_full, dest_str + src_pch[3:]),
+                        )
+                elif src_pch is not None:
+                    # Just moving
+                    os.rename(
+                        os.path.join(self.sd_path_full, src_pch),
+                        os.path.join(self.sd_path_full, dest_str + src_pch[3:]),
+                    )
+        else:
+            slot_files = [None] * 64
             for pch in os.listdir(self.sd_path_full):
-                if pch[:3] == src_str:
-                    src_pch = pch
-                if pch[:3] == dest_str:
-                    dest_pch = pch
-            if src_pch is not None and dest_pch is not None:
-                # We are doing a swap.
-                try:
-                    os.rename(
-                        os.path.join(self.sd_path_full, src_pch),
-                        os.path.join(self.sd_path_full, dest_str + src_pch[3:]),
+                index = pch.split("_")[0]
+                if index and index[0] == "0" and len(index) >= 3:
+                    try:
+                        idx = int(index[1:3])
+                    except ValueError:
+                        continue
+                    if 0 <= idx < 64:
+                        slot_files[idx] = pch
+
+            src = sorted(set(src))
+            src = [i for i in src if 0 <= i < 64 and slot_files[i] is not None]
+            if not src or dest < 0 or dest > 63:
+                self._set_data_sd()
+                return
+
+            if src[0] <= dest <= src[-1]:
+                self._set_data_sd()
+                return
+
+            selected_files = [slot_files[i] for i in src]
+            src_set = set(src)
+            remaining = [slot_files[i] for i in range(64) if i not in src_set]
+            shift = sum(1 for i in src if i < dest)
+            dest_adjusted = dest - shift
+            if dest_adjusted < 0 or dest_adjusted > len(remaining):
+                self._set_data_sd()
+                return
+
+            new_slots = (
+                remaining[:dest_adjusted]
+                + selected_files
+                + remaining[dest_adjusted:]
+            )
+            if len(new_slots) != 64:
+                self._set_data_sd()
+                return
+
+            old_index_for_file = {
+                filename: idx for idx, filename in enumerate(slot_files) if filename is not None
+            }
+            moves = []
+            for new_index, filename in enumerate(new_slots):
+                if filename is None:
+                    continue
+                old_index = old_index_for_file.get(filename)
+                if old_index is None or old_index == new_index:
+                    continue
+                prefix = "00{}".format(new_index) if new_index < 10 else "0{}".format(new_index)
+                new_name = prefix + filename[3:]
+                moves.append(
+                    (
+                        os.path.join(self.sd_path_full, filename),
+                        os.path.join(self.sd_path_full, new_name),
                     )
-                    os.rename(
-                        os.path.join(self.sd_path_full, dest_pch),
-                        os.path.join(self.sd_path_full, src_str + dest_pch[3:]),
-                    )
-                except FileExistsError:
-                    # Swapping files that are named the same thing.
-                    os.rename(
-                        os.path.join(self.sd_path_full, src_pch),
-                        os.path.join(self.sd_path_full, "064" + src_pch[3:]),
-                    )
-                    # Swapping files that are named the same thing.
-                    os.rename(
-                        os.path.join(self.sd_path_full, dest_pch),
-                        os.path.join(self.sd_path_full, src_str + dest_pch[3:]),
-                    )
-                    os.rename(
-                        os.path.join(self.sd_path_full, "064" + src_pch[3:]),
-                        os.path.join(self.sd_path_full, dest_str + src_pch[3:]),
-                    )
-            elif src_pch is not None:
-                # Just moving
-                os.rename(
-                    os.path.join(self.sd_path_full, src_pch),
-                    os.path.join(self.sd_path_full, dest_str + src_pch[3:]),
                 )
+
+            if moves:
+                temp_moves = []
+                for i, (old_path, new_path) in enumerate(moves):
+                    temp_name = "tmp_rename_{}_{}".format(i, os.path.basename(old_path))
+                    temp_path = os.path.join(self.sd_path_full, temp_name)
+                    while os.path.exists(temp_path):
+                        i += 1
+                        temp_name = "tmp_rename_{}_{}".format(i, os.path.basename(old_path))
+                        temp_path = os.path.join(self.sd_path_full, temp_name)
+                    os.rename(old_path, temp_path)
+                    temp_moves.append((temp_path, new_path))
+                for temp_path, new_path in temp_moves:
+                    os.rename(temp_path, new_path)
 
         self._set_data_sd()
         dest_i = dest

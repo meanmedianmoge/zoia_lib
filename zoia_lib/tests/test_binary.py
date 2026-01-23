@@ -1,68 +1,46 @@
 import io
+import os
 import unittest
-import unittest.mock as mock
 import zipfile
 
-from zoia_lib.backend import api, patch_binary
-
-ps = api.PatchStorage()
+from zoia_lib.backend.patch_binary import PatchBinary
 
 
 class FormatTest(unittest.TestCase):
     def test_bin_formatter(self):
         """Extract patch information from binary file"""
 
-        # Mock the download to return fake data
-        with mock.patch.object(ps, 'download', return_value=(b'fake bin data', {})):
-            f = ps.download("105634")
-            self.assertTrue(
-                isinstance(f[0], bytes),
-                "Returned tuple did not contain binary data in the first element.",
-            )
-            self.assertTrue(
-                isinstance(f[1], dict),
-                "Returned tuple did not contain json data in the second element.",
-            )
+        root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+        test_dir = os.path.join(root_dir, "zoia_lib", "tests", "sample_files")
+        sample_path = os.path.join(test_dir, "input_test.bin")
 
-            # Since fake data, adjust expected or skip formatter check
-            # size, name, n_mod = patch_binary.formatter(f[0])
-            # self.assertTrue(size == 908, "Binary size not returning as expected")
-            # self.assertTrue(
-            #     name == "Am I Conscious", "Binary name not returning as expected"
-            # )
-            # self.assertTrue(n_mod == 31, "Binary n_mod not returning as expected")
-            # For now, just check it doesn't crash
-            try:
-                size, name, n_mod = patch_binary.formatter(f[0])
-                self.assertIsInstance(size, int)
-                self.assertIsInstance(name, str)
-                self.assertIsInstance(n_mod, int)
-            except:
-                pass  # Formatter may fail on fake data
+        with open(sample_path, "rb") as f:
+            byt = f.read()
+
+        parsed = PatchBinary().parse_data(byt)
+        self.assertIsInstance(parsed, dict)
+        self.assertIn("modules", parsed)
+        self.assertTrue(parsed["modules"], "Parsed patch should include modules.")
+        self.assertIn("pages_count", parsed)
+        self.assertEqual(parsed["pages_count"], len(parsed["pages"]))
+        self.assertIn("header_color_id", parsed["modules"][0])
 
     def test_zip_formatter(self):
         """Extract patch information from compressed drive"""
 
-        # Mock download
-        with mock.patch.object(ps, 'download', return_value=(b'fake zip data', {})):
-            f = ps.download("124436")
+        root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+        test_dir = os.path.join(root_dir, "zoia_lib", "tests", "sample_files")
+        sample_path = os.path.join(test_dir, "sampleZIPBytes.bin")
 
-            # Given "z", a bytes object containing a ZIP file,
-            # extract the data therein
-            try:
-                zf = zipfile.ZipFile(io.BytesIO(f[0]), "r")
-                for name, info in zip(zf.namelist(), zf.infolist()):
-                    if ".txt" in name:
-                        continue
-                    byt = zf.read(info)
-                    # print(zf.read(fileinfo).decode('latin-1'))
-                    size, name, n_mod = patch_binary.formatter(byt)
+        with open(sample_path, "rb") as f:
+            zip_bytes = f.read()
 
-                    # self.assertTrue(size == 2123, "Binary size not returning as expected")
-                    # self.assertTrue(name == "Juniper", "Binary name not returning as expected")
-                    # self.assertTrue(n_mod == 75, "Binary n_mod not returning as expected")
-                    self.assertIsInstance(size, int)
-                    self.assertIsInstance(name, str)
-                    self.assertIsInstance(n_mod, int)
-            except:
-                pass  # May fail on fake data
+        zf = zipfile.ZipFile(io.BytesIO(zip_bytes), "r")
+        bin_entries = [name for name in zf.namelist() if name.endswith(".bin")]
+        self.assertTrue(bin_entries, "Expected at least one .bin in sample zip.")
+        byt = zf.read(bin_entries[0])
+
+        parsed = PatchBinary().parse_data(byt)
+        self.assertIsInstance(parsed, dict)
+        self.assertIn("modules", parsed)
+        self.assertTrue(parsed["modules"], "Parsed patch should include modules.")

@@ -92,6 +92,13 @@ class PatchExport(Patch):
             remove = "-" + name.split("-")[1].split(".")[0]
             name = name.replace(remove, "")
 
+        base, ext = os.path.splitext(name)
+        if not base.startswith("zoia_"):
+            base = "zoia_" + base
+        if ext.lower() != ".bin":
+            ext = ".bin"
+        name = base + ext
+
         try:
             if -1 < slot < 10:
                 # one digit

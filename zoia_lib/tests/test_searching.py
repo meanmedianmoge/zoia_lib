@@ -171,7 +171,15 @@ class TestSearching(unittest.TestCase):
 
         global data
 
-        pass
+        result = util.search_patches(data, "meagher")
+        self.assertTrue(
+            result[0]["title"] == "LOVELESS",
+            "Expected to find the patch titled LOVELESS but did not.",
+        )
+        self.assertTrue(
+            len(result) == 1,
+            "Returned search result should have only contained 1 result.",
+        )
 
     def test_tag_search(self):
         """Attempts to search a dataset for a tag item.
@@ -181,7 +189,13 @@ class TestSearching(unittest.TestCase):
 
         global data
 
-        pass
+        result = util.search_patches(data, "shoegaze")
+        titles = [item["title"] for item in result]
+        self.assertEqual(
+            titles,
+            ["LOVELESS", "Subtle Knife"],
+            "Expected to find the shoegaze-tagged patches in order.",
+        )
 
     def test_category_search(self):
         """Attempts to search a dataset for a category item.
@@ -191,7 +205,14 @@ class TestSearching(unittest.TestCase):
 
         global data
 
-        pass
+        result = util.search_patches(data, "effect")
+        ids = {item["id"] for item in result}
+        expected_ids = {122243, 121123, 104273, 126563}
+        self.assertEqual(
+            ids,
+            expected_ids,
+            "Expected to find all Effect category patches.",
+        )
 
     def test_date_modified_search(self):
         """Attempts to search a dataset for a updated_at attribute.
@@ -201,4 +222,8 @@ class TestSearching(unittest.TestCase):
 
         global data
 
-        pass
+        result = util.search_patches(data, "2020-04-30")
+        self.assertTrue(
+            result[0]["id"] == 124566,
+            "Expected to find the patch updated on 2020-04-30.",
+        )

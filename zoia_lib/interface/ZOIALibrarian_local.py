@@ -99,6 +99,7 @@ class ZOIALibrarianLocal(QMainWindow):
             if (
                 os.path.isdir(os.path.join(self.path, patch))
                 and len(os.listdir(os.path.join(self.path, patch))) >= 2
+                and patch != "art_cache"
                 and patch != "Banks"
                 and patch != "Folders"
                 and patch != "temp"
@@ -124,6 +125,7 @@ class ZOIALibrarianLocal(QMainWindow):
             if (
                 os.path.isdir(os.path.join(self.path, patch))
                 and len(os.listdir(os.path.join(self.path, patch))) >= 2
+                and patch != "art_cache"
                 and patch != "Banks"
                 and patch != "Folders"
                 and patch != "temp"
@@ -278,12 +280,19 @@ class ZOIALibrarianLocal(QMainWindow):
         self.ui.text_browser_local.setText("")
         self.ui.statusbar.showMessage("Patch(es) deleted.", timeout=5000)
 
-        # Special case, we only have one patch in a version history after
-        # a deletion.
-        if self.ui.back_btn_local.isEnabled() and self.ui.table_local.rowCount() == 1:
-            self.get_local_patches()
-            self.go_back()
-            self.ui.searchbar_local.setText("")
+        # Special case: after a version delete, if only one version remains
+        # in the directory, return to the full list view.
+        if self.ui.back_btn_local.isEnabled():
+            ver_dir = self.curr_ver or self.sender().objectName().split("_")[0]
+            ver_path = os.path.join(self.path, ver_dir)
+            if os.path.isdir(ver_path):
+                remaining_versions = [
+                    pch for pch in os.listdir(ver_path) if pch.split(".")[-1] == "json"
+                ]
+                if len(remaining_versions) <= 1:
+                    self.get_local_patches()
+                    self.go_back()
+                    self.ui.searchbar_local.setText("")
 
         self.window.tab_switch()
 
@@ -615,6 +624,8 @@ class ZOIALibrarianLocal(QMainWindow):
             self.ui.btn_show_routing.setEnabled(False)
             self.ui.update_patch_notes.setEnabled(False)
             self.ui.upload_patch.setEnabled(False)
+            self.ui.new_patch_btn.setEnabled(True)
+            self.ui.edit_patch.setEnabled(False)
             self.ui.btn_prev_page.setEnabled(False)
             self.ui.btn_next_page.setEnabled(False)
             self.viz_disable()
@@ -1174,7 +1185,7 @@ class ZOIALibrarianLocal(QMainWindow):
 
         # widget used for the node graph.
         graph_widget = graph.widget
-        graph_widget.setWindowTitle(pch["name"])
+        graph_widget.setWindowTitle("Patch Expander - {}".format(pch["name"]))
         # graph_widget.resize(1100, 800)
         graph_widget.show()
 
@@ -1192,11 +1203,7 @@ class ZOIALibrarianLocal(QMainWindow):
             )
             inp, outp, in_pos, out_pos = [], [], [], []
             for key, param in module["blocks"].items():
-                if "in" in key:
-                    my_node.add_input(key, multi_input=True)
-                    inp.append(key)
-                    in_pos.append(int(param["position"]))
-                elif param["isParam"]:
+                if "in" in key or param["isParam"]:
                     my_node.add_input(key, multi_input=True)
                     inp.append(key)
                     in_pos.append(int(param["position"]))

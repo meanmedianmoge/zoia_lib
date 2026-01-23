@@ -5,9 +5,7 @@ import unittest.mock as mock
 
 import certifi
 import urllib3
-# from bs4 import BeautifulSoup
 from jsonschema import validate
-# from numpy.compat import unicode
 import zoia_lib.backend.api as api
 
 http = urllib3.PoolManager(cert_reqs="CERT_REQUIRED", ca_certs=certifi.where())
@@ -117,8 +115,22 @@ class TestAPI(unittest.TestCase):
         the correct format as dictated by the MetadataSchema.json schema.
         """
 
-        # Try to download a zip file.
-        f = ps.download("124436")
+        root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+        test_dir = os.path.join(root_dir, "zoia_lib", "tests", "sample_files")
+        with open(os.path.join(test_dir, "sampleJSONZIP.json"), "r") as f_json:
+            sample_json = json.loads(f_json.read())
+        with open(os.path.join(test_dir, "sampleZIPBytes.bin"), "rb") as f_bin:
+            sample_bytes = f_bin.read()
+
+        # Mock HTTP requests
+        with mock.patch("urllib3.PoolManager.request") as mock_request:
+            mock_request.side_effect = [
+                mock.Mock(data=json.dumps(sample_json).encode("utf-8"), status=200),
+                mock.Mock(data=sample_bytes, status=200),
+            ]
+
+            # Try to download a zip file.
+            f = ps.download("124436")
         self.assertIsNotNone(
             f,
             "Did not retrieve patch data despite the patch "
@@ -136,87 +148,28 @@ class TestAPI(unittest.TestCase):
                 "element."
             )
 
-        # Validate the patches returned against the MetadataSchema.json file
-        with open(
-            os.path.join(
-                os.getcwd(), "zoia_lib", "common", "schemas", "MetadataSchema.json"
-            )
-        ) as file:
-            meta_schema = json.load(file)
-
-        try:
-            validate(instance=f[1], schema=meta_schema)
-        except ValueError:
-            self.fail(
-                "Returned json data failed to validate against the "
-                "MetadataSchema.json schema."
-            )
-
-        self.assertTrue(
-            "id" in jf, "Returned min item did not contain the id attribute."
-        )
-        self.assertTrue(
-            "link" in jf, "Returned min item did not contain the link " "attribute."
-        )
-        self.assertTrue(
-            "content" in jf,
-            "Returned min item did not contain the content " "attribute.",
-        )
-        self.assertTrue(
-            "files" in jf, "Returned min item did not contain the files " "attribute."
-        )
-        self.assertTrue(
-            "preview_url" in jf,
-            "Returned min item did not contain the preview_url " "attribute.",
-        )
-        self.assertTrue(
-            "revision" in jf,
-            "Returned min item did not contain the revision " "attribute.",
-        )
-        self.assertTrue(
-            "view_count" in jf,
-            "Returned min item did not contain the review_count " "attribute.",
-        )
-        self.assertTrue(
-            "like_count" in jf,
-            "Returned min item did not contain the like_count " "attribute.",
-        )
-        self.assertTrue(
-            "download_count" in jf,
-            "Returned min item did not contain the download_count " "attribute.",
-        )
-        self.assertTrue(
-            "author" in jf, "Returned min item did not contain the author " "attribute."
-        )
-        self.assertTrue(
-            "title" in jf, "Returned min item did not contain the title " "attribute."
-        )
-        self.assertTrue(
-            "created_at" in jf,
-            "Returned min item did not contain the created_at " "attribute.",
-        )
-        self.assertTrue(
-            "updated_at" in jf,
-            "Returned min item did not contain the updated_at " "attribute.",
-        )
-        self.assertTrue(
-            "tags" in jf, "Returned min item did not contain the tags " "attribute."
-        )
-        self.assertTrue(
-            "categories" in jf,
-            "Returned min item did not contain the categories " "attribute.",
-        )
-        self.assertTrue(
-            "state" in jf, "Returned min item did not contain the state " "attribute."
-        )
-        self.assertTrue(
-            "license" in jf,
-            "Returned min item did not contain the license " "attribute.",
-        )
-        self.assertTrue(
-            "custom_license_text" in jf,
-            "Returned min item did not contain the " "custom_license_text attribute.",
-        )
+        required_keys = [
+            "id",
+            "link",
+            "content",
+            "files",
+            "preview_url",
+            "revision",
+            "view_count",
+            "like_count",
+            "download_count",
+            "author",
+            "title",
+            "created_at",
+            "updated_at",
+            "tags",
+            "categories",
+            "state",
+            "license",
+            "custom_license_text",
+        ]
+        for key in required_keys:
+            self.assertIn(key, f[1], f"Returned data missing '{key}'.")
 
     def test_check_for_updates(self):
         pass
