@@ -596,7 +596,7 @@ class ZOIALibrarianMain(QMainWindow):
             elif (table_index == 1 and not self.ui.back_btn_local.isEnabled()) or (
                 table_index == 3 and not self.ui.back_btn_bank.isEnabled()
             ):
-                if len(os.listdir(os.path.join(self.path, idx))) > 2:
+                if self.local.has_multiple_versions(idx):
                     btn_title.setText(title.rstrip() + "\n[Multiple Versions]")
                 btn_title.setObjectName(idx)
             else:
@@ -631,7 +631,7 @@ class ZOIALibrarianMain(QMainWindow):
                 if (
                     table_index == 1
                     and not self.ui.back_btn_local.isEnabled()
-                    and len(os.listdir(os.path.join(self.path, idx))) > 2
+                    and self.local.has_multiple_versions(idx)
                 ):
                     text_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 curr_table.setItem(i, j + 1, text_item)
@@ -855,8 +855,7 @@ class ZOIALibrarianMain(QMainWindow):
             if (
                 (self.ui.tabs.currentIndex() == 1 or self.ui.tabs.currentIndex() == 3)
                 and "_" not in self.sender().objectName()
-                and len(os.listdir(os.path.join(self.path, self.sender().objectName())))
-                > 2
+                and self.local.has_multiple_versions(self.sender().objectName())
             ):
                 # We are pointing to a version directory.
                 self.display_patch_versions(self.ui.tabs.currentIndex() == 1)

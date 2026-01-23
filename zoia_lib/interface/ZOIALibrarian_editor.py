@@ -725,32 +725,48 @@ class PatchBuilderEditor(QMainWindow):
 
         source_block = QComboBox()
         dest_block = QComboBox()
-        if source_combo.currentData() is not None:
+
+        def refresh_source_blocks():
+            source_idx = source_combo.currentData()
+            if source_idx is None:
+                return
             self._populate_block_combo(
                 source_block,
-                self.selected_modules[source_combo.currentData()][0],
-                self.selected_modules[source_combo.currentData()][1],
+                self.selected_modules[source_idx][0],
+                self.selected_modules[source_idx][1],
+                allowed_types={"audio_out", "cv_out"},
             )
-        if dest_combo.currentData() is not None:
+
+        def refresh_dest_blocks():
+            dest_idx = dest_combo.currentData()
+            if dest_idx is None:
+                return
+            source_idx = source_combo.currentData()
+            source_type = None
+            if source_idx is not None:
+                source_type = self._block_type_for_module(
+                    self.selected_modules[source_idx][0],
+                    self.selected_modules[source_idx][1],
+                    source_block.currentData(),
+                )
+            allowed_types = self._matching_dest_types(source_type)
             self._populate_block_combo(
                 dest_block,
-                self.selected_modules[dest_combo.currentData()][0],
-                self.selected_modules[dest_combo.currentData()][1],
+                self.selected_modules[dest_idx][0],
+                self.selected_modules[dest_idx][1],
+                allowed_types=allowed_types,
             )
-        source_combo.currentIndexChanged.connect(
-            lambda: self._populate_block_combo(
-                source_block,
-                self.selected_modules[source_combo.currentData()][0],
-                self.selected_modules[source_combo.currentData()][1],
-            )
-        )
-        dest_combo.currentIndexChanged.connect(
-            lambda: self._populate_block_combo(
-                dest_block,
-                self.selected_modules[dest_combo.currentData()][0],
-                self.selected_modules[dest_combo.currentData()][1],
-            )
-        )
+
+        def refresh_on_source_module_change():
+            refresh_source_blocks()
+            refresh_dest_blocks()
+
+        refresh_on_source_module_change()
+        refresh_dest_blocks()
+
+        source_combo.currentIndexChanged.connect(refresh_on_source_module_change)
+        source_block.currentIndexChanged.connect(refresh_dest_blocks)
+        dest_combo.currentIndexChanged.connect(refresh_dest_blocks)
         strength = QSpinBox()
         strength.setRange(0, 100)
         strength.setValue(100)
@@ -779,6 +795,12 @@ class PatchBuilderEditor(QMainWindow):
 
     def _add_connection(self, source_mod, source_block, dest_mod, dest_block, strength, module_index):
         if source_mod is None or dest_mod is None:
+            return
+        if source_block is None or dest_block is None:
+            return
+        if not self._is_valid_connection(
+            source_mod, source_block, dest_mod, dest_block
+        ):
             return
 
         self.connections.append(
@@ -930,11 +952,7 @@ class PatchBuilderEditor(QMainWindow):
         return 0.0
 
     def _block_name_for_module(self, mod_id, config, block_index):
-        blocks = {}
-        if config and config.get("blocks"):
-            blocks = config["blocks"]
-        else:
-            blocks = self.module_index.get(str(mod_id), {}).get("blocks", {})
+        blocks = self._module_blocks(mod_id, config)
 
         for name, meta in blocks.items():
             position = meta.get("position")
@@ -944,17 +962,58 @@ class PatchBuilderEditor(QMainWindow):
                 return name
         return f"Block {block_index}"
 
-    def _populate_block_combo(self, combo, mod_id, config):
+    def _module_blocks(self, mod_id, config):
+        if config and config.get("blocks"):
+            return config["blocks"]
+        return self.module_index.get(str(mod_id), {}).get("blocks", {})
+
+    def _block_type_for_module(self, mod_id, config, block_index):
+        if block_index is None:
+            return None
+        blocks = self._module_blocks(mod_id, config)
+        for meta in blocks.values():
+            position = meta.get("position")
+            if isinstance(position, list) and block_index in position:
+                return meta.get("type")
+            if isinstance(position, int) and block_index == position:
+                return meta.get("type")
+        return None
+
+    def _matching_dest_types(self, source_type):
+        if source_type == "audio_out":
+            return {"audio_in"}
+        if source_type == "cv_out":
+            return {"cv_in"}
+        return {"audio_in", "cv_in"}
+
+    def _is_valid_connection(self, source_mod, source_block, dest_mod, dest_block):
+        source_type = self._block_type_for_module(
+            self.selected_modules[int(source_mod)][0],
+            self.selected_modules[int(source_mod)][1],
+            int(source_block),
+        )
+        dest_type = self._block_type_for_module(
+            self.selected_modules[int(dest_mod)][0],
+            self.selected_modules[int(dest_mod)][1],
+            int(dest_block),
+        )
+        if source_type == "audio_out":
+            return dest_type == "audio_in"
+        if source_type == "cv_out":
+            return dest_type == "cv_in"
+        return False
+
+    def _populate_block_combo(self, combo, mod_id, config, allowed_types=None):
         combo.blockSignals(True)
         combo.clear()
-        blocks = {}
-        if config and config.get("blocks"):
-            blocks = config["blocks"]
-        else:
-            blocks = self.module_index.get(str(mod_id), {}).get("blocks", {})
+        combo.setEnabled(True)
+        blocks = self._module_blocks(mod_id, config)
 
         block_entries = []
         for name, meta in blocks.items():
+            block_type = meta.get("type")
+            if allowed_types and block_type and block_type not in allowed_types:
+                continue
             position = meta.get("position")
             if isinstance(position, list):
                 for pos in position:
@@ -968,8 +1027,12 @@ class PatchBuilderEditor(QMainWindow):
             combo.addItem(f"{pos}: {name}", pos)
 
         if combo.count() == 0:
-            for pos in range(0, 128):
-                combo.addItem(f"{pos}: Block {pos}", pos)
+            if not blocks:
+                for pos in range(0, 128):
+                    combo.addItem(f"{pos}: Block {pos}", pos)
+            else:
+                combo.addItem("No valid blocks", None)
+                combo.setEnabled(False)
         combo.blockSignals(False)
 
     def _build_options_section(self, mod_id, config, module_index):

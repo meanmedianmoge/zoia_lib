@@ -16,11 +16,13 @@ New Features
 Fixes
 - Resolved the patch encoder-decoder round trip logic, which allowed for patch editing to exist!
 - Expander now has better handling for feedback loops.
+- Fixed a bug where single patches with samples would register as being a version history.
 - Fixed a bug where imported patches that merged with PS patches would get deleted upon app restart.
 - Fixed a bug in the Version History import where it would falsely flag non-duplicate folder names.
 - Fixed a bug where Zebu patches would show as having 128 pages.
 - Fixed tab switching UI size logic.
 - Fixed menu import threads on Mac.
+- Deleting a patch from local storage will now refresh the table properly.
 - When only one version remains in a version history after manual deletion, the local view will go back to the full list.
 - Deleting a duplicate patch from the Folder list will no longer delete the first entry instead of the one chosen.
 - Bumped minor dependency versions.

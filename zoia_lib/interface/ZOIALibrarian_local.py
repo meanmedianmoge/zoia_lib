@@ -215,6 +215,15 @@ class ZOIALibrarianLocal(QMainWindow):
         del_btn.clicked.connect(self.initiate_delete)
         self.ui.table_local.setCellWidget(i, 6, del_btn)
 
+    def _count_patch_versions(self, patch_id):
+        patch_dir = os.path.join(self.path, patch_id)
+        if not os.path.isdir(patch_dir):
+            return 0
+        return sum(1 for fname in os.listdir(patch_dir) if fname.endswith(".json"))
+
+    def has_multiple_versions(self, patch_id):
+        return self._count_patch_versions(patch_id) > 1
+
     def get_local_patches(self):
         """Retrieves the metadata for patches that a user has previously
         downloaded and saved to their machine's backend.
@@ -232,6 +241,7 @@ class ZOIALibrarianLocal(QMainWindow):
             # Look for patch directories in the backend.
             if (
                 patches != "Banks"
+                and patches != "art_cache"
                 and patches != "Folders"
                 and patches != "data.json"
                 and patches != ".DS_Store"
@@ -260,8 +270,7 @@ class ZOIALibrarianLocal(QMainWindow):
         if "_" not in self.sender().objectName():
             if (
                 not self.ui.back_btn_local.isEnabled()
-                and len(os.listdir(os.path.join(self.path, self.sender().objectName())))
-                > 2
+                and self.has_multiple_versions(self.sender().objectName())
             ):
                 self.delete.delete_full_patch_directory(self.sender().objectName())
             else:
@@ -279,6 +288,8 @@ class ZOIALibrarianLocal(QMainWindow):
         # Reset the text browser.
         self.ui.text_browser_local.setText("")
         self.ui.statusbar.showMessage("Patch(es) deleted.", timeout=5000)
+        if not self.ui.back_btn_local.isEnabled():
+            self.ui.edit_patch.setEnabled(False)
 
         # Special case: after a version delete, if only one version remains
         # in the directory, return to the full list view.
@@ -293,6 +304,9 @@ class ZOIALibrarianLocal(QMainWindow):
                     self.get_local_patches()
                     self.go_back()
                     self.ui.searchbar_local.setText("")
+                else:
+                    self.get_version_patches(True)
+                    self.ui.edit_patch.setEnabled(False)
 
         self.window.tab_switch()
 
@@ -372,7 +386,7 @@ class ZOIALibrarianLocal(QMainWindow):
                     # Got a slot and the user hit "OK"
                     if (
                         "_" not in idx
-                        and len(os.listdir(os.path.join(self.path, idx))) == 2
+                        and not self.has_multiple_versions(idx)
                     ) or "_" in idx:
                         # Not working within a version directory.
                         # Just a single patch
@@ -428,9 +442,7 @@ class ZOIALibrarianLocal(QMainWindow):
 
                     else:
                         # An entire version directory was selected.
-                        pch_num = int(
-                            (len(os.listdir(os.path.join(self.path, idx))) / 2) - 1
-                        )
+                        pch_num = max(0, self._count_patch_versions(idx) - 1)
                         if slot + pch_num > 63:
                             self.ui.statusbar.showMessage(
                                 "Export failed.", timeout=5000
