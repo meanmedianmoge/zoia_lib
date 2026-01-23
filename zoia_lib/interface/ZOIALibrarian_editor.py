@@ -317,12 +317,22 @@ class PatchBuilderEditor(QMainWindow):
 
     def export_patch(self):
         patch_dict = self._build_patch_dict()
-        try:
-            encoder = PatchEncoder()
-            bin_data = encoder.encode(patch_dict)
-        except Exception as e:
-            QMessageBox.critical(self, "Export Failed", str(e))
-            return
+
+        cpu_total = patch_dict.get("meta", {}).get("cpu")
+        if cpu_total is not None and cpu_total >= 100:
+            if cpu_total >= 105:
+                message = f"This patch reports an extremely high CPU usage of {cpu_total}%, which is above the hardware limit. Export anyway?"
+            else:
+                message = f"This patch reports a high CPU usage of {cpu_total}%, which is close to the hardware limit. Export anyway?"
+            choice = QMessageBox.warning(
+                self,
+                "High CPU Usage",
+                message,
+                QMessageBox.Ok | QMessageBox.Cancel,
+                QMessageBox.Cancel,
+            )
+            if choice != QMessageBox.Ok:
+                return
 
         if not self.patch_dict:
             title, ok = QInputDialog.getText(
@@ -331,8 +341,49 @@ class PatchBuilderEditor(QMainWindow):
             if not ok or not title.strip():
                 return
             patch_name = title.strip()
+            patch_dict["name"] = patch_name
+            if "meta" in patch_dict:
+                patch_dict["meta"]["name"] = patch_name
+        else:
+            choice = QDialog(self)
+            choice.setWindowTitle("Export Patch")
+            choice.setModal(True)
+            layout = QVBoxLayout(choice)
+            layout.addWidget(QLabel("How should this edited patch be saved?"))
+            overwrite_btn = QPushButton("Overwrite Existing")
+            new_version_btn = QPushButton("Create New Version")
+            cancel_btn = QPushButton("Cancel")
+            layout.addWidget(overwrite_btn)
+            layout.addWidget(new_version_btn)
+            layout.addWidget(cancel_btn)
+            choice.setLayout(layout)
+
+            result = {"button": None}
+
+            def _choose(btn):
+                result["button"] = btn
+                choice.accept()
+
+            overwrite_btn.clicked.connect(lambda: _choose(overwrite_btn))
+            new_version_btn.clicked.connect(lambda: _choose(new_version_btn))
+            cancel_btn.clicked.connect(choice.reject)
+            choice.exec()
+
+            if result["button"] not in (new_version_btn, overwrite_btn):
+                return
+
+            patch_name = patch_dict.get("name", "UserPatch")
+
+        try:
+            encoder = PatchEncoder()
+            bin_data = encoder.encode(patch_dict)
+        except Exception as e:
+            QMessageBox.critical(self, "Export Failed", str(e))
+            return
+
+        if not self.patch_dict:
             timestamp = "{:%Y%m%d%H%M%S}".format(datetime.datetime.now())
-            file_base = patch_name.lower().replace(" ", "_")
+            file_base = patch_name.replace(" ", "_")
             patch_id = self.patch_save._generate_patch_id(f"{patch_name}-{timestamp}")
             bin_bytes = bytes(bin_data)
             meta = {
@@ -368,34 +419,6 @@ class PatchBuilderEditor(QMainWindow):
                 QMessageBox.critical(self, "Export Failed", str(e))
             return
 
-        choice = QDialog(self)
-        choice.setWindowTitle("Export Patch")
-        choice.setModal(True)
-        layout = QVBoxLayout(choice)
-        layout.addWidget(QLabel("How should this edited patch be saved?"))
-        overwrite_btn = QPushButton("Overwrite Existing")
-        new_version_btn = QPushButton("Create New Version")
-        cancel_btn = QPushButton("Cancel")
-        layout.addWidget(overwrite_btn)
-        layout.addWidget(new_version_btn)
-        layout.addWidget(cancel_btn)
-        choice.setLayout(layout)
-
-        result = {"button": None}
-
-        def _choose(btn):
-            result["button"] = btn
-            choice.accept()
-
-        overwrite_btn.clicked.connect(lambda: _choose(overwrite_btn))
-        new_version_btn.clicked.connect(lambda: _choose(new_version_btn))
-        cancel_btn.clicked.connect(choice.reject)
-        choice.exec()
-
-        if result["button"] not in (new_version_btn, overwrite_btn):
-            return
-
-        patch_name = patch_dict.get("name", "UserPatch")
         patch_id = self.patch_id
         version = None
         if patch_id:
@@ -963,6 +986,39 @@ class PatchBuilderEditor(QMainWindow):
         options_group = QGroupBox("Module Options")
         options_form = QFormLayout(options_group)
 
+        color_names = [
+            "Blue",
+            "Green",
+            "Red",
+            "Yellow",
+            "Aqua",
+            "Magenta",
+            "White",
+            "Orange",
+            "Lima",
+            "Surf",
+            "Sky",
+            "Purple",
+            "Pink",
+            "Peach",
+            "Mango",
+        ]
+        current_color = config.get("color", "Blue")
+        color_combo = QComboBox()
+        color_combo.blockSignals(True)
+        for idx, name in enumerate(color_names):
+            color_combo.addItem(name, idx)
+            if name == current_color:
+                color_combo.setCurrentIndex(idx)
+        config["color"] = color_names[color_combo.currentIndex()]
+        color_combo.blockSignals(False)
+        color_combo.currentIndexChanged.connect(
+            lambda idx, mi=module_index, colors=color_names: self._on_color_changed(
+                mi, colors, idx
+            )
+        )
+        options_form.addRow(QLabel("color"), color_combo)
+
         for opt_name, values in options_def.items():
             if not isinstance(values, list) or not values:
                 continue
@@ -1001,6 +1057,13 @@ class PatchBuilderEditor(QMainWindow):
             config["options_binary"] = {}
         config["options"][option_name] = values[index]
         config["options_binary"][option_name] = index
+
+    def _on_color_changed(self, module_index, colors, index):
+        if module_index < 0 or module_index >= len(self.selected_modules):
+            return
+        mod_id, config = self.selected_modules[module_index]
+        config["color"] = colors[index]
+        self._refresh_routing_view()
         self._recalc_module_blocks_and_params(module_index)
         self._refresh_current_details()
         self._refresh_routing_view()
@@ -1125,9 +1188,14 @@ class PatchBuilderEditor(QMainWindow):
             self.routing_window.raise_()
             self.routing_window.activateWindow()
             return
+        
+        if self.patch_dict is None:
+            name = "New Patch"
+        else:
+            name = self.patch_dict.get("name", "New Patch")
 
         self.routing_window = QMainWindow(self)
-        self.routing_window.setWindowTitle("Patch Expander - {}".format(self.patch_dict.get("name", "Untitled")))
+        self.routing_window.setWindowTitle("Patch Expander - {}".format(name))
         self.routing_window.setAttribute(Qt.WA_DeleteOnClose, True)
         self.routing_window.destroyed.connect(self._on_routing_window_closed)
 
