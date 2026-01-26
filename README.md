@@ -1,4 +1,4 @@
-# zoia-lib
+# ZOIA Librarian
 Patch manager/librarian for the Empress Effects ZOIA pedal-format modular effects unit.
 
 To learn more about ZOIA and its community, join our [Discord chat server](https://discordapp.com/invite/HG5GesY),
@@ -24,17 +24,17 @@ Application can be installed in one of two ways:
 https://github.com/meanmedianmoge/zoia_lib/releases/latest.
 
 - For developers/contributors - Build from source; requires Python 3.11+.
-```
-# Download source code
-git clone https://github.com/meanmedianmoge/zoia_lib.git
-cd zoia_lib
+    ```
+    # Download source code
+    git clone https://github.com/meanmedianmoge/zoia_lib.git
+    cd zoia_lib
 
-# Install dependencies
-sh tools/env.sh
+    # Install dependencies
+    sh tools/env.sh
 
-# Load the application
-python -m zoia_lib.backend.startup
-```
+    # Load the application
+    python -m zoia_lib.backend.startup
+    ```
 
 ## Documentation
 - Overview video and tutorial: https://www.youtube.com/watch?v=JLOUrWtG1Pk
@@ -43,7 +43,7 @@ python -m zoia_lib.backend.startup
 - Supplemental 1.3 video: https://www.youtube.com/watch?v=Y4ILhtxdIvs
 - Supplemental 1.4 video: https://www.youtube.com/watch?v=ymLvRhC1GmI
 - Supplemental 2.0 video: https://www.youtube.com/watch?v=j6mz4DIdEpU
-- You'll find the following in `/documentation`: <br>
+- You'll find the following in `documentation`: <br>
     - Current version of the user manual
     - Overall changelog - lists new features, bug fixes, and known issues for each release
     - Initial app frameworks and discussions among the dev team

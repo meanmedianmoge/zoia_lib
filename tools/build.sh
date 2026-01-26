@@ -3,7 +3,7 @@ if [ "$ARCHITECTURE" = "x86_64" ]; then
     python -m venv venv_x86
     source venv_x86/bin/activate
 else
-    python -m venv venv 
+    python -m venv venv
     source venv/bin/activate
 fi
 
