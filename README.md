@@ -42,7 +42,7 @@ python -m zoia_lib.backend.startup
 - Supplemental 1.2 video: https://www.youtube.com/watch?v=zR8XSI_Unlk
 - Supplemental 1.3 video: https://www.youtube.com/watch?v=Y4ILhtxdIvs
 - Supplemental 1.4 video: https://www.youtube.com/watch?v=ymLvRhC1GmI
-- Supplemental 2.0 video: 
+- Supplemental 2.0 video: https://www.youtube.com/watch?v=j6mz4DIdEpU
 - You'll find the following in `/documentation`: <br>
     - Current version of the user manual
     - Overall changelog - lists new features, bug fixes, and known issues for each release

@@ -1,9 +1,9 @@
 ARCHITECTURE="${1:-$(uname -m)}"
 if [ "$ARCHITECTURE" = "x86_64" ]; then
-    python3 -m venv venv_x86
+    python -m venv venv_x86
     source venv_x86/bin/activate
 else
-    python3 -m venv venv
+    python -m venv venv 
     source venv/bin/activate
 fi
 
