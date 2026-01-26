@@ -109,13 +109,13 @@ def search_patches(data, query):
             search query.
     """
 
-    query = query.lower()
-
     # Input checking.
     if query is None or data is None:
         raise errors.SearchingError(query, 1002)
     if not isinstance(data, list):
         raise errors.SearchingError(query, 1001)
+
+    query = query.lower()
 
     hits = []
 
@@ -176,10 +176,10 @@ def search_patches(data, query):
                     hits.append(curr)
                     continue
         # Check dates.
-        if query in curr["updated_at"].lower() and curr not in hits:
+        if "updated_at" in curr and query in curr["updated_at"].lower() and curr not in hits:
             hits.append(curr)
             continue
-        if query in curr["created_at"].lower() and curr not in hits:
+        if "created_at" in curr and query in curr["created_at"].lower() and curr not in hits:
             hits.append(curr)
 
     return hits

@@ -1,3 +1,37 @@
+Version 2.0 (January 2026)
+New Features
+- Patches can now be edited and created in the app!!!
+  - This feature is offered in a beta state. Without having the unit on hand to measure dynamic CPU loads,
+  there is no guarantee that patches edited with the app will run smoothly on ZOIA.
+- Updated the module index for block defaults and descriptions.
+  - Also, reflected the 5.3 change to Granular modules (new max grain size option).
+- Importing a ZOIA folder as a Version History will now automatically create a Folder list with those patches.
+  - This is to aid in quick import-export functions.
+- Added images to the patch preview/notes pane.
+  - Artwork is locally cached for faster subsequent loads.
+- Updated drag and drop behavior to insert between slots instead of swapping slots.
+- Overhauled unit tests and added Github actions CI/CD for smoother deployments and testing.
+- Included developer build tools for quicker environment and app bundling.
+
+Fixes
+- Resolved the patch encoder-decoder round trip logic, which allowed for patch editing to exist!
+- Expander now has better handling for feedback loops.
+- Fixed a bug where single patches with samples would register as being a version history.
+- Fixed a bug where imported patches that merged with PS patches would get deleted upon app restart.
+- Fixed a bug in the Version History import where it would falsely flag non-duplicate folder names.
+- Fixed a bug where Zebu patches would show as having 128 pages.
+- Fixed tab switching UI size logic.
+- Fixed menu import threads on Mac.
+- Deleting a patch from local storage will now refresh the table properly.
+- When only one version remains in a version history after manual deletion, the local view will go back to the full list.
+- Deleting a duplicate patch from the Folder list will no longer delete the first entry instead of the one chosen.
+- Bumped minor dependency versions.
+
+Plans
+- Patch Editor optimizations, recipes, default options... lots to explore here.
+- Ongoing OS support and bug fixes.
+  - Support for Intel Macs will continue, but those versions won't have been tested on original hardware.
+
 Version 1.4 (December 2024)
 
 New Features

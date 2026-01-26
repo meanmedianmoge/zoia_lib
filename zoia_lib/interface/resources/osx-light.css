@@ -1,0 +1,97 @@
+QHeaderView {
+    background-color: #ddd;
+    color: #000;
+}
+
+QHeaderView::section:selected {
+    background-color: #ddd;
+    color: #000;
+}
+
+QLineEdit {
+    background-color: #FFF;
+    border: 1px solid #000;
+    color: #000;
+    padding: 1px 0 0;
+}
+
+QPushButton {
+    border-radius: 5px;
+    padding: 2px 2px 2px 2px;
+    border: 1px solid black;
+    color: #000;
+}
+
+QPushButton::enabled {
+    background-color: #fff;
+}
+
+QPushButton::!enabled {
+    background-color: #d9ebf9;
+}
+
+QTabBar::tab {
+    border-bottom: 0;
+    border-top-left-radius: 10px 5px;
+    border-top-right-radius: 10px 5px;
+    padding: 5px;
+    width: 200%;
+}
+
+QTabBar::tab:selected {
+    background-color: #a4bddb;
+    font: bold;
+}
+
+QTabBar::tab:!selected {
+    background-color: #808080;
+    color: #FFF;
+    hover: {
+        background-color: #808080;
+    };
+}
+
+QTabWidget::tab-bar {
+    background-color: #FFF;
+    border-bottom: 1px solid #FFF;
+}
+
+QTabWidget::pane {
+    position: absolute;
+}
+
+QTableView::item:selected {
+    background-color: #eaeaea;
+    color: #000;
+}
+
+QToolTip {
+    alternate-background-color: #fff;
+    background-color: #fff;
+    border: .1ex solid #eff0f1;
+    color: #000;
+    padding: .5ex;
+}
+
+QHeaderView::section, QMenuBar, QTableView, QTextBrowser, QTreeWidget {
+    background-color: #FFF;
+    color: #000;
+}
+
+QMainWindow, QTabBar, QTableCornerButton::section {
+    background-color: #FFF;
+}
+
+QRadioButton, QStatusBar {
+    color: #000;
+}
+
+QSpinBox, QTreeView {
+    background-color: #d9ebf9;
+    color: #000;
+}
+
+QSplitter, QSplitter::handle, QWidget#widget_9,
+QWidget#tab_ps, QWidget#tab_sd, QWidget#tab_bank {
+    background-color: #a4bddb;
+}

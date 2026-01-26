@@ -1,0 +1,211 @@
+QLabel {
+    color: #FFF;
+    background-color: #5e616e;
+}
+
+QMessageBox {
+    background-color: #5e616e;
+}
+
+QMenu {
+    border: #5e616e;
+    background: #000;
+}
+
+QMenu::separator
+{
+    background: #444850;
+}
+
+QMenu::item {
+    background-color: #585b67;
+    color: #FFF
+}
+
+QMenu::item:selected {
+    background-color: #747788;
+}
+
+QFontDialog {
+    background-color: #5e616e;
+    color: #FFF
+}
+
+QInputDialog {
+    background-color: #5e616e;
+}
+
+QTabBar::tab:selected {
+    background-color: #444851;
+    border-bottom: 0;
+    border-top-left-radius: 10px 5px;
+    border-top-right-radius: 10px 5px;
+    color: #FFF;
+    font: bold;
+    padding: 5px;
+    width: 200%;
+}
+
+QTabWidget::pane {
+    background-color: #31363b;
+    position: absolute;
+}
+
+QPushButton {
+    background-color: #5e616e;
+    border: 1px solid #696969;
+    color: #FFF;
+}
+
+QPushButton#btn_load_bank,
+QPushButton#btn_export_bank {
+    padding: 2px 25px 2px 25px;
+    border: 1px solid black;
+}
+
+QPushButton#delete_folder_sd_btn,
+QPushButton#import_all_btn,
+QPushButton#import_all_ver_btn,
+QPushButton#btn_dwn_all,
+QPushButton#btn_prev_page,
+QPushButton#btn_next_page,
+QPushButton#back_btn,
+QPushButton#btn_show_routing,
+QPushButton#set_export_dir_btn {
+    border-radius: 5px;
+    padding: 2px 2px 2px 2px;
+    border: 1px solid black;
+}
+
+QPushButton#back_btn_local,
+QPushButton#btn_save_bank,
+QPushButton#back_btn_bank {
+    border-top-left-radius: 10px 5px;
+    padding: 2px 25px 2px 25px;
+    border: 1px solid black;
+}
+
+QPushButton#update_patch_notes {
+    border-top-right-radius: 10px 5px;
+    border-top-left-radius: 10px 5px;
+    padding: 2px 2px 2px 2px;
+    border: 1px solid black;
+}
+
+QPushButton#refresh_pch_btn,
+QPushButton#check_for_updates_btn,
+QPushButton#btn_clear_bank {
+    border-top-right-radius: 10px 5px;
+    padding: 2px 5px 2px 5px;
+    border: 1px solid black;
+}
+
+QPushButton#refresh_pch_btn{
+    border-top-right-radius: 10px 5px;
+    padding: 2px 5px 2px 5px;
+    border: 1px solid black;
+}
+
+QPushButton:hover {
+    background-color: qlineargradient(x1:0.5,
+    y1: 0.5,
+    x2: 0.5,
+    y2: 1,
+    stop: 0 #454a4f,
+    stop: 0.5 #3b4045);
+    border: 1px solid #696969;
+    color: #FFF;
+}
+
+QPushButton:disabled {
+    background-color: #41454c;
+    border: 1px solid #696969;
+    color: #787878;
+}
+
+QLineEdit {
+    background-color: #5e616e;
+    border: 1px solid #696969;
+    color: #FFF;
+    padding: -2px 0 0;
+}
+
+QMenuBar::item:pressed {
+    background-color: #444851;
+    color: #FFF;
+}
+
+QSplitter::handle {
+    background-color: #444851;
+    border: .1ex #76797c;
+}
+
+QMenuBar {
+    background-color: #31363b;
+    color: #FFF;
+}
+
+QTableView::item:selected {
+    background-color: #3b4045;
+    color: #FFF;
+}
+
+QToolTip {
+    alternate-background-color: #3b4045;
+    background-color: #31363b;
+    border: .1ex solid #eff0f1;
+    color: #eff0f1;
+    padding: .5ex;
+}
+
+QHeaderView::section {
+    background-color: #444851;
+    color: #fff;
+}
+
+QHeaderView::section:selected {
+    background-color: #3b4045;
+    color: #fff;
+}
+
+QTabBar::tab:!selected {
+    background-color: #191a20;
+    border-bottom: 0;
+    border-top-left-radius: 10px 5px;
+    border-top-right-radius: 10px 5px;
+    color: #FFF;
+    padding: 5px;
+    width: 200%;
+}
+
+QTabBar::tab:!selected:hover {
+    background-color: #727888;
+}
+
+QTabWidget::tab-bar {
+    background-color: #31363b;
+    border-bottom: 1px solid #31363b;
+}
+
+QHeaderView, QMainWindow, QTabBar, QTabWidget {
+    background-color: #31363b;
+}
+
+QMenuBar::item:hover, QMenuBar::item:selected, QWidget#widget_9,
+QWidget#tab_ps, QWidget#tab_sd, QWidget#tab_bank,
+QSplitter, QTableCornerButton::section {
+    background-color: #444851;
+}
+
+QTreeView, QTextBrowser, QTableView {
+    background-color: #31363b;
+    color: #FFF;
+}
+
+QStatusBar, QRadioButton {
+    color: #FFF;
+}
+
+QScrollBar:vertical, QScrollBar:horizontal {
+    background-color: #2A2929;
+}

@@ -74,6 +74,7 @@ class PatchSave(Patch):
             for fld in os.listdir(self.back_path):
                 if (
                     os.path.isdir(os.path.join(self.back_path, fld))
+                    and fld != "art_cache"
                     and fld != "Banks"
                     and fld != "Folders"
                     and fld != "sample_files"
@@ -383,6 +384,19 @@ class PatchSave(Patch):
             with open(temp_path, "rb") as f:
                 temp_data = f.read()
 
+            if version:
+                patch_dir = os.path.join(self.back_path, str(patch_id))
+                if os.path.isdir(patch_dir):
+                    duplicate = False
+                    for entry in os.listdir(patch_dir):
+                        if entry.endswith(".bin"):
+                            with open(os.path.join(patch_dir, entry), "rb") as bin_file:
+                                if bin_file.read() == temp_data:
+                                    duplicate = True
+                                    break
+                    if duplicate:
+                        continue
+
             # Check if the patch is a valid ZOIA binary
             # try:
             #     pb.parse_data(temp_data)
@@ -423,9 +437,9 @@ class PatchSave(Patch):
                         if js_data["title"].lower() in pch["title"].lower():
                             temp = ps.get_patch_meta(pch["id"])
                             js_data = temp
-                            js_data["files"] = [
-                                {"id": pch["id"], "filename": "{}.{}".format(patch_name, ext)}
-                            ]
+                            # don't fully overwrite files info, just update filename and id
+                            js_data["files"][0]["id"] = pch["id"]
+                            js_data["files"][0]["filename"] = "{}.{}".format(patch_name, ext)
                             js_data["updated_at"] = "{:%Y-%m-%dT%H:%M:%S+00:00}".format(
                                 datetime.datetime.now()
                             )

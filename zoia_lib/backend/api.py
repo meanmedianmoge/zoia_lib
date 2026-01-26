@@ -24,14 +24,14 @@ class PatchStorage:
 
         # Set defaults for query params
         self.url = "https://patchstorage.com/api/beta/"
-        self.platform = 3003  # ZOIA
+        self.platform = 3003  # 3003 ZOIA 8271 H90
         self.api_token = None
         self.api_usr = None
         self.licenses = self._get_license_data()
         self.categories = self._get_categories_data()
         try:
             self.patch_count = self._patch_count()
-        except:
+        except Exception:
             # No internet connection.
             pass
 

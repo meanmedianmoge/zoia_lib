@@ -3,7 +3,8 @@ import os
 import shutil
 import unittest
 
-import zoia_lib.backend.utilities as util
+from zoia_lib.backend.patch_save import PatchSave
+from zoia_lib.backend import utilities as util
 from zoia_lib.common import errors
 
 test_path = os.path.join(os.getcwd(), "zoia_lib", "tests")
@@ -28,14 +29,16 @@ class TestSearching(unittest.TestCase):
 
     def setUp(self):
         global data
-        util.backend_path = test_path
+        self.save = PatchSave()
+        self.save.back_path = test_path
 
         # Get the JSON metadata
         with open(os.path.join(test_path, "sample_files", "sampleMeta.json"), "r") as f:
             data = json.loads(f.read())
 
         for meta in data:
-            util.save_to_backend((b"Test", meta))
+            if not os.path.exists(os.path.join(self.save.back_path, str(meta["id"]))):
+                self.save.save_to_backend((b"Test", meta))
 
     def tearDown(self):
         try:
@@ -67,25 +70,18 @@ class TestSearching(unittest.TestCase):
         # Try to break the method.
         exc = errors.SearchingError
 
-        self.assertTrue(
-            util.search_patches(None, None) is None,
-            "Expected None but got data in return.",
-        )
+        self.assertRaises(exc, util.search_patches, None, None)
         self.assertRaises(exc, util.search_patches, "Hi", "Yee")
-        self.assertTrue(
-            util.search_patches(None, "Hi") is None,
-            "Expected None but got data in return.",
-        )
-        self.assertTrue(
-            util.search_patches("", None) is None,
-            "Expected None but got data in return.",
-        )
+        self.assertRaises(exc, util.search_patches, None, "Hi")
+        self.assertRaises(exc, util.search_patches, "", None)
 
     def test_title_search(self):
         """Attempts to search a dataset for a title attribute.
         This data must be collected beforehand, but that specific
         functionality is not being tested here.
         """
+
+        self.setUp()
 
         global data
 
@@ -171,9 +167,19 @@ class TestSearching(unittest.TestCase):
         functionality is not being tested here.
         """
 
+        self.setUp()
+
         global data
 
-        pass
+        result = util.search_patches(data, "meagher")
+        self.assertTrue(
+            result[0]["title"] == "LOVELESS",
+            "Expected to find the patch titled LOVELESS but did not.",
+        )
+        self.assertTrue(
+            len(result) == 1,
+            "Returned search result should have only contained 1 result.",
+        )
 
     def test_tag_search(self):
         """Attempts to search a dataset for a tag item.
@@ -183,7 +189,13 @@ class TestSearching(unittest.TestCase):
 
         global data
 
-        pass
+        result = util.search_patches(data, "shoegaze")
+        titles = [item["title"] for item in result]
+        self.assertEqual(
+            titles,
+            ["LOVELESS", "Subtle Knife"],
+            "Expected to find the shoegaze-tagged patches in order.",
+        )
 
     def test_category_search(self):
         """Attempts to search a dataset for a category item.
@@ -193,7 +205,14 @@ class TestSearching(unittest.TestCase):
 
         global data
 
-        pass
+        result = util.search_patches(data, "effect")
+        ids = {item["id"] for item in result}
+        expected_ids = {122243, 121123, 104273, 126563}
+        self.assertEqual(
+            ids,
+            expected_ids,
+            "Expected to find all Effect category patches.",
+        )
 
     def test_date_modified_search(self):
         """Attempts to search a dataset for a updated_at attribute.
@@ -203,4 +222,8 @@ class TestSearching(unittest.TestCase):
 
         global data
 
-        pass
+        result = util.search_patches(data, "2020-04-30")
+        self.assertTrue(
+            result[0]["id"] == 124566,
+            "Expected to find the patch updated on 2020-04-30.",
+        )

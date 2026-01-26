@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.meanmedianmoge.zoia_lib</id>
+  <name>ZOIA Librarian</name>
+  <summary>Patch manager for the Empress ZOIA pedal</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <description>
+    <p>
+      Browse, download, edit, and organize ZOIA patches from PatchStorage or
+      your local SD card.
+    </p>
+  </description>
+  <launchable type="desktop-id">io.github.meanmedianmoge.zoia_lib.desktop</launchable>
+  <url type="homepage">https://github.com/meanmedianmoge/zoia_lib</url>
+</component>

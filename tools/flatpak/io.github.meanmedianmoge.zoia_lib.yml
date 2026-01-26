@@ -1,0 +1,41 @@
+app-id: io.github.meanmedianmoge.zoia_lib
+runtime: org.kde.Platform
+runtime-version: "6.6"
+sdk: org.kde.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.python3
+command: zoia-librarian
+finish-args:
+  - --share=network
+  - --socket=wayland
+  - --socket=x11
+  - --device=dri
+  - --filesystem=home
+  - --filesystem=/run/media
+  - --filesystem=/media
+build-options:
+  append-path: /usr/lib/sdk/python3/bin
+  env:
+    PYTHONPATH: /app/lib/python3.11/site-packages:/app
+modules:
+  - name: nodegraphqt
+    buildsystem: simple
+    sources:
+      - type: git
+        url: https://github.com/meanmedianmoge/NodeGraphQt.git
+        branch: zgraph6
+    build-commands:
+      - python3 -m pip install --no-deps --prefix=/app .
+  - name: zoia-lib
+    buildsystem: simple
+    sources:
+      - type: dir
+        path: ..
+    build-commands:
+      - python3 -m pip install --no-deps --prefix=/app -r requirements.txt
+      - install -D -m 755 flatpak/zoia-librarian.sh /app/bin/zoia-librarian
+      - install -D -m 644 flatpak/io.github.meanmedianmoge.zoia_lib.desktop /app/share/applications/io.github.meanmedianmoge.zoia_lib.desktop
+      - install -D -m 644 flatpak/io.github.meanmedianmoge.zoia_lib.metainfo.xml /app/share/metainfo/io.github.meanmedianmoge.zoia_lib.metainfo.xml
+      - install -D -m 644 zoia_lib/interface/resources/splash.png /app/share/icons/hicolor/256x256/apps/io.github.meanmedianmoge.zoia_lib.png
+      - mkdir -p /app/zoia_lib
+      - cp -R zoia_lib /app/zoia_lib

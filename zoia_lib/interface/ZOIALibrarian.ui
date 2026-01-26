@@ -1,0 +1,3641 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1567</width>
+    <height>1280</height>
+   </rect>
+  </property>
+  <property name="focusPolicy">
+   <enum>Qt::StrongFocus</enum>
+  </property>
+  <property name="windowTitle">
+   <string>ZOIA Librarian - Version 2.0</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
+  <property name="tabShape">
+   <enum>QTabWidget::Rounded</enum>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>true</bool>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_5">
+    <property name="sizeConstraint">
+     <enum>QLayout::SetNoConstraint</enum>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <property name="sizeConstraint">
+       <enum>QLayout::SetFixedSize</enum>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QTabWidget" name="tabs">
+        <property name="cursor">
+         <cursorShape>ArrowCursor</cursorShape>
+        </property>
+        <property name="mouseTracking">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="accessibleName">
+         <string>Tab List</string>
+        </property>
+        <property name="accessibleDescription">
+         <string>This list contains four tabs, PatchStorage View, Local Storage View, SD Card View, and Banks. It allows you to switch between tabs to access different features contained with the ZOIA Librarian.</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="tabShape">
+         <enum>QTabWidget::Rounded</enum>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <property name="movable">
+         <bool>false</bool>
+        </property>
+        <property name="tabBarAutoHide">
+         <bool>false</bool>
+        </property>
+        <widget class="QWidget" name="tab_ps">
+         <property name="toolTip">
+          <string/>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <attribute name="title">
+          <string>PatchStorage</string>
+         </attribute>
+         <attribute name="toolTip">
+          <string>Switch to view all ZOIA patches on PatchStorage</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <property name="leftMargin">
+           <number>9</number>
+          </property>
+          <property name="topMargin">
+           <number>9</number>
+          </property>
+          <property name="rightMargin">
+           <number>9</number>
+          </property>
+          <property name="bottomMargin">
+           <number>9</number>
+          </property>
+          <item>
+           <widget class="QWidget" name="widget_5" native="true">
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_6">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QWidget" name="widget_6" native="true">
+               <layout class="QVBoxLayout" name="verticalLayout_6">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QWidget" name="widget_7" native="true">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <layout class="QHBoxLayout" name="horizontalLayout_7">
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <widget class="QSplitter" name="splitter_PS">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="handleWidth">
+                      <number>10</number>
+                     </property>
+                     <widget class="QWidget" name="layoutWidget_4">
+                      <layout class="QVBoxLayout" name="verticalLayout_8">
+                       <property name="spacing">
+                        <number>5</number>
+                       </property>
+                       <item>
+                        <layout class="QHBoxLayout" name="horizontalLayout_5">
+                         <property name="spacing">
+                          <number>6</number>
+                         </property>
+                         <item>
+                          <widget class="QLineEdit" name="searchbar_PS">
+                           <property name="toolTip">
+                            <string>Type and hit enter/return to search!</string>
+                           </property>
+                           <property name="statusTip">
+                            <string>Type and hit enter/return to search!</string>
+                           </property>
+                           <property name="accessibleName">
+                            <string>PatchStorage View search bar</string>
+                           </property>
+                           <property name="accessibleDescription">
+                            <string>Searches through the ZOIA patches currently hosted on PatchStorage for any that match what is written in the search query. Hit enter or return to initiate the search.</string>
+                           </property>
+                           <property name="styleSheet">
+                            <string notr="true"/>
+                           </property>
+                           <property name="inputMask">
+                            <string/>
+                           </property>
+                           <property name="text">
+                            <string/>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QPushButton" name="refresh_pch_btn">
+                           <property name="cursor">
+                            <cursorShape>PointingHandCursor</cursorShape>
+                           </property>
+                           <property name="mouseTracking">
+                            <bool>true</bool>
+                           </property>
+                           <property name="toolTip">
+                            <string>Click here to refresh the PatchStorage patch list.</string>
+                           </property>
+                           <property name="statusTip">
+                            <string>Click here to refresh the PatchStorage patch list.</string>
+                           </property>
+                           <property name="accessibleName">
+                            <string>Refresh PatchStorage patch list button</string>
+                           </property>
+                           <property name="accessibleDescription">
+                            <string>This button will refresh the data in the PatchStorage patch table with the latest patches on PatchStorage should the list ever become out of sync.</string>
+                           </property>
+                           <property name="styleSheet">
+                            <string notr="true"/>
+                           </property>
+                           <property name="text">
+                            <string>Refresh Patches</string>
+                           </property>
+                          </widget>
+                         </item>
+                        </layout>
+                       </item>
+                       <item>
+                        <widget class="QPushButton" name="btn_dwn_all">
+                         <property name="cursor">
+                          <cursorShape>PointingHandCursor</cursorShape>
+                         </property>
+                         <property name="mouseTracking">
+                          <bool>true</bool>
+                         </property>
+                         <property name="toolTip">
+                          <string>Click here to download all patches currently stored on PatchStorage.</string>
+                         </property>
+                         <property name="statusTip">
+                          <string>Click here to download all patches currently stored on PatchStorage.</string>
+                         </property>
+                         <property name="accessibleName">
+                          <string>Download All Button</string>
+                         </property>
+                         <property name="accessibleDescription">
+                          <string>Forcibly downloads and saves all patches currently hosted on the PatchStorage.com website to your local computer. All of these patches will then be available for viewing in the Local Storage View tab.</string>
+                         </property>
+                         <property name="text">
+                          <string>Download All Patches</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QTableWidget" name="table_PS">
+                         <property name="cursor" stdset="0">
+                          <cursorShape>ArrowCursor</cursorShape>
+                         </property>
+                         <property name="mouseTracking">
+                          <bool>false</bool>
+                         </property>
+                         <property name="statusTip">
+                          <string>View list of Patchstorage uploads.</string>
+                         </property>
+                         <property name="accessibleName">
+                          <string>PatchStorage Table</string>
+                         </property>
+                         <property name="accessibleDescription">
+                          <string>Displays all of the ZOIA patches that are currently hosted on PatchStorage.</string>
+                         </property>
+                         <property name="styleSheet">
+                          <string notr="true"/>
+                         </property>
+                         <property name="frameShape">
+                          <enum>QFrame::StyledPanel</enum>
+                         </property>
+                         <property name="frameShadow">
+                          <enum>QFrame::Plain</enum>
+                         </property>
+                         <property name="sizeAdjustPolicy">
+                          <enum>QAbstractScrollArea::AdjustToContents</enum>
+                         </property>
+                         <property name="editTriggers">
+                          <set>QAbstractItemView::NoEditTriggers</set>
+                         </property>
+                         <property name="alternatingRowColors">
+                          <bool>false</bool>
+                         </property>
+                         <property name="selectionMode">
+                          <enum>QAbstractItemView::SingleSelection</enum>
+                         </property>
+                         <property name="selectionBehavior">
+                          <enum>QAbstractItemView::SelectItems</enum>
+                         </property>
+                         <property name="horizontalScrollMode">
+                          <enum>QAbstractItemView::ScrollPerPixel</enum>
+                         </property>
+                         <property name="gridStyle">
+                          <enum>Qt::SolidLine</enum>
+                         </property>
+                         <property name="rowCount">
+                          <number>1</number>
+                         </property>
+                         <property name="columnCount">
+                          <number>5</number>
+                         </property>
+                         <attribute name="horizontalHeaderCascadingSectionResizes">
+                          <bool>true</bool>
+                         </attribute>
+                         <attribute name="horizontalHeaderDefaultSectionSize">
+                          <number>0</number>
+                         </attribute>
+                         <attribute name="horizontalHeaderMinimumSectionSize">
+                          <number>0</number>
+                         </attribute>
+                         <attribute name="horizontalHeaderStretchLastSection">
+                          <bool>true</bool>
+                         </attribute>
+                         <attribute name="verticalHeaderVisible">
+                          <bool>false</bool>
+                         </attribute>
+                         <row/>
+                         <column>
+                          <property name="text">
+                           <string>Title</string>
+                          </property>
+                         </column>
+                         <column>
+                          <property name="text">
+                           <string>Tags</string>
+                          </property>
+                         </column>
+                         <column>
+                          <property name="text">
+                           <string>Categories</string>
+                          </property>
+                         </column>
+                         <column>
+                          <property name="text">
+                           <string>Date Modified</string>
+                          </property>
+                         </column>
+                         <column>
+                          <property name="text">
+                           <string>Download</string>
+                          </property>
+                         </column>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                     <widget class="QTextBrowser" name="text_browser_PS">
+                      <property name="statusTip">
+                       <string>Click on a patch to view its metadata.</string>
+                      </property>
+                      <property name="accessibleName">
+                       <string>Additional Patch Notes Display</string>
+                      </property>
+                      <property name="accessibleDescription">
+                       <string>Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)</string>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true"/>
+                      </property>
+                      <property name="frameShadow">
+                       <enum>QFrame::Plain</enum>
+                      </property>
+                      <property name="textInteractionFlags">
+                       <set>Qt::TextBrowserInteraction</set>
+                      </property>
+                      <property name="openExternalLinks">
+                       <bool>true</bool>
+                      </property>
+                      <property name="openLinks">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_ls">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <attribute name="title">
+          <string>Local Storage</string>
+         </attribute>
+         <attribute name="toolTip">
+          <string>Switch to your locally saved patches</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QWidget" name="widget_9" native="true">
+            <layout class="QVBoxLayout" name="verticalLayout_13">
+             <item>
+              <widget class="QSplitter" name="splitter_local">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="handleWidth">
+                <number>10</number>
+               </property>
+               <widget class="QWidget" name="layoutWidget">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_7">
+                 <property name="sizeConstraint">
+                  <enum>QLayout::SetMaximumSize</enum>
+                 </property>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_12">
+                   <item>
+                    <widget class="QPushButton" name="back_btn_local">
+                     <property name="cursor">
+                      <cursorShape>PointingHandCursor</cursorShape>
+                     </property>
+                     <property name="mouseTracking">
+                      <bool>true</bool>
+                     </property>
+                     <property name="toolTip">
+                      <string>Click here to back to the full patch list.</string>
+                     </property>
+                     <property name="statusTip">
+                      <string>Click here to back to the full patch list.</string>
+                     </property>
+                     <property name="accessibleName">
+                      <string>Back button Local Storage View</string>
+                     </property>
+                     <property name="accessibleDescription">
+                      <string>When clicked, exits out of the Version History for a patch and returns to the full list of patches currently stored in the ZOIA Librarian</string>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true"/>
+                     </property>
+                     <property name="text">
+                      <string>Back</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="searchbar_local">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="acceptDrops">
+                      <bool>false</bool>
+                     </property>
+                     <property name="toolTip">
+                      <string>Type and hit enter/return to search!</string>
+                     </property>
+                     <property name="statusTip">
+                      <string>Type and hit enter/return to search!</string>
+                     </property>
+                     <property name="accessibleName">
+                      <string>LocalStorage View search bar</string>
+                     </property>
+                     <property name="accessibleDescription">
+                      <string>Searches through the ZOIA patches currently saved in the ZOIA Librarian for any that match what is written in the search query. Hit enter or return to initiate the search.</string>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true"/>
+                     </property>
+                     <property name="inputMask">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="check_for_updates_btn">
+                     <property name="cursor">
+                      <cursorShape>PointingHandCursor</cursorShape>
+                     </property>
+                     <property name="mouseTracking">
+                      <bool>true</bool>
+                     </property>
+                     <property name="toolTip">
+                      <string>Click here to check for updates for all patches listed below.</string>
+                     </property>
+                     <property name="statusTip">
+                      <string>Click here to check for updates for all patches listed below.</string>
+                     </property>
+                     <property name="accessibleName">
+                      <string>Check for updates button</string>
+                     </property>
+                     <property name="accessibleDescription">
+                      <string>Automatically checks for updates to any patches listed in the Local Storage View table when clicked. Should any be found, a popup will let you know how many patches were updated.</string>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true"/>
+                     </property>
+                     <property name="text">
+                      <string>Check for Updates</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="new_patch_btn">
+                     <property name="mouseTracking">
+                      <bool>true</bool>
+                     </property>
+                     <property name="toolTip">
+                      <string>Click here to create a new patch.</string>
+                     </property>
+                     <property name="statusTip">
+                      <string>Click here to create a new patch.</string>
+                     </property>
+                     <property name="accessibleName">
+                      <string>New Patch button Local Storage View</string>
+                     </property>
+                     <property name="accessibleDescription">
+                      <string>When clicked, the editor window opens to create a new patch.</string>
+                     </property>
+                     <property name="text">
+                      <string>New Patch</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <widget class="QTableWidget" name="table_local">
+                   <property name="mouseTracking">
+                    <bool>false</bool>
+                   </property>
+                   <property name="statusTip">
+                    <string>View list of local patches.</string>
+                   </property>
+                   <property name="accessibleName">
+                    <string>Local Storage View table</string>
+                   </property>
+                   <property name="accessibleDescription">
+                    <string>Displays all of the patches that have been saved to the ZOIA Librarian</string>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true"/>
+                   </property>
+                   <property name="sizeAdjustPolicy">
+                    <enum>QAbstractScrollArea::AdjustToContents</enum>
+                   </property>
+                   <property name="editTriggers">
+                    <set>QAbstractItemView::DoubleClicked</set>
+                   </property>
+                   <property name="selectionMode">
+                    <enum>QAbstractItemView::SingleSelection</enum>
+                   </property>
+                   <property name="horizontalScrollMode">
+                    <enum>QAbstractItemView::ScrollPerPixel</enum>
+                   </property>
+                   <property name="rowCount">
+                    <number>1</number>
+                   </property>
+                   <property name="columnCount">
+                    <number>7</number>
+                   </property>
+                   <attribute name="horizontalHeaderCascadingSectionResizes">
+                    <bool>true</bool>
+                   </attribute>
+                   <attribute name="horizontalHeaderDefaultSectionSize">
+                    <number>0</number>
+                   </attribute>
+                   <attribute name="horizontalHeaderMinimumSectionSize">
+                    <number>0</number>
+                   </attribute>
+                   <attribute name="horizontalHeaderStretchLastSection">
+                    <bool>true</bool>
+                   </attribute>
+                   <attribute name="verticalHeaderVisible">
+                    <bool>false</bool>
+                   </attribute>
+                   <attribute name="verticalHeaderDefaultSectionSize">
+                    <number>0</number>
+                   </attribute>
+                   <attribute name="verticalHeaderMinimumSectionSize">
+                    <number>0</number>
+                   </attribute>
+                   <row/>
+                   <column>
+                    <property name="text">
+                     <string>Title</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Tags</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Categories</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Date Modified</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Rating</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Export</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Delete</string>
+                    </property>
+                   </column>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="layoutWidget_7" native="true">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_22">
+                 <property name="sizeConstraint">
+                  <enum>QLayout::SetMinimumSize</enum>
+                 </property>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_21" stretch="0,0,0">
+                   <item>
+                    <widget class="QPushButton" name="update_patch_notes">
+                     <property name="cursor">
+                      <cursorShape>PointingHandCursor</cursorShape>
+                     </property>
+                     <property name="mouseTracking">
+                      <bool>true</bool>
+                     </property>
+                     <property name="toolTip">
+                      <string>Click here to update the patch notes for the currently selected patch.</string>
+                     </property>
+                     <property name="statusTip">
+                      <string>Click here to update the patch notes for the currently selected patch.</string>
+                     </property>
+                     <property name="accessibleName">
+                      <string>Update Patch Notes button</string>
+                     </property>
+                     <property name="accessibleDescription">
+                      <string>When clicked, updates the patch notes for the currently selected patch. Patch notes can be add directly below in the Additional Patch Notes Display. </string>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true"/>
+                     </property>
+                     <property name="text">
+                      <string>Update Patch Notes</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="edit_patch">
+                     <property name="mouseTracking">
+                      <bool>true</bool>
+                     </property>
+                     <property name="toolTip">
+                      <string>Click here to edit the patch.</string>
+                     </property>
+                     <property name="statusTip">
+                      <string>Click here to edit the currently selected patch.</string>
+                     </property>
+                     <property name="accessibleName">
+                      <string>Edit Patch Button</string>
+                     </property>
+                     <property name="accessibleDescription">
+                      <string>When clicked, this opens a new window to make changes and edits to the selected patch.</string>
+                     </property>
+                     <property name="text">
+                      <string>Edit Patch</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="upload_patch">
+                     <property name="cursor">
+                      <cursorShape>PointingHandCursor</cursorShape>
+                     </property>
+                     <property name="mouseTracking">
+                      <bool>true</bool>
+                     </property>
+                     <property name="toolTip">
+                      <string>Click here to upload this patch to PatchStorage.</string>
+                     </property>
+                     <property name="statusTip">
+                      <string>Click here to upload this patch to PatchStorage.</string>
+                     </property>
+                     <property name="accessibleName">
+                      <string>Upload Patch Button</string>
+                     </property>
+                     <property name="accessibleDescription">
+                      <string>When clicked, prompts the API to start a request to upload the selected patch.</string>
+                     </property>
+                     <property name="text">
+                      <string>Upload to PatchStorage</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <widget class="QSplitter" name="splitter_local_hori">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="handleWidth">
+                    <number>10</number>
+                   </property>
+                   <widget class="QTextBrowser" name="text_browser_local">
+                    <property name="statusTip">
+                     <string>Click on a patch to view its metadata.</string>
+                    </property>
+                    <property name="accessibleName">
+                     <string>Additional Patch Notes Display</string>
+                    </property>
+                    <property name="accessibleDescription">
+                     <string>Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)</string>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true"/>
+                    </property>
+                    <property name="textInteractionFlags">
+                     <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextEditable|Qt::TextSelectableByMouse</set>
+                    </property>
+                    <property name="openExternalLinks">
+                     <bool>true</bool>
+                    </property>
+                    <property name="openLinks">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                   <widget class="QWidget" name="layoutWidget_8">
+                    <layout class="QVBoxLayout" name="verticalLayout_23">
+                     <item>
+                      <widget class="QLabel" name="page_label">
+                       <property name="frameShape">
+                        <enum>QFrame::Panel</enum>
+                       </property>
+                       <property name="frameShadow">
+                        <enum>QFrame::Plain</enum>
+                       </property>
+                       <property name="text">
+                        <string/>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignCenter</set>
+                       </property>
+                       <property name="wordWrap">
+                        <bool>true</bool>
+                       </property>
+                       <property name="margin">
+                        <number>5</number>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <layout class="QHBoxLayout" name="horizontalLayout_13">
+                       <item>
+                        <layout class="QVBoxLayout" name="verticalLayout_24">
+                         <item>
+                          <widget class="QTextBrowser" name="text_browser_viz">
+                           <property name="sizePolicy">
+                            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                             <horstretch>0</horstretch>
+                             <verstretch>0</verstretch>
+                            </sizepolicy>
+                           </property>
+                           <property name="statusTip">
+                            <string>Click on a patch to visualize its routing.</string>
+                           </property>
+                           <property name="accessibleName">
+                            <string>Visualizer text display</string>
+                           </property>
+                           <property name="accessibleDescription">
+                            <string>Displays information about the selected patch, either in patch view or module view.</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <layout class="QGridLayout" name="gridLayout">
+                           <item row="0" column="1">
+                            <widget class="QPushButton" name="btn_next_page">
+                             <property name="cursor">
+                              <cursorShape>PointingHandCursor</cursorShape>
+                             </property>
+                             <property name="mouseTracking">
+                              <bool>true</bool>
+                             </property>
+                             <property name="toolTip">
+                              <string>Click here to view the next page in the selected patch.</string>
+                             </property>
+                             <property name="statusTip">
+                              <string>Click here to view the next page in the selected patch.</string>
+                             </property>
+                             <property name="accessibleName">
+                              <string>Next viz page Local Storage View</string>
+                             </property>
+                             <property name="accessibleDescription">
+                              <string>Navigates to the next page in the visualizer for the selected patch.</string>
+                             </property>
+                             <property name="text">
+                              <string>Page +</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item row="0" column="0">
+                            <widget class="QPushButton" name="btn_prev_page">
+                             <property name="cursor">
+                              <cursorShape>PointingHandCursor</cursorShape>
+                             </property>
+                             <property name="mouseTracking">
+                              <bool>true</bool>
+                             </property>
+                             <property name="toolTip">
+                              <string>Click here to view the previous page in the selected patch.</string>
+                             </property>
+                             <property name="statusTip">
+                              <string>Click here to view the previous page in the selected patch.</string>
+                             </property>
+                             <property name="whatsThis">
+                              <string>Previous viz page Local Storage View</string>
+                             </property>
+                             <property name="accessibleName">
+                              <string>Navigates to the previous page in the visualizer for the selected patch.</string>
+                             </property>
+                             <property name="text">
+                              <string>Page -</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item row="1" column="1">
+                            <widget class="QPushButton" name="btn_show_routing">
+                             <property name="cursor">
+                              <cursorShape>PointingHandCursor</cursorShape>
+                             </property>
+                             <property name="mouseTracking">
+                              <bool>true</bool>
+                             </property>
+                             <property name="toolTip">
+                              <string>Click to display the patch routing for the selected patch.</string>
+                             </property>
+                             <property name="statusTip">
+                              <string>Click to display the patch routing for the selected patch.</string>
+                             </property>
+                             <property name="accessibleName">
+                              <string>Show Routing button Local Storage View</string>
+                             </property>
+                             <property name="accessibleDescription">
+                              <string>Opens a new window to display the full patch routing, with interactive options.</string>
+                             </property>
+                             <property name="text">
+                              <string>Expand</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item row="1" column="0">
+                            <widget class="QPushButton" name="back_btn">
+                             <property name="cursor">
+                              <cursorShape>PointingHandCursor</cursorShape>
+                             </property>
+                             <property name="mouseTracking">
+                              <bool>true</bool>
+                             </property>
+                             <property name="toolTip">
+                              <string>Click here to view the patch-level details.</string>
+                             </property>
+                             <property name="statusTip">
+                              <string>Click here to view the patch-level details.</string>
+                             </property>
+                             <property name="accessibleName">
+                              <string>Back button viz Local Storage View</string>
+                             </property>
+                             <property name="accessibleDescription">
+                              <string>Navigates the display back to the patch-level details if you are within a module.</string>
+                             </property>
+                             <property name="text">
+                              <string>Clear</string>
+                             </property>
+                            </widget>
+                           </item>
+                          </layout>
+                         </item>
+                        </layout>
+                       </item>
+                       <item>
+                        <widget class="QFrame" name="frame_2">
+                         <property name="frameShape">
+                          <enum>QFrame::StyledPanel</enum>
+                         </property>
+                         <property name="frameShadow">
+                          <enum>QFrame::Raised</enum>
+                         </property>
+                         <layout class="QHBoxLayout" name="horizontalLayout_14">
+                          <property name="spacing">
+                           <number>0</number>
+                          </property>
+                          <property name="leftMargin">
+                           <number>0</number>
+                          </property>
+                          <property name="topMargin">
+                           <number>0</number>
+                          </property>
+                          <property name="rightMargin">
+                           <number>0</number>
+                          </property>
+                          <property name="bottomMargin">
+                           <number>0</number>
+                          </property>
+                          <item>
+                           <layout class="QHBoxLayout" name="horizontalLayout_15">
+                            <item>
+                             <layout class="QVBoxLayout" name="verticalLayout_25">
+                              <item>
+                               <widget class="QPushButton" name="btn_0">
+                                <property name="enabled">
+                                 <bool>true</bool>
+                                </property>
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="minimumSize">
+                                 <size>
+                                  <width>0</width>
+                                  <height>0</height>
+                                 </size>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                                <property name="default">
+                                 <bool>false</bool>
+                                </property>
+                                <property name="flat">
+                                 <bool>false</bool>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_8">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_16">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_24">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_32">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                             </layout>
+                            </item>
+                            <item>
+                             <layout class="QVBoxLayout" name="verticalLayout_26">
+                              <item>
+                               <widget class="QPushButton" name="btn_1">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_9">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_17">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_25">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_33">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                             </layout>
+                            </item>
+                            <item>
+                             <layout class="QVBoxLayout" name="verticalLayout_27">
+                              <item>
+                               <widget class="QPushButton" name="btn_2">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_10">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_18">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_26">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_34">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                             </layout>
+                            </item>
+                            <item>
+                             <layout class="QVBoxLayout" name="verticalLayout_28">
+                              <item>
+                               <widget class="QPushButton" name="btn_3">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_11">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_19">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_27">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_35">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                             </layout>
+                            </item>
+                            <item>
+                             <layout class="QVBoxLayout" name="verticalLayout_29">
+                              <item>
+                               <widget class="QPushButton" name="btn_4">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_12">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_20">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_28">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_36">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                             </layout>
+                            </item>
+                            <item>
+                             <layout class="QVBoxLayout" name="verticalLayout_30">
+                              <item>
+                               <widget class="QPushButton" name="btn_5">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_13">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_21">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_29">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_37">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                             </layout>
+                            </item>
+                            <item>
+                             <layout class="QVBoxLayout" name="verticalLayout_31">
+                              <item>
+                               <widget class="QPushButton" name="btn_6">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_14">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_22">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_30">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_38">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                             </layout>
+                            </item>
+                            <item>
+                             <layout class="QVBoxLayout" name="verticalLayout_32">
+                              <item>
+                               <widget class="QPushButton" name="btn_7">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_15">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_23">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_31">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                              <item>
+                               <widget class="QPushButton" name="btn_39">
+                                <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                  <horstretch>0</horstretch>
+                                  <verstretch>0</verstretch>
+                                 </sizepolicy>
+                                </property>
+                                <property name="text">
+                                 <string/>
+                                </property>
+                               </widget>
+                              </item>
+                             </layout>
+                            </item>
+                           </layout>
+                          </item>
+                         </layout>
+                        </widget>
+                       </item>
+                      </layout>
+                     </item>
+                    </layout>
+                   </widget>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_sd">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <attribute name="title">
+          <string>SD Card</string>
+         </attribute>
+         <attribute name="toolTip">
+          <string>Switch to view your SD card within the ZOIA Librarian</string>
+         </attribute>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QSplitter" name="splitter_sd_vert">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="handleWidth">
+             <number>10</number>
+            </property>
+            <widget class="QTreeView" name="sd_tree">
+             <property name="statusTip">
+              <string>Browse through the SD card directories.</string>
+             </property>
+             <property name="accessibleName">
+              <string>SD Card Viewer</string>
+             </property>
+             <property name="accessibleDescription">
+              <string>Dispalys the contents of the previously specified SD Card (which is specified via the menu bar at File-&gt;Specify SD Card path, or by using Alt+S and then specifying that way).</string>
+             </property>
+             <property name="styleSheet">
+              <string notr="true"/>
+             </property>
+             <property name="lineWidth">
+              <number>10000</number>
+             </property>
+             <property name="midLineWidth">
+              <number>10000</number>
+             </property>
+             <property name="sizeAdjustPolicy">
+              <enum>QAbstractScrollArea::AdjustIgnored</enum>
+             </property>
+             <property name="editTriggers">
+              <set>QAbstractItemView::NoEditTriggers</set>
+             </property>
+             <property name="showDropIndicator" stdset="0">
+              <bool>false</bool>
+             </property>
+             <property name="verticalScrollMode">
+              <enum>QAbstractItemView::ScrollPerPixel</enum>
+             </property>
+             <property name="indentation">
+              <number>20</number>
+             </property>
+             <property name="rootIsDecorated">
+              <bool>true</bool>
+             </property>
+             <property name="sortingEnabled">
+              <bool>false</bool>
+             </property>
+             <property name="animated">
+              <bool>true</bool>
+             </property>
+             <property name="allColumnsShowFocus">
+              <bool>true</bool>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+             <property name="headerHidden">
+              <bool>true</bool>
+             </property>
+             <attribute name="headerVisible">
+              <bool>false</bool>
+             </attribute>
+            </widget>
+            <widget class="QWidget" name="layoutWidget_3">
+             <layout class="QVBoxLayout" name="verticalLayout_11">
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_17">
+                <item>
+                 <widget class="QPushButton" name="delete_folder_sd_btn">
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="mouseTracking">
+                   <bool>true</bool>
+                  </property>
+                  <property name="toolTip">
+                   <string>Click here to delete the currently selected item above from your SD card.</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Click here to delete the currently selected item above from your SD card.</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Delete Selected Item from SD Card Tree View Button</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>Will attempt to delete the currently selected item in the SD tree view above from your SD card. Will create a popup if the currently selected item is a folder, at which point a warning will indicate that deletion will delete everything contained within. The options are yes to continue with the deletion and no to abort. </string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
+                  <property name="text">
+                   <string>Delete Selected Item Above</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="set_export_dir_btn">
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="mouseTracking">
+                   <bool>true</bool>
+                  </property>
+                  <property name="toolTip">
+                   <string>Click here to set the export directory.</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Click here to set the export directory.</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Set Export Directory button</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>Allows the user to set the export directory instead of defaulting to &quot;to_zoia&quot;.</string>
+                  </property>
+                  <property name="text">
+                   <string>Set Export Directory</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="import_all_btn">
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="mouseTracking">
+                   <bool>true</bool>
+                  </property>
+                  <property name="toolTip">
+                   <string>Click here to import all patches currently listed below.</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Click here to import all patches currently listed below.</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Import All Patches button</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>Attempts to import all of the patches listed in the tables below (SD card table left and SD card table right) into the ZOIA Librarian. This requires that a folder is selected from the SD Card Viewer above that contains patches.</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
+                  <property name="text">
+                   <string>Import All Listed Patches Below</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="import_all_ver_btn">
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="toolTip">
+                   <string>Click here to import all patches listed below as a version history.</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Click here to import all patches listed below as a version history.</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Import All Patches as Bank button</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>Attempts to import all of the patches listed in the tables below (SD card table left and SD card table right) into the ZOIA Librarian as a version history. This requires that a folder is selected from the SD Card Viewer above that contains patches.</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
+                  <property name="text">
+                   <string>Import All Listed Patches Below as a Version History</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QSplitter" name="splitter_sd_hori">
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="handleWidth">
+                 <number>10</number>
+                </property>
+                <widget class="QTableWidget" name="table_sd_left">
+                 <property name="mouseTracking">
+                  <bool>false</bool>
+                 </property>
+                 <property name="acceptDrops">
+                  <bool>true</bool>
+                 </property>
+                 <property name="statusTip">
+                  <string>Drag and drop to move patches around.</string>
+                 </property>
+                 <property name="accessibleName">
+                  <string>SD Card Table left</string>
+                 </property>
+                 <property name="accessibleDescription">
+                  <string>Displays patches that would occupy slots 0-31 on a ZOIA</string>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true"/>
+                 </property>
+                 <property name="editTriggers">
+                  <set>QAbstractItemView::NoEditTriggers</set>
+                 </property>
+                 <property name="dragEnabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="dragDropOverwriteMode">
+                  <bool>true</bool>
+                 </property>
+                 <property name="dragDropMode">
+                  <enum>QAbstractItemView::DragDrop</enum>
+                 </property>
+                 <property name="defaultDropAction">
+                  <enum>Qt::IgnoreAction</enum>
+                 </property>
+                 <property name="selectionMode">
+                  <enum>QAbstractItemView::ExtendedSelection</enum>
+                 </property>
+                 <property name="selectionBehavior">
+                  <enum>QAbstractItemView::SelectRows</enum>
+                 </property>
+                 <property name="rowCount">
+                  <number>32</number>
+                 </property>
+                 <property name="columnCount">
+                  <number>3</number>
+                 </property>
+                 <attribute name="horizontalHeaderMinimumSectionSize">
+                  <number>10</number>
+                 </attribute>
+                 <attribute name="horizontalHeaderStretchLastSection">
+                  <bool>true</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderMinimumSectionSize">
+                  <number>0</number>
+                 </attribute>
+                 <row>
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>1</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>2</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>3</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>4</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>5</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>6</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>7</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>8</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>9</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>10</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>11</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>12</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>13</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>14</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>15</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>16</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>17</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>18</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>19</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>20</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>21</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>22</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>23</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>24</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>25</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>26</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>27</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>28</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>29</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>30</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>31</string>
+                  </property>
+                 </row>
+                 <column>
+                  <property name="text">
+                   <string>Patch</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Import</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Remove</string>
+                  </property>
+                 </column>
+                </widget>
+                <widget class="QTableWidget" name="table_sd_right">
+                 <property name="mouseTracking">
+                  <bool>false</bool>
+                 </property>
+                 <property name="acceptDrops">
+                  <bool>true</bool>
+                 </property>
+                 <property name="statusTip">
+                  <string>Drag and drop to move patches around.</string>
+                 </property>
+                 <property name="accessibleName">
+                  <string>SD Card Table right</string>
+                 </property>
+                 <property name="accessibleDescription">
+                  <string>Displays patches that would occupy slots 32-63 on a ZOIA</string>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true"/>
+                 </property>
+                 <property name="editTriggers">
+                  <set>QAbstractItemView::NoEditTriggers</set>
+                 </property>
+                 <property name="dragDropMode">
+                  <enum>QAbstractItemView::DragDrop</enum>
+                 </property>
+                 <property name="selectionMode">
+                  <enum>QAbstractItemView::ExtendedSelection</enum>
+                 </property>
+                 <property name="selectionBehavior">
+                  <enum>QAbstractItemView::SelectRows</enum>
+                 </property>
+                 <property name="rowCount">
+                  <number>32</number>
+                 </property>
+                 <property name="columnCount">
+                  <number>3</number>
+                 </property>
+                 <attribute name="horizontalHeaderMinimumSectionSize">
+                  <number>10</number>
+                 </attribute>
+                 <attribute name="horizontalHeaderStretchLastSection">
+                  <bool>true</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderMinimumSectionSize">
+                  <number>0</number>
+                 </attribute>
+                 <row>
+                  <property name="text">
+                   <string>32</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>33</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>34</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>35</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>36</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>37</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>38</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>39</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>40</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>41</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>42</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>43</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>44</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>45</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>46</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>47</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>48</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>49</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>50</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>51</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>52</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>53</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>54</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>55</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>56</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>57</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>58</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>59</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>60</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>61</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>62</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>63</string>
+                  </property>
+                 </row>
+                 <column>
+                  <property name="text">
+                   <string>Patch</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Import</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Remove</string>
+                  </property>
+                 </column>
+                </widget>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_bank">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <attribute name="title">
+          <string>Folders</string>
+         </attribute>
+         <attribute name="toolTip">
+          <string>Switch to view the Folders creator</string>
+         </attribute>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QSplitter" name="splitter_bank">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="handleWidth">
+             <number>10</number>
+            </property>
+            <widget class="QWidget" name="layoutWidget_6">
+             <layout class="QVBoxLayout" name="verticalLayout">
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <item>
+                 <widget class="QPushButton" name="btn_save_bank">
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="mouseTracking">
+                   <bool>true</bool>
+                  </property>
+                  <property name="toolTip">
+                   <string>Click here to save your Folder.</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Click here to save your Folder.</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Save Folder button</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>When clicked, will open a popup asking for a Folder name, which will then be saved such that it can be loaded at a later time.</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
+                  <property name="text">
+                   <string>Save Folder</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="btn_load_bank">
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="mouseTracking">
+                   <bool>true</bool>
+                  </property>
+                  <property name="toolTip">
+                   <string>Click here to load a Folder.</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Click here to load a Folder.</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Load Folder button</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>When clicked, you will be prompted to select a Folder to load that has been created in a previous session using the ZOIA Librarian.</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
+                  <property name="text">
+                   <string>Load Folder</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="btn_export_bank">
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="mouseTracking">
+                   <bool>true</bool>
+                  </property>
+                  <property name="toolTip">
+                   <string>Click here to export this Folder to your SD card.</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Click here to export this Folder to your SD card.</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Export Folder button</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>When clicked, will open a popup asking for a Folder name, which will then be saved such that it can be exported to an SD card, should it have been specified previously.</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
+                  <property name="text">
+                   <string>Export Folder</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="btn_clear_bank">
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="mouseTracking">
+                   <bool>true</bool>
+                  </property>
+                  <property name="toolTip">
+                   <string>Click here to clear the Folder.</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Click here to clear the Folder.</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Clear Folder button</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>When clicked, will clear the current table without saving or exporting it.</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
+                  <property name="text">
+                   <string>Clear Folder</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QSplitter" name="splitter_bank_tables">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="handleWidth">
+                 <number>10</number>
+                </property>
+                <widget class="QTableWidget" name="table_bank_left">
+                 <property name="mouseTracking">
+                  <bool>false</bool>
+                 </property>
+                 <property name="toolTip">
+                  <string/>
+                 </property>
+                 <property name="statusTip">
+                  <string>Drag and drop a patch here.</string>
+                 </property>
+                 <property name="accessibleName">
+                  <string>Bank Table left</string>
+                 </property>
+                 <property name="accessibleDescription">
+                  <string>Displays patches that would occupy slots 0-31 on a ZOIA</string>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true"/>
+                 </property>
+                 <property name="editTriggers">
+                  <set>QAbstractItemView::NoEditTriggers</set>
+                 </property>
+                 <property name="dragDropOverwriteMode">
+                  <bool>true</bool>
+                 </property>
+                 <property name="dragDropMode">
+                  <enum>QAbstractItemView::DragDrop</enum>
+                 </property>
+                 <property name="defaultDropAction">
+                  <enum>Qt::IgnoreAction</enum>
+                 </property>
+                 <property name="selectionMode">
+                  <enum>QAbstractItemView::ExtendedSelection</enum>
+                 </property>
+                 <property name="selectionBehavior">
+                  <enum>QAbstractItemView::SelectRows</enum>
+                 </property>
+                 <property name="rowCount">
+                  <number>32</number>
+                 </property>
+                 <property name="columnCount">
+                  <number>2</number>
+                 </property>
+                 <attribute name="horizontalHeaderMinimumSectionSize">
+                  <number>10</number>
+                 </attribute>
+                 <attribute name="horizontalHeaderStretchLastSection">
+                  <bool>true</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderMinimumSectionSize">
+                  <number>0</number>
+                 </attribute>
+                 <row>
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>1</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>2</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>3</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>4</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>5</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>6</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>7</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>8</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>9</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>10</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>11</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>12</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>13</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>14</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>15</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>16</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>17</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>18</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>19</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>20</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>21</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>22</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>23</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>24</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>25</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>26</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>27</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>28</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>29</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>30</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>31</string>
+                  </property>
+                 </row>
+                 <column>
+                  <property name="text">
+                   <string>Patch</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Remove</string>
+                  </property>
+                 </column>
+                </widget>
+                <widget class="QTableWidget" name="table_bank_right">
+                 <property name="mouseTracking">
+                  <bool>false</bool>
+                 </property>
+                 <property name="toolTip">
+                  <string/>
+                 </property>
+                 <property name="statusTip">
+                  <string>Drag and drop a patch here.</string>
+                 </property>
+                 <property name="accessibleName">
+                  <string>Bank table right</string>
+                 </property>
+                 <property name="accessibleDescription">
+                  <string>Displays patches that would occupy slots 32-63 on a ZOIA</string>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true"/>
+                 </property>
+                 <property name="editTriggers">
+                  <set>QAbstractItemView::NoEditTriggers</set>
+                 </property>
+                 <property name="dragDropOverwriteMode">
+                  <bool>true</bool>
+                 </property>
+                 <property name="dragDropMode">
+                  <enum>QAbstractItemView::DragDrop</enum>
+                 </property>
+                 <property name="defaultDropAction">
+                  <enum>Qt::IgnoreAction</enum>
+                 </property>
+                 <property name="selectionMode">
+                  <enum>QAbstractItemView::ExtendedSelection</enum>
+                 </property>
+                 <property name="selectionBehavior">
+                  <enum>QAbstractItemView::SelectRows</enum>
+                 </property>
+                 <property name="rowCount">
+                  <number>32</number>
+                 </property>
+                 <property name="columnCount">
+                  <number>2</number>
+                 </property>
+                 <attribute name="horizontalHeaderMinimumSectionSize">
+                  <number>10</number>
+                 </attribute>
+                 <attribute name="horizontalHeaderStretchLastSection">
+                  <bool>true</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderMinimumSectionSize">
+                  <number>0</number>
+                 </attribute>
+                 <row>
+                  <property name="text">
+                   <string>32</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>33</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>34</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>35</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>36</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>37</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>38</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>39</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>40</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>41</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>42</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>43</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>44</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>45</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>46</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>47</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>48</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>49</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>50</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>51</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>52</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>53</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>54</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>55</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>56</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>57</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>58</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>59</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>60</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>61</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>62</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>63</string>
+                  </property>
+                 </row>
+                 <column>
+                  <property name="text">
+                   <string>Patch</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Remove</string>
+                  </property>
+                 </column>
+                </widget>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="layoutWidget_5">
+             <layout class="QVBoxLayout" name="verticalLayout_9">
+              <property name="spacing">
+               <number>5</number>
+              </property>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_11">
+                <item>
+                 <widget class="QPushButton" name="back_btn_bank">
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="mouseTracking">
+                   <bool>true</bool>
+                  </property>
+                  <property name="toolTip">
+                   <string>Click here to back to the full patch list.</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Click here to back to the full patch list.</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Back button Bank</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>When clicked, exits out of the Version History for a patch and returns to the full list of patches currently stored in the ZOIA Librarian</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
+                  <property name="text">
+                   <string>Back</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="searchbar_bank">
+                  <property name="toolTip">
+                   <string>Type and hit enter/return to search!</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Type and hit enter/return to search!</string>
+                  </property>
+                  <property name="whatsThis">
+                   <string/>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Banks search bar</string>
+                  </property>
+                  <property name="accessibleDescription">
+                   <string>Searches through the ZOIA patches currently saved in the ZOIA Librarian for any that match what is written in the search query. Hit enter or return to initiate the search.</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
+                  <property name="inputMask">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QTableWidget" name="table_bank_local">
+                <property name="toolTip">
+                 <string/>
+                </property>
+                <property name="statusTip">
+                 <string>Drag a patch to one of the tables on the left.</string>
+                </property>
+                <property name="accessibleName">
+                 <string>Banks table</string>
+                </property>
+                <property name="accessibleDescription">
+                 <string>Displays all of the patches that have been saved to the ZOIA Librarian</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="sizeAdjustPolicy">
+                 <enum>QAbstractScrollArea::AdjustToContents</enum>
+                </property>
+                <property name="editTriggers">
+                 <set>QAbstractItemView::NoEditTriggers</set>
+                </property>
+                <property name="dragEnabled">
+                 <bool>true</bool>
+                </property>
+                <property name="dragDropOverwriteMode">
+                 <bool>false</bool>
+                </property>
+                <property name="dragDropMode">
+                 <enum>QAbstractItemView::DragOnly</enum>
+                </property>
+                <property name="selectionMode">
+                 <enum>QAbstractItemView::ExtendedSelection</enum>
+                </property>
+                <property name="selectionBehavior">
+                 <enum>QAbstractItemView::SelectRows</enum>
+                </property>
+                <property name="horizontalScrollMode">
+                 <enum>QAbstractItemView::ScrollPerPixel</enum>
+                </property>
+                <property name="rowCount">
+                 <number>1</number>
+                </property>
+                <property name="columnCount">
+                 <number>5</number>
+                </property>
+                <attribute name="horizontalHeaderCascadingSectionResizes">
+                 <bool>true</bool>
+                </attribute>
+                <attribute name="horizontalHeaderDefaultSectionSize">
+                 <number>0</number>
+                </attribute>
+                <attribute name="horizontalHeaderMinimumSectionSize">
+                 <number>0</number>
+                </attribute>
+                <attribute name="horizontalHeaderStretchLastSection">
+                 <bool>true</bool>
+                </attribute>
+                <attribute name="verticalHeaderVisible">
+                 <bool>false</bool>
+                </attribute>
+                <attribute name="verticalHeaderMinimumSectionSize">
+                 <number>0</number>
+                </attribute>
+                <row/>
+                <column>
+                 <property name="text">
+                  <string>Title</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Tags</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Categories</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Rating</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Add to Folder</string>
+                 </property>
+                </column>
+                <item row="0" column="4">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QTextBrowser" name="text_browser_bank">
+             <property name="statusTip">
+              <string>Click on a patch to view its metadata.</string>
+             </property>
+             <property name="accessibleName">
+              <string>Additional Patch Notes Display</string>
+             </property>
+             <property name="accessibleDescription">
+              <string>Displays additional information for a selected patch. This includes the author's name, the like count, the download count, the view count, and a preview link (if it exists)</string>
+             </property>
+             <property name="styleSheet">
+              <string notr="true"/>
+             </property>
+             <property name="textInteractionFlags">
+              <set>Qt::TextBrowserInteraction</set>
+             </property>
+             <property name="openExternalLinks">
+              <bool>true</bool>
+             </property>
+             <property name="openLinks">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1567</width>
+     <height>34</height>
+    </rect>
+   </property>
+   <property name="contextMenuPolicy">
+    <enum>Qt::ActionsContextMenu</enum>
+   </property>
+   <property name="acceptDrops">
+    <bool>false</bool>
+   </property>
+   <property name="nativeMenuBar">
+    <bool>true</bool>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionSpecify_SD_Card_Location"/>
+    <addaction name="actionImport_A_Patch"/>
+    <addaction name="actionImport_Multiple_Patches"/>
+    <addaction name="actionImport_Version_History_directory"/>
+    <addaction name="separator"/>
+    <addaction name="actionCheck_for_Updates"/>
+    <addaction name="actionNavigate_to_local_backend"/>
+    <addaction name="actionReset_API_Token"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuSort">
+    <property name="title">
+     <string>Sort</string>
+    </property>
+    <addaction name="actionSort_by_title_A_Z"/>
+    <addaction name="actionSort_by_title_Z_A"/>
+    <addaction name="actionSort_by_date_new_old"/>
+    <addaction name="actionSort_by_date_old_new"/>
+    <addaction name="actionSort_by_likes_high_low"/>
+    <addaction name="actionSort_by_likes_low_high"/>
+    <addaction name="actionSort_by_views_high_low"/>
+    <addaction name="actionSort_by_views_low_high"/>
+    <addaction name="actionSort_by_downloads_high_low"/>
+    <addaction name="actionSort_by_downloads_low_high"/>
+    <addaction name="actionSort_by_author_A_Z"/>
+    <addaction name="actionSort_by_author_Z_A"/>
+    <addaction name="actionSort_by_rating_high_low"/>
+    <addaction name="actionSort_by_rating_low_high"/>
+    <addaction name="actionSort_by_category_high_low"/>
+    <addaction name="actionSort_by_category_low_high"/>
+    <addaction name="actionSort_by_tag_high_low"/>
+    <addaction name="actionSort_by_tag_low_high"/>
+   </widget>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>Options</string>
+    </property>
+    <addaction name="actionAlternating_Row_Colours"/>
+    <addaction name="actionFont"/>
+    <addaction name="actionIncrease_Font_Size"/>
+    <addaction name="actionDecrease_Font_Size"/>
+    <addaction name="actionToggle_Dark_Mode_2"/>
+    <addaction name="separator"/>
+    <addaction name="actionReset_Sizes"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionDocumentation"/>
+    <addaction name="actionFAQ"/>
+    <addaction name="actionFirmware_Files"/>
+    <addaction name="actionModule_Index"/>
+    <addaction name="actionTips_Tricks"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuSort"/>
+   <addaction name="menuOptions"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionSpecify_SD_Card_Location">
+   <property name="text">
+    <string>Specify SD Card Location</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu" stdset="0">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu" stdset="0">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionSort_by_title_A_Z">
+   <property name="text">
+    <string>Sort by title (A-Z)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+1</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu" stdset="0">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionSort_by_title_Z_A">
+   <property name="text">
+    <string>Sort by title (Z-A)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+2</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu" stdset="0">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionSort_by_date_new_old">
+   <property name="text">
+    <string>Sort by date (new-old)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+3</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
+   </property>
+   <property name="shortcutVisibleInContextMenu" stdset="0">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionSort_by_date_old_new">
+   <property name="text">
+    <string>Sort by date (old-new)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+4</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu" stdset="0">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionSort_by_likes_high_low">
+   <property name="text">
+    <string>Sort by likes (high-low)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+5</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu" stdset="0">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionSort_by_likes_low_high">
+   <property name="text">
+    <string>Sort by likes (low-high)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+6</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu" stdset="0">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionSort_by_views_high_low">
+   <property name="text">
+    <string>Sort by views (high-low)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+7</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu" stdset="0">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionSort_by_views_low_high">
+   <property name="text">
+    <string>Sort by views (low-high)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+8</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu" stdset="0">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionSort_by_downloads_high_low">
+   <property name="text">
+    <string>Sort by downloads (high-low)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+9</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu" stdset="0">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionSort_by_downloads_low_high">
+   <property name="text">
+    <string>Sort by downloads (low-high)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+0</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu" stdset="0">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionZOIA_Librarian_Help">
+   <property name="text">
+    <string>ZOIA Librarian Help</string>
+   </property>
+  </action>
+  <action name="actionAlternating_Row_Colours">
+   <property name="text">
+    <string>Alternating Row Colours</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu" stdset="0">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionImport_A_Patch">
+   <property name="text">
+    <string>Import a Patch (.bin)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu" stdset="0">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionToggle_Dark_Mode">
+   <property name="text">
+    <string>Toggle Dark Mode</string>
+   </property>
+  </action>
+  <action name="actionImport_Multiple_Patches">
+   <property name="text">
+    <string>Import Multiple Patches (directory)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+M</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu" stdset="0">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionArial">
+   <property name="text">
+    <string>Arial</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionArial_Black">
+   <property name="text">
+    <string>Arial Black</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial Black</family>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="actionComic_Sans_MS">
+   <property name="text">
+    <string>Comic Sans</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Comic Sans MS</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionCourier_New">
+   <property name="text">
+    <string>Courier New</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Courier New</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionGeorgia">
+   <property name="text">
+    <string>Georgia</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Georgia</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionLucida_Console">
+   <property name="text">
+    <string>Lucida Console</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Lucida Console</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionLucida_Sans_Unicode">
+   <property name="text">
+    <string>Lucida Sans Unicode</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Lucida Sans Unicode</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionPalatino_Linotype">
+   <property name="text">
+    <string>Palatino Linotype</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Palatino Linotype</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionTahoma">
+   <property name="text">
+    <string>Tahoma</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionTimes_New_Roman">
+   <property name="text">
+    <string>Times New Roman</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Times New Roman</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionTrebuchet_MS">
+   <property name="text">
+    <string>Trebuchet MS</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Trebuchet MS</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionVerdana">
+   <property name="text">
+    <string>Verdana (Default)</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Verdana</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionPapyrus">
+   <property name="text">
+    <string>Papyrus</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Papyrus</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionWingdings">
+   <property name="text">
+    <string>Wingdings (Oh no)</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Verdana</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionIncrease_Font_Size">
+   <property name="text">
+    <string>Increase Font Size</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+=</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu" stdset="0">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionDecrease_Font_Size">
+   <property name="text">
+    <string>Decrease Font Size</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+-</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu" stdset="0">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionFont">
+   <property name="text">
+    <string>Change Font</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu" stdset="0">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionImport_Version_History_directory">
+   <property name="text">
+    <string>Import Version History (directory)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+B</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu" stdset="0">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionToggle_Dark_Mode_2">
+   <property name="text">
+    <string>Toggle Dark Mode</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="actionReset_Sizes">
+   <property name="text">
+    <string>Reset UI</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+U</string>
+   </property>
+  </action>
+  <action name="actionDocumentation">
+   <property name="text">
+    <string>Documentation</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+D</string>
+   </property>
+  </action>
+  <action name="actionFAQ">
+   <property name="text">
+    <string>FAQ</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+Q</string>
+   </property>
+  </action>
+  <action name="actionModule_Index">
+   <property name="text">
+    <string>Module Index</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+M</string>
+   </property>
+  </action>
+  <action name="actionTips_Tricks">
+   <property name="text">
+    <string>Tips and Tricks</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+T</string>
+   </property>
+  </action>
+  <action name="actionFirmware_Files">
+   <property name="text">
+    <string>Changelog</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+C</string>
+   </property>
+  </action>
+  <action name="actionSort_by_author_A_Z">
+   <property name="text">
+    <string>Sort by author (A-Z)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+-</string>
+   </property>
+  </action>
+  <action name="actionSort_by_author_Z_A">
+   <property name="text">
+    <string>Sort by author (Z-A)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+=</string>
+   </property>
+  </action>
+  <action name="actionSort_by_rating_high_low">
+   <property name="text">
+    <string>Sort by rating (high-low)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+[</string>
+   </property>
+  </action>
+  <action name="actionSort_by_rating_low_high">
+   <property name="text">
+    <string>Sort by rating (low-high)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+]</string>
+   </property>
+  </action>
+  <action name="actionSpecify_Default_Export_Directory">
+   <property name="text">
+    <string>Specify Default Export Directory</string>
+   </property>
+  </action>
+  <action name="actionSort_by_category_high_low">
+   <property name="text">
+    <string>Sort by category (A-Z)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+1</string>
+   </property>
+  </action>
+  <action name="actionSort_by_category_low_high">
+   <property name="text">
+    <string>Sort by category (Z-A)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+2</string>
+   </property>
+  </action>
+  <action name="actionSort_by_tag_high_low">
+   <property name="text">
+    <string>Sort by tag (A-Z)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+9</string>
+   </property>
+  </action>
+  <action name="actionSort_by_tag_low_high">
+   <property name="text">
+    <string>Sort by tag (Z-A)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+0</string>
+   </property>
+  </action>
+  <action name="actionNavigate_to_local_backend">
+   <property name="text">
+    <string>Navigate to Local Backend</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionCheck_for_Updates">
+   <property name="text">
+    <string>Check for Updates</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+G</string>
+   </property>
+  </action>
+  <action name="actionSort_by_download_date_new_old">
+   <property name="text">
+    <string>Sort by download date (new-old)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+\</string>
+   </property>
+  </action>
+  <action name="actionSort_by_download_date_old_new">
+   <property name="text">
+    <string>Sort by download date (old-new)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+/</string>
+   </property>
+  </action>
+  <action name="actionReset_API_Token">
+   <property name="text">
+    <string>Reset API Token</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

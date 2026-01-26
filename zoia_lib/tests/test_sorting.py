@@ -29,19 +29,10 @@ class TestSorting(unittest.TestCase):
         # Try to break the method.
         exc = errors.SortingError
 
-        self.assertTrue(
-            util.sort_metadata(None, None, None) is None,
-            "Expected None but got data in return.",
-        )
+        self.assertRaises(exc, util.sort_metadata, None, None, None)
         self.assertRaises(exc, util.sort_metadata, -1, [{"Hi"}], False)
-        self.assertTrue(
-            util.sort_metadata(3, None, True) is None,
-            "Expected None but got data in return.",
-        )
-        self.assertTrue(
-            util.sort_metadata(4, [{"Hello"}], None) is None,
-            "Expected None but got data in return.",
-        )
+        self.assertRaises(exc, util.sort_metadata, 3, None, True)
+        self.assertRaises(exc, util.sort_metadata, 4, [{"Hello"}], None)
         self.assertRaises(exc, util.sort_metadata, 5, "Nope", True)
 
     def test_title_sort(self):

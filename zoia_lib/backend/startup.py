@@ -13,10 +13,11 @@ import os
 import sys
 
 from PySide6.QtGui import QPixmap, Qt
+from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QApplication, QSplashScreen, QStyleFactory
 
 from zoia_lib.backend.utilities import meipass
-from zoia_lib.UI.ZOIALibrarian_main import ZOIALibrarianMain
+from zoia_lib.interface.ZOIALibrarian_main import ZOIALibrarianMain
 
 # Entry point for the application.
 if __name__ == "__main__":
@@ -26,7 +27,7 @@ if __name__ == "__main__":
     app.setStyle(QStyleFactory.create("Fusion"))
 
     file_path = meipass(
-        os.path.join(os.getcwd(), "zoia_lib", "UI", "resources", "splash.png")
+        os.path.join(os.getcwd(), "zoia_lib", "interface", "resources", "splash.png")
     )
 
     # Create and display the splash screen
@@ -36,7 +37,13 @@ if __name__ == "__main__":
 
     # Show the window after it finishes setting up and close the splash.
     window = ZOIALibrarianMain()
+    window.setUpdatesEnabled(False)
     window.show()
-    splash.finish(window)
+
+    def finalize_startup():
+        window.setUpdatesEnabled(True)
+        splash.finish(window)
+
+    QTimer.singleShot(0, finalize_startup)
 
     sys.exit(app.exec())

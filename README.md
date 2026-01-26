@@ -1,4 +1,4 @@
-# zoia-lib
+# ZOIA Librarian
 Patch manager/librarian for the Empress Effects ZOIA pedal-format modular effects unit.
 
 To learn more about ZOIA and its community, join our [Discord chat server](https://discordapp.com/invite/HG5GesY),
@@ -24,16 +24,17 @@ Application can be installed in one of two ways:
 https://github.com/meanmedianmoge/zoia_lib/releases/latest.
 
 - For developers/contributors - Build from source; requires Python 3.11+.
-```
-# Download source code
-git clone https://github.com/meanmedianmoge/zoia_lib.git
+    ```
+    # Download source code
+    git clone https://github.com/meanmedianmoge/zoia_lib.git
+    cd zoia_lib
 
-# Single-line dependency install
-sh zoia_lib/setup.sh
+    # Install dependencies
+    sh tools/env.sh
 
-# Load the application
-python -m zoia_lib.backend.startup
-```
+    # Load the application
+    python -m zoia_lib.backend.startup
+    ```
 
 ## Documentation
 - Overview video and tutorial: https://www.youtube.com/watch?v=JLOUrWtG1Pk
@@ -41,34 +42,36 @@ python -m zoia_lib.backend.startup
 - Supplemental 1.2 video: https://www.youtube.com/watch?v=zR8XSI_Unlk
 - Supplemental 1.3 video: https://www.youtube.com/watch?v=Y4ILhtxdIvs
 - Supplemental 1.4 video: https://www.youtube.com/watch?v=ymLvRhC1GmI
-- You'll find the following in `/documentation`: <br>
+- Supplemental 2.0 video: https://www.youtube.com/watch?v=j6mz4DIdEpU
+- You'll find the following in `documentation`: <br>
     - Current version of the user manual
     - Overall changelog - lists new features, bug fixes, and known issues for each release
     - Initial app frameworks and discussions among the dev team
     - Binary format (updated by marcuslupinus, thanks!)
 
 ## Features
-- Browse PatchStorage uploads and local patches within the UI
+- Browse PatchStorage uploads and local patches
 - Search for specific patches, authors, tags, and more
 - Sort the results by author, title, date modified, likes, views, or downloads
 - Download & upload patches from/to PatchStorage
 - Import patches from local storage or SD card
 - Version control and patch merging
+- Create and modify patches with the patch editor
 - Preview patches with the patch visualizer
 - Expose the internal routing and connections with the patch expander
 - View and edit patch notes
 - Customized category and tag labels for all patches
 - Manage your SD card folders quickly
 - Drag & drop patches into folders, configured automatically into a ZOIA-readable format
-- Organize sample files from patches using the new Sampler module
+- Organize sample files for patches using the Sampler module
 - Help toolbar for app documentation and ZOIA resources
 - Dark and light themes
 
 ## Contributing
 We welcome all contributions! If you want to see something added, 
 either fork or clone the repo to get started. Some useful tools include:
-- Python 3 - https://www.python.org/downloads/
-- PyCharm Community Edition - https://www.jetbrains.com/pycharm/download
+- Python - https://www.python.org/downloads/
+- VS Code - https://code.visualstudio.com/download
 - QtDesigner - https://build-system.fman.io/qt-designer-download
 
 ## Authors

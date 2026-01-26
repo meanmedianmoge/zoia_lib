@@ -3,7 +3,8 @@ import os
 import shutil
 import unittest
 
-import zoia_lib.backend.utilities as util
+from zoia_lib.backend.patch_save import PatchSave
+from zoia_lib.backend.patch_export import PatchExport
 
 test_path = os.path.join(os.getcwd(), "zoia_lib", "tests")
 
@@ -16,12 +17,15 @@ class TestExporting(unittest.TestCase):
     """
 
     def setUp(self):
-        util.backend_path = test_path
+        self.save = PatchSave()
+        self.save.back_path = test_path
+        self.export = PatchExport()
+        self.export.back_path = test_path
         # Create a patch to export.
         sample_bytes = b"test"
         with open(os.path.join(test_path, "sample_files", "sampleJSON.json")) as f:
             sample_json = json.loads(f.read())
-        util.save_to_backend((sample_bytes, sample_json))
+        self.save.save_to_backend((sample_bytes, sample_json))
 
     def tearDown(self):
         try:
@@ -40,7 +44,7 @@ class TestExporting(unittest.TestCase):
         """
 
         # TODO Make this a lot more robust.
-        util.export_patch_bin("122661", test_path, 7)
+        self.export.export_patch_bin("122661", test_path, 7)
 
         self.assertTrue(
             "007_zoia_dream_mender.bin" in os.listdir(test_path),
