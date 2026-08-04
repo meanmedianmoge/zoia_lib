@@ -16,7 +16,6 @@ from PySide6.QtWidgets import (
     QTreeWidget,
     QTreeWidgetItem,
     QWidget,
-    QFileDialog,
     QInputDialog,
     QMessageBox,
     QDialog,
@@ -137,7 +136,7 @@ class PatchBuilderEditor(QMainWindow):
         # Create main container to hold everything
         main_container = QWidget()
         container_layout = QVBoxLayout(main_container)
-        
+
         # Create the main layout for modules and details
         main_layout = QHBoxLayout()
 
@@ -234,7 +233,7 @@ class PatchBuilderEditor(QMainWindow):
         bottom_layout.addWidget(self.toggle_page_layout_btn)
         bottom_layout.addWidget(self.export_btn)
         container_layout.addLayout(bottom_layout, 0)
-        
+
         # Set the main container as central widget
         self.setCentralWidget(main_container)
 
@@ -254,7 +253,7 @@ class PatchBuilderEditor(QMainWindow):
         self.export_btn.clicked.connect(self.export_patch)
         self.toggle_routing_btn.clicked.connect(self.toggle_routing_view)
         self.toggle_page_layout_btn.clicked.connect(self.toggle_page_layout_view)
-        
+
         self._load_module_overrides()
 
         # If editing an existing patch, load its modules
@@ -902,7 +901,7 @@ class PatchBuilderEditor(QMainWindow):
         if current_row < 0:
             self.clear_module_details()
             return
-        
+
         self.current_module_index = current_row
         mod_id, config = self.selected_modules[current_row]
         self.show_module_details(mod_id, config, current_row)
@@ -958,20 +957,20 @@ class PatchBuilderEditor(QMainWindow):
         sender = self.sender()
         param_name = sender.property("param_name")
         module_index = sender.property("module_index")
-        
+
         if module_index >= 0 and module_index < len(self.selected_modules):
             mod_id, config = self.selected_modules[module_index]
-            
+
             # Ensure config has parameters dict
             if "parameters" not in config:
                 config["parameters"] = {}
-            
+
             # Update parameter value (normalize to 0.0-1.0)
             if isinstance(sender, QSlider):
                 normalized_value = value / 100.0
             else:  # QDoubleSpinBox
                 normalized_value = value
-            
+
             config["parameters"][param_name] = normalized_value
 
     def on_parameter_slider_changed(self, value):
@@ -979,7 +978,7 @@ class PatchBuilderEditor(QMainWindow):
         sender = self.sender()
         param_name = sender.property("param_name")
         module_index = sender.property("module_index")
-        
+
         # Update config
         if module_index >= 0 and module_index < len(self.selected_modules):
             mod_id, config = self.selected_modules[module_index]
@@ -987,7 +986,7 @@ class PatchBuilderEditor(QMainWindow):
                 config["parameters"] = {}
             normalized_value = value / 100.0
             config["parameters"][param_name] = normalized_value
-        
+
         # Update spinbox without triggering its signal
         control_key = f"{module_index}_{param_name}"
         if control_key in self.param_controls:
@@ -1002,14 +1001,14 @@ class PatchBuilderEditor(QMainWindow):
         sender = self.sender()
         param_name = sender.property("param_name")
         module_index = sender.property("module_index")
-        
+
         # Update config
         if module_index >= 0 and module_index < len(self.selected_modules):
             mod_id, config = self.selected_modules[module_index]
             if "parameters" not in config:
                 config["parameters"] = {}
             config["parameters"][param_name] = value
-        
+
         # Update slider without triggering its signal
         control_key = f"{module_index}_{param_name}"
         if control_key in self.param_controls:
@@ -1500,7 +1499,7 @@ class PatchBuilderEditor(QMainWindow):
         """Load modules from an existing patch dict into the editor."""
         if not self.patch_dict or "modules" not in self.patch_dict:
             return
-        
+
         starred = self.patch_dict.get("starred", [])
         for module in self.patch_dict["modules"]:
             mod_id = str(module["mod_idx"])
@@ -1537,12 +1536,12 @@ class PatchBuilderEditor(QMainWindow):
             mod_dict = self._module_to_patch_format(mod_id, current_pos, i, config)
             modules.append(mod_dict)
             current_pos += self.module_index[mod_id]["min_blocks"]
-        
+
         cpu_total = sum(self.module_index[mod_id]["cpu"] for mod_id, _ in self.selected_modules)
-        
+
         # If editing, preserve original patch name; otherwise use default
         patch_name = self.patch_dict.get("name", "UserPatch") if self.patch_dict else "UserPatch"
-        
+
         # Preserve connections and other data from original patch if editing
         connections = list(self.connections)
         pages = ["Page 1"]
@@ -1652,18 +1651,18 @@ class PatchBuilderEditor(QMainWindow):
 
     def _module_to_patch_format(self, mod_id, position, number, config):
         mod = self.module_index[mod_id]
-        
+
         # Use edited parameters from config if available
         if config and "parameters" in config:
             parameters = dict(config["parameters"])
         else:
             parameters = {}
-        
+
         # Preserve other module data from original config if editing
         options_binary = {i: 0 for i in range(8)}
         if config and "options_binary" in config:
             options_binary = config["options_binary"]
-        
+
         if config and "params" in config:
             params_count = config["params"]
         else:
@@ -1682,7 +1681,7 @@ class PatchBuilderEditor(QMainWindow):
             if config and "saved_data" in config:
                 saved_data_len = len(config["saved_data"])
             module_size = 14 + params_count + int((saved_data_len + 3) / 4)
-        
+
         # Use config data if available, otherwise use module index
         return {
             "number": number,
@@ -2565,7 +2564,6 @@ class PatchBuilderEditor(QMainWindow):
         starred_cc = config.get("starred_cc")
         if not isinstance(starred_cc, dict):
             starred_cc = dict(starred_cc) if starred_cc else {}
-        used_display = set(self._all_starred_cc_values())
 
         order = self._param_order(
             mod_id, self._module_blocks(mod_id, config), use_order_field=False
@@ -2840,7 +2838,6 @@ class PatchBuilderEditor(QMainWindow):
 
         max_pos = 39
         cols = 8
-        rows = (max_pos + 1) // cols
 
         for page_index in range(page_count):
             page_group = QGroupBox()
@@ -2998,7 +2995,7 @@ class PatchBuilderEditor(QMainWindow):
             self.routing_window.raise_()
             self.routing_window.activateWindow()
             return
-        
+
         if self.patch_dict is None:
             name = "New Patch"
         else:
@@ -3503,7 +3500,7 @@ class ZOIALibrarianEditor(QMainWindow):
 
     def edit_patch(self):
         """Launch the patch editor with an existing patch for modifications.
-        
+
         patch_dict: A parsed patch dict (from PatchBinary.parse_data or similar)
                    containing modules, connections, pages, etc.
         """

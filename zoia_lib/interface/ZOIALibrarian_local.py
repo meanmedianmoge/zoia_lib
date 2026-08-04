@@ -906,6 +906,9 @@ class ZOIALibrarianLocal(QMainWindow):
         pch_id = None
 
         usr = self.usr_pwd()
+        if usr is None:
+            # Authentication failed; usr_pwd already alerted the user.
+            return
 
         file = os.path.join(self.path, self.local_selected, self.local_selected)
         with open(file + ".json", "r") as f:
@@ -1034,6 +1037,9 @@ class ZOIALibrarianLocal(QMainWindow):
         pch_id = None
 
         usr = self.usr_pwd()
+        if usr is None:
+            # Authentication failed; usr_pwd already alerted the user.
+            return
 
         # For updates, only allow if username matches the author.
         file = os.path.join(self.path, self.local_selected, self.local_selected)
@@ -1186,28 +1192,63 @@ class ZOIALibrarianLocal(QMainWindow):
         self.userpass.resize(300, 100)
         self.userpass.setWindowTitle("PatchStorage Credentials")
 
-        if self.api.api_token is None:
-            # No token exists, create it.
-            self.userpass.exec_()
-            self.api.generate_token(usr.text(), pwd.text())
-            assert self.api.api_token is not None
-            assert self.api.auth_token() == 200
-            usr = usr.text()
-        else:
-            # Token is no longer authenticated, create another.
-            if self.api.auth_token() != 200:
+        try:
+            if self.api.api_token is None:
+                # No token exists, create it.
                 self.userpass.exec_()
-                self.api.generate_token(usr.text(), pwd.text())
-                assert self.api.api_token is not None
-                assert self.api.auth_token() == 200
+                if not self._authenticate(usr.text(), pwd.text()):
+                    return None
                 usr = usr.text()
-            # Token exists and is valid, need to get the username from prefs.
             else:
-                with open(os.path.join(self.path, 'pref.json'), 'r') as f:
-                    prefs = json.loads(f.read())
-                usr = prefs[0]['api_user']
+                # Token is no longer authenticated, create another.
+                if self.api.auth_token() != 200:
+                    self.userpass.exec_()
+                    if not self._authenticate(usr.text(), pwd.text()):
+                        return None
+                    usr = usr.text()
+                # Token exists and is valid, need to get the username
+                # from prefs.
+                else:
+                    with open(os.path.join(self.path, 'pref.json'), 'r') as f:
+                        prefs = json.loads(f.read())
+                    usr = prefs[0]['api_user']
+        except urllib3.exceptions.HTTPError:
+            # Could not connect to the PS API.
+            self.ui.statusbar.showMessage("API connection failed.", timeout=5000)
+            self.msg.setWindowTitle("API Error")
+            self.msg.setIcon(QMessageBox.Warning)
+            self.msg.setText(
+                "Failed to connect to PatchStorage. Check your internet "
+                "connection and try again."
+            )
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+            return None
 
         return usr
+
+    def _authenticate(self, username, password):
+        """Generates and validates a PS API token, alerting the user
+        should the authentication fail.
+
+        return: True if the credentials authenticated successfully,
+                False otherwise.
+        """
+
+        if self.api.generate_token(username, password) \
+                and self.api.auth_token() == 200:
+            return True
+
+        self.ui.statusbar.showMessage("Authentication failed.", timeout=5000)
+        self.msg.setWindowTitle("Authentication Failed")
+        self.msg.setIcon(QMessageBox.Warning)
+        self.msg.setText(
+            "Could not authenticate with PatchStorage. "
+            "Please check your credentials."
+        )
+        self.msg.setStandardButtons(QMessageBox.Ok)
+        self.msg.exec_()
+        return False
 
     def license(self):
         cb = QComboBox()
@@ -1585,7 +1626,7 @@ class ZOIALibrarianLocal(QMainWindow):
             graph.auto_layout_nodes()
         except KeyError:
             graph.reset_zoom()
-        except RecursionError as e:
+        except RecursionError:
             graph.fit_to_selection()
             self.ui.statusbar.showMessage("Expand incomplete.", timeout=5000)
             self.msg.setWindowTitle("Auto Layout Failed")

@@ -4,7 +4,6 @@ import shutil
 import unittest
 
 from zoia_lib.backend.patch_save import PatchSave
-from zoia_lib.backend import utilities as util
 from zoia_lib.common import errors
 
 test_path = os.path.join(os.getcwd(), "zoia_lib", "tests")

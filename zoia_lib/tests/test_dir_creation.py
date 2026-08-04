@@ -2,7 +2,6 @@ import os
 import shutil
 import unittest
 
-import zoia_lib.backend.utilities as util
 from zoia_lib.backend.patch_save import PatchSave
 from zoia_lib.common import errors
 from zoia_lib.backend.utilities import add_test_patch

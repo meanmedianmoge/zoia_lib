@@ -388,3 +388,22 @@ class TestSorting(unittest.TestCase):
             data[4]["title"] == "Subtle Knife",
             "Sorted data did not have Subtle Knife in position 4",
         )
+
+    def test_date_modified_sort_mixed_keys(self):
+        """Sorting a list that mixes local metadata (downloaded_at)
+        with PS metadata (updated_at) should sort each entry on
+        whichever date it carries instead of raising KeyError.
+        """
+
+        data = [
+            {"title": "a", "downloaded_at": "2020-03-01T00:00:00"},
+            {"title": "b", "updated_at": "2020-01-01T00:00:00"},
+            {"title": "c", "downloaded_at": "2020-02-01T00:00:00"},
+        ]
+
+        util.sort_metadata(6, data, False)
+        self.assertEqual(
+            [x["title"] for x in data],
+            ["b", "c", "a"],
+            "Mixed-key data was not sorted by its per-entry dates.",
+        )

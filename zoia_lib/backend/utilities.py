@@ -2,11 +2,31 @@ import json
 import os
 import re
 import sys
-# import signal
 import _thread as thread
 import threading
 
 from zoia_lib.common import errors
+
+
+def merge_patch_metadata(new_patches, known):
+    """Merges freshly retrieved PS metadata into the metadata already
+    cached in data.json.
+
+    Pages are retrieved in blocks of 100, so the newest block can
+    overlap with patches that are already cached. Where both carry the
+    same patch the freshly retrieved copy wins; resolving the other way
+    would pin the cached copy and a patch updated on PatchStorage could
+    never refresh its metadata.
+
+    new_patches: The metadata just retrieved from PatchStorage.
+    known: The metadata previously stored in data.json.
+
+    return: A list holding the new metadata followed by the cached
+            metadata it did not supersede.
+    """
+
+    fresh = {x["id"] for x in new_patches}
+    return new_patches + [x for x in known if x["id"] not in fresh]
 
 
 def sort_metadata(mode, data, rev):
@@ -28,9 +48,9 @@ def sort_metadata(mode, data, rev):
          false otherwise.
     """
 
-    """ The use of .upper() is to prevent sorting of lower case names 
-    before their uppercase counterparts, especially when they share the 
-    same initial letter. In a list, you would want all the "d" titles 
+    """ The use of .upper() is to prevent sorting of lower case names
+    before their uppercase counterparts, especially when they share the
+    same initial letter. In a list, you would want all the "d" titles
     grouped together.
     """
     # Input checking.
@@ -67,11 +87,14 @@ def sort_metadata(mode, data, rev):
             key=lambda x: x["view_count"] if "view_count" in x else 0, reverse=rev
         )
     elif mode == 6:
-        # Sort by date modified
-        try:
-            data.sort(key=lambda x: x["downloaded_at"].upper(), reverse=rev)
-        except KeyError:
-            data.sort(key=lambda x: x["updated_at"].upper(), reverse=rev)
+        # Sort by date modified. Local metadata carries downloaded_at,
+        # PS metadata carries updated_at; a mixed list is sorted on
+        # whichever each entry has, instead of aborting mid-sort on
+        # the first entry that lacks the key.
+        data.sort(
+            key=lambda x: x.get("downloaded_at", x.get("updated_at", "")),
+            reverse=rev,
+        )
     elif mode == 7:
         # Sort by revision #
         data.sort(key=lambda x: x["revision"] if "revision" in x else 0, reverse=rev)
@@ -81,18 +104,16 @@ def sort_metadata(mode, data, rev):
     elif mode == 9:
         # Sort by category
         data.sort(
-            key=lambda x: [", ".join(y["name"] for y in x["categories"])], reverse=rev
+            key=lambda x: ", ".join(y["name"] for y in x["categories"]), reverse=rev
         )
-        # [[', '.join(y['name'] for y in x['categories'])] for x in data]
     elif mode == 10:
         # Sort by tag
         data.sort(
-            key=lambda x: [
-                ", ".join(y["name"].lower().replace("#", "") for y in x["tags"])
-            ],
+            key=lambda x: ", ".join(
+                y["name"].lower().replace("#", "") for y in x["tags"]
+            ),
             reverse=rev,
         )
-        # [[', '.join(y['name'].lower() for y in x['tags'])] for x in data]
 
 
 def search_patches(data, query):
@@ -117,70 +138,69 @@ def search_patches(data, query):
 
     query = query.lower()
 
-    hits = []
+    if not query:
+        # Every patch matches an empty query, so there is nothing to
+        # rank; return them in their existing order.
+        return list(data)
 
-    # Special case, searching for a category. Since there are a known # of
-    # categories, we prioritize these first.
-    if (
-        query in "composition"
-        or query in "effect"
-        or query in "game"
-        or query in "other"
-        or query in "sampler"
-        or query in "sequencer"
-        or query in "sound"
-        or query in "synthesizer"
-        or query in "utility"
-        or query in "video"
-    ):
-        for curr in data:
-            if "categories" in curr:
-                # Check category tag.
-                for category in curr["categories"]:
-                    if query in category["name"].lower():
-                        hits.insert(0, curr)
-                        break
+    hits = []
+    # Track hits by object identity; comparing whole metadata dicts
+    # against the hit list made the search quadratic.
+    seen = set()
+
+    def add_hit(entry):
+        hits.append(entry)
+        seen.add(id(entry))
+
+    # Category matches are prioritized. Note the direction of the
+    # match: the category has to start with the query, so "synt" ranks
+    # Synthesizer patches first, but a query merely contained in a
+    # category name (e.g. "o") no longer reorders the results. The
+    # names are read from the patches themselves, so a category added
+    # on PatchStorage is picked up without editing this file.
+    for curr in data:
+        # Check category tag.
+        for category in curr.get("categories", []):
+            if category["name"].lower().startswith(query):
+                add_hit(curr)
+                break
 
     for curr in data:
+        if id(curr) in seen:
+            continue
         # Check the patch title.
-        if query in curr["title"].lower() and curr not in hits:
-            hits.append(curr)
+        if query in curr["title"].lower():
+            add_hit(curr)
             continue
         # Check the version title (local and folders tab only).
         if "files" in curr:
             try:
-                if (
-                    query
-                    in curr["files"][0]["filename"]
+                version = (
+                    curr["files"][0]["filename"]
                     .split(".")[0]
                     .split("_zoia_")[-1]
                     .replace("_", " ")
                     .lower()
-                ) and curr not in hits:
-                    hits.append(curr)
-                    continue
-            except KeyError:
+                )
+            except (KeyError, IndexError):
+                version = None
+            if version is not None and query in version:
+                add_hit(curr)
                 continue
         # Check the author.
-        if (
-            "author" in curr
-            and query in curr["author"]["name"].lower()
-            and curr not in hits
-        ):
-            hits.append(curr)
+        if "author" in curr and query in curr["author"]["name"].lower():
+            add_hit(curr)
             continue
         # Check every tag.
-        if "tags" in curr:
-            for tag in curr["tags"]:
-                if query in tag["name"].lower() and curr not in hits:
-                    hits.append(curr)
-                    continue
-        # Check dates.
-        if "updated_at" in curr and query in curr["updated_at"].lower() and curr not in hits:
-            hits.append(curr)
+        if any(query in tag["name"].lower() for tag in curr.get("tags", [])):
+            add_hit(curr)
             continue
-        if "created_at" in curr and query in curr["created_at"].lower() and curr not in hits:
-            hits.append(curr)
+        # Check dates.
+        if "updated_at" in curr and query in curr["updated_at"].lower():
+            add_hit(curr)
+            continue
+        if "created_at" in curr and query in curr["created_at"].lower():
+            add_hit(curr)
 
     return hits
 
@@ -303,34 +323,3 @@ def exit_after(s):
             return result
         return inner
     return outer
-
-
-# class Timeout:
-#     """Timeout class using ALARM signal.
-#
-#     UNIX only, does not work on Windows
-#     See exit_after decorator above for cross-plat
-#
-#     Usage:
-#     with Timeout(3):
-#         try:
-#             func()
-#         except Timeout.Timeout:
-#             break
-#     """
-#
-#     class Timeout(Exception):
-#         pass
-#
-#     def __init__(self, sec):
-#         self.sec = sec
-#
-#     def __enter__(self):
-#         signal.signal(signal.SIGALRM, self.raise_timeout)
-#         signal.alarm(self.sec)
-#
-#     def __exit__(self, *args):
-#         signal.alarm(0)  # disable alarm
-#
-#     def raise_timeout(self, *args):
-#         raise Timeout.Timeout()

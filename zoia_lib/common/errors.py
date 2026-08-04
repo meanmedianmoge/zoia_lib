@@ -13,7 +13,7 @@ class BinaryError(ZoiaLibError):
 
     def __init__(self, patch, error_code_zoia=0):
         if patch is None:
-            error_msg = f"Expected a patch object but got None instead."
+            error_msg = "Expected a patch object but got None instead."
         else:
             try:
                 error_msg = {
@@ -36,7 +36,7 @@ class UpdateError(ZoiaLibError):
 
     def __init__(self, idx, error_code_zoia=0):
         if idx is None:
-            print(f"Expected a patch index but got None instead.")
+            print("Expected a patch index but got None instead.")
         elif error_code_zoia == 201:
             print(f"Patch {idx} has multiple versions.")
         else:
@@ -56,7 +56,7 @@ class BadPathError(ZoiaLibError):
 
     def __init__(self, path, error_code_zoia=0):
         if path is None:
-            print(f"Expected a file path but got None instead.")
+            print("Expected a file path but got None instead.")
         elif error_code_zoia == 301:
             print(f"Path {path} did not lead to a file or directory.")
         else:
@@ -79,7 +79,7 @@ class DeletionError(ZoiaLibError):
 
     def __init__(self, patch, error_code_zoia=0):
         if patch is None:
-            error_msg = f"Expected a patch name but got None instead."
+            error_msg = "Expected a patch name but got None instead."
         else:
             try:
                 error_msg = {
@@ -121,7 +121,7 @@ class SavingError(ZoiaLibError):
 
     def __init__(self, patch, error_code_zoia=0):
         if patch is None:
-            error_msg = f"Expected a patch name but got None instead."
+            error_msg = "Expected a patch name but got None instead."
         else:
             try:
                 error_msg = {
@@ -156,7 +156,7 @@ class RenamingError(ZoiaLibError):
 
     def __init__(self, patch, error_code=0):
         if patch is None:
-            print(f"Expected a patch name but got None instead.")
+            print("Expected a patch name but got None instead.")
         elif error_code == 601:
             print(
                 f"Could not rename the file {patch} correctly "
@@ -180,17 +180,17 @@ class ExportingError(ZoiaLibError):
 
     def __init__(self, patch, slot=-1, error_code_zoia=0):
         if patch is None:
-            error_msg = f"Expected a patch name but got None instead."
+            error_msg = "Expected a patch name but got None instead."
         else:
             try:
                 error_msg = {
                     701: f"Could not export the file {patch} correctly "
                     f"due to the slot number being greater than 63 "
                     f"(got {slot}).",
-                    702: f"Exporting would result in overwriting of data,"
-                    f"as a directory already existed on the SD"
-                    f"card",
-                    703: f"Exporting would create a conflict between two" f"patches.",
+                    702: "Exporting would result in overwriting of data,"
+                    "as a directory already existed on the SD"
+                    "card",
+                    703: "Exporting would create a conflict between two" "patches.",
                 }[error_code_zoia]
             except KeyError:
                 error_msg = (
@@ -209,7 +209,7 @@ class JSONError(ZoiaLibError):
 
     def __init__(self, data, error_code_zoia=0):
         if data is None:
-            print(f"Expected a JSON data but got None instead.")
+            print("Expected a JSON data but got None instead.")
         elif error_code_zoia == 801:
             print(
                 f"Could not process {data} because the JSON data "
@@ -231,7 +231,7 @@ class SortingError(ZoiaLibError):
 
     def __init__(self, info, error_code_zoia=0):
         if info is None:
-            error_msg = f"Expected information but got None instead."
+            error_msg = "Expected information but got None instead."
         else:
             try:
                 error_msg = {
@@ -239,8 +239,8 @@ class SortingError(ZoiaLibError):
                     f"modes occur between 1 and 10 inclusive.",
                     902: f"The supplied metadata {info} is not a list. "
                     f"Sorting can only occur on valid lists.",
-                    903: f"The parameter list was invalid. Ensure that no "
-                    f"parameters contain None as a value.",
+                    903: "The parameter list was invalid. Ensure that no "
+                    "parameters contain None as a value.",
                 }[error_code_zoia]
             except KeyError:
                 error_msg = (
@@ -261,14 +261,14 @@ class SearchingError(ZoiaLibError):
 
     def __init__(self, info, error_code_zoia=0):
         if info is None:
-            error_msg = f"Expected information but got None instead."
+            error_msg = "Expected information but got None instead."
         else:
             try:
                 error_msg = {
                     1001: f"The supplied metadata {info} is not a list. "
                     f"Searching can only occur on valid lists.",
-                    1002: f"The parameter list was invalid. Ensure that no "
-                    f"parameters contain None as a value.",
+                    1002: "The parameter list was invalid. Ensure that no "
+                    "parameters contain None as a value.",
                 }[error_code_zoia]
             except KeyError:
                 error_msg = (
@@ -289,7 +289,7 @@ class UploadError(ZoiaLibError):
 
     def __init__(self, info, error_code_zoia=0):
         if info is None:
-            error_msg = f"Expected information but got None instead."
+            error_msg = "Expected information but got None instead."
         else:
             try:
                 error_msg = {

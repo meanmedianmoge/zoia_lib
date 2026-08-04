@@ -6,3 +6,6 @@ certifi==2024.7.4
 requests==2.32.4
 jsonschema==4.17.3
 rarfile~=4.0
+# The bundled NodeGraphQt wheel imports distutils, which was removed
+# from the standard library in Python 3.12; setuptools provides it.
+setuptools

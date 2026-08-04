@@ -63,7 +63,6 @@ class PatchEncoder(Patch):
         file_array = bytearray()
         farray = bytearray()
 
-        patch_size = self.encode_value(pch["size"], 4)
         patch_name = self.encode_text(pch["name"], 16)
         module_count = self.encode_value(pch["meta"]["n_modules"], 4)
 

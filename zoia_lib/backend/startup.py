@@ -19,8 +19,9 @@ from PySide6.QtWidgets import QApplication, QSplashScreen, QStyleFactory
 from zoia_lib.backend.utilities import meipass
 from zoia_lib.interface.ZOIALibrarian_main import ZOIALibrarianMain
 
-# Entry point for the application.
-if __name__ == "__main__":
+def main():
+    """Entry point for the application."""
+
     app = QApplication(sys.argv)
 
     # Set style
@@ -47,3 +48,7 @@ if __name__ == "__main__":
     QTimer.singleShot(0, finalize_startup)
 
     sys.exit(app.exec())
+
+
+if __name__ == "__main__":
+    main()

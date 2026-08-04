@@ -1,10 +1,12 @@
 import json
 import os
 
+import urllib3
 from PySide6 import QtCore
 from PySide6.QtCore import QThread
 from PySide6.QtWidgets import QMainWindow, QMessageBox, QPushButton
 
+from zoia_lib.backend import utilities as util
 from zoia_lib.common import errors
 
 
@@ -50,49 +52,50 @@ class ZOIALibrarianPS(QMainWindow):
 
         try:
             # Check for metadata in the user's backend.
-            if "data.json" not in os.listdir(self.path):
+            data = None
+            if "data.json" in os.listdir(self.path):
+                try:
+                    with open(os.path.join(self.path, "data.json"), "r") as f:
+                        data = json.loads(f.read())
+                except json.JSONDecodeError:
+                    # Existing data.json was empty/corrupt, replace it.
+                    data = None
+
+            if data is None:
                 ps_data = self.api.get_all_patch_data_init()
+            elif 'data' in data:
+                # Maligned data.json, need to remove
+                ps_data = [x for x in data if 'data' not in x and 'code'
+                           not in x and 'message' not in x]
             else:
                 # Got previous metadata, need to ensure that there are no
                 # new patches.
-                with open(os.path.join(self.path, "data.json"), "r") as f:
-                    data = json.loads(f.read())
-                if 'data' in data:
-                    # Maligned data.json, need to remove
-                    ps_data = [x for x in data if 'data' not in x and 'code'
-                               not in x and 'message' not in x]
-                elif len(data) == self.api.patch_count:
+                patch_count = self.api.refresh_patch_count()
+                if len(data) == patch_count:
                     # Assume no new patches; allow the user to refresh manually.
                     self.data_PS = data
                     return
-                elif len(data) > self.api.patch_count:
+                elif len(data) > patch_count:
                     # Uh oh, some patches got deleted on PatchStorage.
                     ps_data = self.api.get_all_patch_data_init()
                 else:
                     # Get the new patch metadata that we don't have.
                     new_patches = self.api.get_newest_patches(len(data))
-                    ps_data = new_patches + data
+                    ps_data = util.merge_patch_metadata(new_patches, data)
 
             # Create/update the data file with the new data.
             with open(os.path.join(self.path, "data.json"), "w") as f:
                 f.write(json.dumps(ps_data))
                 self.data_PS = ps_data
 
-        except json.JSONDecodeError:
-            # Existing data.json was empty, replace it
-            ps_data = self.api.get_all_patch_data_init()
-            # Create/update the data file with the new data.
-            with open(os.path.join(self.path, "data.json"), "w") as f:
-                f.write(json.dumps(ps_data))
-                self.data_PS = ps_data
-
-        except AttributeError:
-            # Could not connect to API to determine patch count
+        except urllib3.exceptions.HTTPError:
+            # Could not connect to the PS API.
             self.ui.statusbar.showMessage("API connection failed.", timeout=5000)
             self.msg.setWindowTitle("API Error")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText(
-                "Failed to retrieve the patch count from PatchStorage."
+                "Failed to connect to PatchStorage. Check your internet "
+                "connection, then refresh via the PatchStorage View tab."
             )
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()

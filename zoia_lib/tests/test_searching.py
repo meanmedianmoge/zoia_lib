@@ -227,3 +227,86 @@ class TestSearching(unittest.TestCase):
             result[0]["id"] == 124566,
             "Expected to find the patch updated on 2020-04-30.",
         )
+
+    def test_category_prioritization(self):
+        """A query that prefixes a category name should rank patches
+        in that category first, in stable data order, without
+        duplicating patches that also match on other attributes.
+        """
+
+        sample = [
+            {"title": "Ambient Verb", "categories": [{"name": "Effect"}]},
+            {"title": "Synthy Delay", "categories": [{"name": "Effect"}]},
+            {"title": "Moog Bass", "categories": [{"name": "Synthesizer"}]},
+            {"title": "Juno Pad", "categories": [{"name": "Synthesizer"}]},
+        ]
+
+        result = util.search_patches(sample, "synth")
+        self.assertEqual(
+            [x["title"] for x in result],
+            ["Moog Bass", "Juno Pad", "Synthy Delay"],
+            "Expected Synthesizer category patches first, then the "
+            "title match, with no duplicates.",
+        )
+
+    def test_category_prioritization_is_not_hardcoded(self):
+        """Prioritization reads category names off the patches, so a
+        category that PatchStorage adds later still ranks first.
+        """
+
+        sample = [
+            {"title": "Some Effect", "categories": [{"name": "Effect"}]},
+            {"title": "Tape Loop", "categories": [{"name": "Granular"}]},
+        ]
+
+        result = util.search_patches(sample, "granular")
+        self.assertEqual(
+            [x["title"] for x in result],
+            ["Tape Loop"],
+            "A category unknown to this file should still be matched.",
+        )
+
+    def test_empty_query_returns_everything_in_order(self):
+        """An empty query matches every patch, so it should not
+        reorder them.
+        """
+
+        sample = [
+            {"title": "Has Category", "categories": [{"name": "Effect"}]},
+            {"title": "No Category"},
+            {"title": "Also Category", "categories": [{"name": "Utility"}]},
+        ]
+
+        result = util.search_patches(sample, "")
+        self.assertEqual(
+            [x["title"] for x in result],
+            ["Has Category", "No Category", "Also Category"],
+            "An empty query should preserve the input order.",
+        )
+        self.assertIsNot(result, sample, "Callers must not alias the input.")
+
+    def test_merge_patch_metadata_prefers_fresh(self):
+        """Where a patch appears in both the newly retrieved block and
+        the cached data, the fresh copy must win so updated metadata
+        can actually refresh.
+        """
+
+        known = [
+            {"id": 1, "title": "One", "updated_at": "2020-01-01"},
+            {"id": 2, "title": "Two", "updated_at": "2020-01-01"},
+        ]
+        new_patches = [
+            {"id": 3, "title": "Three", "updated_at": "2024-01-01"},
+            {"id": 2, "title": "Two (renamed)", "updated_at": "2024-06-01"},
+        ]
+
+        merged = util.merge_patch_metadata(new_patches, known)
+
+        self.assertEqual(
+            [x["id"] for x in merged], [3, 2, 1], "Expected no duplicate ids."
+        )
+        self.assertEqual(
+            [x for x in merged if x["id"] == 2][0]["updated_at"],
+            "2024-06-01",
+            "The freshly retrieved copy should supersede the cached one.",
+        )

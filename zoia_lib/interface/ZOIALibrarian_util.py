@@ -51,7 +51,7 @@ class ZOIALibrarianUtil:
             f = QFont(f, f_size)
             ok, start = True, False
         else:
-            if type(name) == str:
+            if isinstance(name, str):
                 # Case 3.1: Init with pref.json
                 f = name.split("%")
                 f = QFont(f[0], int(f[1]))
@@ -418,11 +418,9 @@ class ZOIALibrarianUtil:
         if len(rows_left) > 1 and len(rows_right) == 0:
             curr_rows = rows_left
             main_table = table_1
-            other_table = table_2
         else:
             curr_rows = rows_right
             main_table = table_2
-            other_table = table_1
 
         # Find the first entry for the current set of rows.
         for i in sorted(curr_rows):

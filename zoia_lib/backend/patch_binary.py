@@ -223,7 +223,7 @@ class PatchBinary(Patch):
         starred = []
         curr_step += 1
         # Extract the starred parameters in the patch.
-        for l in range(data[curr_step]):
+        for _ in range(data[curr_step]):
             byte2 = struct.unpack(
                 "hh", byt[(curr_step + 1) * 4: (curr_step + 1) * 4 + 4]
             )
