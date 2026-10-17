@@ -49,6 +49,7 @@ export function parsePatch(buffer, moduleIndex) {
     const definition = moduleIndex[String(typeId)] || {};
     const nameStart = (cursor + size - 4) * 4;
     const customName = cleanText(bytes.slice(nameStart, nameStart + 16));
+    const rawParameters = Array.from({ length: parameterCount }, (_, i) => word(cursor + 10 + i));
     modules.push({
       number,
       typeId,
@@ -56,12 +57,17 @@ export function parsePatch(buffer, moduleIndex) {
       category: definition.category || "Unknown",
       customName,
       displayName: customName || definition.name || `Unknown module ${typeId}`,
+      description: definition.description || "No description is available for this module type.",
       version,
       page: Math.max(0, Math.min(63, pageRaw)),
       position,
       size,
       parameterCount,
-      parameters: Array.from({ length: parameterCount }, (_, i) => word(cursor + 10 + i)),
+      parameters: rawParameters.map((raw, index) => ({
+        name: definition.parameters?.[index] || `Parameter ${index + 1}`,
+        raw,
+        normalized: Math.round((raw / 65535) * 1000) / 1000
+      })),
       cpu: Number(definition.cpu) || 0,
       colorId: headerColorId,
       color: COLORS[headerColorId]?.[0] || "Unknown",

@@ -62,7 +62,12 @@
           <article><span>Estimated CPU</span><strong id="cpu-total">0%</strong></article>
         </div>
 
-        <div class="dashboard">
+        <nav class="view-tabs" aria-label="Patch views">
+          <button class="view-tab active" type="button" data-view="inventory">Inventory</button>
+          <button class="view-tab" type="button" data-view="visualizer">Patch visualizer <span class="beta-tag">Mockup</span></button>
+        </nav>
+
+        <div class="dashboard view-pane" id="inventory-view">
           <section class="panel module-panel">
             <div class="panel-head">
               <div>
@@ -90,6 +95,27 @@
             </section>
           </aside>
         </div>
+
+        <section class="visualizer view-pane" id="visualizer-view" hidden>
+          <div class="visualizer-toolbar">
+            <div>
+              <span class="section-label">Routing canvas</span>
+              <h3>Patch visualizer</h3>
+            </div>
+            <div class="page-filters" id="page-filters" aria-label="Filter visualizer by page"></div>
+            <div class="visualizer-key" aria-label="Connection legend">
+              <span><i class="line-key audio"></i>Audio / CV route</span>
+              <span>Click a module for details</span>
+            </div>
+          </div>
+          <div class="graph-scroll">
+            <div class="graph-canvas" id="graph-canvas">
+              <svg id="connection-layer" aria-hidden="true"></svg>
+              <div id="graph-modules"></div>
+            </div>
+          </div>
+          <div class="visualizer-status"><span id="visible-module-count">0 modules</span><span>ZOIA grid · 8 columns per page</span></div>
+        </section>
       </section>
 
       <section class="error-card" id="error-card" hidden role="alert">
@@ -98,6 +124,24 @@
         <button class="text-button" id="error-reset" type="button">Choose another file →</button>
       </section>
     </main>
+
+    <dialog class="module-dialog" id="module-dialog">
+      <div class="dialog-color" id="dialog-color"></div>
+      <div class="dialog-head">
+        <div>
+          <span class="section-label" id="dialog-category">Module</span>
+          <h2 id="dialog-name">Module name</h2>
+          <p id="dialog-type"></p>
+        </div>
+        <button class="dialog-close" id="dialog-close" type="button" aria-label="Close module details">×</button>
+      </div>
+      <p class="dialog-description" id="dialog-description"></p>
+      <dl class="module-facts" id="module-facts"></dl>
+      <div class="parameter-section">
+        <div class="parameter-title"><span class="section-label">Saved parameters</span><span id="parameter-count"></span></div>
+        <div class="parameter-list" id="parameter-list"></div>
+      </div>
+    </dialog>
 
     <footer>
       <span>Experimental web companion to ZOIA Librarian.</span>

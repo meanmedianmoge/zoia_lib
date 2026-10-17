@@ -6,7 +6,9 @@ const elements = {
   dropZone: $("#drop-zone"), input: $("#file-input"), choose: $("#choose-button"), demo: $("#demo-button"),
   reset: $("#new-file-button"), errorReset: $("#error-reset"), export: $("#export-button"), search: $("#module-search"),
   patchName: $("#patch-name"), fileName: $("#file-name"), modules: $("#module-list"), pages: $("#page-list"),
-  chart: $("#strength-chart"), emptyFilter: $("#empty-filter")
+  chart: $("#strength-chart"), emptyFilter: $("#empty-filter"), graph: $("#graph-canvas"),
+  graphModules: $("#graph-modules"), connectionLayer: $("#connection-layer"), pageFilters: $("#page-filters"),
+  dialog: $("#module-dialog")
 };
 
 let moduleIndex;
@@ -67,6 +69,7 @@ function render(patch) {
     return row;
   }));
   renderChart(patch.connections);
+  renderVisualizer(patch);
 }
 
 function renderModules(modules) {
@@ -84,9 +87,140 @@ function renderModules(modules) {
     row.querySelector(".module-name span").textContent = module.customName ? module.type : `v${module.version}`;
     row.querySelector(".category").textContent = module.category;
     row.querySelector(".color-dot").style.background = module.colorHex;
+    row.tabIndex = 0;
+    row.setAttribute("role", "button");
+    row.setAttribute("aria-label", `View details for ${module.displayName}`);
+    row.addEventListener("click", () => showModuleDetails(module));
+    row.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") showModuleDetails(module); });
     return row;
   }));
   elements.emptyFilter.hidden = modules.length > 0;
+}
+
+function renderVisualizer(patch) {
+  const pageWidth = 910;
+  const canvasWidth = Math.max(1080, patch.pages.length * pageWidth);
+  const canvasHeight = 560;
+  elements.graph.style.width = `${canvasWidth}px`;
+  elements.graph.style.height = `${canvasHeight}px`;
+  elements.connectionLayer.setAttribute("viewBox", `0 0 ${canvasWidth} ${canvasHeight}`);
+
+  const positions = new Map();
+  const cards = patch.modules.map((module) => {
+    const gridPosition = Math.max(0, module.position);
+    const column = gridPosition % 8;
+    const row = Math.min(4, Math.floor(gridPosition / 8));
+    const x = module.page * pageWidth + 34 + column * 108;
+    const y = 62 + row * 96;
+    positions.set(module.number, { x: x + 47, y: y + 31 });
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "graph-module";
+    card.dataset.page = String(module.page);
+    card.style.cssText = `left:${x}px;top:${y}px;--module-color:${module.colorHex}`;
+    card.innerHTML = `<span class="graph-index"></span><strong></strong><small></small>`;
+    card.querySelector(".graph-index").textContent = String(module.number + 1).padStart(2, "0");
+    card.querySelector("strong").textContent = module.displayName;
+    card.querySelector("small").textContent = module.category;
+    card.addEventListener("click", () => showModuleDetails(module));
+    return card;
+  });
+  elements.graphModules.replaceChildren(...cards);
+
+  const namespace = "http://www.w3.org/2000/svg";
+  const pageGuides = patch.pages.map((page) => {
+    const group = document.createElementNS(namespace, "g");
+    group.classList.add("page-guide");
+    group.dataset.page = String(page.number);
+    const rect = document.createElementNS(namespace, "rect");
+    rect.setAttribute("x", String(page.number * pageWidth + 12));
+    rect.setAttribute("y", "18");
+    rect.setAttribute("width", String(pageWidth - 24));
+    rect.setAttribute("height", "520");
+    const label = document.createElementNS(namespace, "text");
+    label.setAttribute("x", String(page.number * pageWidth + 32));
+    label.setAttribute("y", "43");
+    label.textContent = `${String(page.number + 1).padStart(2, "0")}  ${page.name}`;
+    group.append(rect, label);
+    return group;
+  });
+  const paths = patch.connections.map((connection, index) => {
+    const source = positions.get(connection.sourceModule);
+    const destination = positions.get(connection.destinationModule);
+    if (!source || !destination) return null;
+    const path = document.createElementNS(namespace, "path");
+    const bend = Math.max(42, Math.abs(destination.x - source.x) * .42);
+    path.setAttribute("d", `M ${source.x} ${source.y} C ${source.x + bend} ${source.y}, ${destination.x - bend} ${destination.y}, ${destination.x} ${destination.y}`);
+    path.setAttribute("class", "connection-path");
+    path.dataset.sourcePage = String(patch.modules[connection.sourceModule]?.page ?? -1);
+    path.dataset.destinationPage = String(patch.modules[connection.destinationModule]?.page ?? -1);
+    path.style.setProperty("--route-delay", `${(index % 12) * 35}ms`);
+    const title = document.createElementNS(namespace, "title");
+    title.textContent = `${patch.modules[connection.sourceModule]?.displayName || "Module"} → ${patch.modules[connection.destinationModule]?.displayName || "Module"} · ${connection.strength}%`;
+    path.append(title);
+    return path;
+  }).filter(Boolean);
+  elements.connectionLayer.replaceChildren(...pageGuides, ...paths);
+
+  const filterButtons = [{ number: -1, name: "All pages" }, ...patch.pages].map((page, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `page-filter${index === 0 ? " active" : ""}`;
+    button.textContent = page.number === -1 ? page.name : String(page.number + 1).padStart(2, "0");
+    button.title = page.name;
+    button.addEventListener("click", () => filterGraph(page.number, button));
+    return button;
+  });
+  elements.pageFilters.replaceChildren(...filterButtons);
+  $("#visible-module-count").textContent = `${patch.modules.length} modules`;
+}
+
+function filterGraph(pageNumber, activeButton) {
+  elements.pageFilters.querySelectorAll("button").forEach((button) => button.classList.toggle("active", button === activeButton));
+  elements.graphModules.querySelectorAll(".graph-module").forEach((module) => {
+    module.hidden = pageNumber >= 0 && Number(module.dataset.page) !== pageNumber;
+  });
+  elements.connectionLayer.querySelectorAll(".connection-path").forEach((path) => {
+    path.hidden = pageNumber >= 0 && Number(path.dataset.sourcePage) !== pageNumber && Number(path.dataset.destinationPage) !== pageNumber;
+  });
+  elements.connectionLayer.querySelectorAll(".page-guide").forEach((guide) => {
+    guide.classList.toggle("muted", pageNumber >= 0 && Number(guide.dataset.page) !== pageNumber);
+  });
+  const visible = pageNumber < 0 ? currentPatch.modules.length : currentPatch.modules.filter((module) => module.page === pageNumber).length;
+  $("#visible-module-count").textContent = `${visible} module${visible === 1 ? "" : "s"}`;
+  if (pageNumber >= 0) document.querySelector(".graph-scroll").scrollTo({ left: pageNumber * 910, behavior: "smooth" });
+}
+
+function showModuleDetails(module) {
+  $("#dialog-color").style.background = module.colorHex;
+  $("#dialog-category").textContent = module.category;
+  $("#dialog-name").textContent = module.displayName;
+  $("#dialog-type").textContent = module.customName ? `${module.type} · Custom label` : `Module ${module.number + 1} · ${module.color}`;
+  $("#dialog-description").textContent = module.description;
+  const facts = [
+    ["Page", `${module.page + 1}`], ["Grid position", `${module.position + 1}`],
+    ["Version", `${module.version}`], ["Estimated CPU", `${module.cpu}%`]
+  ];
+  $("#module-facts").replaceChildren(...facts.flatMap(([label, value]) => {
+    const term = document.createElement("dt"); term.textContent = label;
+    const detail = document.createElement("dd"); detail.textContent = value;
+    return [term, detail];
+  }));
+  $("#parameter-count").textContent = `${module.parameters.length} saved`;
+  $("#parameter-list").replaceChildren(...module.parameters.map((parameter) => {
+    const row = document.createElement("div");
+    row.className = "parameter-row";
+    row.innerHTML = `<span></span><div class="parameter-meter"><i></i></div><code></code>`;
+    row.querySelector("span").textContent = parameter.name.replaceAll("_", " ");
+    row.querySelector("i").style.width = `${Math.max(0, Math.min(100, parameter.normalized * 100))}%`;
+    row.querySelector("code").textContent = parameter.normalized.toFixed(3);
+    return row;
+  }));
+  if (!module.parameters.length) {
+    const empty = document.createElement("p"); empty.className = "no-parameters"; empty.textContent = "This module has no saved parameters.";
+    $("#parameter-list").append(empty);
+  }
+  elements.dialog.showModal();
 }
 
 function renderChart(connections) {
@@ -121,7 +255,7 @@ elements.demo.addEventListener("click", async () => {
   try {
     const response = await fetch("./sample/demo.bin");
     if (!response.ok) throw new Error("The demo patch could not be loaded.");
-    await inspectBuffer(await response.arrayBuffer(), "demo_patch.bin");
+    await inspectBuffer(await response.arrayBuffer(), "000_zoia_Juniper.bin");
   } catch (error) {
     elements.hero.hidden = true;
     elements.error.hidden = false;
@@ -153,4 +287,14 @@ elements.export.addEventListener("click", () => {
   link.download = `${currentFileName.replace(/\.bin$/i, "")}.json`;
   link.click();
   URL.revokeObjectURL(link.href);
+});
+document.querySelectorAll(".view-tab").forEach((tab) => tab.addEventListener("click", () => {
+  document.querySelectorAll(".view-tab").forEach((item) => item.classList.toggle("active", item === tab));
+  $("#inventory-view").hidden = tab.dataset.view !== "inventory";
+  $("#visualizer-view").hidden = tab.dataset.view !== "visualizer";
+}));
+$("#dialog-close").addEventListener("click", () => elements.dialog.close());
+elements.dialog.addEventListener("click", (event) => {
+  const rect = elements.dialog.getBoundingClientRect();
+  if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) elements.dialog.close();
 });
