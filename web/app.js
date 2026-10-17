@@ -1,4 +1,6 @@
-import { parsePatch } from "./parser.js";
+import { parsePatch } from "./parser.js?v=0.2.1";
+
+const ASSET_VERSION = "0.2.1";
 
 const $ = (selector) => document.querySelector(selector);
 const elements = {
@@ -17,7 +19,7 @@ let currentFileName = "patch.bin";
 
 async function getModuleIndex() {
   if (!moduleIndex) {
-    const response = await fetch("./data/modules.json");
+    const response = await fetch(`./data/modules.json?v=${ASSET_VERSION}`);
     if (!response.ok) throw new Error("The module catalog could not be loaded.");
     moduleIndex = await response.json();
   }
@@ -253,7 +255,7 @@ elements.dropZone.addEventListener("click", (event) => { if (!event.target.close
 elements.input.addEventListener("change", () => inspectFile(elements.input.files?.[0]));
 elements.demo.addEventListener("click", async () => {
   try {
-    const response = await fetch("./sample/demo.bin");
+    const response = await fetch(`./sample/demo.bin?v=${ASSET_VERSION}`);
     if (!response.ok) throw new Error("The demo patch could not be loaded.");
     await inspectBuffer(await response.arrayBuffer(), "000_zoia_Juniper.bin");
   } catch (error) {
