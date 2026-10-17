@@ -1,8 +1,9 @@
-import { parsePatch } from "./parser.js?v=0.5.0";
-import { getPatch, listPatches, patchId, removePatch, savePatch } from "./library.js?v=0.5.0";
-import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.5.0";
+import { parsePatch } from "./parser.js?v=0.6.0";
+import { getPatch, listBanks, listPatches, patchId, removeBank, removePatch, saveBank, savePatch } from "./library.js?v=0.6.0";
+import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.6.0";
+import { createZip } from "./zip.js?v=0.6.0";
 
-const ASSET_VERSION = "0.5.0";
+const ASSET_VERSION = "0.6.0";
 
 const $ = (selector) => document.querySelector(selector);
 const elements = {
@@ -15,7 +16,8 @@ const elements = {
   dialog: $("#module-dialog"), library: $("#library"), libraryList: $("#library-list"),
   libraryEmpty: $("#library-empty"), libraryInput: $("#library-file-input"), librarySearch: $("#library-search"),
   librarySort: $("#library-sort"), libraryStatus: $("#library-status"), browse: $("#browse"),
-  patchGrid: $("#patch-grid"), browseMessage: $("#browse-message"), patchDialog: $("#patch-dialog")
+  patchGrid: $("#patch-grid"), browseMessage: $("#browse-message"), patchDialog: $("#patch-dialog"),
+  banks: $("#banks"), bankList: $("#bank-list"), bankSlots: $("#bank-slots"), bankPatchList: $("#bank-patch-list")
 };
 
 let moduleIndex;
@@ -27,6 +29,10 @@ let browsePage = 1;
 let browseTotalPages = 1;
 let browseQuery = "";
 let selectedCommunityPatch;
+let bankRecords = [];
+let activeBank;
+let selectedBankPatchId;
+let bankNameTimer;
 
 async function getModuleIndex() {
   if (!moduleIndex) {
@@ -45,6 +51,8 @@ async function inspectBuffer(buffer, fileName, { persist = false, lastModified =
     render(currentPatch);
     elements.hero.hidden = true;
     elements.library.hidden = true;
+    elements.browse.hidden = true;
+    elements.banks.hidden = true;
     elements.error.hidden = true;
     elements.workspace.hidden = false;
     if (persist) {
@@ -160,9 +168,208 @@ async function deleteLibraryPatch(record) {
   await refreshLibrary();
 }
 
+async function refreshBanks() {
+  try {
+    bankRecords = (await listBanks()).sort((a, b) => b.updatedAt - a.updatedAt);
+    $("#bank-count").textContent = String(bankRecords.length);
+    if (activeBank) activeBank = bankRecords.find((bank) => bank.id === activeBank.id);
+    renderBankList();
+    renderActiveBank();
+  } catch (error) {
+    $("#bank-save-status").textContent = "Bank storage unavailable";
+  }
+}
+
+async function showBanks() {
+  elements.hero.hidden = true;
+  elements.library.hidden = true;
+  elements.browse.hidden = true;
+  elements.workspace.hidden = true;
+  elements.error.hidden = true;
+  elements.banks.hidden = false;
+  await refreshLibrary();
+  await refreshBanks();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+async function createBank() {
+  const name = window.prompt("Name this ZOIA bank:", `Bank ${bankRecords.length + 1}`)?.trim();
+  if (!name) return;
+  const now = Date.now();
+  activeBank = { id: crypto.randomUUID(), name, createdAt: now, updatedAt: now, slots: Array(64).fill(null) };
+  await saveBank(activeBank);
+  await refreshBanks();
+}
+
+function renderBankList() {
+  elements.bankList.replaceChildren(...bankRecords.map((bank) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `bank-list-item${activeBank?.id === bank.id ? " active" : ""}`;
+    const filled = bank.slots.filter(Boolean).length;
+    button.innerHTML = `<span class="bank-mini-grid"></span><span><strong></strong><small></small></span>`;
+    button.querySelector("strong").textContent = bank.name;
+    button.querySelector("small").textContent = `${filled} of 64 slots`;
+    button.querySelector(".bank-mini-grid").replaceChildren(...Array.from({ length: 4 }, (_, index) => {
+      const dot = document.createElement("i");
+      dot.classList.toggle("filled", index < Math.ceil(filled / 16));
+      return dot;
+    }));
+    button.addEventListener("click", () => { activeBank = bank; selectedBankPatchId = undefined; renderBankList(); renderActiveBank(); });
+    return button;
+  }));
+}
+
+function renderActiveBank() {
+  const hasBank = Boolean(activeBank);
+  $("#bank-empty").hidden = hasBank;
+  $("#bank-content").hidden = !hasBank;
+  if (!hasBank) return;
+  $("#bank-name").value = activeBank.name;
+  renderBankSlots();
+  renderBankPalette();
+  renderBankHealth();
+}
+
+function renderBankSlots() {
+  const patches = new Map(libraryRecords.map((record) => [record.id, record]));
+  const duplicateIds = new Set(activeBank.slots.filter((id, index, slots) => id && slots.indexOf(id) !== index));
+  elements.bankSlots.replaceChildren(...activeBank.slots.map((patchRecordId, index) => {
+    const record = patches.get(patchRecordId);
+    const row = document.createElement("div");
+    row.className = `bank-slot${record ? " filled" : ""}${patchRecordId && !record ? " missing" : ""}${duplicateIds.has(patchRecordId) ? " duplicate" : ""}`;
+    row.dataset.slot = String(index);
+    row.innerHTML = `<span class="slot-number"></span><button class="slot-patch" type="button"><strong></strong><small></small></button><span class="slot-state"></span><button class="slot-clear" type="button" aria-label="Clear slot">×</button>`;
+    row.querySelector(".slot-number").textContent = String(index).padStart(3, "0");
+    row.querySelector(".slot-patch strong").textContent = record?.title || (patchRecordId ? "Missing library patch" : "Empty slot");
+    row.querySelector(".slot-patch small").textContent = record ? bankFileName(index, record) : "Drop or select a patch";
+    row.querySelector(".slot-state").textContent = duplicateIds.has(patchRecordId) ? "Duplicate" : record ? "Ready" : patchRecordId ? "Missing" : "Empty";
+    row.querySelector(".slot-clear").hidden = !patchRecordId;
+    row.querySelector(".slot-clear").addEventListener("click", () => assignBankSlot(index, null));
+    row.querySelector(".slot-patch").addEventListener("click", () => {
+      if (selectedBankPatchId) assignBankSlot(index, selectedBankPatchId);
+      else if (record) inspectBuffer(record.buffer, record.fileName);
+    });
+    if (record) {
+      row.draggable = true;
+      row.addEventListener("dragstart", (event) => event.dataTransfer.setData("application/x-zoia-slot", String(index)));
+    }
+    row.addEventListener("dragover", (event) => { event.preventDefault(); row.classList.add("drag-over"); });
+    row.addEventListener("dragleave", () => row.classList.remove("drag-over"));
+    row.addEventListener("drop", (event) => {
+      event.preventDefault(); row.classList.remove("drag-over");
+      const sourceSlot = event.dataTransfer.getData("application/x-zoia-slot");
+      const patchIdValue = event.dataTransfer.getData("application/x-zoia-patch");
+      if (sourceSlot !== "") moveBankSlot(Number(sourceSlot), index);
+      else if (patchIdValue) assignBankSlot(index, patchIdValue);
+    });
+    return row;
+  }));
+}
+
+function renderBankPalette() {
+  const query = $("#bank-patch-search").value.trim().toLowerCase();
+  const matches = libraryRecords.filter((record) => `${record.title} ${record.fileName}`.toLowerCase().includes(query));
+  elements.bankPatchList.replaceChildren(...matches.map((record) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.draggable = true;
+    button.className = `bank-patch${selectedBankPatchId === record.id ? " selected" : ""}`;
+    button.innerHTML = `<span class="library-patch-icon"><i></i><i></i><i></i><i></i></span><span><strong></strong><small></small></span>`;
+    button.querySelector("strong").textContent = record.title;
+    button.querySelector("small").textContent = `${record.summary.moduleCount} modules · ${record.summary.estimatedCpu}% CPU`;
+    button.addEventListener("click", () => {
+      selectedBankPatchId = selectedBankPatchId === record.id ? undefined : record.id;
+      $("#selected-bank-patch").textContent = selectedBankPatchId ? `${record.title} selected` : "No patch selected";
+      renderBankPalette();
+    });
+    button.addEventListener("dragstart", (event) => event.dataTransfer.setData("application/x-zoia-patch", record.id));
+    return button;
+  }));
+  if (!matches.length) {
+    const empty = document.createElement("p"); empty.className = "palette-empty";
+    empty.textContent = libraryRecords.length ? "No matching patches." : "Import patches into your local library first.";
+    elements.bankPatchList.append(empty);
+  }
+}
+
+async function persistActiveBank(message = "Saved locally") {
+  if (!activeBank) return;
+  activeBank.updatedAt = Date.now();
+  await saveBank(activeBank);
+  $("#bank-save-status").textContent = message;
+  bankRecords = (await listBanks()).sort((a, b) => b.updatedAt - a.updatedAt);
+  renderBankList();
+}
+
+async function assignBankSlot(index, patchRecordId) {
+  activeBank.slots[index] = patchRecordId;
+  renderBankSlots(); renderBankHealth();
+  await persistActiveBank(`Slot ${String(index).padStart(3, "0")} saved`);
+}
+
+async function moveBankSlot(source, destination) {
+  if (source === destination) return;
+  [activeBank.slots[source], activeBank.slots[destination]] = [activeBank.slots[destination], activeBank.slots[source]];
+  renderBankSlots(); renderBankHealth();
+  await persistActiveBank(`Moved slot ${String(source).padStart(3, "0")} → ${String(destination).padStart(3, "0")}`);
+}
+
+function renderBankHealth() {
+  const filled = activeBank.slots.filter(Boolean);
+  const duplicates = filled.length - new Set(filled).size;
+  const missing = filled.filter((id) => !libraryRecords.some((record) => record.id === id)).length;
+  $("#bank-health").innerHTML = `<span class="health-ready"><b>${filled.length}</b> ready</span><span><b>${64 - filled.length}</b> empty</span><span class="${duplicates ? "health-warning" : ""}"><b>${duplicates}</b> duplicates</span><span class="${missing ? "health-error" : ""}"><b>${missing}</b> missing</span>`;
+}
+
+function safeBankName(value) {
+  return value.normalize("NFKD").replace(/[^a-zA-Z0-9 _-]/g, "").trim().replace(/\s+/g, "_").slice(0, 32) || "zoia_bank";
+}
+
+function bankFileName(slot, record) {
+  const title = safeBankName(record.title).toLowerCase().slice(0, 20);
+  return `${String(slot).padStart(3, "0")}_zoia_${title}.bin`;
+}
+
+function bankFiles() {
+  const patches = new Map(libraryRecords.map((record) => [record.id, record]));
+  return activeBank.slots.flatMap((id, slot) => {
+    const record = patches.get(id);
+    return record ? [{ name: bankFileName(slot, record), data: new Uint8Array(record.buffer) }] : [];
+  });
+}
+
+function exportBankZip() {
+  const files = bankFiles();
+  if (!files.length) { window.alert("Add at least one patch before exporting this bank."); return; }
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(createZip(files));
+  link.download = `${safeBankName(activeBank.name)}.zip`;
+  link.click(); URL.revokeObjectURL(link.href);
+  $("#bank-save-status").textContent = `Exported ${files.length} patches as ZIP`;
+}
+
+async function exportBankFolder() {
+  if (!("showDirectoryPicker" in window)) { window.alert("Direct folder export is not supported in this browser. Use Export ZIP instead."); return; }
+  const files = bankFiles();
+  if (!files.length) { window.alert("Add at least one patch before exporting this bank."); return; }
+  try {
+    const root = await window.showDirectoryPicker({ mode: "readwrite" });
+    const folder = await root.getDirectoryHandle(safeBankName(activeBank.name), { create: true });
+    for (const file of files) {
+      const handle = await folder.getFileHandle(file.name, { create: true });
+      const writable = await handle.createWritable(); await writable.write(file.data); await writable.close();
+    }
+    $("#bank-save-status").textContent = `Wrote ${files.length} patches to folder`;
+  } catch (error) {
+    if (error.name !== "AbortError") $("#bank-save-status").textContent = `Folder export failed: ${error.message}`;
+  }
+}
+
 function showLibrary() {
   elements.hero.hidden = true;
   elements.browse.hidden = true;
+  elements.banks.hidden = true;
   elements.workspace.hidden = true;
   elements.error.hidden = true;
   elements.library.hidden = false;
@@ -173,6 +380,7 @@ function showLibrary() {
 function showBrowse() {
   elements.hero.hidden = true;
   elements.library.hidden = true;
+  elements.banks.hidden = true;
   elements.workspace.hidden = true;
   elements.error.hidden = true;
   elements.browse.hidden = false;
@@ -579,6 +787,7 @@ function reset() {
   elements.workspace.hidden = true;
   elements.library.hidden = true;
   elements.browse.hidden = true;
+  elements.banks.hidden = true;
   elements.error.hidden = true;
   elements.hero.hidden = false;
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -636,8 +845,10 @@ elements.dialog.addEventListener("click", (event) => {
 });
 $("#library-nav").addEventListener("click", showLibrary);
 $("#browse-nav").addEventListener("click", showBrowse);
+$("#banks-nav").addEventListener("click", showBanks);
 $("#library-home").addEventListener("click", reset);
 $("#browse-home").addEventListener("click", reset);
+$("#banks-home").addEventListener("click", reset);
 [$("#library-import"), $("#library-empty-import")].forEach((button) => button.addEventListener("click", () => elements.libraryInput.click()));
 elements.libraryInput.addEventListener("change", () => importLibraryFiles(elements.libraryInput.files || []));
 elements.librarySearch.addEventListener("input", renderLibrary);
@@ -650,4 +861,20 @@ $("#browse-next").addEventListener("click", () => { if (browsePage < browseTotal
 $("#patch-dialog-close").addEventListener("click", () => elements.patchDialog.close());
 $("#patch-dialog-save").addEventListener("click", saveCommunityPatch);
 elements.patchDialog.addEventListener("close", () => { $("#patch-dialog-save").textContent = "Add to local library"; $("#patch-dialog-art").classList.remove("art-placeholder"); });
+[$("#new-bank"), $("#empty-new-bank")].forEach((button) => button.addEventListener("click", createBank));
+$("#bank-patch-search").addEventListener("input", renderBankPalette);
+$("#bank-name").addEventListener("input", () => {
+  if (!activeBank) return;
+  activeBank.name = $("#bank-name").value.trim() || "Untitled bank";
+  clearTimeout(bankNameTimer);
+  $("#bank-save-status").textContent = "Saving…";
+  bankNameTimer = setTimeout(() => persistActiveBank("Bank name saved"), 450);
+});
+$("#export-bank-zip").addEventListener("click", exportBankZip);
+$("#export-bank-folder").addEventListener("click", exportBankFolder);
+$("#delete-bank").addEventListener("click", async () => {
+  if (!activeBank || !window.confirm(`Delete “${activeBank.name}”? Its patches will remain in the local library.`)) return;
+  await removeBank(activeBank.id); activeBank = undefined; selectedBankPatchId = undefined; await refreshBanks();
+});
 refreshLibrary();
+refreshBanks();

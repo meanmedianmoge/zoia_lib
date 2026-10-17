@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=0.5.0">
+    <link rel="stylesheet" href="styles.css?v=0.6.0">
   </head>
   <body>
     <header class="topbar">
@@ -20,6 +20,7 @@
       <span class="privacy"><span></span> Local-only processing</span>
       <button class="library-nav" id="browse-nav" type="button">PatchStorage</button>
       <button class="library-nav" id="library-nav" type="button">Library <span id="library-count">0</span></button>
+      <button class="library-nav" id="banks-nav" type="button">Banks <span id="bank-count">0</span></button>
       <a class="github-link" href="https://github.com/meanmedianmoge/zoia_lib" target="_blank" rel="noreferrer">Source ↗</a>
     </header>
 
@@ -67,6 +68,58 @@
           <button class="button secondary" id="browse-next" type="button">Next →</button>
         </nav>
         <p class="patchstorage-credit">Patch data and files are provided by <a href="https://patchstorage.com/platform/zoia/" target="_blank" rel="noreferrer">PatchStorage</a>.</p>
+      </section>
+
+      <section class="banks" id="banks" hidden>
+        <div class="banks-head">
+          <div>
+            <button class="back-button" id="banks-home" type="button">← Back home</button>
+            <div class="eyebrow">SD-ready organization</div>
+            <h2>Bank builder</h2>
+            <p>Arrange local patches into 64 numbered ZOIA slots, then export the complete bank.</p>
+          </div>
+          <button class="button primary" id="new-bank" type="button">New bank</button>
+        </div>
+        <div class="bank-layout">
+          <aside class="bank-sidebar panel">
+            <div class="panel-head compact"><div><span class="section-label">Saved locally</span><h3>Banks</h3></div></div>
+            <div class="bank-list" id="bank-list"></div>
+          </aside>
+          <section class="bank-editor panel" id="bank-editor">
+            <div class="bank-empty" id="bank-empty">
+              <span class="empty-grid" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+              <strong>Create your first bank</strong>
+              <p>A bank holds up to 64 patches in pedal-ready order.</p>
+              <button class="text-button" id="empty-new-bank" type="button">Create bank →</button>
+            </div>
+            <div id="bank-content" hidden>
+              <div class="bank-editor-head">
+                <label><span class="section-label">Bank name</span><input id="bank-name" maxlength="48" aria-label="Bank name"></label>
+                <div class="bank-editor-actions">
+                  <button class="button secondary" id="export-bank-folder" type="button">Export folder</button>
+                  <button class="button secondary" id="export-bank-zip" type="button">Export ZIP</button>
+                  <button class="danger-button" id="delete-bank" type="button">Delete</button>
+                </div>
+              </div>
+              <div class="bank-health" id="bank-health"></div>
+              <div class="bank-workspace">
+                <div class="bank-slots-wrap">
+                  <div class="bank-slots-head"><span>Slot</span><span>Patch</span><span>Status</span></div>
+                  <div class="bank-slots" id="bank-slots"></div>
+                </div>
+                <aside class="bank-palette">
+                  <div class="bank-palette-head">
+                    <span class="section-label">Local library</span>
+                    <label class="search"><span>⌕</span><input id="bank-patch-search" type="search" placeholder="Filter patches…" aria-label="Filter bank patches"></label>
+                  </div>
+                  <p class="palette-help">Drag a patch into a slot, or select one and then choose a slot.</p>
+                  <div class="bank-patch-list" id="bank-patch-list"></div>
+                </aside>
+              </div>
+              <div class="bank-statusbar"><span id="bank-save-status">Saved locally</span><span id="selected-bank-patch">No patch selected</span></div>
+            </div>
+          </section>
+        </div>
       </section>
 
       <section class="library" id="library" hidden>
@@ -245,6 +298,6 @@
       <span>Experimental web companion to ZOIA Librarian.</span>
       <span>Not affiliated with Empress Effects.</span>
     </footer>
-    <script type="module" src="app.js?v=0.5.0"></script>
+    <script type="module" src="app.js?v=0.6.0"></script>
   </body>
 </html>
