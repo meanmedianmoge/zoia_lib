@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=0.9.1">
+    <link rel="stylesheet" href="styles.css?v=0.10.0">
   </head>
   <body>
     <header class="topbar">
@@ -26,7 +26,7 @@
 
     <main>
       <section class="hero" id="hero">
-        <div class="eyebrow">Browser experiment · v0.1</div>
+        <div class="eyebrow">Browser experiment · v0.10</div>
         <h1>See what’s inside<br><em>your sound.</em></h1>
         <p class="hero-copy">A lightweight patch inspector for the Empress Effects ZOIA. No install, no account, and your files never leave this browser.</p>
 
@@ -173,6 +173,7 @@
             </div>
           </div>
           <div class="workspace-actions">
+            <button class="button primary" id="name-editor-button" type="button">Edit names</button>
             <button class="button secondary" id="versions-button" type="button">Versions</button>
             <button class="button secondary" id="edit-metadata-button" type="button">Edit details</button>
             <button class="button secondary" id="export-button" type="button">Export analysis</button>
@@ -358,10 +359,28 @@
       <div class="versions-status" id="versions-status">Snapshots are stored in this browser.</div>
     </dialog>
 
+    <dialog class="name-editor-dialog" id="name-editor-dialog">
+      <form id="name-editor-form">
+        <div class="name-editor-head">
+          <div><span class="section-label">Safe patch editor</span><h2>Edit names</h2><p>Patch, page, and module names are limited to 16 bytes on ZOIA.</p></div>
+          <button class="dialog-close" id="name-editor-close" type="button" aria-label="Close name editor">×</button>
+        </div>
+        <div class="name-editor-body">
+          <label class="name-editor-patch"><span>Patch name</span><input id="editor-patch-name" maxlength="16" required></label>
+          <section><div class="parameter-title"><span class="section-label">Pages</span><span id="editor-page-count"></span></div><div class="name-editor-list" id="editor-pages"></div></section>
+          <section><div class="parameter-title"><span class="section-label">Modules</span><span id="editor-module-count"></span></div><div class="name-editor-list module-names" id="editor-modules"></div></section>
+        </div>
+        <div class="name-editor-footer">
+          <span id="name-editor-status">Applying an edit creates a snapshot of the original.</span>
+          <div><button class="button secondary" id="export-edited-patch" type="button">Export current .bin</button><button class="button primary" type="submit">Apply changes</button></div>
+        </div>
+      </form>
+    </dialog>
+
     <footer>
       <span>Experimental web companion to ZOIA Librarian.</span>
       <span>Not affiliated with Empress Effects.</span>
     </footer>
-    <script type="module" src="app.js?v=0.9.1"></script>
+    <script type="module" src="app.js?v=0.10.0"></script>
   </body>
 </html>

@@ -76,7 +76,8 @@ export function parsePatch(buffer, moduleIndex) {
       cpu: Number(definition.cpu) || 0,
       colorId: headerColorId,
       color: COLORS[headerColorId]?.[0] || "Unknown",
-      colorHex: COLORS[headerColorId]?.[1] || "#8b887d"
+      colorHex: COLORS[headerColorId]?.[1] || "#8b887d",
+      nameOffset: size >= 14 && nameStart >= (cursor + 10 + parameterCount) * 4 ? nameStart : null
     });
     cursor += size;
   }
@@ -107,7 +108,8 @@ export function parsePatch(buffer, moduleIndex) {
   const pages = Array.from({ length: usedPageCount }, (_, index) => ({
     number: index,
     name: pageNames[index] || `Page ${index + 1}`,
-    moduleCount: modules.filter((module) => module.page === index).length
+    moduleCount: modules.filter((module) => module.page === index).length,
+    nameOffset: (cursor - storedPageCount * 4 + index * 4) * 4
   }));
 
   const starredCount = cursor < wordCount ? word(cursor) : 0;
@@ -141,6 +143,7 @@ export function parsePatch(buffer, moduleIndex) {
 
   return {
     name: patchName,
+    nameOffset: 4,
     size: patchSize,
     byteLength: buffer.byteLength,
     modules,

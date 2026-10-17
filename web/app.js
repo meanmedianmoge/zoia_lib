@@ -1,9 +1,10 @@
-import { parsePatch } from "./parser.js?v=0.9.1";
-import { getPatch, getRevision, listBanks, listPatches, listRevisions, patchId, removeBank, removePatch, removeRevision, saveBank, savePatch, saveRevision } from "./library.js?v=0.9.1";
-import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.9.1";
-import { createZip, readZip } from "./zip.js?v=0.9.1";
+import { parsePatch } from "./parser.js?v=0.10.0";
+import { editPatchNames } from "./editor.js?v=0.10.0";
+import { getPatch, getRevision, listBanks, listPatches, listRevisions, patchId, removeBank, removePatch, removeRevision, saveBank, savePatch, saveRevision } from "./library.js?v=0.10.0";
+import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.10.0";
+import { createZip, readZip } from "./zip.js?v=0.10.0";
 
-const ASSET_VERSION = "0.9.1";
+const ASSET_VERSION = "0.10.0";
 
 const $ = (selector) => document.querySelector(selector);
 const elements = {
@@ -458,6 +459,86 @@ function downloadRevisionBinary(revision) {
   const link = document.createElement("a");
   link.href = URL.createObjectURL(new Blob([revision.buffer], { type: "application/octet-stream" }));
   link.download = versionPatchRecord.fileName.replace(/\.bin$/i, `_${safeBankName(revision.label)}.bin`);
+  link.click(); URL.revokeObjectURL(link.href);
+}
+
+function openNameEditor() {
+  if (!currentPatch || !currentBuffer) return;
+  $("#editor-patch-name").value = currentPatch.name;
+  $("#editor-page-count").textContent = `${currentPatch.pages.length} pages`;
+  $("#editor-module-count").textContent = `${currentPatch.modules.length} modules`;
+  $("#editor-pages").replaceChildren(...currentPatch.pages.map((page) => {
+    const label = document.createElement("label"); label.className = "name-editor-item";
+    label.innerHTML = `<span></span><input maxlength="16"><small></small>`;
+    label.querySelector("span").textContent = `Page ${String(page.number + 1).padStart(2, "0")}`;
+    label.querySelector("input").value = page.name;
+    label.querySelector("input").dataset.index = String(page.number);
+    label.querySelector("small").textContent = `${page.moduleCount} module${page.moduleCount === 1 ? "" : "s"}`;
+    return label;
+  }));
+  $("#editor-modules").replaceChildren(...currentPatch.modules.map((module) => {
+    const label = document.createElement("label"); label.className = "name-editor-item";
+    label.innerHTML = `<span></span><input maxlength="16"><small></small>`;
+    label.querySelector("span").textContent = `Module ${String(module.number + 1).padStart(2, "0")}`;
+    label.querySelector("input").value = module.customName;
+    label.querySelector("input").placeholder = module.type;
+    label.querySelector("input").dataset.index = String(module.number);
+    label.querySelector("input").disabled = !Number.isInteger(module.nameOffset);
+    label.querySelector("small").textContent = Number.isInteger(module.nameOffset) ? `${module.type} · Page ${module.page + 1}` : "Legacy module · name field unavailable";
+    return label;
+  }));
+  $("#name-editor-status").textContent = currentLibraryRecordId
+    ? "Applying an edit creates a snapshot of the original."
+    : "Open files can be edited and exported; library files also receive a snapshot.";
+  $("#name-editor-dialog").showModal();
+}
+
+async function snapshotBeforeNameEdit(record) {
+  const hash = await bufferHash(record.buffer);
+  if ((await listRevisions(record.id)).some((revision) => revision.hash === hash)) return;
+  await saveRevision({
+    id: `${record.id}::${hash}`, patchId: record.id, hash,
+    label: "Before name edit", note: "Automatic snapshot created by the safe name editor.",
+    createdAt: Date.now(), buffer: record.buffer,
+    metadata: structuredClone(metadataFor(record)), analysis: compactAnalysis(currentPatch)
+  });
+}
+
+async function applyNameEdits(event) {
+  event.preventDefault();
+  const pages = []; const modules = [];
+  $("#editor-pages").querySelectorAll("input").forEach((input) => { pages[Number(input.dataset.index)] = input.value; });
+  $("#editor-modules").querySelectorAll("input").forEach((input) => { modules[Number(input.dataset.index)] = input.value; });
+  const status = $("#name-editor-status"); status.textContent = "Validating edits…";
+  try {
+    const editedBuffer = editPatchNames(currentBuffer, currentPatch, { patchName: $("#editor-patch-name").value, pages, modules });
+    const editedPatch = parsePatch(editedBuffer, await getModuleIndex());
+    let displayTitle;
+    if (currentLibraryRecordId) {
+      const record = await getPatch(currentLibraryRecordId);
+      if (record) {
+        await snapshotBeforeNameEdit(record);
+        const followsInternalName = record.title === currentPatch.name;
+        const metadata = structuredClone(metadataFor(record));
+        if (metadata.title === currentPatch.name) metadata.title = editedPatch.name;
+        const updated = { ...record, buffer: editedBuffer, byteLength: editedBuffer.byteLength, summary: { ...editedPatch.meta }, metadata };
+        if (followsInternalName) updated.title = editedPatch.name;
+        await savePatch(updated); displayTitle = updated.title;
+      }
+    }
+    await inspectBuffer(editedBuffer, currentFileName, { recordId: currentLibraryRecordId, displayTitle });
+    status.textContent = "Names applied and original snapshot saved ✓";
+    $("#name-editor-dialog").close();
+  } catch (error) {
+    status.textContent = error.message;
+  }
+}
+
+function exportCurrentPatch() {
+  if (!currentBuffer) return;
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(new Blob([currentBuffer], { type: "application/octet-stream" }));
+  link.download = currentFileName.replace(/\.bin$/i, "_edited.bin");
   link.click(); URL.revokeObjectURL(link.href);
 }
 
@@ -1291,6 +1372,10 @@ $("#edit-metadata-button").addEventListener("click", async () => {
   if (record) openMetadataEditor(record);
 });
 $("#versions-button").addEventListener("click", () => openVersionHistory());
+$("#name-editor-button").addEventListener("click", openNameEditor);
+$("#name-editor-close").addEventListener("click", () => $("#name-editor-dialog").close());
+$("#name-editor-form").addEventListener("submit", applyNameEdits);
+$("#export-edited-patch").addEventListener("click", exportCurrentPatch);
 $("#versions-dialog-close").addEventListener("click", () => elements.versionsDialog.close());
 $("#snapshot-form").addEventListener("submit", createSnapshot);
 $("#compare-versions").addEventListener("click", compareSelectedRevisions);
