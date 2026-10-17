@@ -1,10 +1,10 @@
-import { parsePatch } from "./parser.js?v=0.13.0";
-import { editLayoutAndRoutes, editModuleSettings, editPatchNames } from "./editor.js?v=0.13.0";
-import { getPatch, getRevision, listBanks, listPatches, listRevisions, patchId, removeBank, removePatch, removeRevision, saveBank, savePatch, saveRevision } from "./library.js?v=0.13.0";
-import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.13.0";
-import { createZip, readZip } from "./zip.js?v=0.13.0";
+import { parsePatch } from "./parser.js?v=0.14.0";
+import { editLayoutAndRoutes, editModuleSettings, editPatchNames } from "./editor.js?v=0.14.0";
+import { getPatch, getRevision, listBanks, listPatches, listRevisions, patchId, removeBank, removePatch, removeRevision, saveBank, savePatch, saveRevision } from "./library.js?v=0.14.0";
+import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.14.0";
+import { createZip, readZip } from "./zip.js?v=0.14.0";
 
-const ASSET_VERSION = "0.13.0";
+const ASSET_VERSION = "0.14.0";
 
 const $ = (selector) => document.querySelector(selector);
 const elements = {
@@ -19,7 +19,7 @@ const elements = {
   librarySort: $("#library-sort"), libraryStatus: $("#library-status"), browse: $("#browse"),
   patchGrid: $("#patch-grid"), browseMessage: $("#browse-message"), patchDialog: $("#patch-dialog"),
   banks: $("#banks"), bankList: $("#bank-list"), bankSlots: $("#bank-slots"), bankPatchList: $("#bank-patch-list"),
-  metadataDialog: $("#metadata-dialog"), versionsDialog: $("#versions-dialog")
+  metadataDialog: $("#metadata-dialog"), versionsDialog: $("#versions-dialog"), patchEditor: $("#patch-editor-page")
 };
 
 let moduleIndex;
@@ -42,6 +42,8 @@ let versionPatchRecord;
 let revisionRecords = [];
 let selectedRevisionIds = new Set();
 let editorModule;
+let fullEditorDraft;
+let fullEditorSelected = 0;
 
 async function getModuleIndex() {
   if (!moduleIndex) {
@@ -64,6 +66,7 @@ async function inspectBuffer(buffer, fileName, { persist = false, lastModified =
     elements.library.hidden = true;
     elements.browse.hidden = true;
     elements.banks.hidden = true;
+    elements.patchEditor.hidden = true;
     elements.error.hidden = true;
     elements.workspace.hidden = false;
     if (persist) {
@@ -558,6 +561,137 @@ const EDITOR_COLORS = [
   [11, "Sky"], [12, "Purple"], [13, "Pink"], [14, "Peach"], [15, "Mango"]
 ];
 
+async function showFullEditor() {
+  if (!currentPatch) return;
+  fullEditorDraft = {
+    patchName: currentPatch.name,
+    names: currentPatch.modules.map((module) => module.customName),
+    settings: currentPatch.modules.map((module) => ({ colorId: module.colorId, parameters: module.parameters.map((parameter) => parameter.raw) })),
+    layouts: currentPatch.modules.map((module) => ({ page: module.page, position: module.position })),
+    connections: currentPatch.connections.map(({ sourceModule, sourceBlock, destinationModule, destinationBlock, strengthRaw }) => ({ sourceModule, sourceBlock, destinationModule, destinationBlock, strengthRaw }))
+  };
+  fullEditorSelected = Math.min(fullEditorSelected, currentPatch.modules.length - 1);
+  elements.workspace.hidden = true;
+  elements.patchEditor.hidden = false;
+  $("#patch-editor-title").textContent = currentFileName;
+  $("#full-editor-patch-name").value = fullEditorDraft.patchName;
+  $("#full-editor-module-count").textContent = `${currentPatch.modules.length} modules`;
+  renderFullCatalog(); renderFullModuleList(); renderFullInspector();
+  $("#full-editor-status").textContent = "Changes stay in a draft until you save.";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function renderFullCatalog() {
+  const query = $("#full-editor-catalog-search").value.trim().toLowerCase();
+  const items = Object.entries(moduleIndex || {}).filter(([, module]) => `${module.name} ${module.category}`.toLowerCase().includes(query));
+  $("#full-editor-catalog").replaceChildren(...items.map(([id, module]) => {
+    const row = document.createElement("div"); row.className = "catalog-item";
+    row.innerHTML = `<i></i><span><strong></strong><small></small></span><small></small>`;
+    row.querySelector("strong").textContent = module.name; row.querySelector("span small").textContent = module.category;
+    row.querySelector(":scope > small").textContent = `${module.cpu}%`; row.title = `Module ${id} · insertion support is coming next`;
+    return row;
+  }));
+}
+
+function captureFullInspector() {
+  if (!fullEditorDraft || !currentPatch.modules[fullEditorSelected] || $("#full-editor-details").hidden) return;
+  fullEditorDraft.names[fullEditorSelected] = $("#full-editor-module-name").value;
+  fullEditorDraft.settings[fullEditorSelected] = {
+    colorId: Number($("#full-editor-color").value),
+    parameters: [...$("#full-editor-parameters").querySelectorAll(".parameter-raw")].map((input) => Number(input.value))
+  };
+  fullEditorDraft.layouts[fullEditorSelected] = { page: Number($("#full-editor-page").value) - 1, position: Number($("#full-editor-position").value) - 1 };
+}
+
+function renderFullModuleList() {
+  const query = $("#full-editor-module-search").value.trim().toLowerCase();
+  $("#full-editor-modules").replaceChildren(...currentPatch.modules.map((module, index) => {
+    const row = document.createElement("button"); row.type = "button"; row.className = `patch-module-item${index === fullEditorSelected ? " active" : ""}`;
+    row.dataset.search = `${fullEditorDraft.names[index]} ${module.type} ${module.page + 1}`.toLowerCase(); row.hidden = !row.dataset.search.includes(query);
+    row.innerHTML = `<i></i><span><strong></strong><small></small></span><small></small>`;
+    row.querySelector("strong").textContent = fullEditorDraft.names[index] || module.type;
+    row.querySelector("span small").textContent = module.type; row.querySelector(":scope > small").textContent = `P${fullEditorDraft.layouts[index].page + 1}`;
+    row.addEventListener("click", () => { captureFullInspector(); fullEditorSelected = index; renderFullModuleList(); renderFullInspector(); });
+    return row;
+  }));
+}
+
+function renderFullInspector() {
+  const module = currentPatch.modules[fullEditorSelected];
+  $("#full-editor-empty").hidden = Boolean(module); $("#full-editor-details").hidden = !module;
+  if (!module) return;
+  $("#full-editor-module-title").textContent = `${String(module.number + 1).padStart(2, "0")} · ${module.type}`;
+  $("#full-editor-module-name").value = fullEditorDraft.names[fullEditorSelected];
+  $("#full-editor-module-name").disabled = !Number.isInteger(module.nameOffset);
+  $("#full-editor-color").replaceChildren(...EDITOR_COLORS.map(([id, name]) => { const option = document.createElement("option"); option.value = id; option.textContent = name; option.selected = id === fullEditorDraft.settings[fullEditorSelected].colorId; return option; }));
+  $("#full-editor-page").value = fullEditorDraft.layouts[fullEditorSelected].page + 1;
+  $("#full-editor-position").value = fullEditorDraft.layouts[fullEditorSelected].position + 1;
+  const values = fullEditorDraft.settings[fullEditorSelected].parameters;
+  const parameterRows = module.parameters.map((parameter, index) => {
+    const row = document.createElement("label"); row.className = "module-parameter-control";
+    row.innerHTML = `<span></span><input class="parameter-slider" type="range" min="0" max="65535"><input class="parameter-raw" type="number" min="0" max="65535" step="1"><output></output>`;
+    row.querySelector("span").textContent = parameter.name.replaceAll("_", " ");
+    const slider = row.querySelector(".parameter-slider"); const raw = row.querySelector(".parameter-raw"); const output = row.querySelector("output");
+    const sync = (value) => { const safe = Math.max(0, Math.min(65535, Number(value) || 0)); slider.value = raw.value = String(Math.round(safe)); output.value = (safe / 65535).toFixed(3); };
+    slider.addEventListener("input", () => sync(slider.value)); raw.addEventListener("input", () => sync(raw.value)); sync(values[index]); return row;
+  });
+  if (!parameterRows.length) { const empty = document.createElement("p"); empty.className = "no-parameters"; empty.textContent = "This module has no saved parameters."; parameterRows.push(empty); }
+  $("#full-editor-parameters").replaceChildren(...parameterRows); $("#full-editor-parameter-count").textContent = `${module.parameters.length} values`;
+  $("#full-route-other").replaceChildren(...currentPatch.modules.filter((_, index) => index !== fullEditorSelected).map((item) => { const option = document.createElement("option"); option.value = item.number; option.textContent = `${item.number + 1} · ${fullEditorDraft.names[item.number] || item.type}`; return option; }));
+  renderFullRoutes();
+}
+
+function renderFullRoutes() {
+  const relevant = fullEditorDraft.connections.map((route, index) => ({ route, index })).filter(({ route }) => route.sourceModule === fullEditorSelected || route.destinationModule === fullEditorSelected);
+  $("#full-editor-route-count").textContent = `${relevant.length} routes`;
+  $("#full-editor-routes").replaceChildren(...relevant.map(({ route, index }) => {
+    const row = document.createElement("div"); row.className = "full-route-row";
+    row.innerHTML = `<span><strong></strong><small></small></span><input type="number" min="-200" max="200" step="0.01"><button type="button" aria-label="Remove route">×</button>`;
+    row.querySelector("strong").textContent = `${fullEditorDraft.names[route.sourceModule] || currentPatch.modules[route.sourceModule].type} → ${fullEditorDraft.names[route.destinationModule] || currentPatch.modules[route.destinationModule].type}`;
+    row.querySelector("small").textContent = `Block ${route.sourceBlock} → Block ${route.destinationBlock}`;
+    const strength = row.querySelector("input"); strength.value = (route.strengthRaw / 100).toFixed(2); strength.addEventListener("input", () => { route.strengthRaw = Math.round(Number(strength.value) * 100); });
+    row.querySelector("button").addEventListener("click", () => { fullEditorDraft.connections.splice(index, 1); renderFullRoutes(); }); return row;
+  }));
+}
+
+function addFullEditorRoute() {
+  const other = Number($("#full-route-other").value); if (!Number.isInteger(other)) return;
+  const outward = $("#full-route-direction").value === "out";
+  fullEditorDraft.connections.push({ sourceModule: outward ? fullEditorSelected : other, sourceBlock: Number($("#full-route-source-block").value), destinationModule: outward ? other : fullEditorSelected, destinationBlock: Number($("#full-route-destination-block").value), strengthRaw: Math.round(Number($("#full-route-strength").value) * 100) });
+  renderFullRoutes();
+}
+
+function fullEditorLayoutIsClear() {
+  const seen = new Set();
+  for (const layout of fullEditorDraft.layouts) { const key = `${layout.page}:${layout.position}`; if (seen.has(key)) return false; seen.add(key); }
+  return true;
+}
+
+async function saveFullEditor() {
+  captureFullInspector(); fullEditorDraft.patchName = $("#full-editor-patch-name").value;
+  const status = $("#full-editor-status");
+  if (!fullEditorLayoutIsClear()) { status.textContent = "Two modules share the same page and grid position."; return; }
+  status.textContent = "Validating and writing one combined edit…";
+  try {
+    let editedBuffer = editPatchNames(currentBuffer, currentPatch, { patchName: fullEditorDraft.patchName, pages: currentPatch.pages.map((page) => page.name), modules: fullEditorDraft.names });
+    currentPatch.modules.forEach((module, index) => { editedBuffer = editModuleSettings(editedBuffer, module, fullEditorDraft.settings[index]); });
+    editedBuffer = editLayoutAndRoutes(editedBuffer, currentPatch, { modules: fullEditorDraft.layouts, connections: fullEditorDraft.connections });
+    const editedPatch = parsePatch(editedBuffer, await getModuleIndex()); let displayTitle;
+    if (currentLibraryRecordId) {
+      const record = await getPatch(currentLibraryRecordId);
+      if (record) {
+        await snapshotBeforeEdit(record, "Before full editor changes", "Automatic snapshot created by the unified patch editor.");
+        const followsInternalName = record.title === currentPatch.name; const metadata = structuredClone(metadataFor(record));
+        if (metadata.title === currentPatch.name) metadata.title = editedPatch.name;
+        const updated = { ...record, buffer: editedBuffer, byteLength: editedBuffer.byteLength, summary: { ...editedPatch.meta }, metadata };
+        if (followsInternalName) updated.title = editedPatch.name; await savePatch(updated); displayTitle = updated.title;
+      }
+    }
+    await inspectBuffer(editedBuffer, currentFileName, { recordId: currentLibraryRecordId, displayTitle });
+    await showFullEditor(); $("#full-editor-status").textContent = "All changes saved · original snapshot preserved ✓";
+  } catch (error) { status.textContent = error.message; }
+}
+
 function openModuleEditor() {
   if (!editorModule) return;
   elements.dialog.close();
@@ -772,6 +906,7 @@ async function showBanks() {
   elements.library.hidden = true;
   elements.browse.hidden = true;
   elements.workspace.hidden = true;
+  elements.patchEditor.hidden = true;
   elements.error.hidden = true;
   elements.banks.hidden = false;
   await refreshLibrary();
@@ -1009,6 +1144,7 @@ function showLibrary() {
   elements.browse.hidden = true;
   elements.banks.hidden = true;
   elements.workspace.hidden = true;
+  elements.patchEditor.hidden = true;
   elements.error.hidden = true;
   elements.library.hidden = false;
   refreshLibrary();
@@ -1020,6 +1156,7 @@ function showBrowse() {
   elements.library.hidden = true;
   elements.banks.hidden = true;
   elements.workspace.hidden = true;
+  elements.patchEditor.hidden = true;
   elements.error.hidden = true;
   elements.browse.hidden = false;
   if (!elements.patchGrid.children.length) loadBrowseResults();
@@ -1436,6 +1573,7 @@ function reset() {
   currentPatch = undefined;
   elements.input.value = "";
   elements.workspace.hidden = true;
+  elements.patchEditor.hidden = true;
   elements.library.hidden = true;
   elements.browse.hidden = true;
   elements.banks.hidden = true;
@@ -1524,7 +1662,15 @@ $("#edit-metadata-button").addEventListener("click", async () => {
   if (record) openMetadataEditor(record);
 });
 $("#versions-button").addEventListener("click", () => openVersionHistory());
-$("#editor-hub-button").addEventListener("click", openEditorHub);
+$("#editor-hub-button").addEventListener("click", showFullEditor);
+$("#patch-editor-back").addEventListener("click", () => { captureFullInspector(); elements.patchEditor.hidden = true; elements.workspace.hidden = false; window.scrollTo({ top: 0, behavior: "smooth" }); });
+$("#full-editor-catalog-search").addEventListener("input", renderFullCatalog);
+$("#full-editor-module-search").addEventListener("input", renderFullModuleList);
+$("#full-editor-patch-name").addEventListener("input", () => { if (fullEditorDraft) fullEditorDraft.patchName = $("#full-editor-patch-name").value; });
+$("#full-editor-module-name").addEventListener("input", () => { if (!fullEditorDraft) return; fullEditorDraft.names[fullEditorSelected] = $("#full-editor-module-name").value; renderFullModuleList(); });
+$("#full-add-route").addEventListener("click", addFullEditorRoute);
+$("#full-editor-save").addEventListener("click", saveFullEditor);
+$("#full-editor-export").addEventListener("click", exportCurrentPatch);
 $("#editor-hub-close").addEventListener("click", () => $("#editor-hub-dialog").close());
 $("#hub-edit-names").addEventListener("click", () => { $("#editor-hub-dialog").close(); openNameEditor(); });
 $("#hub-edit-layout").addEventListener("click", () => { $("#editor-hub-dialog").close(); openLayoutEditor(); });
