@@ -1,9 +1,9 @@
-import { parsePatch } from "./parser.js?v=0.6.0";
-import { getPatch, listBanks, listPatches, patchId, removeBank, removePatch, saveBank, savePatch } from "./library.js?v=0.6.0";
-import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.6.0";
-import { createZip } from "./zip.js?v=0.6.0";
+import { parsePatch } from "./parser.js?v=0.7.0";
+import { getPatch, listBanks, listPatches, patchId, removeBank, removePatch, saveBank, savePatch } from "./library.js?v=0.7.0";
+import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.7.0";
+import { createZip } from "./zip.js?v=0.7.0";
 
-const ASSET_VERSION = "0.6.0";
+const ASSET_VERSION = "0.7.0";
 
 const $ = (selector) => document.querySelector(selector);
 const elements = {
@@ -17,7 +17,8 @@ const elements = {
   libraryEmpty: $("#library-empty"), libraryInput: $("#library-file-input"), librarySearch: $("#library-search"),
   librarySort: $("#library-sort"), libraryStatus: $("#library-status"), browse: $("#browse"),
   patchGrid: $("#patch-grid"), browseMessage: $("#browse-message"), patchDialog: $("#patch-dialog"),
-  banks: $("#banks"), bankList: $("#bank-list"), bankSlots: $("#bank-slots"), bankPatchList: $("#bank-patch-list")
+  banks: $("#banks"), bankList: $("#bank-list"), bankSlots: $("#bank-slots"), bankPatchList: $("#bank-patch-list"),
+  metadataDialog: $("#metadata-dialog")
 };
 
 let moduleIndex;
@@ -33,6 +34,9 @@ let bankRecords = [];
 let activeBank;
 let selectedBankPatchId;
 let bankNameTimer;
+let currentLibraryRecordId;
+let metadataRecord;
+let metadataRating = 0;
 
 async function getModuleIndex() {
   if (!moduleIndex) {
@@ -43,12 +47,14 @@ async function getModuleIndex() {
   return moduleIndex;
 }
 
-async function inspectBuffer(buffer, fileName, { persist = false, lastModified = 0 } = {}) {
+async function inspectBuffer(buffer, fileName, { persist = false, lastModified = 0, recordId, displayTitle } = {}) {
   try {
     currentPatch = parsePatch(buffer, await getModuleIndex());
     currentFileName = fileName;
     currentBuffer = buffer;
+    currentLibraryRecordId = recordId;
     render(currentPatch);
+    if (displayTitle) elements.patchName.textContent = displayTitle;
     elements.hero.hidden = true;
     elements.library.hidden = true;
     elements.browse.hidden = true;
@@ -57,12 +63,15 @@ async function inspectBuffer(buffer, fileName, { persist = false, lastModified =
     elements.workspace.hidden = false;
     if (persist) {
       try {
-        await savePatch(makeLibraryRecord(currentPatch, buffer, fileName, lastModified));
+        const record = makeLibraryRecord(currentPatch, buffer, fileName, lastModified);
+        await savePatch(record);
+        currentLibraryRecordId = record.id;
         await refreshLibrary();
       } catch (storageError) {
         console.warn("Patch opened, but could not be saved to the local library.", storageError);
       }
     }
+    $("#edit-metadata-button").disabled = !currentLibraryRecordId;
     window.scrollTo({ top: 0, behavior: "smooth" });
   } catch (error) {
     elements.hero.hidden = true;
@@ -83,16 +92,31 @@ async function inspectFile(file) {
   await inspectBuffer(await file.arrayBuffer(), file.name, { persist: true, lastModified: file.lastModified });
 }
 
-function makeLibraryRecord(patch, buffer, fileName, lastModified = 0) {
+function makeLibraryRecord(patch, buffer, fileName, lastModified = 0, metadata = {}) {
+  const now = new Date().toISOString();
+  const details = {
+    title: metadata.title || patch.name,
+    content: metadata.content || "",
+    author: typeof metadata.author === "string" ? metadata.author : metadata.author?.name || "",
+    revision: String(metadata.revision || "1"),
+    rating: Number(metadata.rating) || 0,
+    categories: (metadata.categories || []).map((item) => typeof item === "string" ? item : item.name).filter(Boolean),
+    tags: (metadata.tags || []).map((item) => typeof item === "string" ? item : item.name).filter(Boolean),
+    link: metadata.link || metadata.url || "",
+    created_at: metadata.created_at || now,
+    updated_at: metadata.updated_at || now,
+    remote_id: metadata.id || null
+  };
   return {
     id: patchId(fileName, buffer.byteLength, lastModified),
     fileName,
-    title: patch.name,
+    title: details.title,
     addedAt: Date.now(),
     lastModified,
     byteLength: buffer.byteLength,
     buffer,
-    summary: { ...patch.meta }
+    summary: { ...patch.meta },
+    metadata: details
   };
 }
 
@@ -128,7 +152,7 @@ function renderLibrary() {
     row.innerHTML = `
       <button class="library-title" type="button"><span class="library-patch-icon"><i></i><i></i><i></i><i></i></span><span><strong></strong><small></small></span></button>
       <span class="library-stat"></span><span class="library-stat"></span><span class="library-stat"></span><span class="library-date"></span>
-      <span class="library-actions"><button type="button" data-action="export" title="Download original binary">↓</button><button type="button" data-action="remove" title="Remove from library">×</button></span>`;
+      <span class="library-actions"><button type="button" data-action="edit" title="Edit patch details">✎</button><button type="button" data-action="export" title="Download original binary">↓</button><button type="button" data-action="remove" title="Remove from library">×</button></span>`;
     row.querySelector(".library-title strong").textContent = record.title;
     row.querySelector(".library-title small").textContent = record.fileName;
     const stats = row.querySelectorAll(".library-stat");
@@ -137,6 +161,7 @@ function renderLibrary() {
     stats[2].textContent = `${record.summary.estimatedCpu}%`;
     row.querySelector(".library-date").textContent = new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" }).format(record.addedAt);
     row.querySelector(".library-title").addEventListener("click", () => openLibraryPatch(record.id));
+    row.querySelector('[data-action="edit"]').addEventListener("click", () => openMetadataEditor(record));
     row.querySelector('[data-action="export"]').addEventListener("click", () => downloadBinary(record));
     row.querySelector('[data-action="remove"]').addEventListener("click", () => deleteLibraryPatch(record));
     return row;
@@ -151,7 +176,7 @@ function renderLibrary() {
 
 async function openLibraryPatch(id) {
   const record = await getPatch(id);
-  if (record) await inspectBuffer(record.buffer, record.fileName);
+  if (record) await inspectBuffer(record.buffer, record.fileName, { recordId: record.id, displayTitle: record.title });
 }
 
 function downloadBinary(record) {
@@ -166,6 +191,121 @@ async function deleteLibraryPatch(record) {
   if (!window.confirm(`Remove “${record.title}” from this browser library? The original file on your device will not be affected.`)) return;
   await removePatch(record.id);
   await refreshLibrary();
+}
+
+function metadataFor(record) {
+  const now = new Date().toISOString();
+  return record.metadata || {
+    title: record.title, content: "", author: "", revision: "1", rating: 0,
+    categories: [], tags: [], link: "", created_at: now, updated_at: now, remote_id: null
+  };
+}
+
+function openMetadataEditor(record) {
+  metadataRecord = record;
+  const metadata = metadataFor(record);
+  $("#metadata-binary-name").textContent = `Binary: ${record.fileName}`;
+  $("#metadata-title").value = metadata.title || record.title;
+  $("#metadata-author").value = typeof metadata.author === "string" ? metadata.author : metadata.author?.name || "";
+  $("#metadata-revision").value = metadata.revision || "";
+  $("#metadata-source").value = metadata.link || "";
+  $("#metadata-categories").value = (metadata.categories || []).map((item) => typeof item === "string" ? item : item.name).join(", ");
+  $("#metadata-tags").value = (metadata.tags || []).map((item) => typeof item === "string" ? item : item.name).join(", ");
+  $("#metadata-notes").value = metadata.content || "";
+  metadataRating = Math.max(0, Math.min(5, Number(metadata.rating) || 0));
+  renderRating();
+  $("#metadata-save-status").textContent = "Stored only in this browser";
+  if (!elements.metadataDialog.open) elements.metadataDialog.showModal();
+}
+
+function renderRating() {
+  $("#metadata-rating").replaceChildren(...Array.from({ length: 5 }, (_, index) => {
+    const value = index + 1;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = value <= metadataRating ? "active" : "";
+    button.textContent = "★";
+    button.setAttribute("aria-label", `${value} star${value === 1 ? "" : "s"}`);
+    button.addEventListener("click", () => { metadataRating = metadataRating === value ? 0 : value; renderRating(); });
+    return button;
+  }));
+}
+
+function splitMetadataList(value) {
+  return [...new Set(value.split(",").map((item) => item.trim()).filter(Boolean))];
+}
+
+function collectMetadata() {
+  const previous = metadataFor(metadataRecord);
+  return {
+    ...previous,
+    title: $("#metadata-title").value.trim(),
+    author: $("#metadata-author").value.trim(),
+    revision: $("#metadata-revision").value.trim(),
+    rating: metadataRating,
+    link: $("#metadata-source").value.trim(),
+    categories: splitMetadataList($("#metadata-categories").value),
+    tags: splitMetadataList($("#metadata-tags").value),
+    content: $("#metadata-notes").value,
+    updated_at: new Date().toISOString()
+  };
+}
+
+function sidecarJson(record, metadata = metadataFor(record)) {
+  return {
+    id: metadata.remote_id || 0,
+    link: metadata.link || "",
+    created_at: metadata.created_at,
+    updated_at: metadata.updated_at,
+    title: metadata.title,
+    content: metadata.content,
+    revision: metadata.revision,
+    rating: metadata.rating,
+    author: { name: metadata.author || "" },
+    categories: metadata.categories.map((name) => ({ name })),
+    tags: metadata.tags.map((name) => ({ name })),
+    files: [{ id: 0, filesize: record.byteLength, filename: record.fileName }]
+  };
+}
+
+function downloadJson(data, fileName) {
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
+  link.download = fileName;
+  link.click(); URL.revokeObjectURL(link.href);
+}
+
+async function saveMetadata(event) {
+  event.preventDefault();
+  if (!metadataRecord) return;
+  const metadata = collectMetadata();
+  if (!metadata.title) return;
+  metadataRecord = { ...metadataRecord, title: metadata.title, metadata };
+  await savePatch(metadataRecord);
+  if (currentLibraryRecordId === metadataRecord.id) elements.patchName.textContent = metadata.title;
+  $("#metadata-save-status").textContent = "Saved ✓";
+  await refreshLibrary();
+  setTimeout(() => elements.metadataDialog.close(), 350);
+}
+
+async function importMetadataFile(file) {
+  if (!file || !metadataRecord) return;
+  try {
+    const data = JSON.parse(await file.text());
+    if (!data || typeof data !== "object") throw new Error("Expected a JSON object.");
+    const merged = { ...metadataFor(metadataRecord), ...data };
+    merged.author = typeof data.author === "string" ? data.author : data.author?.name || "";
+    merged.categories = (data.categories || []).map((item) => typeof item === "string" ? item : item.name).filter(Boolean);
+    merged.tags = (data.tags || []).map((item) => typeof item === "string" ? item : item.name).filter(Boolean);
+    merged.remote_id = data.remote_id || data.id || null;
+    metadataRecord = { ...metadataRecord, metadata: merged };
+    openMetadataEditor(metadataRecord);
+    $("#metadata-save-status").textContent = "Imported—review and save";
+  } catch (error) {
+    $("#metadata-save-status").textContent = `Import failed: ${error.message}`;
+  } finally {
+    $("#metadata-import-input").value = "";
+  }
 }
 
 async function refreshBanks() {
@@ -504,7 +644,7 @@ async function saveCommunityPatch() {
   try {
     const buffer = await downloadPatchFile(file.url);
     const patch = parsePatch(buffer, await getModuleIndex());
-    await savePatch(makeLibraryRecord(patch, buffer, file.filename, Date.parse(selectedCommunityPatch.updated_at) || 0));
+    await savePatch(makeLibraryRecord(patch, buffer, file.filename, Date.parse(selectedCommunityPatch.updated_at) || 0, selectedCommunityPatch));
     await refreshLibrary();
     button.textContent = "Saved to library ✓";
     $("#download-status").textContent = `${patch.name} is ready in your local library.`;
@@ -861,6 +1001,20 @@ $("#browse-next").addEventListener("click", () => { if (browsePage < browseTotal
 $("#patch-dialog-close").addEventListener("click", () => elements.patchDialog.close());
 $("#patch-dialog-save").addEventListener("click", saveCommunityPatch);
 elements.patchDialog.addEventListener("close", () => { $("#patch-dialog-save").textContent = "Add to local library"; $("#patch-dialog-art").classList.remove("art-placeholder"); });
+$("#edit-metadata-button").addEventListener("click", async () => {
+  if (!currentLibraryRecordId) return;
+  const record = await getPatch(currentLibraryRecordId);
+  if (record) openMetadataEditor(record);
+});
+$("#metadata-dialog-close").addEventListener("click", () => elements.metadataDialog.close());
+$("#metadata-form").addEventListener("submit", saveMetadata);
+$("#metadata-import").addEventListener("click", () => $("#metadata-import-input").click());
+$("#metadata-import-input").addEventListener("change", () => importMetadataFile($("#metadata-import-input").files?.[0]));
+$("#metadata-export").addEventListener("click", () => {
+  if (!metadataRecord) return;
+  const metadata = collectMetadata();
+  downloadJson(sidecarJson(metadataRecord, metadata), `${metadataRecord.fileName.replace(/\.bin$/i, "")}.json`);
+});
 [$("#new-bank"), $("#empty-new-bank")].forEach((button) => button.addEventListener("click", createBank));
 $("#bank-patch-search").addEventListener("input", renderBankPalette);
 $("#bank-name").addEventListener("input", () => {

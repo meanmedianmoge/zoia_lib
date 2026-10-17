@@ -87,7 +87,7 @@ code { font-family: DM Mono, monospace; color: var(--blue); }
 .sort-label select { padding: 8px 28px 8px 9px; border: 1px solid #89909a; border-radius: 5px; background: #fff; color: #25272b; font: 500 10px Manrope, sans-serif; }
 .library-status { margin-left: auto; color: #424955; font: 500 10px DM Mono, monospace; }
 .library-table-wrap { overflow: hidden; border: 1px solid #b9b6ac; border-radius: 0 0 10px 10px; background: var(--panel); box-shadow: var(--shadow); }
-.library-table-head, .library-row { display: grid; grid-template-columns: minmax(260px, 2.2fr) .55fr .45fr .55fr .8fr 80px; align-items: center; gap: 12px; }
+.library-table-head, .library-row { display: grid; grid-template-columns: minmax(260px, 2.2fr) .55fr .45fr .55fr .8fr 112px; align-items: center; gap: 12px; }
 .library-table-head { min-height: 38px; padding: 0 18px; background: #444851; color: #fff; font: 500 8px DM Mono, monospace; text-transform: uppercase; letter-spacing: .08em; }
 .library-row { min-height: 70px; padding: 9px 18px; border-bottom: 1px solid #dfdcd2; }
 .library-row:last-child { border-bottom: 0; }
@@ -245,9 +245,33 @@ code { font-family: DM Mono, monospace; color: var(--blue); }
 .palette-empty { padding: 25px 10px; color: var(--muted); font-size: 10px; text-align: center; }
 .bank-statusbar { display: flex; justify-content: space-between; gap: 15px; padding: 8px 12px; background: #444851; color: #d4d6da; font: 400 8px DM Mono, monospace; }
 
+.metadata-dialog { width: min(760px, calc(100% - 28px)); max-height: min(900px, calc(100vh - 30px)); padding: 0; overflow: auto; border: 1px solid #25272d; border-radius: 12px; background: #f7f6f1; color: var(--ink); box-shadow: 0 28px 90px rgba(0,0,0,.4); }
+.metadata-dialog::backdrop { background: rgba(27,28,32,.75); backdrop-filter: blur(3px); }
+.metadata-dialog form > input[type="file"] { position: absolute; opacity: 0; pointer-events: none; }
+.metadata-dialog-head { display: flex; justify-content: space-between; gap: 20px; padding: 28px 30px 22px; border-bottom: 1px solid var(--line); background: white; }
+.metadata-dialog-head h2 { margin: 7px 0 4px; font-size: 38px; }
+.metadata-dialog-head p { margin: 0; color: var(--muted); font: 400 9px DM Mono, monospace; }
+.metadata-fields { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 18px; padding: 26px 30px; }
+.metadata-fields label > span, .rating-field legend { display: block; margin-bottom: 7px; color: #535249; font: 500 9px DM Mono, monospace; text-transform: uppercase; letter-spacing: .05em; }
+.metadata-fields label small { color: #99968b; text-transform: none; letter-spacing: 0; }
+.metadata-fields input, .metadata-fields textarea { width: 100%; padding: 10px 11px; border: 1px solid #aaa79d; border-radius: 5px; background: white; color: var(--ink); font-size: 12px; outline: 0; }
+.metadata-fields input:focus, .metadata-fields textarea:focus { border-color: #5373ff; box-shadow: 0 0 0 3px rgba(83,115,255,.12); }
+.metadata-fields textarea { resize: vertical; line-height: 1.55; }
+.field-wide { grid-column: 1 / -1; }
+.rating-field { margin: 0; padding: 0; border: 0; }
+.rating-stars { display: flex; gap: 3px; }
+.rating-stars button { padding: 2px; border: 0; background: none; color: #c7c4ba; font-size: 25px; cursor: pointer; }
+.rating-stars button.active { color: #e2a413; }
+.metadata-dialog-footer { position: sticky; bottom: 0; display: flex; align-items: center; gap: 16px; padding: 15px 30px; border-top: 1px solid #aaa; background: #444851; color: white; }
+.metadata-dialog-footer > div { display: flex; gap: 15px; }
+.metadata-dialog-footer .text-button { color: white; }
+.metadata-dialog-footer > span { flex: 1; color: #c6c8ce; font: 400 8px DM Mono, monospace; text-align: right; }
+.metadata-dialog-footer .primary { margin-left: 0; background: #d8ff48; color: #171610; }
+
 .workspace { padding: 56px 0 90px; animation: reveal .45s ease both; }
 @keyframes reveal { from { opacity: 0; transform: translateY(12px); } }
 .workspace-head { display: flex; align-items: end; justify-content: space-between; gap: 30px; margin-bottom: 34px; }
+.workspace-actions { display: flex; gap: 9px; }
 .back-button { color: var(--muted); font-size: 12px; margin-bottom: 14px; }
 .title-line { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 h2 { font-size: clamp(38px, 6vw, 64px); line-height: 1; letter-spacing: -.055em; margin: 0; }
@@ -387,7 +411,7 @@ footer { width: min(1180px, calc(100% - 40px)); margin: auto; padding: 28px 0 40
   .metrics article:nth-child(2) { border-right: 0; }
   .metrics article:nth-child(-n+2) { border-bottom: 1px solid rgba(255,255,255,.16); }
   .dashboard { grid-template-columns: 1fr; }
-  .library-table-head, .library-row { grid-template-columns: minmax(180px, 1fr) 55px 55px 70px; }
+  .library-table-head, .library-row { grid-template-columns: minmax(180px, 1fr) 55px 55px 100px; }
   .library-table-head span:nth-child(3), .library-table-head span:nth-child(5), .library-row > span:nth-child(3), .library-row > span:nth-child(5) { display: none; }
   .library-head { align-items: flex-start; flex-direction: column; }
   .library-head .primary { margin: 0; }
@@ -416,6 +440,8 @@ footer { width: min(1180px, calc(100% - 40px)); margin: auto; padding: 28px 0 40
   .drop-icon { width: 46px; height: 46px; }
   .primary { width: 100%; margin: 4px 0 0; }
   .workspace-head { align-items: flex-start; flex-direction: column; }
+  .workspace-actions { width: 100%; }
+  .workspace-actions .button { flex: 1; }
   .module-row { grid-template-columns: 26px 1fr auto; padding: 14px 16px; }
   .module-row .page-num, .module-row .cpu { display: none; }
   .panel-head { align-items: flex-start; flex-direction: column; }
@@ -438,6 +464,11 @@ footer { width: min(1180px, calc(100% - 40px)); margin: auto; padding: 28px 0 40
   .patch-dialog-body h2 { font-size: 32px; }
   .patch-dialog-actions { align-items: stretch; flex-direction: column; }
   .patch-dialog-actions .button { text-align: center; }
+  .metadata-fields { grid-template-columns: 1fr; padding: 22px 18px; }
+  .metadata-fields .field-wide { grid-column: 1; }
+  .metadata-dialog-head { padding: 24px 18px 18px; }
+  .metadata-dialog-footer { align-items: stretch; flex-direction: column; padding: 14px 18px; }
+  .metadata-dialog-footer > span { text-align: left; }
   .library-search { width: 100%; }
   .library-status { margin-left: 0; }
   .library-table-head { display: none; }

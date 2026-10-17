@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=0.6.0">
+    <link rel="stylesheet" href="styles.css?v=0.7.0">
   </head>
   <body>
     <header class="topbar">
@@ -166,7 +166,10 @@
               <span class="file-pill" id="file-name">patch.bin</span>
             </div>
           </div>
-          <button class="button secondary" id="export-button" type="button">Export JSON</button>
+          <div class="workspace-actions">
+            <button class="button secondary" id="edit-metadata-button" type="button">Edit details</button>
+            <button class="button secondary" id="export-button" type="button">Export analysis</button>
+          </div>
         </div>
 
         <div class="metrics" aria-label="Patch summary">
@@ -294,10 +297,35 @@
       </div>
     </dialog>
 
+    <dialog class="metadata-dialog" id="metadata-dialog">
+      <form id="metadata-form">
+        <input type="file" id="metadata-import-input" accept=".json,application/json">
+        <div class="metadata-dialog-head">
+          <div><span class="section-label">Local sidecar</span><h2>Patch details</h2><p id="metadata-binary-name"></p></div>
+          <button class="dialog-close" id="metadata-dialog-close" type="button" aria-label="Close patch details editor">×</button>
+        </div>
+        <div class="metadata-fields">
+          <label class="field-wide"><span>Display title</span><input id="metadata-title" maxlength="120" required></label>
+          <label><span>Author</span><input id="metadata-author" maxlength="100"></label>
+          <label><span>Revision</span><input id="metadata-revision" maxlength="24" placeholder="1.0"></label>
+          <fieldset class="rating-field"><legend>Local rating</legend><div class="rating-stars" id="metadata-rating"></div></fieldset>
+          <label><span>Source URL</span><input id="metadata-source" type="url" placeholder="https://…"></label>
+          <label class="field-wide"><span>Categories <small>comma separated</small></span><input id="metadata-categories" placeholder="Effect, Utility"></label>
+          <label class="field-wide"><span>Tags <small>comma separated</small></span><input id="metadata-tags" placeholder="ambient, delay, guitar"></label>
+          <label class="field-wide"><span>Patch notes</span><textarea id="metadata-notes" rows="9" placeholder="Performance notes, controls, signal flow…"></textarea></label>
+        </div>
+        <div class="metadata-dialog-footer">
+          <div><button class="text-button" id="metadata-import" type="button">Import JSON</button><button class="text-button" id="metadata-export" type="button">Export JSON</button></div>
+          <span id="metadata-save-status"></span>
+          <button class="button primary" type="submit">Save details</button>
+        </div>
+      </form>
+    </dialog>
+
     <footer>
       <span>Experimental web companion to ZOIA Librarian.</span>
       <span>Not affiliated with Empress Effects.</span>
     </footer>
-    <script type="module" src="app.js?v=0.6.0"></script>
+    <script type="module" src="app.js?v=0.7.0"></script>
   </body>
 </html>
