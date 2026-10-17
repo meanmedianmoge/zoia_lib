@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#15140f">
+    <meta name="description" content="Inspect Empress Effects ZOIA patch files privately in your browser.">
+    <title>ZOIA Patchwork</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="ZOIA Patchwork home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span>ZOIA <b>Patchwork</b></span>
+      </a>
+      <span class="privacy"><span></span> Local-only processing</span>
+      <a class="github-link" href="https://github.com/meanmedianmoge/zoia_lib" target="_blank" rel="noreferrer">Source ↗</a>
+    </header>
+
+    <main>
+      <section class="hero" id="hero">
+        <div class="eyebrow">Browser experiment · v0.1</div>
+        <h1>See what’s inside<br><em>your sound.</em></h1>
+        <p class="hero-copy">A lightweight patch inspector for the Empress Effects ZOIA. No install, no account, and your files never leave this browser.</p>
+
+        <div class="drop-zone" id="drop-zone">
+          <input type="file" id="file-input" accept=".bin,application/octet-stream">
+          <div class="drop-icon" aria-hidden="true">↓</div>
+          <div>
+            <strong>Drop a ZOIA patch here</strong>
+            <span>or choose a <code>.bin</code> file</span>
+          </div>
+          <button class="button primary" id="choose-button" type="button">Choose patch</button>
+        </div>
+
+        <div class="demo-row">
+          <button class="text-button" id="demo-button" type="button">Try the included demo patch <span>→</span></button>
+          <span>Works in modern desktop and mobile browsers</span>
+        </div>
+      </section>
+
+      <section class="workspace" id="workspace" hidden>
+        <div class="workspace-head">
+          <div>
+            <button class="back-button" id="new-file-button" type="button">← Open another patch</button>
+            <div class="title-line">
+              <h2 id="patch-name">Untitled patch</h2>
+              <span class="file-pill" id="file-name">patch.bin</span>
+            </div>
+          </div>
+          <button class="button secondary" id="export-button" type="button">Export JSON</button>
+        </div>
+
+        <div class="metrics" aria-label="Patch summary">
+          <article><span>Modules</span><strong id="module-count">0</strong></article>
+          <article><span>Connections</span><strong id="connection-count">0</strong></article>
+          <article><span>Pages</span><strong id="page-count">0</strong></article>
+          <article><span>Estimated CPU</span><strong id="cpu-total">0%</strong></article>
+        </div>
+
+        <div class="dashboard">
+          <section class="panel module-panel">
+            <div class="panel-head">
+              <div>
+                <span class="section-label">Module inventory</span>
+                <h3>Building blocks</h3>
+              </div>
+              <label class="search"><span>⌕</span><input id="module-search" type="search" placeholder="Filter modules…" aria-label="Filter modules"></label>
+            </div>
+            <div class="module-list" id="module-list"></div>
+            <div class="empty-filter" id="empty-filter" hidden>No modules match that filter.</div>
+          </section>
+
+          <aside class="side-column">
+            <section class="panel">
+              <div class="panel-head compact">
+                <div><span class="section-label">Canvas map</span><h3>Pages</h3></div>
+              </div>
+              <div class="page-list" id="page-list"></div>
+            </section>
+            <section class="panel">
+              <div class="panel-head compact">
+                <div><span class="section-label">Signal flow</span><h3>Connection mix</h3></div>
+              </div>
+              <div class="strength-chart" id="strength-chart"></div>
+            </section>
+          </aside>
+        </div>
+      </section>
+
+      <section class="error-card" id="error-card" hidden role="alert">
+        <strong>That patch could not be read.</strong>
+        <p id="error-message"></p>
+        <button class="text-button" id="error-reset" type="button">Choose another file →</button>
+      </section>
+    </main>
+
+    <footer>
+      <span>Experimental web companion to ZOIA Librarian.</span>
+      <span>Not affiliated with Empress Effects.</span>
+    </footer>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
