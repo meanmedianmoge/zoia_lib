@@ -71,12 +71,15 @@ export function parsePatch(buffer, moduleIndex) {
       parameters: rawParameters.map((raw, index) => ({
         name: definition.parameters?.[index] || `Parameter ${index + 1}`,
         raw,
-        normalized: Math.round((raw / 65535) * 1000) / 1000
+        normalized: Math.round((raw / 65535) * 1000) / 1000,
+        offset: (cursor + 10 + index) * 4
       })),
       cpu: Number(definition.cpu) || 0,
       colorId: headerColorId,
       color: COLORS[headerColorId]?.[0] || "Unknown",
       colorHex: COLORS[headerColorId]?.[1] || "#8b887d",
+      headerColorOffset: (cursor + 4) * 4,
+      colorOffset: null,
       nameOffset: size >= 14 && nameStart >= (cursor + 10 + parameterCount) * 4 ? nameStart : null
     });
     cursor += size;
@@ -129,6 +132,18 @@ export function parsePatch(buffer, moduleIndex) {
       midiCc: encodedBlock >= 128 ? Math.round(encodedBlock / 128) - 1 : null
     };
   });
+
+  const colorStart = cursor + 1 + safeStarredCount;
+  const trailingColors = colorStart + moduleCount <= Math.min(wordCount, patchSize)
+    ? modules.map((_, index) => word(colorStart + index)) : [];
+  if (trailingColors.length === moduleCount && trailingColors.every((colorId) => COLORS[colorId])) {
+    modules.forEach((module, index) => {
+      module.colorId = trailingColors[index];
+      module.color = COLORS[module.colorId][0];
+      module.colorHex = COLORS[module.colorId][1];
+      module.colorOffset = (colorStart + index) * 4;
+    });
+  }
 
   connections.forEach((connection) => {
     const source = modules[connection.sourceModule];

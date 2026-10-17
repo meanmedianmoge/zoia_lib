@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=0.10.0">
+    <link rel="stylesheet" href="styles.css?v=0.11.0">
   </head>
   <body>
     <header class="topbar">
@@ -26,7 +26,7 @@
 
     <main>
       <section class="hero" id="hero">
-        <div class="eyebrow">Browser experiment · v0.10</div>
+        <div class="eyebrow">Browser experiment · v0.11</div>
         <h1>See what’s inside<br><em>your sound.</em></h1>
         <p class="hero-copy">A lightweight patch inspector for the Empress Effects ZOIA. No install, no account, and your files never leave this browser.</p>
 
@@ -285,6 +285,7 @@
         <div class="parameter-title"><span class="section-label">Module blocks</span><span id="block-count"></span></div>
         <div class="block-list" id="block-list"></div>
       </div>
+      <div class="module-dialog-actions"><span>Fixed-field editing preserves patch structure.</span><button class="button primary" id="edit-module-button" type="button">Edit module</button></div>
     </dialog>
 
     <dialog class="patch-dialog" id="patch-dialog">
@@ -377,10 +378,24 @@
       </form>
     </dialog>
 
+    <dialog class="module-editor-dialog" id="module-editor-dialog">
+      <form id="module-editor-form">
+        <div class="name-editor-head">
+          <div><span class="section-label">Module editor</span><h2 id="module-editor-name">Edit module</h2><p id="module-editor-type"></p></div>
+          <button class="dialog-close" id="module-editor-close" type="button" aria-label="Close module editor">×</button>
+        </div>
+        <div class="module-editor-body">
+          <label class="module-color-field"><span>Module color</span><select id="module-editor-color"></select></label>
+          <section><div class="parameter-title"><span class="section-label">Saved parameter values</span><span>Raw 0–65535</span></div><div class="module-parameter-editor" id="module-parameter-editor"></div></section>
+        </div>
+        <div class="name-editor-footer"><span id="module-editor-status">The original is snapshotted before changes are applied.</span><button class="button primary" type="submit">Apply module changes</button></div>
+      </form>
+    </dialog>
+
     <footer>
       <span>Experimental web companion to ZOIA Librarian.</span>
       <span>Not affiliated with Empress Effects.</span>
     </footer>
-    <script type="module" src="app.js?v=0.10.0"></script>
+    <script type="module" src="app.js?v=0.11.0"></script>
   </body>
 </html>

@@ -1,10 +1,10 @@
-import { parsePatch } from "./parser.js?v=0.10.0";
-import { editPatchNames } from "./editor.js?v=0.10.0";
-import { getPatch, getRevision, listBanks, listPatches, listRevisions, patchId, removeBank, removePatch, removeRevision, saveBank, savePatch, saveRevision } from "./library.js?v=0.10.0";
-import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.10.0";
-import { createZip, readZip } from "./zip.js?v=0.10.0";
+import { parsePatch } from "./parser.js?v=0.11.0";
+import { editModuleSettings, editPatchNames } from "./editor.js?v=0.11.0";
+import { getPatch, getRevision, listBanks, listPatches, listRevisions, patchId, removeBank, removePatch, removeRevision, saveBank, savePatch, saveRevision } from "./library.js?v=0.11.0";
+import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.11.0";
+import { createZip, readZip } from "./zip.js?v=0.11.0";
 
-const ASSET_VERSION = "0.10.0";
+const ASSET_VERSION = "0.11.0";
 
 const $ = (selector) => document.querySelector(selector);
 const elements = {
@@ -41,6 +41,7 @@ let metadataRating = 0;
 let versionPatchRecord;
 let revisionRecords = [];
 let selectedRevisionIds = new Set();
+let editorModule;
 
 async function getModuleIndex() {
   if (!moduleIndex) {
@@ -366,7 +367,7 @@ function compactAnalysis(patch) {
     pages: patch.pages.map((page) => ({ ...page })),
     modules: patch.modules.map((module) => ({
       number: module.number, typeId: module.typeId, displayName: module.displayName,
-      type: module.type, page: module.page, position: module.position, version: module.version,
+      type: module.type, page: module.page, position: module.position, version: module.version, colorId: module.colorId,
       parameters: module.parameters.map((parameter) => parameter.raw)
     })),
     connections: patch.connections.map((connection) => ({
@@ -493,12 +494,12 @@ function openNameEditor() {
   $("#name-editor-dialog").showModal();
 }
 
-async function snapshotBeforeNameEdit(record) {
+async function snapshotBeforeEdit(record, label, note) {
   const hash = await bufferHash(record.buffer);
   if ((await listRevisions(record.id)).some((revision) => revision.hash === hash)) return;
   await saveRevision({
     id: `${record.id}::${hash}`, patchId: record.id, hash,
-    label: "Before name edit", note: "Automatic snapshot created by the safe name editor.",
+    label, note,
     createdAt: Date.now(), buffer: record.buffer,
     metadata: structuredClone(metadataFor(record)), analysis: compactAnalysis(currentPatch)
   });
@@ -517,7 +518,7 @@ async function applyNameEdits(event) {
     if (currentLibraryRecordId) {
       const record = await getPatch(currentLibraryRecordId);
       if (record) {
-        await snapshotBeforeNameEdit(record);
+        await snapshotBeforeEdit(record, "Before name edit", "Automatic snapshot created by the safe name editor.");
         const followsInternalName = record.title === currentPatch.name;
         const metadata = structuredClone(metadataFor(record));
         if (metadata.title === currentPatch.name) metadata.title = editedPatch.name;
@@ -540,6 +541,60 @@ function exportCurrentPatch() {
   link.href = URL.createObjectURL(new Blob([currentBuffer], { type: "application/octet-stream" }));
   link.download = currentFileName.replace(/\.bin$/i, "_edited.bin");
   link.click(); URL.revokeObjectURL(link.href);
+}
+
+const EDITOR_COLORS = [
+  [1, "Blue"], [2, "Green"], [3, "Red"], [4, "Yellow"], [5, "Aqua"],
+  [6, "Magenta"], [7, "White"], [8, "Orange"], [9, "Lima"], [10, "Surf"],
+  [11, "Sky"], [12, "Purple"], [13, "Pink"], [14, "Peach"], [15, "Mango"]
+];
+
+function openModuleEditor() {
+  if (!editorModule) return;
+  elements.dialog.close();
+  $("#module-editor-name").textContent = editorModule.displayName;
+  $("#module-editor-type").textContent = `${editorModule.type} · Module ${editorModule.number + 1} · Page ${editorModule.page + 1}`;
+  $("#module-editor-color").replaceChildren(...EDITOR_COLORS.map(([id, name]) => {
+    const option = document.createElement("option"); option.value = String(id); option.textContent = name; option.selected = id === editorModule.colorId; return option;
+  }));
+  const rows = editorModule.parameters.map((parameter, index) => {
+    const row = document.createElement("label"); row.className = "module-parameter-control";
+    row.innerHTML = `<span></span><input class="parameter-slider" type="range" min="0" max="65535"><input class="parameter-raw" type="number" min="0" max="65535" step="1"><output></output>`;
+    row.querySelector("span").textContent = parameter.name.replaceAll("_", " ");
+    const slider = row.querySelector(".parameter-slider"); const raw = row.querySelector(".parameter-raw"); const output = row.querySelector("output");
+    slider.value = raw.value = String(parameter.raw); raw.dataset.index = String(index);
+    const sync = (value) => { const safe = Math.max(0, Math.min(65535, Number(value) || 0)); slider.value = raw.value = String(Math.round(safe)); output.value = (safe / 65535).toFixed(3); };
+    slider.addEventListener("input", () => sync(slider.value)); raw.addEventListener("input", () => sync(raw.value)); sync(parameter.raw);
+    return row;
+  });
+  if (!rows.length) { const empty = document.createElement("p"); empty.className = "no-parameters"; empty.textContent = "This module has no saved parameter values; its color can still be changed."; rows.push(empty); }
+  $("#module-parameter-editor").replaceChildren(...rows);
+  $("#module-editor-status").textContent = currentLibraryRecordId ? "The original is snapshotted before changes are applied." : "Open files can be edited and exported; library files also receive a snapshot.";
+  $("#module-editor-dialog").showModal();
+}
+
+async function applyModuleEdits(event) {
+  event.preventDefault();
+  if (!editorModule) return;
+  const parameters = [...$("#module-parameter-editor").querySelectorAll(".parameter-raw")].map((input) => Number(input.value));
+  const status = $("#module-editor-status"); status.textContent = "Validating module values…";
+  try {
+    const editedBuffer = editModuleSettings(currentBuffer, editorModule, { colorId: Number($("#module-editor-color").value), parameters });
+    const editedPatch = parsePatch(editedBuffer, await getModuleIndex());
+    let displayTitle;
+    if (currentLibraryRecordId) {
+      const record = await getPatch(currentLibraryRecordId);
+      if (record) {
+        await snapshotBeforeEdit(record, `Before editing ${editorModule.displayName}`, "Automatic snapshot created by the module editor.");
+        const updated = { ...record, buffer: editedBuffer, byteLength: editedBuffer.byteLength, summary: { ...editedPatch.meta } };
+        await savePatch(updated); displayTitle = updated.title;
+      }
+    }
+    await inspectBuffer(editedBuffer, currentFileName, { recordId: currentLibraryRecordId, displayTitle });
+    $("#module-editor-dialog").close();
+  } catch (error) {
+    status.textContent = error.message;
+  }
 }
 
 async function restoreRevision(revision) {
@@ -580,7 +635,7 @@ function compareSelectedRevisions() {
   const changed = [...after.keys()].filter((number) => {
     if (!before.has(number)) return false;
     const a = before.get(number); const b = after.get(number);
-    return a.typeId !== b.typeId || a.page !== b.page || a.position !== b.position || a.version !== b.version || JSON.stringify(a.parameters) !== JSON.stringify(b.parameters);
+    return a.typeId !== b.typeId || a.page !== b.page || a.position !== b.position || a.version !== b.version || a.colorId !== b.colorId || JSON.stringify(a.parameters) !== JSON.stringify(b.parameters);
   }).map((number) => ({ before: before.get(number), after: after.get(number) }));
   const fromRoutes = new Set(from.analysis.connections.map(connectionKey));
   const toRoutes = new Set(to.analysis.connections.map(connectionKey));
@@ -1230,6 +1285,7 @@ function filterGraph(pageNumber, activeButton) {
 }
 
 function showModuleDetails(module) {
+  editorModule = module;
   $("#dialog-color").style.background = module.colorHex;
   $("#dialog-category").textContent = module.category;
   $("#dialog-name").textContent = module.displayName;
@@ -1344,6 +1400,9 @@ document.querySelectorAll(".view-tab").forEach((tab) => tab.addEventListener("cl
   $("#visualizer-view").hidden = tab.dataset.view !== "visualizer";
 }));
 $("#dialog-close").addEventListener("click", () => elements.dialog.close());
+$("#edit-module-button").addEventListener("click", openModuleEditor);
+$("#module-editor-close").addEventListener("click", () => $("#module-editor-dialog").close());
+$("#module-editor-form").addEventListener("submit", applyModuleEdits);
 elements.dialog.addEventListener("click", (event) => {
   const rect = elements.dialog.getBoundingClientRect();
   if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) elements.dialog.close();

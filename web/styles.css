@@ -447,6 +447,8 @@ h3 { margin: 5px 0 0; font-size: 21px; letter-spacing: -.03em; }
 .block-item.cv_out i { background: #e2a413; }
 .block-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; text-transform: capitalize; }
 .block-item small { color: var(--muted); font: 400 7px DM Mono, monospace; text-transform: uppercase; }
+.module-dialog-actions { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 15px 30px; border-top: 1px solid #c9c7bf; background: #eeece5; }
+.module-dialog-actions span { color: var(--muted); font: 400 8px DM Mono, monospace; }
 .error-card { max-width: 680px; margin: 100px auto; padding: 38px; background: #fff2ed; border: 1px solid #eab8a8; border-radius: 14px; }
 .error-card strong { font-size: 22px; }
 .error-card p { color: #72594f; line-height: 1.6; }
@@ -469,6 +471,16 @@ footer { width: min(1180px, calc(100% - 40px)); margin: auto; padding: 28px 0 40
 .name-editor-footer { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 15px 28px; border-top: 1px solid var(--line); background: #eeece5; }
 .name-editor-footer > span { color: var(--muted); font: 400 8px/1.5 DM Mono, monospace; }
 .name-editor-footer > div { display: flex; gap: 8px; flex-shrink: 0; }
+.module-editor-dialog { width: min(720px, calc(100% - 28px)); max-height: calc(100vh - 36px); padding: 0; border: 1px solid #25272d; border-radius: 12px; background: #f8f7f2; color: var(--ink); box-shadow: 0 28px 90px rgba(0,0,0,.35); }
+.module-editor-dialog::backdrop { background: rgba(27,28,32,.72); backdrop-filter: blur(3px); }
+.module-editor-body { display: grid; gap: 24px; max-height: min(620px, calc(100vh - 220px)); padding: 22px 28px; overflow: auto; }
+.module-color-field { display: grid; grid-template-columns: 130px minmax(180px, 280px); align-items: center; gap: 15px; font-size: 11px; }
+.module-color-field select { padding: 9px 10px; border: 1px solid #aaa; border-radius: 5px; background: white; }
+.module-parameter-editor { display: grid; gap: 7px; }
+.module-parameter-control { display: grid; grid-template-columns: minmax(120px, 1fr) minmax(150px, 1.4fr) 92px 48px; gap: 10px; align-items: center; padding: 9px 10px; border: 1px solid #d2d0c8; border-radius: 5px; background: white; }
+.module-parameter-control > span { overflow: hidden; font-size: 10px; text-overflow: ellipsis; text-transform: capitalize; white-space: nowrap; }
+.module-parameter-control .parameter-raw { box-sizing: border-box; width: 100%; padding: 6px; border: 1px solid #aaa; border-radius: 4px; font: 400 9px DM Mono, monospace; }
+.module-parameter-control output { color: var(--muted); font: 400 8px DM Mono, monospace; text-align: right; }
 
 @media (max-width: 800px) {
   .name-editor-list.module-names { grid-template-columns: repeat(2, minmax(0,1fr)); }
@@ -501,6 +513,8 @@ footer { width: min(1180px, calc(100% - 40px)); margin: auto; padding: 28px 0 40
   .name-editor-list, .name-editor-list.module-names { grid-template-columns: 1fr; }
   .name-editor-footer { align-items: stretch; flex-direction: column; }
   .name-editor-footer > div { flex-wrap: wrap; }
+  .module-parameter-control { grid-template-columns: 1fr 70px; }
+  .module-parameter-control .parameter-slider { grid-column: 1 / 3; }
   main { width: min(100% - 24px, 1180px); }
   .topbar { padding: 0 16px; height: 64px; }
   .github-link { padding-left: 16px; }
