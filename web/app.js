@@ -1,7 +1,8 @@
-import { parsePatch } from "./parser.js?v=0.4.0";
-import { getPatch, listPatches, patchId, removePatch, savePatch } from "./library.js?v=0.4.0";
+import { parsePatch } from "./parser.js?v=0.5.0";
+import { getPatch, listPatches, patchId, removePatch, savePatch } from "./library.js?v=0.5.0";
+import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.5.0";
 
-const ASSET_VERSION = "0.4.0";
+const ASSET_VERSION = "0.5.0";
 
 const $ = (selector) => document.querySelector(selector);
 const elements = {
@@ -13,7 +14,8 @@ const elements = {
   graphModules: $("#graph-modules"), connectionLayer: $("#connection-layer"), pageFilters: $("#page-filters"),
   dialog: $("#module-dialog"), library: $("#library"), libraryList: $("#library-list"),
   libraryEmpty: $("#library-empty"), libraryInput: $("#library-file-input"), librarySearch: $("#library-search"),
-  librarySort: $("#library-sort"), libraryStatus: $("#library-status")
+  librarySort: $("#library-sort"), libraryStatus: $("#library-status"), browse: $("#browse"),
+  patchGrid: $("#patch-grid"), browseMessage: $("#browse-message"), patchDialog: $("#patch-dialog")
 };
 
 let moduleIndex;
@@ -21,6 +23,10 @@ let currentPatch;
 let currentFileName = "patch.bin";
 let currentBuffer;
 let libraryRecords = [];
+let browsePage = 1;
+let browseTotalPages = 1;
+let browseQuery = "";
+let selectedCommunityPatch;
 
 async function getModuleIndex() {
   if (!moduleIndex) {
@@ -156,11 +162,149 @@ async function deleteLibraryPatch(record) {
 
 function showLibrary() {
   elements.hero.hidden = true;
+  elements.browse.hidden = true;
   elements.workspace.hidden = true;
   elements.error.hidden = true;
   elements.library.hidden = false;
   refreshLibrary();
   window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function showBrowse() {
+  elements.hero.hidden = true;
+  elements.library.hidden = true;
+  elements.workspace.hidden = true;
+  elements.error.hidden = true;
+  elements.browse.hidden = false;
+  if (!elements.patchGrid.children.length) loadBrowseResults();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+async function loadBrowseResults() {
+  elements.browseMessage.hidden = false;
+  elements.browseMessage.className = "browse-message loading";
+  elements.browseMessage.textContent = "Loading community patches…";
+  elements.patchGrid.setAttribute("aria-busy", "true");
+  try {
+    const result = await browsePatches({ page: browsePage, search: browseQuery });
+    browseTotalPages = result.totalPages;
+    $("#browse-result-count").textContent = `${result.total.toLocaleString()} result${result.total === 1 ? "" : "s"}`;
+    $("#browse-page-label").textContent = `Page ${browsePage} of ${browseTotalPages}`;
+    $("#browse-previous").disabled = browsePage <= 1;
+    $("#browse-next").disabled = browsePage >= browseTotalPages;
+    elements.patchGrid.replaceChildren(...result.patches.map(renderCommunityCard));
+    elements.browseMessage.hidden = result.patches.length > 0;
+    if (!result.patches.length) {
+      elements.browseMessage.className = "browse-message";
+      elements.browseMessage.textContent = "No patches matched that search.";
+    }
+  } catch (error) {
+    elements.patchGrid.replaceChildren();
+    elements.browseMessage.hidden = false;
+    elements.browseMessage.className = "browse-message error";
+    elements.browseMessage.textContent = `PatchStorage could not be reached. ${error.message}`;
+  } finally {
+    elements.patchGrid.removeAttribute("aria-busy");
+  }
+}
+
+function renderCommunityCard(patch) {
+  const card = document.createElement("article");
+  card.className = "community-card";
+  card.innerHTML = `
+    <button class="community-art" type="button" aria-label="View patch details"></button>
+    <div class="community-body">
+      <div class="community-category"></div>
+      <button class="community-title" type="button"></button>
+      <p class="community-author"></p>
+      <p class="community-excerpt"></p>
+      <div class="community-footer"><span></span><span></span><span></span></div>
+    </div>`;
+  const art = card.querySelector(".community-art");
+  if (patch.artwork?.thumbnail_url) {
+    const image = document.createElement("img");
+    image.src = patch.artwork.thumbnail_url;
+    image.alt = "";
+    image.loading = "lazy";
+    art.append(image);
+  } else {
+    art.classList.add("art-placeholder");
+    art.textContent = "ZOIA";
+  }
+  card.querySelector(".community-category").textContent = patch.categories?.[0]?.name || "Patch";
+  card.querySelector(".community-title").textContent = patch.title;
+  card.querySelector(".community-author").textContent = `by ${patch.author?.name || "Unknown"}`;
+  card.querySelector(".community-excerpt").textContent = patch.excerpt || "No description provided.";
+  const stats = card.querySelectorAll(".community-footer span");
+  stats[0].textContent = `↓ ${Number(patch.download_count || 0).toLocaleString()}`;
+  stats[1].textContent = `♡ ${Number(patch.like_count || 0).toLocaleString()}`;
+  stats[2].textContent = `v${patch.revision || "—"}`;
+  [art, card.querySelector(".community-title")].forEach((button) => button.addEventListener("click", () => openCommunityPatch(patch.id)));
+  return card;
+}
+
+async function openCommunityPatch(id) {
+  selectedCommunityPatch = undefined;
+  $("#download-status").textContent = "Loading patch details…";
+  $("#patch-dialog-title").textContent = "Loading…";
+  $("#patch-dialog-save").disabled = true;
+  elements.patchDialog.showModal();
+  try {
+    const patch = await getPatchDetails(id);
+    selectedCommunityPatch = patch;
+    $("#patch-dialog-title").textContent = patch.title;
+    $("#patch-dialog-category").textContent = patch.categories?.[0]?.name || "Community patch";
+    $("#patch-dialog-byline").textContent = `by ${patch.author?.name || "Unknown"} · Revision ${patch.revision || "—"}`;
+    $("#patch-dialog-content").textContent = patch.content || patch.excerpt || "No description provided.";
+    $("#patch-dialog-external").href = patch.url;
+    $("#patch-dialog-stats").replaceChildren(...[
+      [`${Number(patch.download_count || 0).toLocaleString()}`, "Downloads"],
+      [`${Number(patch.like_count || 0).toLocaleString()}`, "Likes"],
+      [`${Number(patch.view_count || 0).toLocaleString()}`, "Views"]
+    ].map(([value, label]) => {
+      const item = document.createElement("span"); item.innerHTML = `<strong></strong><small></small>`;
+      item.querySelector("strong").textContent = value; item.querySelector("small").textContent = label;
+      return item;
+    }));
+    $("#patch-dialog-tags").replaceChildren(...(patch.tags || []).slice(0, 10).map((tag) => {
+      const item = document.createElement("span"); item.textContent = tag.name; return item;
+    }));
+    const art = $("#patch-dialog-art");
+    art.replaceChildren();
+    if (patch.artwork?.url) {
+      const image = document.createElement("img"); image.src = patch.artwork.url; image.alt = ""; art.append(image);
+    } else {
+      art.textContent = "ZOIA"; art.classList.add("art-placeholder");
+    }
+    $("#patch-dialog-save").disabled = false;
+    $("#download-status").textContent = "";
+  } catch (error) {
+    $("#download-status").textContent = `Could not load details. ${error.message}`;
+  }
+}
+
+async function saveCommunityPatch() {
+  if (!selectedCommunityPatch) return;
+  const button = $("#patch-dialog-save");
+  const file = selectedCommunityPatch.files?.find((candidate) => candidate.filename?.toLowerCase().endsWith(".bin"));
+  if (!file) {
+    $("#download-status").textContent = "This upload does not include a directly compatible .bin file.";
+    return;
+  }
+  button.disabled = true;
+  button.textContent = "Downloading…";
+  try {
+    const buffer = await downloadPatchFile(file.url);
+    const patch = parsePatch(buffer, await getModuleIndex());
+    await savePatch(makeLibraryRecord(patch, buffer, file.filename, Date.parse(selectedCommunityPatch.updated_at) || 0));
+    await refreshLibrary();
+    button.textContent = "Saved to library ✓";
+    $("#download-status").textContent = `${patch.name} is ready in your local library.`;
+  } catch (error) {
+    button.disabled = false;
+    button.textContent = "Try again";
+    $("#download-status").textContent = `The patch could not be saved. ${error.message}`;
+  }
 }
 
 async function importLibraryFiles(files) {
@@ -434,6 +578,7 @@ function reset() {
   elements.input.value = "";
   elements.workspace.hidden = true;
   elements.library.hidden = true;
+  elements.browse.hidden = true;
   elements.error.hidden = true;
   elements.hero.hidden = false;
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -490,9 +635,19 @@ elements.dialog.addEventListener("click", (event) => {
   if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) elements.dialog.close();
 });
 $("#library-nav").addEventListener("click", showLibrary);
+$("#browse-nav").addEventListener("click", showBrowse);
 $("#library-home").addEventListener("click", reset);
+$("#browse-home").addEventListener("click", reset);
 [$("#library-import"), $("#library-empty-import")].forEach((button) => button.addEventListener("click", () => elements.libraryInput.click()));
 elements.libraryInput.addEventListener("change", () => importLibraryFiles(elements.libraryInput.files || []));
 elements.librarySearch.addEventListener("input", renderLibrary);
 elements.librarySort.addEventListener("change", renderLibrary);
+$("#browse-form").addEventListener("submit", (event) => {
+  event.preventDefault(); browseQuery = $("#browse-search").value.trim(); browsePage = 1; loadBrowseResults();
+});
+$("#browse-previous").addEventListener("click", () => { if (browsePage > 1) { browsePage -= 1; loadBrowseResults(); window.scrollTo({ top: 180, behavior: "smooth" }); } });
+$("#browse-next").addEventListener("click", () => { if (browsePage < browseTotalPages) { browsePage += 1; loadBrowseResults(); window.scrollTo({ top: 180, behavior: "smooth" }); } });
+$("#patch-dialog-close").addEventListener("click", () => elements.patchDialog.close());
+$("#patch-dialog-save").addEventListener("click", saveCommunityPatch);
+elements.patchDialog.addEventListener("close", () => { $("#patch-dialog-save").textContent = "Add to local library"; $("#patch-dialog-art").classList.remove("art-placeholder"); });
 refreshLibrary();
