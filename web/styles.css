@@ -507,8 +507,13 @@ footer { width: min(1180px, calc(100% - 40px)); margin: auto; padding: 28px 0 40
 .layout-module-row small, .layout-route-row small { margin-top: 2px; color: var(--muted); font: 400 7px DM Mono, monospace; }
 .layout-module-row label { color: var(--muted); font: 500 7px DM Mono, monospace; text-transform: uppercase; }
 .layout-module-row input, .layout-route-row input { box-sizing: border-box; width: 100%; margin-top: 3px; padding: 5px; border: 1px solid #aaa; border-radius: 4px; font: 400 9px DM Mono, monospace; }
-.layout-route-row { display: grid; grid-template-columns: minmax(150px,1fr) 78px 15px; gap: 6px; align-items: center; padding: 7px 8px; border: 1px solid #d2d0c8; border-radius: 5px; background: white; }
+.layout-route-row { display: grid; grid-template-columns: minmax(150px,1fr) 78px 15px 27px; gap: 6px; align-items: center; padding: 7px 8px; border: 1px solid #d2d0c8; border-radius: 5px; background: white; }
 .layout-route-row output { color: var(--muted); font: 400 8px DM Mono, monospace; }
+.layout-route-row > button { width: 25px; height: 25px; border: 1px solid #bbb; border-radius: 4px; background: #f2f1ed; cursor: pointer; }
+.layout-route-row > button:hover { background: #ffe1d8; }
+.route-builder { display: grid; grid-template-columns: minmax(90px,1fr) 52px 16px minmax(90px,1fr) 52px 62px auto; gap: 5px; align-items: center; margin-bottom: 8px; padding: 8px; border: 1px solid #bcbab2; border-radius: 5px; background: #eeece5; }
+.route-builder select, .route-builder input { box-sizing: border-box; min-width: 0; width: 100%; padding: 6px; border: 1px solid #aaa; border-radius: 4px; background: white; font-size: 8px; }
+.route-builder .button { margin: 0; padding: 7px 9px; }
 
 @media (max-width: 800px) {
   .name-editor-list.module-names { grid-template-columns: repeat(2, minmax(0,1fr)); }

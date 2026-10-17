@@ -1,10 +1,10 @@
-import { parsePatch } from "./parser.js?v=0.12.1";
-import { editLayoutAndRoutes, editModuleSettings, editPatchNames } from "./editor.js?v=0.12.1";
-import { getPatch, getRevision, listBanks, listPatches, listRevisions, patchId, removeBank, removePatch, removeRevision, saveBank, savePatch, saveRevision } from "./library.js?v=0.12.1";
-import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.12.1";
-import { createZip, readZip } from "./zip.js?v=0.12.1";
+import { parsePatch } from "./parser.js?v=0.13.0";
+import { editLayoutAndRoutes, editModuleSettings, editPatchNames } from "./editor.js?v=0.13.0";
+import { getPatch, getRevision, listBanks, listPatches, listRevisions, patchId, removeBank, removePatch, removeRevision, saveBank, savePatch, saveRevision } from "./library.js?v=0.13.0";
+import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.13.0";
+import { createZip, readZip } from "./zip.js?v=0.13.0";
 
-const ASSET_VERSION = "0.12.1";
+const ASSET_VERSION = "0.13.0";
 
 const $ = (selector) => document.querySelector(selector);
 const elements = {
@@ -636,24 +636,43 @@ function openLayoutEditor() {
     row.querySelector('[data-field="page"]').value = String(module.page + 1); row.querySelector('[data-field="position"]').value = String(module.position + 1);
     row.querySelectorAll("input").forEach((input) => input.addEventListener("input", validateLayoutAnchors)); return row;
   }));
-  $("#layout-route-list").replaceChildren(...currentPatch.connections.map((connection, index) => {
-    const row = document.createElement("label"); row.className = "layout-route-row";
-    row.innerHTML = `<span><strong></strong><small></small></span><input type="number" min="-200" max="200" step="0.01"><output>%</output>`;
-    row.querySelector("strong").textContent = `${connection.sourceName} → ${connection.destinationName}`;
-    row.querySelector("small").textContent = `${connection.sourceBlockName} → ${connection.destinationBlockName}`;
-    const input = row.querySelector("input"); input.dataset.index = String(index); input.value = (connection.strengthRaw / 100).toFixed(2);
-    return row;
-  }));
+  $("#layout-route-list").replaceChildren(...currentPatch.connections.map(routeEditorRow));
+  const moduleOptions = currentPatch.modules.map((module) => { const option = document.createElement("option"); option.value = String(module.number); option.textContent = `${module.number + 1} · ${module.displayName}`; return option; });
+  $("#route-source-module").replaceChildren(...moduleOptions.map((option) => option.cloneNode(true)));
+  $("#route-destination-module").replaceChildren(...moduleOptions.map((option) => option.cloneNode(true)));
   validateLayoutAnchors(); $("#layout-editor-dialog").showModal();
+}
+
+function routeEditorRow(connection) {
+  const row = document.createElement("div"); row.className = "layout-route-row";
+  row.dataset.sourceModule = String(connection.sourceModule); row.dataset.sourceBlock = String(connection.sourceBlock);
+  row.dataset.destinationModule = String(connection.destinationModule); row.dataset.destinationBlock = String(connection.destinationBlock);
+  row.innerHTML = `<span><strong></strong><small></small></span><input type="number" min="-200" max="200" step="0.01"><output>%</output><button type="button" aria-label="Remove connection">×</button>`;
+  const source = currentPatch.modules[connection.sourceModule]; const destination = currentPatch.modules[connection.destinationModule];
+  row.querySelector("strong").textContent = `${source?.displayName || "Module"} → ${destination?.displayName || "Module"}`;
+  row.querySelector("small").textContent = `Block ${connection.sourceBlock} → Block ${connection.destinationBlock}`;
+  row.querySelector("input").value = (connection.strengthRaw / 100).toFixed(2);
+  row.querySelector("button").addEventListener("click", () => row.remove()); return row;
+}
+
+function addRouteFromBuilder() {
+  const connection = {
+    sourceModule: Number($("#route-source-module").value), sourceBlock: Number($("#route-source-block").value),
+    destinationModule: Number($("#route-destination-module").value), destinationBlock: Number($("#route-destination-block").value),
+    strengthRaw: Math.round(Number($("#route-new-strength").value) * 100)
+  };
+  $("#layout-route-list").prepend(routeEditorRow(connection));
 }
 
 async function applyLayoutEdits(event) {
   event.preventDefault();
   if (!validateLayoutAnchors()) return;
-  const strengths = [...$("#layout-route-list").querySelectorAll("input")].map((input) => Math.round(Number(input.value) * 100));
+  const connections = [...$("#layout-route-list").querySelectorAll(".layout-route-row")].map((row) => ({
+    sourceModule: Number(row.dataset.sourceModule), sourceBlock: Number(row.dataset.sourceBlock), destinationModule: Number(row.dataset.destinationModule), destinationBlock: Number(row.dataset.destinationBlock), strengthRaw: Math.round(Number(row.querySelector("input").value) * 100)
+  }));
   const status = $("#layout-editor-status"); status.textContent = "Validating layout and routes…";
   try {
-    const editedBuffer = editLayoutAndRoutes(currentBuffer, currentPatch, { modules: readLayoutModules(), strengths });
+    const editedBuffer = editLayoutAndRoutes(currentBuffer, currentPatch, { modules: readLayoutModules(), connections });
     const editedPatch = parsePatch(editedBuffer, await getModuleIndex()); let displayTitle;
     if (currentLibraryRecordId) {
       const record = await getPatch(currentLibraryRecordId);
@@ -1476,6 +1495,7 @@ $("#module-editor-close").addEventListener("click", () => $("#module-editor-dial
 $("#module-editor-form").addEventListener("submit", applyModuleEdits);
 $("#layout-editor-close").addEventListener("click", () => $("#layout-editor-dialog").close());
 $("#layout-editor-form").addEventListener("submit", applyLayoutEdits);
+$("#add-route").addEventListener("click", addRouteFromBuilder);
 elements.dialog.addEventListener("click", (event) => {
   const rect = elements.dialog.getBoundingClientRect();
   if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) elements.dialog.close();

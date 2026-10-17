@@ -35,9 +35,9 @@ export function editModuleSettings(buffer, module, { colorId, parameters }) {
   return output;
 }
 
-export function editLayoutAndRoutes(buffer, patch, { modules, strengths }) {
+export function editLayoutAndRoutes(buffer, patch, { modules, connections }) {
   if (!Array.isArray(modules) || modules.length !== patch.modules.length) throw new Error("The module layout is incomplete.");
-  if (!Array.isArray(strengths) || strengths.length !== patch.connections.length) throw new Error("The routing values are incomplete.");
+  if (!Array.isArray(connections) || connections.length > 4096) throw new Error("The routing list is invalid.");
   const occupied = new Set();
   modules.forEach(({ page, position }, index) => {
     if (!Number.isInteger(page) || page < 0 || page > 63) throw new Error(`Module ${index + 1} must use a page from 1 to 64.`);
@@ -46,14 +46,31 @@ export function editLayoutAndRoutes(buffer, patch, { modules, strengths }) {
     if (occupied.has(key)) throw new Error(`Two modules cannot start at page ${page + 1}, position ${position + 1}.`);
     occupied.add(key);
   });
-  strengths.forEach((value, index) => {
-    if (!Number.isInteger(value) || value < -20000 || value > 20000) throw new Error(`Route ${index + 1} must be between -200% and 200%.`);
+  connections.forEach((connection, index) => {
+    for (const key of ["sourceModule", "sourceBlock", "destinationModule", "destinationBlock", "strengthRaw"]) if (!Number.isInteger(connection[key])) throw new Error(`Route ${index + 1} is incomplete.`);
+    if (!patch.modules[connection.sourceModule] || !patch.modules[connection.destinationModule]) throw new Error(`Route ${index + 1} references a missing module.`);
+    if (connection.sourceBlock < 0 || connection.destinationBlock < 0) throw new Error(`Route ${index + 1} has an invalid block.`);
+    if (connection.strengthRaw < -20000 || connection.strengthRaw > 20000) throw new Error(`Route ${index + 1} must be between -200% and 200%.`);
   });
-  const output = buffer.slice(0); const view = new DataView(output);
+  const placed = buffer.slice(0); const placedView = new DataView(placed);
   modules.forEach(({ page, position }, index) => {
-    view.setInt32(patch.modules[index].pageOffset, page, true);
-    view.setInt32(patch.modules[index].positionOffset, position, true);
+    placedView.setInt32(patch.modules[index].pageOffset, page, true);
+    placedView.setInt32(patch.modules[index].positionOffset, position, true);
   });
-  strengths.forEach((value, index) => view.setInt32(patch.connections[index].strengthOffset, value, true));
+  const { connectionCountOffset, connectionsEndOffset, dataEndOffset } = patch.sections;
+  const suffix = new Uint8Array(placed, connectionsEndOffset, dataEndOffset - connectionsEndOffset);
+  const newDataEnd = connectionCountOffset + 4 + connections.length * 20 + suffix.length;
+  if (newDataEnd > placed.byteLength) throw new Error("The patch has no remaining space for those connections.");
+  const output = new ArrayBuffer(placed.byteLength); const bytes = new Uint8Array(output); const view = new DataView(output);
+  bytes.set(new Uint8Array(placed, 0, connectionCountOffset), 0);
+  view.setInt32(connectionCountOffset, connections.length, true);
+  connections.forEach((connection, index) => {
+    const offset = connectionCountOffset + 4 + index * 20;
+    view.setInt32(offset, connection.sourceModule, true); view.setInt32(offset + 4, connection.sourceBlock, true);
+    view.setInt32(offset + 8, connection.destinationModule, true); view.setInt32(offset + 12, connection.destinationBlock, true);
+    view.setInt32(offset + 16, connection.strengthRaw, true);
+  });
+  bytes.set(suffix, connectionCountOffset + 4 + connections.length * 20);
+  view.setInt32(0, newDataEnd / 4, true);
   return output;
 }

@@ -87,6 +87,7 @@ export function parsePatch(buffer, moduleIndex) {
     cursor += size;
   }
 
+  const connectionCountOffset = cursor * 4;
   const connectionCount = word(cursor);
   assert(connectionCount >= 0 && connectionCount <= 4096, "The connection count is outside the supported range.");
   const connections = [];
@@ -100,6 +101,7 @@ export function parsePatch(buffer, moduleIndex) {
     });
   }
   cursor += 1 + connectionCount * 5;
+  const connectionsEndOffset = cursor * 4;
 
   const storedPageCount = word(cursor);
   assert(storedPageCount >= 0 && storedPageCount <= 256, "The page count is outside the supported range.");
@@ -168,6 +170,7 @@ export function parsePatch(buffer, moduleIndex) {
     connections,
     pages,
     starred,
+    sections: { connectionCountOffset, connectionsEndOffset, dataEndOffset: Math.min(buffer.byteLength, patchSize * 4) },
     meta: {
       moduleCount: modules.length,
       connectionCount: connections.length,
