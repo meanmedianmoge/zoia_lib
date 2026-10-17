@@ -2,7 +2,7 @@ name: Deploy web experiment to GitHub Pages
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, test]
     paths:
       - "web/**"
       - ".github/workflows/pages.yml"
