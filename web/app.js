@@ -1,6 +1,7 @@
-import { parsePatch } from "./parser.js?v=0.3.0";
+import { parsePatch } from "./parser.js?v=0.4.0";
+import { getPatch, listPatches, patchId, removePatch, savePatch } from "./library.js?v=0.4.0";
 
-const ASSET_VERSION = "0.3.0";
+const ASSET_VERSION = "0.4.0";
 
 const $ = (selector) => document.querySelector(selector);
 const elements = {
@@ -10,12 +11,16 @@ const elements = {
   patchName: $("#patch-name"), fileName: $("#file-name"), modules: $("#module-list"), pages: $("#page-list"),
   chart: $("#strength-chart"), emptyFilter: $("#empty-filter"), graph: $("#graph-canvas"),
   graphModules: $("#graph-modules"), connectionLayer: $("#connection-layer"), pageFilters: $("#page-filters"),
-  dialog: $("#module-dialog")
+  dialog: $("#module-dialog"), library: $("#library"), libraryList: $("#library-list"),
+  libraryEmpty: $("#library-empty"), libraryInput: $("#library-file-input"), librarySearch: $("#library-search"),
+  librarySort: $("#library-sort"), libraryStatus: $("#library-status")
 };
 
 let moduleIndex;
 let currentPatch;
 let currentFileName = "patch.bin";
+let currentBuffer;
+let libraryRecords = [];
 
 async function getModuleIndex() {
   if (!moduleIndex) {
@@ -26,14 +31,24 @@ async function getModuleIndex() {
   return moduleIndex;
 }
 
-async function inspectBuffer(buffer, fileName) {
+async function inspectBuffer(buffer, fileName, { persist = false, lastModified = 0 } = {}) {
   try {
     currentPatch = parsePatch(buffer, await getModuleIndex());
     currentFileName = fileName;
+    currentBuffer = buffer;
     render(currentPatch);
     elements.hero.hidden = true;
+    elements.library.hidden = true;
     elements.error.hidden = true;
     elements.workspace.hidden = false;
+    if (persist) {
+      try {
+        await savePatch(makeLibraryRecord(currentPatch, buffer, fileName, lastModified));
+        await refreshLibrary();
+      } catch (storageError) {
+        console.warn("Patch opened, but could not be saved to the local library.", storageError);
+      }
+    }
     window.scrollTo({ top: 0, behavior: "smooth" });
   } catch (error) {
     elements.hero.hidden = true;
@@ -51,7 +66,122 @@ async function inspectFile(file) {
     elements.errorMessage.textContent = "Please choose a ZOIA .bin patch file.";
     return;
   }
-  await inspectBuffer(await file.arrayBuffer(), file.name);
+  await inspectBuffer(await file.arrayBuffer(), file.name, { persist: true, lastModified: file.lastModified });
+}
+
+function makeLibraryRecord(patch, buffer, fileName, lastModified = 0) {
+  return {
+    id: patchId(fileName, buffer.byteLength, lastModified),
+    fileName,
+    title: patch.name,
+    addedAt: Date.now(),
+    lastModified,
+    byteLength: buffer.byteLength,
+    buffer,
+    summary: { ...patch.meta }
+  };
+}
+
+async function refreshLibrary() {
+  try {
+    libraryRecords = await listPatches();
+    $("#library-count").textContent = String(libraryRecords.length);
+    renderLibrary();
+  } catch (error) {
+    libraryRecords = [];
+    elements.libraryStatus.textContent = "Storage unavailable";
+    elements.libraryEmpty.querySelector("strong").textContent = "Browser storage is unavailable";
+    elements.libraryEmpty.querySelector("p").textContent = "Your browser may be blocking IndexedDB in this context.";
+    elements.libraryEmpty.hidden = false;
+  }
+}
+
+function renderLibrary() {
+  const query = elements.librarySearch.value.trim().toLowerCase();
+  const sort = elements.librarySort.value;
+  const records = libraryRecords.filter((record) => `${record.title} ${record.fileName}`.toLowerCase().includes(query));
+  records.sort((a, b) => {
+    if (sort === "title-asc") return a.title.localeCompare(b.title);
+    if (sort === "modules-desc") return b.summary.moduleCount - a.summary.moduleCount;
+    if (sort === "cpu-desc") return b.summary.estimatedCpu - a.summary.estimatedCpu;
+    return b.addedAt - a.addedAt;
+  });
+  elements.libraryStatus.textContent = `${records.length} patch${records.length === 1 ? "" : "es"}`;
+  elements.libraryEmpty.hidden = libraryRecords.length > 0;
+  elements.libraryList.replaceChildren(...records.map((record) => {
+    const row = document.createElement("article");
+    row.className = "library-row";
+    row.innerHTML = `
+      <button class="library-title" type="button"><span class="library-patch-icon"><i></i><i></i><i></i><i></i></span><span><strong></strong><small></small></span></button>
+      <span class="library-stat"></span><span class="library-stat"></span><span class="library-stat"></span><span class="library-date"></span>
+      <span class="library-actions"><button type="button" data-action="export" title="Download original binary">↓</button><button type="button" data-action="remove" title="Remove from library">×</button></span>`;
+    row.querySelector(".library-title strong").textContent = record.title;
+    row.querySelector(".library-title small").textContent = record.fileName;
+    const stats = row.querySelectorAll(".library-stat");
+    stats[0].textContent = record.summary.moduleCount;
+    stats[1].textContent = record.summary.pageCount;
+    stats[2].textContent = `${record.summary.estimatedCpu}%`;
+    row.querySelector(".library-date").textContent = new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" }).format(record.addedAt);
+    row.querySelector(".library-title").addEventListener("click", () => openLibraryPatch(record.id));
+    row.querySelector('[data-action="export"]').addEventListener("click", () => downloadBinary(record));
+    row.querySelector('[data-action="remove"]').addEventListener("click", () => deleteLibraryPatch(record));
+    return row;
+  }));
+  if (libraryRecords.length && !records.length) {
+    const noResults = document.createElement("p");
+    noResults.className = "library-no-results";
+    noResults.textContent = "No patches match that search.";
+    elements.libraryList.append(noResults);
+  }
+}
+
+async function openLibraryPatch(id) {
+  const record = await getPatch(id);
+  if (record) await inspectBuffer(record.buffer, record.fileName);
+}
+
+function downloadBinary(record) {
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(new Blob([record.buffer], { type: "application/octet-stream" }));
+  link.download = record.fileName;
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+async function deleteLibraryPatch(record) {
+  if (!window.confirm(`Remove “${record.title}” from this browser library? The original file on your device will not be affected.`)) return;
+  await removePatch(record.id);
+  await refreshLibrary();
+}
+
+function showLibrary() {
+  elements.hero.hidden = true;
+  elements.workspace.hidden = true;
+  elements.error.hidden = true;
+  elements.library.hidden = false;
+  refreshLibrary();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+async function importLibraryFiles(files) {
+  const validFiles = [...files].filter((file) => file.name.toLowerCase().endsWith(".bin"));
+  if (!validFiles.length) return;
+  elements.libraryStatus.textContent = `Importing 0 of ${validFiles.length}…`;
+  const catalog = await getModuleIndex();
+  let imported = 0;
+  for (const file of validFiles) {
+    try {
+      const buffer = await file.arrayBuffer();
+      const patch = parsePatch(buffer, catalog);
+      await savePatch(makeLibraryRecord(patch, buffer, file.name, file.lastModified));
+      imported += 1;
+      elements.libraryStatus.textContent = `Importing ${imported} of ${validFiles.length}…`;
+    } catch (error) {
+      console.warn(`Could not import ${file.name}`, error);
+    }
+  }
+  elements.libraryInput.value = "";
+  await refreshLibrary();
 }
 
 function render(patch) {
@@ -303,6 +433,7 @@ function reset() {
   currentPatch = undefined;
   elements.input.value = "";
   elements.workspace.hidden = true;
+  elements.library.hidden = true;
   elements.error.hidden = true;
   elements.hero.hidden = false;
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -358,3 +489,10 @@ elements.dialog.addEventListener("click", (event) => {
   const rect = elements.dialog.getBoundingClientRect();
   if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) elements.dialog.close();
 });
+$("#library-nav").addEventListener("click", showLibrary);
+$("#library-home").addEventListener("click", reset);
+[$("#library-import"), $("#library-empty-import")].forEach((button) => button.addEventListener("click", () => elements.libraryInput.click()));
+elements.libraryInput.addEventListener("change", () => importLibraryFiles(elements.libraryInput.files || []));
+elements.librarySearch.addEventListener("input", renderLibrary);
+elements.librarySort.addEventListener("change", renderLibrary);
+refreshLibrary();

@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=0.3.0">
+    <link rel="stylesheet" href="styles.css?v=0.4.0">
   </head>
   <body>
     <header class="topbar">
@@ -18,6 +18,7 @@
         <span>ZOIA <b>Patchwork</b></span>
       </a>
       <span class="privacy"><span></span> Local-only processing</span>
+      <button class="library-nav" id="library-nav" type="button">Library <span id="library-count">0</span></button>
       <a class="github-link" href="https://github.com/meanmedianmoge/zoia_lib" target="_blank" rel="noreferrer">Source ↗</a>
     </header>
 
@@ -40,6 +41,41 @@
         <div class="demo-row">
           <button class="text-button" id="demo-button" type="button">Try the included demo patch <span>→</span></button>
           <span>Works in modern desktop and mobile browsers</span>
+        </div>
+      </section>
+
+      <section class="library" id="library" hidden>
+        <input type="file" id="library-file-input" accept=".bin,application/octet-stream" multiple>
+        <div class="library-head">
+          <div>
+            <button class="back-button" id="library-home" type="button">← Back home</button>
+            <div class="eyebrow">Stored in this browser</div>
+            <h2>Patch library</h2>
+            <p>Build a working collection without uploading anything. Your patches stay in this browser’s local storage.</p>
+          </div>
+          <button class="button primary" id="library-import" type="button">Import patches</button>
+        </div>
+        <div class="library-toolbar">
+          <label class="search library-search"><span>⌕</span><input id="library-search" type="search" placeholder="Search title or filename…" aria-label="Search patch library"></label>
+          <label class="sort-label">Sort
+            <select id="library-sort">
+              <option value="added-desc">Recently added</option>
+              <option value="title-asc">Title A–Z</option>
+              <option value="modules-desc">Most modules</option>
+              <option value="cpu-desc">Highest CPU</option>
+            </select>
+          </label>
+          <span class="library-status" id="library-status">0 patches</span>
+        </div>
+        <div class="library-table-wrap">
+          <div class="library-table-head"><span>Patch</span><span>Modules</span><span>Pages</span><span>CPU</span><span>Added</span><span>Actions</span></div>
+          <div class="library-list" id="library-list"></div>
+          <div class="library-empty" id="library-empty">
+            <span class="empty-grid" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            <strong>Your local library is empty</strong>
+            <p>Import one or more ZOIA <code>.bin</code> files to begin.</p>
+            <button class="text-button" id="library-empty-import" type="button">Choose patch files →</button>
+          </div>
         </div>
       </section>
 
@@ -166,6 +202,6 @@
       <span>Experimental web companion to ZOIA Librarian.</span>
       <span>Not affiliated with Empress Effects.</span>
     </footer>
-    <script type="module" src="app.js?v=0.3.0"></script>
+    <script type="module" src="app.js?v=0.4.0"></script>
   </body>
 </html>
