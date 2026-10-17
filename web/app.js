@@ -1,9 +1,9 @@
-import { parsePatch } from "./parser.js?v=0.8.1";
-import { getPatch, getRevision, listBanks, listPatches, listRevisions, patchId, removeBank, removePatch, removeRevision, saveBank, savePatch, saveRevision } from "./library.js?v=0.8.1";
-import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.8.1";
-import { createZip, readZip } from "./zip.js?v=0.8.1";
+import { parsePatch } from "./parser.js?v=0.9.1";
+import { getPatch, getRevision, listBanks, listPatches, listRevisions, patchId, removeBank, removePatch, removeRevision, saveBank, savePatch, saveRevision } from "./library.js?v=0.9.1";
+import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.9.1";
+import { createZip, readZip } from "./zip.js?v=0.9.1";
 
-const ASSET_VERSION = "0.8.1";
+const ASSET_VERSION = "0.9.1";
 
 const $ = (selector) => document.querySelector(selector);
 const elements = {
@@ -700,6 +700,57 @@ function bankFiles() {
   });
 }
 
+async function importBankZip(file) {
+  if (!file?.name.toLowerCase().endsWith(".zip")) throw new Error("Choose a .zip bank archive.");
+  const entries = await readZip(await file.arrayBuffer(), { extensions: [".bin"] });
+  const name = file.name.replace(/\.zip$/i, "").replace(/[_-]+/g, " ").trim();
+  await importBankEntries(entries, name, file.lastModified, "ZIP");
+}
+
+async function importBankFolder(files) {
+  const bins = [...files].filter((file) => file.name.toLowerCase().endsWith(".bin"));
+  if (!bins.length) throw new Error("The selected folder does not contain any .bin patches.");
+  const entries = await Promise.all(bins.map(async (file) => ({ name: file.name, data: new Uint8Array(await file.arrayBuffer()) })));
+  const relativePath = bins[0].webkitRelativePath || "";
+  const name = relativePath.split("/")[0].replace(/[_-]+/g, " ").trim();
+  await importBankEntries(entries, name, Math.max(...bins.map((file) => file.lastModified || 0)), "folder");
+}
+
+async function importBankEntries(entries, bankName, lastModified, sourceLabel) {
+  const catalog = await getModuleIndex();
+  const slots = Array(64).fill(null);
+  const failures = [];
+  let imported = 0;
+
+  for (const entry of entries) {
+    const match = entry.name.match(/^(\d{3})_/);
+    const slot = match ? Number(match[1]) : -1;
+    if (slot < 0 || slot > 63) { failures.push(`${entry.name}: no 000–063 slot prefix`); continue; }
+    if (slots[slot]) { failures.push(`${entry.name}: slot ${match[1]} is already filled`); continue; }
+    try {
+      const buffer = entry.data.buffer.slice(entry.data.byteOffset, entry.data.byteOffset + entry.data.byteLength);
+      const patch = parsePatch(buffer, catalog);
+      const record = makeLibraryRecord(patch, buffer, entry.name, lastModified);
+      await savePatch(record);
+      slots[slot] = record.id;
+      imported += 1;
+    } catch (error) {
+      failures.push(`${entry.name}: ${error.message}`);
+    }
+  }
+
+  if (!imported) throw new Error("No valid numbered ZOIA patches were found. Bank filenames must begin with slots 000 through 063.");
+  const now = Date.now();
+  const name = bankName || `Imported bank ${bankRecords.length + 1}`;
+  activeBank = { id: crypto.randomUUID(), name, createdAt: now, updatedAt: now, slots };
+  await saveBank(activeBank);
+  await refreshLibrary();
+  await refreshBanks();
+  $("#bank-save-status").textContent = failures.length
+    ? `Imported ${imported} patches · skipped ${failures.length}`
+    : `Imported ${imported} patches from ${sourceLabel}`;
+}
+
 function exportBankZip() {
   const files = bankFiles();
   if (!files.length) { window.alert("Add at least one patch before exporting this bank."); return; }
@@ -1253,6 +1304,40 @@ $("#metadata-export").addEventListener("click", () => {
   downloadJson(sidecarJson(metadataRecord, metadata), `${metadataRecord.fileName.replace(/\.bin$/i, "")}.json`);
 });
 [$("#new-bank"), $("#empty-new-bank")].forEach((button) => button.addEventListener("click", createBank));
+$("#import-bank").addEventListener("click", () => $("#bank-import-input").click());
+$("#import-bank-folder").addEventListener("click", () => $("#bank-folder-input").click());
+$("#bank-import-input").addEventListener("change", async () => {
+  const input = $("#bank-import-input");
+  const button = $("#import-bank");
+  if (!input.files?.[0]) return;
+  button.disabled = true; button.textContent = "Importing…";
+  try {
+    await importBankZip(input.files[0]);
+    button.textContent = "Bank imported ✓";
+  } catch (error) {
+    window.alert(`The bank could not be imported. ${error.message}`);
+    button.textContent = "Import ZIP";
+  } finally {
+    button.disabled = false; input.value = "";
+    setTimeout(() => { button.textContent = "Import ZIP"; }, 1800);
+  }
+});
+$("#bank-folder-input").addEventListener("change", async () => {
+  const input = $("#bank-folder-input");
+  const button = $("#import-bank-folder");
+  if (!input.files?.length) return;
+  button.disabled = true; button.textContent = "Importing…";
+  try {
+    await importBankFolder(input.files);
+    button.textContent = "Bank imported ✓";
+  } catch (error) {
+    window.alert(`The bank could not be imported. ${error.message}`);
+    button.textContent = "Import folder";
+  } finally {
+    button.disabled = false; input.value = "";
+    setTimeout(() => { button.textContent = "Import folder"; }, 1800);
+  }
+});
 $("#bank-patch-search").addEventListener("input", renderBankPalette);
 $("#bank-name").addEventListener("input", () => {
   if (!activeBank) return;

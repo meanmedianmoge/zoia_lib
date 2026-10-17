@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=0.8.1">
+    <link rel="stylesheet" href="styles.css?v=0.9.1">
   </head>
   <body>
     <header class="topbar">
@@ -71,6 +71,8 @@
       </section>
 
       <section class="banks" id="banks" hidden>
+        <input type="file" id="bank-import-input" accept=".zip,application/zip">
+        <input type="file" id="bank-folder-input" accept=".bin,application/octet-stream" webkitdirectory directory multiple>
         <div class="banks-head">
           <div>
             <button class="back-button" id="banks-home" type="button">← Back home</button>
@@ -78,7 +80,11 @@
             <h2>Bank builder</h2>
             <p>Arrange local patches into 64 numbered ZOIA slots, then export the complete bank.</p>
           </div>
-          <button class="button primary" id="new-bank" type="button">New bank</button>
+          <div class="banks-head-actions">
+            <button class="button secondary" id="import-bank-folder" type="button">Import folder</button>
+            <button class="button secondary" id="import-bank" type="button">Import ZIP</button>
+            <button class="button primary" id="new-bank" type="button">New bank</button>
+          </div>
         </div>
         <div class="bank-layout">
           <aside class="bank-sidebar panel">
@@ -356,6 +362,6 @@
       <span>Experimental web companion to ZOIA Librarian.</span>
       <span>Not affiliated with Empress Effects.</span>
     </footer>
-    <script type="module" src="app.js?v=0.8.1"></script>
+    <script type="module" src="app.js?v=0.9.1"></script>
   </body>
 </html>

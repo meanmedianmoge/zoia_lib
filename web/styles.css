@@ -172,7 +172,8 @@ code { font-family: DM Mono, monospace; color: var(--blue); }
 .banks-head { display: flex; justify-content: space-between; align-items: end; gap: 30px; margin-bottom: 30px; }
 .banks-head h2 { margin: 20px 0 14px; }
 .banks-head p { margin: 0; color: var(--muted); font-size: 14px; }
-.banks-head .primary { margin-left: auto; }
+.banks-head-actions { display: flex; gap: 8px; margin-left: auto; }
+#bank-import-input, #bank-folder-input { display: none; }
 .bank-layout { display: grid; grid-template-columns: 235px minmax(0,1fr); gap: 18px; align-items: start; }
 .bank-sidebar { position: sticky; top: 15px; }
 .bank-list { display: grid; padding: 8px; }
@@ -502,7 +503,7 @@ footer { width: min(1180px, calc(100% - 40px)); margin: auto; padding: 28px 0 40
   .browse-result-count { margin-left: 0; }
   .patch-grid { grid-template-columns: 1fr; }
   .banks-head { align-items: flex-start; flex-direction: column; }
-  .banks-head .primary { margin-left: 0; }
+  .banks-head-actions { margin-left: 0; flex-wrap: wrap; }
   .bank-list { grid-template-columns: 1fr; }
   .bank-editor-head { align-items: stretch; flex-direction: column; }
   .bank-editor-actions { flex-wrap: wrap; }
