@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=0.2.1">
+    <link rel="stylesheet" href="styles.css?v=0.3.0">
   </head>
   <body>
     <header class="topbar">
@@ -114,6 +114,21 @@
               <div id="graph-modules"></div>
             </div>
           </div>
+          <div class="inspector-strip">
+            <section class="inspector-card">
+              <span class="section-label">Patch metadata</span>
+              <dl class="patch-metadata" id="patch-metadata"></dl>
+            </section>
+            <section class="inspector-card">
+              <span class="section-label">Starred parameters</span>
+              <div class="starred-list" id="starred-list"></div>
+            </section>
+            <section class="inspector-card route-inspector" id="route-inspector">
+              <span class="section-label">Selected route</span>
+              <strong id="route-title">Select a connection line</strong>
+              <p id="route-blocks">Its source, destination, and strength will appear here.</p>
+            </section>
+          </div>
           <div class="visualizer-status"><span id="visible-module-count">0 modules</span><span>ZOIA grid · 8 columns per page</span></div>
         </section>
       </section>
@@ -141,12 +156,16 @@
         <div class="parameter-title"><span class="section-label">Saved parameters</span><span id="parameter-count"></span></div>
         <div class="parameter-list" id="parameter-list"></div>
       </div>
+      <div class="block-section">
+        <div class="parameter-title"><span class="section-label">Module blocks</span><span id="block-count"></span></div>
+        <div class="block-list" id="block-list"></div>
+      </div>
     </dialog>
 
     <footer>
       <span>Experimental web companion to ZOIA Librarian.</span>
       <span>Not affiliated with Empress Effects.</span>
     </footer>
-    <script type="module" src="app.js?v=0.2.1"></script>
+    <script type="module" src="app.js?v=0.3.0"></script>
   </body>
 </html>

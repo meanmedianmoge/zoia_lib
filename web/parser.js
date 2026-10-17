@@ -58,6 +58,11 @@ export function parsePatch(buffer, moduleIndex) {
       customName,
       displayName: customName || definition.name || `Unknown module ${typeId}`,
       description: definition.description || "No description is available for this module type.",
+      footprint: Math.max(1, Number(definition.defaultBlocks) || 1),
+      blocks: (definition.blocks || []).map((block) => ({
+        ...block,
+        label: block.name.replaceAll("_", " ")
+      })),
       version,
       page: Math.max(0, Math.min(63, pageRaw)),
       position,
@@ -106,8 +111,33 @@ export function parsePatch(buffer, moduleIndex) {
   }));
 
   const starredCount = cursor < wordCount ? word(cursor) : 0;
-  const safeStarredCount = starredCount >= 0 && starredCount < 1024 ? starredCount : 0;
+  const safeStarredCount = starredCount >= 0 && starredCount < 1024 && cursor + starredCount < wordCount ? starredCount : 0;
+  const starred = Array.from({ length: safeStarredCount }, (_, index) => {
+    const byteOffset = (cursor + 1 + index) * 4;
+    const moduleNumber = view.getInt16(byteOffset, true);
+    const encodedBlock = view.getInt16(byteOffset + 2, true);
+    const blockNumber = encodedBlock % 128;
+    const module = modules[moduleNumber];
+    const block = module?.blocks.find((candidate) => candidate.position === blockNumber);
+    return {
+      module: moduleNumber,
+      moduleName: module?.displayName || `Module ${moduleNumber + 1}`,
+      block: blockNumber,
+      blockName: block?.label || `Block ${blockNumber + 1}`,
+      midiCc: encodedBlock >= 128 ? Math.round(encodedBlock / 128) - 1 : null
+    };
+  });
+
+  connections.forEach((connection) => {
+    const source = modules[connection.sourceModule];
+    const destination = modules[connection.destinationModule];
+    connection.sourceName = source?.displayName || `Module ${connection.sourceModule + 1}`;
+    connection.destinationName = destination?.displayName || `Module ${connection.destinationModule + 1}`;
+    connection.sourceBlockName = source?.blocks.find((block) => block.position === connection.sourceBlock)?.label || `Block ${connection.sourceBlock + 1}`;
+    connection.destinationBlockName = destination?.blocks.find((block) => block.position === connection.destinationBlock)?.label || `Block ${connection.destinationBlock + 1}`;
+  });
   const totalCpu = modules.reduce((sum, module) => sum + module.cpu, 0);
+  const typeNames = modules.map((module) => module.type.toLowerCase());
 
   return {
     name: patchName,
@@ -116,12 +146,16 @@ export function parsePatch(buffer, moduleIndex) {
     modules,
     connections,
     pages,
-    starredCount: safeStarredCount,
+    starred,
     meta: {
       moduleCount: modules.length,
       connectionCount: connections.length,
       pageCount: pages.length,
-      estimatedCpu: Math.round(totalCpu * 100) / 100
+      starredCount: starred.length,
+      estimatedCpu: Math.round(totalCpu * 100) / 100,
+      audioInputs: typeNames.filter((name) => name === "audio input").length,
+      audioOutputs: typeNames.filter((name) => name === "audio output").length,
+      midiModules: typeNames.filter((name) => name.includes("midi")).length
     }
   };
 }

@@ -1,6 +1,6 @@
-import { parsePatch } from "./parser.js?v=0.2.1";
+import { parsePatch } from "./parser.js?v=0.3.0";
 
-const ASSET_VERSION = "0.2.1";
+const ASSET_VERSION = "0.3.0";
 
 const $ = (selector) => document.querySelector(selector);
 const elements = {
@@ -72,6 +72,7 @@ function render(patch) {
   }));
   renderChart(patch.connections);
   renderVisualizer(patch);
+  renderInspector(patch);
 }
 
 function renderModules(modules) {
@@ -120,10 +121,11 @@ function renderVisualizer(patch) {
     card.className = "graph-module";
     card.dataset.page = String(module.page);
     card.style.cssText = `left:${x}px;top:${y}px;--module-color:${module.colorHex}`;
-    card.innerHTML = `<span class="graph-index"></span><strong></strong><small></small>`;
+    card.innerHTML = `<span class="graph-index"></span><strong></strong><small></small><span class="footprint" aria-label="Default module footprint"></span>`;
     card.querySelector(".graph-index").textContent = String(module.number + 1).padStart(2, "0");
     card.querySelector("strong").textContent = module.displayName;
     card.querySelector("small").textContent = module.category;
+    card.querySelector(".footprint").replaceChildren(...Array.from({ length: Math.min(8, module.footprint) }, () => document.createElement("i")));
     card.addEventListener("click", () => showModuleDetails(module));
     return card;
   });
@@ -157,9 +159,13 @@ function renderVisualizer(patch) {
     path.dataset.sourcePage = String(patch.modules[connection.sourceModule]?.page ?? -1);
     path.dataset.destinationPage = String(patch.modules[connection.destinationModule]?.page ?? -1);
     path.style.setProperty("--route-delay", `${(index % 12) * 35}ms`);
+    path.tabIndex = 0;
+    path.setAttribute("role", "button");
     const title = document.createElementNS(namespace, "title");
     title.textContent = `${patch.modules[connection.sourceModule]?.displayName || "Module"} → ${patch.modules[connection.destinationModule]?.displayName || "Module"} · ${connection.strength}%`;
     path.append(title);
+    path.addEventListener("click", () => selectRoute(path, connection));
+    path.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") selectRoute(path, connection); });
     return path;
   }).filter(Boolean);
   elements.connectionLayer.replaceChildren(...pageGuides, ...paths);
@@ -175,6 +181,49 @@ function renderVisualizer(patch) {
   });
   elements.pageFilters.replaceChildren(...filterButtons);
   $("#visible-module-count").textContent = `${patch.modules.length} modules`;
+}
+
+function renderInspector(patch) {
+  const metadata = [
+    ["File size", `${(patch.byteLength / 1024).toFixed(0)} KB`],
+    ["Audio I/O", `${patch.meta.audioInputs} in · ${patch.meta.audioOutputs} out`],
+    ["MIDI modules", patch.meta.midiModules],
+    ["Starred", patch.meta.starredCount]
+  ];
+  $("#patch-metadata").replaceChildren(...metadata.flatMap(([label, value]) => {
+    const term = document.createElement("dt"); term.textContent = label;
+    const detail = document.createElement("dd"); detail.textContent = String(value);
+    return [term, detail];
+  }));
+  const stars = patch.starred.slice(0, 8).map((star) => {
+    const item = document.createElement("button");
+    item.type = "button";
+    item.className = "starred-item";
+    item.innerHTML = `<span>★</span><b></b><small></small>`;
+    item.querySelector("b").textContent = star.moduleName;
+    item.querySelector("small").textContent = `${star.blockName}${star.midiCc === null ? "" : ` · CC ${star.midiCc}`}`;
+    item.addEventListener("click", () => {
+      const module = patch.modules[star.module];
+      if (module) showModuleDetails(module);
+    });
+    return item;
+  });
+  if (!stars.length) {
+    const empty = document.createElement("p");
+    empty.className = "inspector-empty";
+    empty.textContent = "No starred parameters in this patch.";
+    stars.push(empty);
+  }
+  $("#starred-list").replaceChildren(...stars);
+  $("#route-title").textContent = "Select a connection line";
+  $("#route-blocks").textContent = "Its source, destination, and strength will appear here.";
+}
+
+function selectRoute(path, connection) {
+  elements.connectionLayer.querySelectorAll(".connection-path").forEach((item) => item.classList.toggle("selected", item === path));
+  $("#route-title").textContent = `${connection.sourceName} → ${connection.destinationName}`;
+  $("#route-blocks").textContent = `${connection.sourceBlockName} → ${connection.destinationBlockName} · ${connection.strength}% strength`;
+  $("#route-inspector").classList.add("has-route");
 }
 
 function filterGraph(pageNumber, activeButton) {
@@ -222,6 +271,15 @@ function showModuleDetails(module) {
     const empty = document.createElement("p"); empty.className = "no-parameters"; empty.textContent = "This module has no saved parameters.";
     $("#parameter-list").append(empty);
   }
+  $("#block-count").textContent = `${module.blocks.length} available`;
+  $("#block-list").replaceChildren(...module.blocks.map((block) => {
+    const item = document.createElement("div");
+    item.className = `block-item ${block.type || "block"}`;
+    item.innerHTML = `<i></i><span></span><small></small>`;
+    item.querySelector("span").textContent = block.label;
+    item.querySelector("small").textContent = block.type?.replaceAll("_", " ") || "block";
+    return item;
+  }));
   elements.dialog.showModal();
 }
 
