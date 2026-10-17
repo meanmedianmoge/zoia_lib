@@ -1,10 +1,10 @@
-import { parsePatch } from "./parser.js?v=0.14.0";
-import { editLayoutAndRoutes, editModuleSettings, editPatchNames } from "./editor.js?v=0.14.0";
-import { getPatch, getRevision, listBanks, listPatches, listRevisions, patchId, removeBank, removePatch, removeRevision, saveBank, savePatch, saveRevision } from "./library.js?v=0.14.0";
-import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.14.0";
-import { createZip, readZip } from "./zip.js?v=0.14.0";
+import { parsePatch } from "./parser.js?v=0.15.0";
+import { editLayoutAndRoutes, editModuleSettings, editPatchNames, insertModule } from "./editor.js?v=0.15.0";
+import { getPatch, getRevision, listBanks, listPatches, listRevisions, patchId, removeBank, removePatch, removeRevision, saveBank, savePatch, saveRevision } from "./library.js?v=0.15.0";
+import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.15.0";
+import { createZip, readZip } from "./zip.js?v=0.15.0";
 
-const ASSET_VERSION = "0.14.0";
+const ASSET_VERSION = "0.15.0";
 
 const $ = (selector) => document.querySelector(selector);
 const elements = {
@@ -44,6 +44,7 @@ let selectedRevisionIds = new Set();
 let editorModule;
 let fullEditorDraft;
 let fullEditorSelected = 0;
+let fullEditorOriginal;
 
 async function getModuleIndex() {
   if (!moduleIndex) {
@@ -513,7 +514,7 @@ async function snapshotBeforeEdit(record, label, note) {
     id: `${record.id}::${hash}`, patchId: record.id, hash,
     label, note,
     createdAt: Date.now(), buffer: record.buffer,
-    metadata: structuredClone(metadataFor(record)), analysis: compactAnalysis(currentPatch)
+    metadata: structuredClone(metadataFor(record)), analysis: compactAnalysis(parsePatch(record.buffer, await getModuleIndex()))
   });
 }
 
@@ -561,15 +562,20 @@ const EDITOR_COLORS = [
   [11, "Sky"], [12, "Purple"], [13, "Pink"], [14, "Peach"], [15, "Mango"]
 ];
 
-async function showFullEditor() {
-  if (!currentPatch) return;
-  fullEditorDraft = {
+function createFullEditorDraft() {
+  return {
     patchName: currentPatch.name,
     names: currentPatch.modules.map((module) => module.customName),
     settings: currentPatch.modules.map((module) => ({ colorId: module.colorId, parameters: module.parameters.map((parameter) => parameter.raw) })),
     layouts: currentPatch.modules.map((module) => ({ page: module.page, position: module.position })),
     connections: currentPatch.connections.map(({ sourceModule, sourceBlock, destinationModule, destinationBlock, strengthRaw }) => ({ sourceModule, sourceBlock, destinationModule, destinationBlock, strengthRaw }))
   };
+}
+
+async function showFullEditor() {
+  if (!currentPatch) return;
+  fullEditorOriginal = { patch: currentPatch, buffer: currentBuffer };
+  fullEditorDraft = createFullEditorDraft();
   fullEditorSelected = Math.min(fullEditorSelected, currentPatch.modules.length - 1);
   elements.workspace.hidden = true;
   elements.patchEditor.hidden = false;
@@ -585,12 +591,50 @@ function renderFullCatalog() {
   const query = $("#full-editor-catalog-search").value.trim().toLowerCase();
   const items = Object.entries(moduleIndex || {}).filter(([, module]) => `${module.name} ${module.category}`.toLowerCase().includes(query));
   $("#full-editor-catalog").replaceChildren(...items.map(([id, module]) => {
-    const row = document.createElement("div"); row.className = "catalog-item";
+    const row = document.createElement("button"); row.type = "button"; row.className = "catalog-item";
     row.innerHTML = `<i></i><span><strong></strong><small></small></span><small></small>`;
     row.querySelector("strong").textContent = module.name; row.querySelector("span small").textContent = module.category;
-    row.querySelector(":scope > small").textContent = `${module.cpu}%`; row.title = `Module ${id} · insertion support is coming next`;
+    row.querySelector(":scope > small").textContent = "+ Add"; row.title = `Add ${module.name} to this patch`;
+    row.addEventListener("click", () => addCatalogModule(Number(id), module));
     return row;
   }));
+}
+
+function materializeFullEditorDraft() {
+  captureFullInspector(); fullEditorDraft.patchName = $("#full-editor-patch-name").value;
+  let editedBuffer = editPatchNames(currentBuffer, currentPatch, { patchName: fullEditorDraft.patchName, pages: currentPatch.pages.map((page) => page.name), modules: fullEditorDraft.names });
+  currentPatch.modules.forEach((module, index) => { editedBuffer = editModuleSettings(editedBuffer, module, fullEditorDraft.settings[index]); });
+  return editLayoutAndRoutes(editedBuffer, currentPatch, { modules: fullEditorDraft.layouts, connections: fullEditorDraft.connections });
+}
+
+function nextModulePlacement(footprint) {
+  const occupied = new Set();
+  currentPatch.modules.forEach((module, index) => {
+    const layout = fullEditorDraft.layouts[index];
+    for (let cell = 0; cell < Math.max(1, module.footprint); cell += 1) if (layout.position + cell < 40) occupied.add(`${layout.page}:${layout.position + cell}`);
+  });
+  const width = Math.max(1, Math.min(40, Number(footprint) || 1));
+  for (let page = 0; page < 64; page += 1) for (let position = 0; position <= 40 - width; position += 1) {
+    if (Array.from({ length: width }, (_, cell) => `${page}:${position + cell}`).every((key) => !occupied.has(key))) return { page, position };
+  }
+  throw new Error("No open grid space remains for that module.");
+}
+
+async function addCatalogModule(typeId, definition) {
+  const status = $("#full-editor-status"); status.textContent = `Adding ${definition.name}…`;
+  try {
+    if (!fullEditorLayoutIsClear()) throw new Error("Resolve the overlapping module anchors before adding another module.");
+    const placement = nextModulePlacement(definition.defaultBlocks);
+    const materialized = materializeFullEditorDraft();
+    const materializedPatch = parsePatch(materialized, await getModuleIndex());
+    currentBuffer = insertModule(materialized, materializedPatch, { typeId, definition, ...placement });
+    currentPatch = parsePatch(currentBuffer, await getModuleIndex());
+    fullEditorDraft = createFullEditorDraft(); fullEditorSelected = currentPatch.modules.length - 1;
+    $("#full-editor-patch-name").value = fullEditorDraft.patchName;
+    $("#full-editor-module-count").textContent = `${currentPatch.modules.length} modules`;
+    renderFullModuleList(); renderFullInspector();
+    status.textContent = `${definition.name} added on page ${placement.page + 1}, position ${placement.position + 1} · save to commit`;
+  } catch (error) { status.textContent = error.message; }
 }
 
 function captureFullInspector() {
@@ -673,9 +717,7 @@ async function saveFullEditor() {
   if (!fullEditorLayoutIsClear()) { status.textContent = "Two modules share the same page and grid position."; return; }
   status.textContent = "Validating and writing one combined edit…";
   try {
-    let editedBuffer = editPatchNames(currentBuffer, currentPatch, { patchName: fullEditorDraft.patchName, pages: currentPatch.pages.map((page) => page.name), modules: fullEditorDraft.names });
-    currentPatch.modules.forEach((module, index) => { editedBuffer = editModuleSettings(editedBuffer, module, fullEditorDraft.settings[index]); });
-    editedBuffer = editLayoutAndRoutes(editedBuffer, currentPatch, { modules: fullEditorDraft.layouts, connections: fullEditorDraft.connections });
+    const editedBuffer = materializeFullEditorDraft();
     const editedPatch = parsePatch(editedBuffer, await getModuleIndex()); let displayTitle;
     if (currentLibraryRecordId) {
       const record = await getPatch(currentLibraryRecordId);
@@ -1663,7 +1705,7 @@ $("#edit-metadata-button").addEventListener("click", async () => {
 });
 $("#versions-button").addEventListener("click", () => openVersionHistory());
 $("#editor-hub-button").addEventListener("click", showFullEditor);
-$("#patch-editor-back").addEventListener("click", () => { captureFullInspector(); elements.patchEditor.hidden = true; elements.workspace.hidden = false; window.scrollTo({ top: 0, behavior: "smooth" }); });
+$("#patch-editor-back").addEventListener("click", () => { if (fullEditorOriginal) { currentPatch = fullEditorOriginal.patch; currentBuffer = fullEditorOriginal.buffer; } elements.patchEditor.hidden = true; elements.workspace.hidden = false; window.scrollTo({ top: 0, behavior: "smooth" }); });
 $("#full-editor-catalog-search").addEventListener("input", renderFullCatalog);
 $("#full-editor-module-search").addEventListener("input", renderFullModuleList);
 $("#full-editor-patch-name").addEventListener("input", () => { if (fullEditorDraft) fullEditorDraft.patchName = $("#full-editor-patch-name").value; });

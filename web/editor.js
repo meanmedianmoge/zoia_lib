@@ -35,6 +35,31 @@ export function editModuleSettings(buffer, module, { colorId, parameters }) {
   return output;
 }
 
+export function insertModule(buffer, patch, { typeId, definition, page, position, colorId = 1 }) {
+  if (!Number.isInteger(typeId) || typeId < 0) throw new Error("Choose a valid module type.");
+  if (!definition || typeof definition !== "object") throw new Error("That module definition is unavailable.");
+  if (!Number.isInteger(page) || page < 0 || page > 63 || !Number.isInteger(position) || position < 0 || position > 39) throw new Error("The new module needs a valid grid position.");
+  if (!Number.isInteger(colorId) || colorId < 1 || colorId > 15) throw new Error("Choose a valid ZOIA module color.");
+  const parameters = (definition.blocks || []).filter((block) => block.isDefault && block.isParam).sort((a, b) => a.position - b.position);
+  const sizeWords = 14 + parameters.length;
+  const record = new ArrayBuffer(sizeWords * 4); const view = new DataView(record);
+  view.setInt32(0, sizeWords, true); view.setInt32(4, typeId, true); view.setInt32(8, 1, true);
+  view.setInt32(12, page, true); view.setInt32(16, colorId, true); view.setInt32(20, position, true);
+  view.setInt32(24, parameters.length, true); view.setInt32(28, 0, true);
+  const extraColorBytes = patch.sections.hasTrailingColors ? 4 : 0;
+  const addedBytes = record.byteLength + extraColorBytes;
+  const oldEnd = patch.sections.dataEndOffset; const newEnd = oldEnd + addedBytes;
+  if (newEnd > buffer.byteLength) throw new Error("This patch has no remaining binary space for that module.");
+  const output = new ArrayBuffer(buffer.byteLength); const bytes = new Uint8Array(output); const outputView = new DataView(output);
+  bytes.set(new Uint8Array(buffer, 0, patch.sections.connectionCountOffset), 0);
+  bytes.set(new Uint8Array(record), patch.sections.connectionCountOffset);
+  bytes.set(new Uint8Array(buffer, patch.sections.connectionCountOffset, oldEnd - patch.sections.connectionCountOffset), patch.sections.connectionCountOffset + record.byteLength);
+  if (patch.sections.hasTrailingColors) outputView.setInt32(oldEnd + record.byteLength, colorId, true);
+  outputView.setInt32(20, patch.modules.length + 1, true);
+  outputView.setInt32(0, newEnd / 4, true);
+  return output;
+}
+
 export function editLayoutAndRoutes(buffer, patch, { modules, connections }) {
   if (!Array.isArray(modules) || modules.length !== patch.modules.length) throw new Error("The module layout is incomplete.");
   if (!Array.isArray(connections) || connections.length > 4096) throw new Error("The routing list is invalid.");

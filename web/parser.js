@@ -141,7 +141,8 @@ export function parsePatch(buffer, moduleIndex) {
   const colorStart = cursor + 1 + safeStarredCount;
   const trailingColors = colorStart + moduleCount <= Math.min(wordCount, patchSize)
     ? modules.map((_, index) => word(colorStart + index)) : [];
-  if (trailingColors.length === moduleCount && trailingColors.every((colorId) => COLORS[colorId])) {
+  const hasTrailingColors = trailingColors.length === moduleCount && trailingColors.every((colorId) => COLORS[colorId]);
+  if (hasTrailingColors) {
     modules.forEach((module, index) => {
       module.colorId = trailingColors[index];
       module.color = COLORS[module.colorId][0];
@@ -170,7 +171,7 @@ export function parsePatch(buffer, moduleIndex) {
     connections,
     pages,
     starred,
-    sections: { connectionCountOffset, connectionsEndOffset, dataEndOffset: Math.min(buffer.byteLength, patchSize * 4) },
+    sections: { connectionCountOffset, connectionsEndOffset, colorStartOffset: colorStart * 4, hasTrailingColors, dataEndOffset: Math.min(buffer.byteLength, patchSize * 4) },
     meta: {
       moduleCount: modules.length,
       connectionCount: connections.length,

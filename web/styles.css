@@ -515,13 +515,13 @@ footer { width: min(1180px, calc(100% - 40px)); margin: auto; padding: 28px 0 40
 .route-builder select, .route-builder input { box-sizing: border-box; min-width: 0; width: 100%; padding: 6px; border: 1px solid #aaa; border-radius: 4px; background: white; font-size: 8px; }
 .route-builder .button { margin: 0; padding: 7px 9px; }
 
-.patch-editor-page { width: min(1500px, calc(100vw - 40px)); margin: 34px auto 80px; animation: reveal .35s ease both; }
+.patch-editor-page { width: 100%; max-width: 100%; min-width: 0; margin: 34px auto 80px; animation: reveal .35s ease both; }
 .patch-editor-head { display: flex; align-items: end; justify-content: space-between; gap: 28px; margin-bottom: 20px; }
 .patch-editor-head h2 { margin: 6px 0 0; font-size: 34px; }
 .patch-title-field { width: min(360px, 40vw); }
 .patch-title-field span, .editor-field-grid label > span { display: block; margin-bottom: 6px; color: var(--muted); font: 500 8px DM Mono, monospace; text-transform: uppercase; }
 .patch-title-field input, .editor-field-grid input, .editor-field-grid select { box-sizing: border-box; width: 100%; padding: 9px 10px; border: 1px solid #aaa; border-radius: 5px; background: white; font: 500 11px Manrope, sans-serif; }
-.editor-workbench { display: grid; grid-template-columns: minmax(220px,.78fr) minmax(260px,.9fr) minmax(430px,1.5fr); height: min(720px, calc(100vh - 235px)); min-height: 540px; overflow: hidden; border: 1px solid #25272d; border-radius: 10px 10px 0 0; background: #f8f7f2; box-shadow: 0 18px 55px rgba(0,0,0,.13); }
+.editor-workbench { width: 100%; max-width: 100%; min-width: 0; display: grid; grid-template-columns: minmax(220px,.78fr) minmax(260px,.9fr) minmax(0,1.5fr); height: min(720px, calc(100vh - 235px)); min-height: 540px; overflow: hidden; border: 1px solid #25272d; border-radius: 10px 10px 0 0; background: #f8f7f2; box-shadow: 0 18px 55px rgba(0,0,0,.13); }
 .editor-pane { min-width: 0; min-height: 0; display: flex; flex-direction: column; border-right: 1px solid #c8c6be; }
 .editor-pane:last-child { border-right: 0; }
 .editor-pane-head { display: flex; align-items: center; gap: 12px; min-height: 74px; padding: 0 18px; border-bottom: 1px solid #d2d0c8; background: #eeece5; }
@@ -531,6 +531,7 @@ footer { width: min(1180px, calc(100% - 40px)); margin: auto; padding: 28px 0 40
 .editor-search input { min-width: 0; width: 100%; border: 0; outline: 0; font: 500 10px Manrope, sans-serif; }
 .full-editor-list { min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
 .catalog-item, .patch-module-item { width: 100%; display: grid; grid-template-columns: 9px minmax(0,1fr) auto; gap: 10px; align-items: center; box-sizing: border-box; padding: 11px 15px; border: 0; border-bottom: 1px solid #dedcd5; background: transparent; color: var(--ink); text-align: left; }
+.catalog-item { cursor: pointer; }.catalog-item:hover, .catalog-item:focus-visible { background: #edf0ff; outline: none; }.catalog-item > small { color: #4260db; font-weight: 500; }
 .catalog-item i, .patch-module-item i { width: 8px; height: 8px; border-radius: 2px; background: #7892ff; }
 .catalog-item strong, .patch-module-item strong { display: block; overflow: hidden; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
 .catalog-item small, .patch-module-item small { display: block; margin-top: 3px; color: var(--muted); font: 400 7px DM Mono, monospace; }
@@ -541,10 +542,10 @@ footer { width: min(1180px, calc(100% - 40px)); margin: auto; padding: 28px 0 40
 .editor-pane-note { margin: auto 14px 14px; padding-top: 12px; border-top: 1px solid #d2d0c8; color: var(--muted); font: 400 8px/1.5 DM Mono, monospace; }
 .editor-inspector-pane { overflow: hidden; }
 .full-editor-empty { margin: auto; max-width: 280px; padding: 30px; color: var(--muted); font: 400 10px/1.7 DM Mono, monospace; text-align: center; }
-.full-editor-details { min-height: 0; padding: 18px; overflow-y: auto; scrollbar-gutter: stable; }
+.full-editor-details { width: 100%; min-width: 0; min-height: 0; padding: 18px; overflow-x: hidden; overflow-y: auto; scrollbar-gutter: stable; }
 .editor-field-grid { display: grid; grid-template-columns: 1.4fr .8fr .8fr; gap: 11px; }
 .editor-field-grid .field-wide { grid-column: 1 / -1; }
-.editor-detail-section { margin-top: 24px; }
+.editor-detail-section { min-width: 0; margin-top: 24px; }
 .full-route-builder { display: grid; grid-template-columns: 115px minmax(100px,1fr) 58px 58px 70px auto; gap: 5px; padding: 9px; border: 1px solid #c8c6be; border-radius: 5px; background: #eeece5; }
 .full-route-builder select, .full-route-builder input { min-width: 0; box-sizing: border-box; width: 100%; padding: 6px; border: 1px solid #aaa; border-radius: 4px; background: white; font-size: 8px; }
 .full-route-builder .button { margin: 0; padding: 6px 9px; }
@@ -554,15 +555,18 @@ footer { width: min(1180px, calc(100% - 40px)); margin: auto; padding: 28px 0 40
 .full-route-row strong { font-size: 9px; }.full-route-row small { margin-top: 2px; color: var(--muted); font: 400 7px DM Mono, monospace; }
 .full-route-row input { box-sizing: border-box; width: 100%; padding: 5px; border: 1px solid #aaa; border-radius: 4px; font: 400 9px DM Mono, monospace; }
 .full-route-row button { width: 27px; height: 27px; border: 1px solid #bbb; border-radius: 4px; background: #f2f1ed; cursor: pointer; }
-.patch-editor-footer { position: sticky; bottom: 0; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 14px 18px; border: 1px solid #25272d; border-top: 0; border-radius: 0 0 10px 10px; background: #1e2025; color: #aaa; box-shadow: 0 16px 45px rgba(0,0,0,.18); }
+.patch-editor-footer { width: 100%; max-width: 100%; position: sticky; bottom: 0; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 14px 18px; border: 1px solid #25272d; border-top: 0; border-radius: 0 0 10px 10px; background: #1e2025; color: #aaa; box-shadow: 0 16px 45px rgba(0,0,0,.18); }
 .patch-editor-footer > span { font: 400 8px DM Mono, monospace; }.patch-editor-footer > div { display: flex; gap: 8px; }
 
-@media (max-width: 800px) {
+@media (max-width: 1050px) {
   .patch-editor-page { width: min(100% - 24px, 700px); }
   .patch-editor-head { align-items: stretch; flex-direction: column; }.patch-title-field { width: 100%; }
   .editor-workbench { grid-template-columns: 1fr; height: auto; max-height: none; overflow: visible; }
   .editor-pane { min-height: 350px; max-height: 520px; border-right: 0; border-bottom: 1px solid #c8c6be; }.editor-inspector-pane { max-height: none; }
   .full-editor-details { overflow: visible; }.full-route-builder { grid-template-columns: 1fr 1fr 58px 58px; }.full-route-builder .button { grid-column: span 2; }
+}
+
+@media (max-width: 800px) {
   .name-editor-list.module-names { grid-template-columns: repeat(2, minmax(0,1fr)); }
   .layout-editor-body { grid-template-columns: 1fr; overflow: auto; }
   .layout-module-list, .layout-route-list { max-height: 360px; }
