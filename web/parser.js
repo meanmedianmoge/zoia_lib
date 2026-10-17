@@ -65,7 +65,9 @@ export function parsePatch(buffer, moduleIndex) {
       })),
       version,
       page: Math.max(0, Math.min(63, pageRaw)),
+      pageOffset: (cursor + 3) * 4,
       position,
+      positionOffset: (cursor + 5) * 4,
       size,
       parameterCount,
       parameters: rawParameters.map((raw, index) => ({
@@ -93,7 +95,8 @@ export function parsePatch(buffer, moduleIndex) {
     connections.push({
       sourceModule: word(offset), sourceBlock: word(offset + 1),
       destinationModule: word(offset + 2), destinationBlock: word(offset + 3),
-      strengthRaw: word(offset + 4), strength: Math.round(word(offset + 4) / 100)
+      strengthRaw: word(offset + 4), strength: Math.round(word(offset + 4) / 100),
+      strengthOffset: (offset + 4) * 4
     });
   }
   cursor += 1 + connectionCount * 5;
@@ -112,7 +115,7 @@ export function parsePatch(buffer, moduleIndex) {
     number: index,
     name: pageNames[index] || `Page ${index + 1}`,
     moduleCount: modules.filter((module) => module.page === index).length,
-    nameOffset: (cursor - storedPageCount * 4 + index * 4) * 4
+    nameOffset: index < storedPageCount ? (cursor - storedPageCount * 4 + index * 4) * 4 : null
   }));
 
   const starredCount = cursor < wordCount ? word(cursor) : 0;

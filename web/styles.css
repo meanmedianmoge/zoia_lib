@@ -481,9 +481,25 @@ footer { width: min(1180px, calc(100% - 40px)); margin: auto; padding: 28px 0 40
 .module-parameter-control > span { overflow: hidden; font-size: 10px; text-overflow: ellipsis; text-transform: capitalize; white-space: nowrap; }
 .module-parameter-control .parameter-raw { box-sizing: border-box; width: 100%; padding: 6px; border: 1px solid #aaa; border-radius: 4px; font: 400 9px DM Mono, monospace; }
 .module-parameter-control output { color: var(--muted); font: 400 8px DM Mono, monospace; text-align: right; }
+.layout-editor-dialog { width: min(920px, calc(100% - 28px)); max-height: calc(100vh - 30px); padding: 0; border: 1px solid #25272d; border-radius: 12px; background: #f8f7f2; color: var(--ink); box-shadow: 0 28px 90px rgba(0,0,0,.35); }
+.layout-editor-dialog::backdrop { background: rgba(27,28,32,.72); backdrop-filter: blur(3px); }
+.layout-editor-body { display: grid; grid-template-columns: 1fr 1.25fr; gap: 18px; max-height: min(650px, calc(100vh - 205px)); padding: 20px; overflow: hidden; }
+.layout-editor-body section { min-width: 0; display: flex; flex-direction: column; }
+.layout-module-list, .layout-route-list { display: grid; gap: 5px; overflow: auto; }
+.layout-module-row { display: grid; grid-template-columns: minmax(120px,1fr) 70px 78px; gap: 7px; align-items: center; padding: 7px 8px; border: 1px solid #d2d0c8; border-radius: 5px; background: white; }
+.layout-module-row.conflict { border-color: #d14d3f; background: #fff0ec; box-shadow: inset 3px 0 #d14d3f; }
+.layout-module-row strong, .layout-module-row small, .layout-route-row strong, .layout-route-row small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.layout-module-row strong, .layout-route-row strong { font-size: 9px; }
+.layout-module-row small, .layout-route-row small { margin-top: 2px; color: var(--muted); font: 400 7px DM Mono, monospace; }
+.layout-module-row label { color: var(--muted); font: 500 7px DM Mono, monospace; text-transform: uppercase; }
+.layout-module-row input, .layout-route-row input { box-sizing: border-box; width: 100%; margin-top: 3px; padding: 5px; border: 1px solid #aaa; border-radius: 4px; font: 400 9px DM Mono, monospace; }
+.layout-route-row { display: grid; grid-template-columns: minmax(150px,1fr) 78px 15px; gap: 6px; align-items: center; padding: 7px 8px; border: 1px solid #d2d0c8; border-radius: 5px; background: white; }
+.layout-route-row output { color: var(--muted); font: 400 8px DM Mono, monospace; }
 
 @media (max-width: 800px) {
   .name-editor-list.module-names { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .layout-editor-body { grid-template-columns: 1fr; overflow: auto; }
+  .layout-module-list, .layout-route-list { max-height: 360px; }
   .privacy { display: none; }
   .github-link { margin-left: auto; }
   .drop-zone { align-items: flex-start; flex-wrap: wrap; }

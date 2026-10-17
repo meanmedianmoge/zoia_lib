@@ -1,10 +1,10 @@
-import { parsePatch } from "./parser.js?v=0.11.0";
-import { editModuleSettings, editPatchNames } from "./editor.js?v=0.11.0";
-import { getPatch, getRevision, listBanks, listPatches, listRevisions, patchId, removeBank, removePatch, removeRevision, saveBank, savePatch, saveRevision } from "./library.js?v=0.11.0";
-import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.11.0";
-import { createZip, readZip } from "./zip.js?v=0.11.0";
+import { parsePatch } from "./parser.js?v=0.12.0";
+import { editLayoutAndRoutes, editModuleSettings, editPatchNames } from "./editor.js?v=0.12.0";
+import { getPatch, getRevision, listBanks, listPatches, listRevisions, patchId, removeBank, removePatch, removeRevision, saveBank, savePatch, saveRevision } from "./library.js?v=0.12.0";
+import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.12.0";
+import { createZip, readZip } from "./zip.js?v=0.12.0";
 
-const ASSET_VERSION = "0.11.0";
+const ASSET_VERSION = "0.12.0";
 
 const $ = (selector) => document.querySelector(selector);
 const elements = {
@@ -474,7 +474,8 @@ function openNameEditor() {
     label.querySelector("span").textContent = `Page ${String(page.number + 1).padStart(2, "0")}`;
     label.querySelector("input").value = page.name;
     label.querySelector("input").dataset.index = String(page.number);
-    label.querySelector("small").textContent = `${page.moduleCount} module${page.moduleCount === 1 ? "" : "s"}`;
+    label.querySelector("input").disabled = !Number.isInteger(page.nameOffset);
+    label.querySelector("small").textContent = Number.isInteger(page.nameOffset) ? `${page.moduleCount} module${page.moduleCount === 1 ? "" : "s"}` : "Generated page · name field unavailable";
     return label;
   }));
   $("#editor-modules").replaceChildren(...currentPatch.modules.map((module) => {
@@ -595,6 +596,68 @@ async function applyModuleEdits(event) {
   } catch (error) {
     status.textContent = error.message;
   }
+}
+
+function readLayoutModules() {
+  return [...$("#layout-module-list").querySelectorAll(".layout-module-row")].map((row) => ({
+    page: Number(row.querySelector('[data-field="page"]').value) - 1,
+    position: Number(row.querySelector('[data-field="position"]').value) - 1
+  }));
+}
+
+function validateLayoutAnchors() {
+  const rows = [...$("#layout-module-list").querySelectorAll(".layout-module-row")];
+  const groups = new Map();
+  rows.forEach((row) => {
+    row.classList.remove("conflict");
+    const key = `${row.querySelector('[data-field="page"]').value}:${row.querySelector('[data-field="position"]').value}`;
+    groups.set(key, [...(groups.get(key) || []), row]);
+  });
+  let collisions = 0;
+  groups.forEach((group) => { if (group.length > 1) { collisions += group.length; group.forEach((row) => row.classList.add("conflict")); } });
+  $("#layout-editor-status").textContent = collisions ? `${collisions} module anchors overlap. Resolve highlighted rows before saving.` : "Layout is clear · applying changes will snapshot the original.";
+  return collisions === 0;
+}
+
+function openLayoutEditor() {
+  if (!currentPatch) return;
+  $("#layout-module-list").replaceChildren(...currentPatch.modules.map((module) => {
+    const row = document.createElement("div"); row.className = "layout-module-row";
+    row.innerHTML = `<span><strong></strong><small></small></span><label>Page<input data-field="page" type="number" min="1" max="64"></label><label>Position<input data-field="position" type="number" min="1" max="40"></label>`;
+    row.querySelector("strong").textContent = module.displayName; row.querySelector("small").textContent = module.type;
+    row.querySelector('[data-field="page"]').value = String(module.page + 1); row.querySelector('[data-field="position"]').value = String(module.position + 1);
+    row.querySelectorAll("input").forEach((input) => input.addEventListener("input", validateLayoutAnchors)); return row;
+  }));
+  $("#layout-route-list").replaceChildren(...currentPatch.connections.map((connection, index) => {
+    const row = document.createElement("label"); row.className = "layout-route-row";
+    row.innerHTML = `<span><strong></strong><small></small></span><input type="number" min="-200" max="200" step="0.01"><output>%</output>`;
+    row.querySelector("strong").textContent = `${connection.sourceName} → ${connection.destinationName}`;
+    row.querySelector("small").textContent = `${connection.sourceBlockName} → ${connection.destinationBlockName}`;
+    const input = row.querySelector("input"); input.dataset.index = String(index); input.value = (connection.strengthRaw / 100).toFixed(2);
+    return row;
+  }));
+  validateLayoutAnchors(); $("#layout-editor-dialog").showModal();
+}
+
+async function applyLayoutEdits(event) {
+  event.preventDefault();
+  if (!validateLayoutAnchors()) return;
+  const strengths = [...$("#layout-route-list").querySelectorAll("input")].map((input) => Math.round(Number(input.value) * 100));
+  const status = $("#layout-editor-status"); status.textContent = "Validating layout and routes…";
+  try {
+    const editedBuffer = editLayoutAndRoutes(currentBuffer, currentPatch, { modules: readLayoutModules(), strengths });
+    const editedPatch = parsePatch(editedBuffer, await getModuleIndex()); let displayTitle;
+    if (currentLibraryRecordId) {
+      const record = await getPatch(currentLibraryRecordId);
+      if (record) {
+        await snapshotBeforeEdit(record, "Before layout edit", "Automatic snapshot created by the layout and routing editor.");
+        const updated = { ...record, buffer: editedBuffer, byteLength: editedBuffer.byteLength, summary: { ...editedPatch.meta } };
+        await savePatch(updated); displayTitle = updated.title;
+      }
+    }
+    await inspectBuffer(editedBuffer, currentFileName, { recordId: currentLibraryRecordId, displayTitle });
+    $("#layout-editor-dialog").close();
+  } catch (error) { status.textContent = error.message; }
 }
 
 async function restoreRevision(revision) {
@@ -1403,6 +1466,9 @@ $("#dialog-close").addEventListener("click", () => elements.dialog.close());
 $("#edit-module-button").addEventListener("click", openModuleEditor);
 $("#module-editor-close").addEventListener("click", () => $("#module-editor-dialog").close());
 $("#module-editor-form").addEventListener("submit", applyModuleEdits);
+$("#layout-editor-button").addEventListener("click", openLayoutEditor);
+$("#layout-editor-close").addEventListener("click", () => $("#layout-editor-dialog").close());
+$("#layout-editor-form").addEventListener("submit", applyLayoutEdits);
 elements.dialog.addEventListener("click", (event) => {
   const rect = elements.dialog.getBoundingClientRect();
   if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) elements.dialog.close();
