@@ -1,10 +1,10 @@
-import { parsePatch } from "./parser.js?v=0.12.0";
-import { editLayoutAndRoutes, editModuleSettings, editPatchNames } from "./editor.js?v=0.12.0";
-import { getPatch, getRevision, listBanks, listPatches, listRevisions, patchId, removeBank, removePatch, removeRevision, saveBank, savePatch, saveRevision } from "./library.js?v=0.12.0";
-import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.12.0";
-import { createZip, readZip } from "./zip.js?v=0.12.0";
+import { parsePatch } from "./parser.js?v=0.12.1";
+import { editLayoutAndRoutes, editModuleSettings, editPatchNames } from "./editor.js?v=0.12.1";
+import { getPatch, getRevision, listBanks, listPatches, listRevisions, patchId, removeBank, removePatch, removeRevision, saveBank, savePatch, saveRevision } from "./library.js?v=0.12.1";
+import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.12.1";
+import { createZip, readZip } from "./zip.js?v=0.12.1";
 
-const ASSET_VERSION = "0.12.0";
+const ASSET_VERSION = "0.12.1";
 
 const $ = (selector) => document.querySelector(selector);
 const elements = {
@@ -493,6 +493,14 @@ function openNameEditor() {
     ? "Applying an edit creates a snapshot of the original."
     : "Open files can be edited and exported; library files also receive a snapshot.";
   $("#name-editor-dialog").showModal();
+}
+
+function openEditorHub() {
+  if (!currentPatch) return;
+  $("#hub-module-select").replaceChildren(...currentPatch.modules.map((module) => {
+    const option = document.createElement("option"); option.value = String(module.number); option.textContent = `${String(module.number + 1).padStart(2, "0")} · ${module.displayName}`; return option;
+  }));
+  $("#editor-hub-dialog").showModal();
 }
 
 async function snapshotBeforeEdit(record, label, note) {
@@ -1466,7 +1474,6 @@ $("#dialog-close").addEventListener("click", () => elements.dialog.close());
 $("#edit-module-button").addEventListener("click", openModuleEditor);
 $("#module-editor-close").addEventListener("click", () => $("#module-editor-dialog").close());
 $("#module-editor-form").addEventListener("submit", applyModuleEdits);
-$("#layout-editor-button").addEventListener("click", openLayoutEditor);
 $("#layout-editor-close").addEventListener("click", () => $("#layout-editor-dialog").close());
 $("#layout-editor-form").addEventListener("submit", applyLayoutEdits);
 elements.dialog.addEventListener("click", (event) => {
@@ -1497,7 +1504,15 @@ $("#edit-metadata-button").addEventListener("click", async () => {
   if (record) openMetadataEditor(record);
 });
 $("#versions-button").addEventListener("click", () => openVersionHistory());
-$("#name-editor-button").addEventListener("click", openNameEditor);
+$("#editor-hub-button").addEventListener("click", openEditorHub);
+$("#editor-hub-close").addEventListener("click", () => $("#editor-hub-dialog").close());
+$("#hub-edit-names").addEventListener("click", () => { $("#editor-hub-dialog").close(); openNameEditor(); });
+$("#hub-edit-layout").addEventListener("click", () => { $("#editor-hub-dialog").close(); openLayoutEditor(); });
+$("#hub-edit-module").addEventListener("click", () => {
+  editorModule = currentPatch.modules[Number($("#hub-module-select").value)];
+  if (!editorModule) return;
+  $("#editor-hub-dialog").close(); openModuleEditor();
+});
 $("#name-editor-close").addEventListener("click", () => $("#name-editor-dialog").close());
 $("#name-editor-form").addEventListener("submit", applyNameEdits);
 $("#export-edited-patch").addEventListener("click", exportCurrentPatch);

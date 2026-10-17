@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=0.12.0">
+    <link rel="stylesheet" href="styles.css?v=0.12.1">
   </head>
   <body>
     <header class="topbar">
@@ -173,8 +173,7 @@
             </div>
           </div>
           <div class="workspace-actions">
-            <button class="button secondary" id="layout-editor-button" type="button">Layout &amp; routes</button>
-            <button class="button primary" id="name-editor-button" type="button">Edit names</button>
+            <button class="button primary" id="editor-hub-button" type="button">Edit patch</button>
             <button class="button secondary" id="versions-button" type="button">Versions</button>
             <button class="button secondary" id="edit-metadata-button" type="button">Edit details</button>
             <button class="button secondary" id="export-button" type="button">Export analysis</button>
@@ -379,6 +378,16 @@
       </form>
     </dialog>
 
+    <dialog class="editor-hub-dialog" id="editor-hub-dialog">
+      <div class="name-editor-head"><div><span class="section-label">Patch editor</span><h2>What would you like to edit?</h2><p>All safe editing tools are collected here.</p></div><button class="dialog-close" id="editor-hub-close" type="button" aria-label="Close patch editor">×</button></div>
+      <div class="editor-hub-grid">
+        <button class="editor-hub-card" id="hub-edit-names" type="button"><span>01</span><strong>Names</strong><small>Patch, page, and module labels</small></button>
+        <section class="editor-hub-card module-card"><span>02</span><strong>Module settings</strong><small>Color and saved parameter values</small><select id="hub-module-select" aria-label="Choose module"></select><button class="button secondary" id="hub-edit-module" type="button">Edit selected module</button></section>
+        <button class="editor-hub-card" id="hub-edit-layout" type="button"><span>03</span><strong>Layout &amp; routes</strong><small>Page, grid position, and connection strength</small></button>
+      </div>
+      <div class="editor-hub-note">Every applied edit validates the binary and snapshots library patches first.</div>
+    </dialog>
+
     <dialog class="module-editor-dialog" id="module-editor-dialog">
       <form id="module-editor-form">
         <div class="name-editor-head">
@@ -408,6 +417,6 @@
       <span>Experimental web companion to ZOIA Librarian.</span>
       <span>Not affiliated with Empress Effects.</span>
     </footer>
-    <script type="module" src="app.js?v=0.12.0"></script>
+    <script type="module" src="app.js?v=0.12.1"></script>
   </body>
 </html>
