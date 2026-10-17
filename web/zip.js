@@ -1,12 +1,70 @@
 const encoder = new TextEncoder();
 
-function crc32(bytes) {
+export function crc32(bytes) {
   let crc = 0xffffffff;
   for (const byte of bytes) {
     crc ^= byte;
     for (let bit = 0; bit < 8; bit += 1) crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0);
   }
   return (crc ^ 0xffffffff) >>> 0;
+}
+
+function findEndRecord(bytes) {
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const minimum = Math.max(0, bytes.length - 65557);
+  for (let offset = bytes.length - 22; offset >= minimum; offset -= 1) {
+    if (view.getUint32(offset, true) === 0x06054b50) return offset;
+  }
+  throw new Error("The ZIP directory could not be found.");
+}
+
+async function inflateRaw(bytes) {
+  if (!("DecompressionStream" in globalThis)) throw new Error("Compressed ZIP files are not supported by this browser.");
+  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+export async function readZip(buffer, { extensions = [".bin"], maxFiles = 256, maxBytes = 64 * 1024 * 1024 } = {}) {
+  const bytes = new Uint8Array(buffer);
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const endOffset = findEndRecord(bytes);
+  const entryCount = view.getUint16(endOffset + 10, true);
+  let cursor = view.getUint32(endOffset + 16, true);
+  if (entryCount > maxFiles) throw new Error(`The ZIP contains more than ${maxFiles} files.`);
+  const allowed = extensions.map((extension) => extension.toLowerCase());
+  const files = [];
+  let expandedBytes = 0;
+
+  for (let index = 0; index < entryCount; index += 1) {
+    if (cursor + 46 > bytes.length || view.getUint32(cursor, true) !== 0x02014b50) throw new Error("The ZIP directory is damaged.");
+    const method = view.getUint16(cursor + 10, true);
+    const expectedCrc = view.getUint32(cursor + 16, true);
+    const compressedSize = view.getUint32(cursor + 20, true);
+    const uncompressedSize = view.getUint32(cursor + 24, true);
+    const nameLength = view.getUint16(cursor + 28, true);
+    const extraLength = view.getUint16(cursor + 30, true);
+    const commentLength = view.getUint16(cursor + 32, true);
+    const localOffset = view.getUint32(cursor + 42, true);
+    const fullName = new TextDecoder().decode(bytes.slice(cursor + 46, cursor + 46 + nameLength));
+    cursor += 46 + nameLength + extraLength + commentLength;
+    if (fullName.endsWith("/")) continue;
+    const name = fullName.split(/[\\/]/).pop();
+    if (!allowed.some((extension) => name.toLowerCase().endsWith(extension))) continue;
+    if (localOffset + 30 > bytes.length || view.getUint32(localOffset, true) !== 0x04034b50) throw new Error(`The entry ${name} has a damaged header.`);
+    const localNameLength = view.getUint16(localOffset + 26, true);
+    const localExtraLength = view.getUint16(localOffset + 28, true);
+    const dataOffset = localOffset + 30 + localNameLength + localExtraLength;
+    if (dataOffset + compressedSize > bytes.length) throw new Error(`The entry ${name} is incomplete.`);
+    const compressed = bytes.slice(dataOffset, dataOffset + compressedSize);
+    const data = method === 0 ? compressed : method === 8 ? await inflateRaw(compressed) : null;
+    if (!data) throw new Error(`The entry ${name} uses unsupported ZIP compression method ${method}.`);
+    if (data.length !== uncompressedSize || crc32(data) !== expectedCrc) throw new Error(`The entry ${name} failed its integrity check.`);
+    expandedBytes += data.length;
+    if (expandedBytes > maxBytes) throw new Error("The expanded ZIP is larger than the 64 MB safety limit.");
+    files.push({ name, data });
+  }
+  if (!files.length) throw new Error(`The ZIP does not contain any supported ${allowed.join(" or ")} files.`);
+  return files;
 }
 
 function write16(view, offset, value) { view.setUint16(offset, value, true); }

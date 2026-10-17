@@ -1,9 +1,9 @@
-import { parsePatch } from "./parser.js?v=0.7.0";
-import { getPatch, listBanks, listPatches, patchId, removeBank, removePatch, saveBank, savePatch } from "./library.js?v=0.7.0";
-import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.7.0";
-import { createZip } from "./zip.js?v=0.7.0";
+import { parsePatch } from "./parser.js?v=0.8.1";
+import { getPatch, getRevision, listBanks, listPatches, listRevisions, patchId, removeBank, removePatch, removeRevision, saveBank, savePatch, saveRevision } from "./library.js?v=0.8.1";
+import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.8.1";
+import { createZip, readZip } from "./zip.js?v=0.8.1";
 
-const ASSET_VERSION = "0.7.0";
+const ASSET_VERSION = "0.8.1";
 
 const $ = (selector) => document.querySelector(selector);
 const elements = {
@@ -18,7 +18,7 @@ const elements = {
   librarySort: $("#library-sort"), libraryStatus: $("#library-status"), browse: $("#browse"),
   patchGrid: $("#patch-grid"), browseMessage: $("#browse-message"), patchDialog: $("#patch-dialog"),
   banks: $("#banks"), bankList: $("#bank-list"), bankSlots: $("#bank-slots"), bankPatchList: $("#bank-patch-list"),
-  metadataDialog: $("#metadata-dialog")
+  metadataDialog: $("#metadata-dialog"), versionsDialog: $("#versions-dialog")
 };
 
 let moduleIndex;
@@ -37,6 +37,9 @@ let bankNameTimer;
 let currentLibraryRecordId;
 let metadataRecord;
 let metadataRating = 0;
+let versionPatchRecord;
+let revisionRecords = [];
+let selectedRevisionIds = new Set();
 
 async function getModuleIndex() {
   if (!moduleIndex) {
@@ -72,6 +75,7 @@ async function inspectBuffer(buffer, fileName, { persist = false, lastModified =
       }
     }
     $("#edit-metadata-button").disabled = !currentLibraryRecordId;
+    $("#versions-button").disabled = !currentLibraryRecordId;
     window.scrollTo({ top: 0, behavior: "smooth" });
   } catch (error) {
     elements.hero.hidden = true;
@@ -83,13 +87,52 @@ async function inspectBuffer(buffer, fileName, { persist = false, lastModified =
 
 async function inspectFile(file) {
   if (!file) return;
-  if (!file.name.toLowerCase().endsWith(".bin")) {
+  const extension = file.name.toLowerCase().split(".").pop();
+  if (!isAllowedPatchFile(file.name)) {
     elements.hero.hidden = true;
     elements.error.hidden = false;
-    elements.errorMessage.textContent = "Please choose a ZOIA .bin patch file.";
+    elements.errorMessage.textContent = "Please choose a ZOIA .bin patch or a .zip archive.";
+    return;
+  }
+  if (extension === "zip") {
+    try {
+      const count = await importZipBuffer(await file.arrayBuffer(), { lastModified: file.lastModified });
+      showLibrary();
+      elements.libraryStatus.textContent = `Imported ${count} patch${count === 1 ? "" : "es"} from ${file.name}`;
+    } catch (error) {
+      elements.hero.hidden = true; elements.error.hidden = false; elements.errorMessage.textContent = error.message;
+    }
     return;
   }
   await inspectBuffer(await file.arrayBuffer(), file.name, { persist: true, lastModified: file.lastModified });
+}
+
+function isAllowedPatchFile(fileName) {
+  const lower = fileName.toLowerCase();
+  return lower.endsWith(".bin") || lower.endsWith(".zip");
+}
+
+async function saveBinToLibrary(buffer, fileName, { lastModified = 0, metadata = {} } = {}) {
+  const patch = parsePatch(buffer, await getModuleIndex());
+  await savePatch(makeLibraryRecord(patch, buffer, fileName, lastModified, metadata));
+  return patch;
+}
+
+async function importZipBuffer(buffer, { lastModified = 0, metadata = {}, refresh = true } = {}) {
+  const entries = await readZip(buffer, { extensions: [".bin"] });
+  let imported = 0;
+  const failures = [];
+  for (const entry of entries) {
+    try {
+      await saveBinToLibrary(entry.data.buffer, entry.name, { lastModified, metadata });
+      imported += 1;
+    } catch (error) {
+      failures.push(`${entry.name}: ${error.message}`);
+    }
+  }
+  if (!imported) throw new Error(`No valid ZOIA binaries were found in the ZIP. ${failures.join(" ")}`);
+  if (refresh) await refreshLibrary();
+  return imported;
 }
 
 function makeLibraryRecord(patch, buffer, fileName, lastModified = 0, metadata = {}) {
@@ -189,6 +232,8 @@ function downloadBinary(record) {
 
 async function deleteLibraryPatch(record) {
   if (!window.confirm(`Remove “${record.title}” from this browser library? The original file on your device will not be affected.`)) return;
+  const revisions = await listRevisions(record.id);
+  await Promise.all(revisions.map((revision) => removeRevision(revision.id)));
   await removePatch(record.id);
   await refreshLibrary();
 }
@@ -306,6 +351,182 @@ async function importMetadataFile(file) {
   } finally {
     $("#metadata-import-input").value = "";
   }
+}
+
+async function bufferHash(buffer) {
+  const digest = await crypto.subtle.digest("SHA-256", buffer);
+  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function compactAnalysis(patch) {
+  return {
+    name: patch.name,
+    meta: { ...patch.meta },
+    pages: patch.pages.map((page) => ({ ...page })),
+    modules: patch.modules.map((module) => ({
+      number: module.number, typeId: module.typeId, displayName: module.displayName,
+      type: module.type, page: module.page, position: module.position, version: module.version,
+      parameters: module.parameters.map((parameter) => parameter.raw)
+    })),
+    connections: patch.connections.map((connection) => ({
+      sourceModule: connection.sourceModule, sourceBlock: connection.sourceBlock,
+      destinationModule: connection.destinationModule, destinationBlock: connection.destinationBlock,
+      strengthRaw: connection.strengthRaw
+    }))
+  };
+}
+
+async function openVersionHistory(recordId = currentLibraryRecordId) {
+  if (!recordId) return;
+  versionPatchRecord = await getPatch(recordId);
+  if (!versionPatchRecord) return;
+  $("#versions-patch-name").textContent = `${versionPatchRecord.title} · ${versionPatchRecord.fileName}`;
+  selectedRevisionIds = new Set();
+  $("#comparison-results").hidden = true;
+  $("#comparison-empty").hidden = false;
+  await refreshRevisions();
+  elements.versionsDialog.showModal();
+}
+
+async function refreshRevisions() {
+  revisionRecords = (await listRevisions(versionPatchRecord.id)).sort((a, b) => b.createdAt - a.createdAt);
+  $("#versions-count").textContent = `${revisionRecords.length} snapshot${revisionRecords.length === 1 ? "" : "s"}`;
+  $("#compare-versions").disabled = selectedRevisionIds.size !== 2;
+  const timeline = $("#revision-timeline");
+  timeline.replaceChildren(...revisionRecords.map((revision) => {
+    const item = document.createElement("article");
+    item.className = `revision-item${selectedRevisionIds.has(revision.id) ? " selected" : ""}`;
+    item.innerHTML = `
+      <label class="revision-select"><input type="checkbox"><i></i></label>
+      <div class="revision-copy"><strong></strong><time></time><p></p><div class="revision-metrics"></div></div>
+      <div class="revision-actions"><button type="button" data-action="binary" title="Export binary">.bin</button><button type="button" data-action="json" title="Export metadata">.json</button><button type="button" data-action="restore">Restore</button><button type="button" data-action="delete" title="Delete snapshot">×</button></div>`;
+    const checkbox = item.querySelector("input"); checkbox.checked = selectedRevisionIds.has(revision.id);
+    item.querySelector("strong").textContent = revision.label;
+    item.querySelector("time").textContent = new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(revision.createdAt);
+    item.querySelector("p").textContent = revision.note || "No snapshot note.";
+    item.querySelector(".revision-metrics").textContent = `${revision.analysis.meta.moduleCount} modules · ${revision.analysis.meta.connectionCount} routes · ${revision.analysis.meta.estimatedCpu}% CPU`;
+    checkbox.addEventListener("change", () => toggleRevisionSelection(revision.id, checkbox.checked));
+    item.querySelector('[data-action="binary"]').addEventListener("click", () => downloadRevisionBinary(revision));
+    item.querySelector('[data-action="json"]').addEventListener("click", () => downloadJson(sidecarJson(versionPatchRecord, revision.metadata), `${versionPatchRecord.fileName.replace(/\.bin$/i, "")}_${safeBankName(revision.label)}.json`));
+    item.querySelector('[data-action="restore"]').addEventListener("click", () => restoreRevision(revision));
+    item.querySelector('[data-action="delete"]').addEventListener("click", () => deleteRevision(revision));
+    return item;
+  }));
+  if (!revisionRecords.length) {
+    const empty = document.createElement("div"); empty.className = "revision-empty";
+    empty.innerHTML = "<strong>No snapshots yet</strong><p>Save the current binary above to begin its history.</p>";
+    timeline.append(empty);
+  }
+}
+
+function toggleRevisionSelection(id, checked) {
+  if (checked && selectedRevisionIds.size >= 2) return refreshRevisions();
+  if (checked) selectedRevisionIds.add(id); else selectedRevisionIds.delete(id);
+  refreshRevisions();
+}
+
+async function createSnapshot(event) {
+  event.preventDefault();
+  if (!versionPatchRecord) return;
+  const hash = await bufferHash(versionPatchRecord.buffer);
+  const revision = {
+    id: `${versionPatchRecord.id}::${hash}`,
+    patchId: versionPatchRecord.id,
+    hash,
+    label: $("#snapshot-label").value.trim(),
+    note: $("#snapshot-note").value.trim(),
+    createdAt: Date.now(),
+    buffer: versionPatchRecord.buffer,
+    metadata: structuredClone(metadataFor(versionPatchRecord)),
+    analysis: compactAnalysis(parsePatch(versionPatchRecord.buffer, await getModuleIndex()))
+  };
+  if (revisionRecords.some((existing) => existing.hash === hash)) {
+    $("#versions-status").textContent = "That binary is already in this patch’s history.";
+    return;
+  }
+  try {
+    await saveRevision(revision);
+    $("#snapshot-form").reset();
+    $("#versions-status").textContent = `Saved “${revision.label}” ✓`;
+    await refreshRevisions();
+  } catch (error) {
+    $("#versions-status").textContent = error.name === "ConstraintError" ? "That binary is already in this patch’s history." : `Snapshot failed: ${error.message}`;
+  }
+}
+
+function downloadRevisionBinary(revision) {
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(new Blob([revision.buffer], { type: "application/octet-stream" }));
+  link.download = versionPatchRecord.fileName.replace(/\.bin$/i, `_${safeBankName(revision.label)}.bin`);
+  link.click(); URL.revokeObjectURL(link.href);
+}
+
+async function restoreRevision(revision) {
+  if (!window.confirm(`Restore “${revision.label}” as the current binary? The existing snapshots will remain available.`)) return;
+  const parsed = parsePatch(revision.buffer, await getModuleIndex());
+  versionPatchRecord = {
+    ...versionPatchRecord,
+    buffer: revision.buffer,
+    byteLength: revision.buffer.byteLength,
+    summary: { ...parsed.meta },
+    metadata: structuredClone(revision.metadata),
+    title: revision.metadata.title || versionPatchRecord.title
+  };
+  await savePatch(versionPatchRecord);
+  await refreshLibrary();
+  if (currentLibraryRecordId === versionPatchRecord.id) await inspectBuffer(revision.buffer, versionPatchRecord.fileName, { recordId: versionPatchRecord.id, displayTitle: versionPatchRecord.title });
+  $("#versions-status").textContent = `Restored “${revision.label}” ✓`;
+}
+
+async function deleteRevision(revision) {
+  if (!window.confirm(`Delete snapshot “${revision.label}”? This cannot be undone.`)) return;
+  await removeRevision(revision.id); selectedRevisionIds.delete(revision.id); await refreshRevisions();
+  $("#versions-status").textContent = "Snapshot deleted.";
+}
+
+function connectionKey(connection) {
+  return `${connection.sourceModule}.${connection.sourceBlock}>${connection.destinationModule}.${connection.destinationBlock}@${connection.strengthRaw}`;
+}
+
+function compareSelectedRevisions() {
+  const selected = revisionRecords.filter((revision) => selectedRevisionIds.has(revision.id)).sort((a, b) => a.createdAt - b.createdAt);
+  if (selected.length !== 2) return;
+  const [from, to] = selected;
+  const before = new Map(from.analysis.modules.map((module) => [module.number, module]));
+  const after = new Map(to.analysis.modules.map((module) => [module.number, module]));
+  const added = [...after.keys()].filter((number) => !before.has(number)).map((number) => after.get(number));
+  const removed = [...before.keys()].filter((number) => !after.has(number)).map((number) => before.get(number));
+  const changed = [...after.keys()].filter((number) => {
+    if (!before.has(number)) return false;
+    const a = before.get(number); const b = after.get(number);
+    return a.typeId !== b.typeId || a.page !== b.page || a.position !== b.position || a.version !== b.version || JSON.stringify(a.parameters) !== JSON.stringify(b.parameters);
+  }).map((number) => ({ before: before.get(number), after: after.get(number) }));
+  const fromRoutes = new Set(from.analysis.connections.map(connectionKey));
+  const toRoutes = new Set(to.analysis.connections.map(connectionKey));
+  const routesAdded = [...toRoutes].filter((route) => !fromRoutes.has(route)).length;
+  const routesRemoved = [...fromRoutes].filter((route) => !toRoutes.has(route)).length;
+  $("#comparison-from").textContent = from.label; $("#comparison-to").textContent = to.label;
+  const summary = [
+    [to.analysis.meta.moduleCount - from.analysis.meta.moduleCount, "Modules"],
+    [to.analysis.meta.connectionCount - from.analysis.meta.connectionCount, "Routes"],
+    [Math.round((to.analysis.meta.estimatedCpu - from.analysis.meta.estimatedCpu) * 100) / 100, "CPU"],
+    [to.analysis.meta.pageCount - from.analysis.meta.pageCount, "Pages"]
+  ];
+  $("#comparison-summary").replaceChildren(...summary.map(([delta, label]) => {
+    const item = document.createElement("span"); item.className = delta > 0 ? "positive" : delta < 0 ? "negative" : "";
+    item.innerHTML = `<strong></strong><small></small>`; item.querySelector("strong").textContent = `${delta > 0 ? "+" : ""}${delta}${label === "CPU" ? "%" : ""}`; item.querySelector("small").textContent = label; return item;
+  }));
+  const groups = [
+    ["Added modules", added.map((module) => module.displayName)],
+    ["Removed modules", removed.map((module) => module.displayName)],
+    ["Changed modules", changed.map(({ after: module }) => module.displayName)],
+    ["Routing", [`${routesAdded} added`, `${routesRemoved} removed`]]
+  ];
+  $("#comparison-changes").replaceChildren(...groups.map(([title, items]) => {
+    const group = document.createElement("section"); group.innerHTML = `<h4></h4><div></div>`; group.querySelector("h4").textContent = title;
+    group.querySelector("div").replaceChildren(...(items.length ? items : ["None"]).map((value) => { const item = document.createElement("span"); item.textContent = value; return item; })); return group;
+  }));
+  $("#comparison-empty").hidden = true; $("#comparison-results").hidden = false;
 }
 
 async function refreshBanks() {
@@ -634,20 +855,26 @@ async function openCommunityPatch(id) {
 async function saveCommunityPatch() {
   if (!selectedCommunityPatch) return;
   const button = $("#patch-dialog-save");
-  const file = selectedCommunityPatch.files?.find((candidate) => candidate.filename?.toLowerCase().endsWith(".bin"));
+  const file = selectedCommunityPatch.files?.find((candidate) => isAllowedPatchFile(candidate.filename || ""));
   if (!file) {
-    $("#download-status").textContent = "This upload does not include a directly compatible .bin file.";
+    $("#download-status").textContent = "This upload does not include a compatible .bin or .zip file.";
     return;
   }
   button.disabled = true;
   button.textContent = "Downloading…";
   try {
     const buffer = await downloadPatchFile(file.url);
-    const patch = parsePatch(buffer, await getModuleIndex());
-    await savePatch(makeLibraryRecord(patch, buffer, file.filename, Date.parse(selectedCommunityPatch.updated_at) || 0, selectedCommunityPatch));
-    await refreshLibrary();
+    const modified = Date.parse(selectedCommunityPatch.updated_at) || 0;
+    let count = 1;
+    let patch;
+    if (file.filename.toLowerCase().endsWith(".zip")) {
+      count = await importZipBuffer(buffer, { lastModified: modified, metadata: selectedCommunityPatch });
+    } else {
+      patch = await saveBinToLibrary(buffer, file.filename, { lastModified: modified, metadata: selectedCommunityPatch });
+      await refreshLibrary();
+    }
     button.textContent = "Saved to library ✓";
-    $("#download-status").textContent = `${patch.name} is ready in your local library.`;
+    $("#download-status").textContent = file.filename.toLowerCase().endsWith(".zip") ? `${count} patches from the ZIP are ready in your local library.` : `${patch.name} is ready in your local library.`;
   } catch (error) {
     button.disabled = false;
     button.textContent = "Try again";
@@ -656,24 +883,30 @@ async function saveCommunityPatch() {
 }
 
 async function importLibraryFiles(files) {
-  const validFiles = [...files].filter((file) => file.name.toLowerCase().endsWith(".bin"));
+  const validFiles = [...files].filter((file) => isAllowedPatchFile(file.name));
   if (!validFiles.length) return;
   elements.libraryStatus.textContent = `Importing 0 of ${validFiles.length}…`;
   const catalog = await getModuleIndex();
   let imported = 0;
+  let processed = 0;
   for (const file of validFiles) {
     try {
       const buffer = await file.arrayBuffer();
-      const patch = parsePatch(buffer, catalog);
-      await savePatch(makeLibraryRecord(patch, buffer, file.name, file.lastModified));
-      imported += 1;
-      elements.libraryStatus.textContent = `Importing ${imported} of ${validFiles.length}…`;
+      if (file.name.toLowerCase().endsWith(".zip")) imported += await importZipBuffer(buffer, { lastModified: file.lastModified, refresh: false });
+      else {
+        const patch = parsePatch(buffer, catalog);
+        await savePatch(makeLibraryRecord(patch, buffer, file.name, file.lastModified));
+        imported += 1;
+      }
     } catch (error) {
       console.warn(`Could not import ${file.name}`, error);
     }
+    processed += 1;
+    elements.libraryStatus.textContent = `Processing ${processed} of ${validFiles.length}…`;
   }
   elements.libraryInput.value = "";
   await refreshLibrary();
+  elements.libraryStatus.textContent = `Imported ${imported} patch${imported === 1 ? "" : "es"}.`;
 }
 
 function render(patch) {
@@ -1006,6 +1239,10 @@ $("#edit-metadata-button").addEventListener("click", async () => {
   const record = await getPatch(currentLibraryRecordId);
   if (record) openMetadataEditor(record);
 });
+$("#versions-button").addEventListener("click", () => openVersionHistory());
+$("#versions-dialog-close").addEventListener("click", () => elements.versionsDialog.close());
+$("#snapshot-form").addEventListener("submit", createSnapshot);
+$("#compare-versions").addEventListener("click", compareSelectedRevisions);
 $("#metadata-dialog-close").addEventListener("click", () => elements.metadataDialog.close());
 $("#metadata-form").addEventListener("submit", saveMetadata);
 $("#metadata-import").addEventListener("click", () => $("#metadata-import-input").click());

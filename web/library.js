@@ -1,7 +1,8 @@
 const DATABASE_NAME = "zoia-patchwork";
-const DATABASE_VERSION = 2;
+const DATABASE_VERSION = 3;
 const PATCH_STORE = "patches";
 const BANK_STORE = "banks";
+const REVISION_STORE = "revisions";
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -16,6 +17,11 @@ function openDatabase() {
       if (!database.objectStoreNames.contains(BANK_STORE)) {
         const banks = database.createObjectStore(BANK_STORE, { keyPath: "id" });
         banks.createIndex("updatedAt", "updatedAt");
+      }
+      if (!database.objectStoreNames.contains(REVISION_STORE)) {
+        const revisions = database.createObjectStore(REVISION_STORE, { keyPath: "id" });
+        revisions.createIndex("patchId", "patchId");
+        revisions.createIndex("createdAt", "createdAt");
       }
     };
     request.onsuccess = () => resolve(request.result);
@@ -77,4 +83,20 @@ export async function listBanks() {
 
 export async function removeBank(id) {
   return store(BANK_STORE, "readwrite", (banks) => requestResult(banks.delete(id)));
+}
+
+export async function saveRevision(record) {
+  return store(REVISION_STORE, "readwrite", (revisions) => requestResult(revisions.add(record)));
+}
+
+export async function listRevisions(patchRecordId) {
+  return store(REVISION_STORE, "readonly", (revisions) => requestResult(revisions.index("patchId").getAll(patchRecordId)));
+}
+
+export async function getRevision(id) {
+  return store(REVISION_STORE, "readonly", (revisions) => requestResult(revisions.get(id)));
+}
+
+export async function removeRevision(id) {
+  return store(REVISION_STORE, "readwrite", (revisions) => requestResult(revisions.delete(id)));
 }
