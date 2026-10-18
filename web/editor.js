@@ -35,17 +35,21 @@ export function editModuleSettings(buffer, module, { colorId, parameters }) {
   return output;
 }
 
-export function insertModule(buffer, patch, { typeId, definition, page, position, colorId = 1 }) {
+export function insertModule(buffer, patch, { typeId, definition, page, position, colorId = 1, optionIndices = [], blocks, parameters }) {
   if (!Number.isInteger(typeId) || typeId < 0) throw new Error("Choose a valid module type.");
   if (!definition || typeof definition !== "object") throw new Error("That module definition is unavailable.");
   if (!Number.isInteger(page) || page < 0 || page > 63 || !Number.isInteger(position) || position < 0 || position > 39) throw new Error("The new module needs a valid grid position.");
   if (!Number.isInteger(colorId) || colorId < 1 || colorId > 15) throw new Error("Choose a valid ZOIA module color.");
-  const parameters = (definition.blocks || []).filter((block) => block.isDefault && block.isParam).sort((a, b) => a.position - b.position);
-  const sizeWords = 14 + parameters.length;
+  const activeBlocks = blocks || (definition.blocks || []).filter((block) => block.isDefault);
+  const parameterValues = parameters || activeBlocks.filter((block) => block.isParam).map(() => 0);
+  const sizeWords = 14 + parameterValues.length;
   const record = new ArrayBuffer(sizeWords * 4); const view = new DataView(record);
   view.setInt32(0, sizeWords, true); view.setInt32(4, typeId, true); view.setInt32(8, 1, true);
   view.setInt32(12, page, true); view.setInt32(16, colorId, true); view.setInt32(20, position, true);
-  view.setInt32(24, parameters.length, true); view.setInt32(28, 0, true);
+  view.setInt32(24, parameterValues.length, true); view.setInt32(28, 0, true);
+  const recordBytes = new Uint8Array(record);
+  optionIndices.slice(0, 8).forEach((value, index) => { recordBytes[32 + index] = Number(value) || 0; });
+  parameterValues.forEach((value, index) => view.setInt32((10 + index) * 4, value, true));
   const extraColorBytes = patch.sections.hasTrailingColors ? 4 : 0;
   const addedBytes = record.byteLength + extraColorBytes;
   const oldEnd = patch.sections.dataEndOffset; const newEnd = oldEnd + addedBytes;

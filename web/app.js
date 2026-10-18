@@ -1,10 +1,11 @@
-import { parsePatch } from "./parser.js?v=0.15.0";
-import { editLayoutAndRoutes, editModuleSettings, editPatchNames, insertModule } from "./editor.js?v=0.15.0";
-import { getPatch, getRevision, listBanks, listPatches, listRevisions, patchId, removeBank, removePatch, removeRevision, saveBank, savePatch, saveRevision } from "./library.js?v=0.15.0";
-import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.15.0";
-import { createZip, readZip } from "./zip.js?v=0.15.0";
+import { parsePatch } from "./parser.js?v=0.16.0";
+import { editLayoutAndRoutes, editModuleSettings, editPatchNames, insertModule } from "./editor.js?v=0.16.0";
+import { getPatch, getRevision, listBanks, listPatches, listRevisions, patchId, removeBank, removePatch, removeRevision, saveBank, savePatch, saveRevision } from "./library.js?v=0.16.0";
+import { configuredBlocks, defaultParameterRaw } from "./moduleconfig.js?v=0.16.0";
+import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.16.0";
+import { createZip, readZip } from "./zip.js?v=0.16.0";
 
-const ASSET_VERSION = "0.15.0";
+const ASSET_VERSION = "0.16.0";
 
 const $ = (selector) => document.querySelector(selector);
 const elements = {
@@ -45,6 +46,7 @@ let editorModule;
 let fullEditorDraft;
 let fullEditorSelected = 0;
 let fullEditorOriginal;
+let pendingModuleInsert;
 
 async function getModuleIndex() {
   if (!moduleIndex) {
@@ -595,9 +597,39 @@ function renderFullCatalog() {
     row.innerHTML = `<i></i><span><strong></strong><small></small></span><small></small>`;
     row.querySelector("strong").textContent = module.name; row.querySelector("span small").textContent = module.category;
     row.querySelector(":scope > small").textContent = "+ Add"; row.title = `Add ${module.name} to this patch`;
-    row.addEventListener("click", () => addCatalogModule(Number(id), module));
+    row.addEventListener("click", () => openModuleInsert(Number(id), module));
     return row;
   }));
+}
+
+function readInsertOptions() {
+  return [...$("#insert-module-options").querySelectorAll("select")].map((select) => Number(select.value));
+}
+
+function refreshInsertSummary() {
+  if (!pendingModuleInsert) return;
+  try {
+    const blocks = configuredBlocks(pendingModuleInsert.typeId, pendingModuleInsert.definition, readInsertOptions());
+    $("#insert-block-count").textContent = blocks.length;
+    $("#insert-parameter-count").textContent = blocks.filter((block) => block.isParam).length;
+    $("#insert-module-status").textContent = "The module will use the next open grid position.";
+  } catch (error) { $("#insert-module-status").textContent = error.message; }
+}
+
+function openModuleInsert(typeId, definition) {
+  pendingModuleInsert = { typeId, definition };
+  $("#insert-module-name").textContent = definition.name;
+  $("#insert-module-description").textContent = definition.description || definition.category;
+  $("#insert-cpu").textContent = `${definition.cpu}%`;
+  const optionRows = Object.entries(definition.options || {}).map(([name, values], optionIndex) => {
+    const label = document.createElement("label"); label.className = "insert-option-field";
+    label.innerHTML = `<span></span><select></select>`; label.querySelector("span").textContent = name.replaceAll("_", " ");
+    const select = label.querySelector("select"); select.dataset.optionIndex = optionIndex;
+    select.replaceChildren(...values.map((value, index) => { const option = document.createElement("option"); option.value = index; option.textContent = String(value).replaceAll("_", " "); return option; }));
+    select.addEventListener("change", refreshInsertSummary); return label;
+  });
+  if (!optionRows.length) { const empty = document.createElement("p"); empty.className = "insert-options-empty"; empty.textContent = "This module has no configurable creation options."; optionRows.push(empty); }
+  $("#insert-module-options").replaceChildren(...optionRows); refreshInsertSummary(); $("#insert-module-dialog").showModal();
 }
 
 function materializeFullEditorDraft() {
@@ -620,19 +652,21 @@ function nextModulePlacement(footprint) {
   throw new Error("No open grid space remains for that module.");
 }
 
-async function addCatalogModule(typeId, definition) {
+async function addCatalogModule(typeId, definition, optionIndices = []) {
   const status = $("#full-editor-status"); status.textContent = `Adding ${definition.name}…`;
   try {
     if (!fullEditorLayoutIsClear()) throw new Error("Resolve the overlapping module anchors before adding another module.");
-    const placement = nextModulePlacement(definition.defaultBlocks);
+    const blocks = configuredBlocks(typeId, definition, optionIndices);
+    const placement = nextModulePlacement(blocks.length);
     const materialized = materializeFullEditorDraft();
     const materializedPatch = parsePatch(materialized, await getModuleIndex());
-    currentBuffer = insertModule(materialized, materializedPatch, { typeId, definition, ...placement });
+    currentBuffer = insertModule(materialized, materializedPatch, { typeId, definition, optionIndices, blocks, parameters: defaultParameterRaw(definition, blocks), ...placement });
     currentPatch = parsePatch(currentBuffer, await getModuleIndex());
     fullEditorDraft = createFullEditorDraft(); fullEditorSelected = currentPatch.modules.length - 1;
     $("#full-editor-patch-name").value = fullEditorDraft.patchName;
     $("#full-editor-module-count").textContent = `${currentPatch.modules.length} modules`;
     renderFullModuleList(); renderFullInspector();
+    $("#insert-module-dialog").close();
     status.textContent = `${definition.name} added on page ${placement.page + 1}, position ${placement.position + 1} · save to commit`;
   } catch (error) { status.textContent = error.message; }
 }
@@ -1713,6 +1747,9 @@ $("#full-editor-module-name").addEventListener("input", () => { if (!fullEditorD
 $("#full-add-route").addEventListener("click", addFullEditorRoute);
 $("#full-editor-save").addEventListener("click", saveFullEditor);
 $("#full-editor-export").addEventListener("click", exportCurrentPatch);
+$("#insert-module-close").addEventListener("click", () => $("#insert-module-dialog").close());
+$("#insert-module-cancel").addEventListener("click", () => $("#insert-module-dialog").close());
+$("#insert-module-form").addEventListener("submit", async (event) => { event.preventDefault(); if (pendingModuleInsert) await addCatalogModule(pendingModuleInsert.typeId, pendingModuleInsert.definition, readInsertOptions()); });
 $("#editor-hub-close").addEventListener("click", () => $("#editor-hub-dialog").close());
 $("#hub-edit-names").addEventListener("click", () => { $("#editor-hub-dialog").close(); openNameEditor(); });
 $("#hub-edit-layout").addEventListener("click", () => { $("#editor-hub-dialog").close(); openLayoutEditor(); });

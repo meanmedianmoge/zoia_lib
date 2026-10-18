@@ -1,3 +1,5 @@
+import { configuredBlocks, optionValues } from "./moduleconfig.js?v=0.16.0";
+
 const COLORS = {
   1: ["Blue", "#4f6dff"], 2: ["Green", "#56a55d"], 3: ["Red", "#ef4c4c"],
   4: ["Yellow", "#e2c72d"], 5: ["Aqua", "#35bfc1"], 6: ["Magenta", "#d04aa2"],
@@ -47,6 +49,10 @@ export function parsePatch(buffer, moduleIndex) {
     assert(parameterCount >= 0 && parameterCount <= 512 && cursor + 10 + parameterCount <= wordCount, `Module ${number + 1} has invalid parameter data.`);
 
     const definition = moduleIndex[String(typeId)] || {};
+    const optionIndices = Array.from(bytes.slice((cursor + 8) * 4, (cursor + 10) * 4));
+    let activeBlocks;
+    try { activeBlocks = configuredBlocks(typeId, definition, optionIndices); } catch { activeBlocks = definition.blocks || []; }
+    const activeParameterNames = activeBlocks.filter((block) => block.isParam).map((block) => block.name);
     const nameStart = (cursor + size - 4) * 4;
     const customName = cleanText(bytes.slice(nameStart, nameStart + 16));
     const rawParameters = Array.from({ length: parameterCount }, (_, i) => word(cursor + 10 + i));
@@ -58,8 +64,8 @@ export function parsePatch(buffer, moduleIndex) {
       customName,
       displayName: customName || definition.name || `Unknown module ${typeId}`,
       description: definition.description || "No description is available for this module type.",
-      footprint: Math.max(1, Number(definition.defaultBlocks) || 1),
-      blocks: (definition.blocks || []).map((block) => ({
+      footprint: Math.max(1, activeBlocks.length || Number(definition.defaultBlocks) || 1),
+      blocks: activeBlocks.map((block) => ({
         ...block,
         label: block.name.replaceAll("_", " ")
       })),
@@ -70,8 +76,10 @@ export function parsePatch(buffer, moduleIndex) {
       positionOffset: (cursor + 5) * 4,
       size,
       parameterCount,
+      optionIndices,
+      optionValues: optionValues(definition, optionIndices),
       parameters: rawParameters.map((raw, index) => ({
-        name: definition.parameters?.[index] || `Parameter ${index + 1}`,
+        name: activeParameterNames[index] || definition.parameters?.[index] || `Parameter ${index + 1}`,
         raw,
         normalized: Math.round((raw / 65535) * 1000) / 1000,
         offset: (cursor + 10 + index) * 4

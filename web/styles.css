@@ -494,6 +494,13 @@ footer { width: min(1180px, calc(100% - 40px)); margin: auto; padding: 28px 0 40
 .module-parameter-control > span { overflow: hidden; font-size: 10px; text-overflow: ellipsis; text-transform: capitalize; white-space: nowrap; }
 .module-parameter-control .parameter-raw { box-sizing: border-box; width: 100%; padding: 6px; border: 1px solid #aaa; border-radius: 4px; font: 400 9px DM Mono, monospace; }
 .module-parameter-control output { color: var(--muted); font: 400 8px DM Mono, monospace; text-align: right; }
+.insert-module-dialog { width: min(720px, calc(100% - 28px)); }
+.insert-module-summary { display: grid; grid-template-columns: repeat(3,1fr); border: 1px solid #c9c7bf; border-radius: 6px; background: white; }
+.insert-module-summary span { padding: 13px; border-right: 1px solid #d8d5cc; color: var(--muted); font: 500 8px DM Mono, monospace; text-align: center; text-transform: uppercase; }.insert-module-summary span:last-child { border-right: 0; }.insert-module-summary strong { display: block; margin-bottom: 4px; color: var(--ink); font-size: 16px; }
+.insert-option-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; }
+.insert-option-field { min-width: 0; padding: 11px; border: 1px solid #d2d0c8; border-radius: 6px; background: white; }
+.insert-option-field span { display: block; margin-bottom: 6px; color: var(--muted); font: 500 8px DM Mono, monospace; text-transform: capitalize; }.insert-option-field select { box-sizing: border-box; width: 100%; padding: 7px; border: 1px solid #aaa; border-radius: 4px; background: white; font-size: 10px; }
+.insert-options-empty { margin: 0; padding: 22px; border: 1px dashed #c9c7bf; border-radius: 6px; color: var(--muted); font: 400 9px/1.6 DM Mono, monospace; text-align: center; }
 .layout-editor-dialog { width: min(920px, calc(100% - 28px)); height: min(790px, calc(100vh - 30px)); max-height: calc(100vh - 30px); padding: 0; border: 1px solid #25272d; border-radius: 12px; background: #f8f7f2; color: var(--ink); box-shadow: 0 28px 90px rgba(0,0,0,.35); overflow: hidden; }
 .layout-editor-dialog::backdrop { background: rgba(27,28,32,.72); backdrop-filter: blur(3px); }
 .layout-editor-dialog form { height: 100%; display: flex; flex-direction: column; min-height: 0; }
@@ -524,12 +531,12 @@ footer { width: min(1180px, calc(100% - 40px)); margin: auto; padding: 28px 0 40
 .editor-workbench { width: 100%; max-width: 100%; min-width: 0; display: grid; grid-template-columns: minmax(220px,.78fr) minmax(260px,.9fr) minmax(0,1.5fr); height: min(720px, calc(100vh - 235px)); min-height: 540px; overflow: hidden; border: 1px solid #25272d; border-radius: 10px 10px 0 0; background: #f8f7f2; box-shadow: 0 18px 55px rgba(0,0,0,.13); }
 .editor-pane { min-width: 0; min-height: 0; display: flex; flex-direction: column; border-right: 1px solid #c8c6be; }
 .editor-pane:last-child { border-right: 0; }
-.editor-pane-head { display: flex; align-items: center; gap: 12px; min-height: 74px; padding: 0 18px; border-bottom: 1px solid #d2d0c8; background: #eeece5; }
+.editor-pane-head { min-height: 74px; flex: 0 0 74px; display: flex; align-items: center; gap: 12px; padding: 0 18px; border-bottom: 1px solid #d2d0c8; background: #eeece5; }
 .editor-pane-head h3 { margin: 3px 0 0; font-size: 18px; }
 .editor-step { display: grid; place-items: center; width: 28px; height: 28px; flex: 0 0 28px; border-radius: 50%; background: #1e2025; color: white; font: 500 8px DM Mono, monospace; }
-.editor-search { display: flex; gap: 7px; margin: 12px; padding: 8px 10px; border: 1px solid #c4c2ba; border-radius: 5px; background: white; }
+.editor-search { flex: 0 0 auto; display: flex; gap: 7px; margin: 12px; padding: 8px 10px; border: 1px solid #c4c2ba; border-radius: 5px; background: white; }
 .editor-search input { min-width: 0; width: 100%; border: 0; outline: 0; font: 500 10px Manrope, sans-serif; }
-.full-editor-list { min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+.full-editor-list { min-height: 0; flex: 1 1 0; padding-bottom: 10px; overflow-y: auto; overscroll-behavior: contain; scroll-padding-bottom: 10px; scrollbar-gutter: stable; -webkit-overflow-scrolling: touch; }
 .catalog-item, .patch-module-item { width: 100%; display: grid; grid-template-columns: 9px minmax(0,1fr) auto; gap: 10px; align-items: center; box-sizing: border-box; padding: 11px 15px; border: 0; border-bottom: 1px solid #dedcd5; background: transparent; color: var(--ink); text-align: left; }
 .catalog-item { cursor: pointer; }.catalog-item:hover, .catalog-item:focus-visible { background: #edf0ff; outline: none; }.catalog-item > small { color: #4260db; font-weight: 500; }
 .catalog-item i, .patch-module-item i { width: 8px; height: 8px; border-radius: 2px; background: #7892ff; }
@@ -539,10 +546,10 @@ footer { width: min(1180px, calc(100% - 40px)); margin: auto; padding: 28px 0 40
 .patch-module-item { cursor: pointer; }
 .patch-module-item:hover, .patch-module-item.active { background: #e8ecff; }
 .patch-module-item.active { box-shadow: inset 3px 0 #5373ff; }
-.editor-pane-note { margin: auto 14px 14px; padding-top: 12px; border-top: 1px solid #d2d0c8; color: var(--muted); font: 400 8px/1.5 DM Mono, monospace; }
+.editor-pane-note { flex: 0 0 auto; margin: 0 14px 14px; padding-top: 12px; border-top: 1px solid #d2d0c8; color: var(--muted); font: 400 8px/1.5 DM Mono, monospace; }
 .editor-inspector-pane { overflow: hidden; }
 .full-editor-empty { margin: auto; max-width: 280px; padding: 30px; color: var(--muted); font: 400 10px/1.7 DM Mono, monospace; text-align: center; }
-.full-editor-details { width: 100%; min-width: 0; min-height: 0; padding: 18px; overflow-x: hidden; overflow-y: auto; scrollbar-gutter: stable; }
+.full-editor-details { width: 100%; min-width: 0; min-height: 0; flex: 1 1 0; padding: 18px 18px 34px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scroll-padding-bottom: 34px; scrollbar-gutter: stable; -webkit-overflow-scrolling: touch; }
 .editor-field-grid { display: grid; grid-template-columns: 1.4fr .8fr .8fr; gap: 11px; }
 .editor-field-grid .field-wide { grid-column: 1 / -1; }
 .editor-detail-section { min-width: 0; margin-top: 24px; }
@@ -598,6 +605,7 @@ footer { width: min(1180px, calc(100% - 40px)); margin: auto; padding: 28px 0 40
   .inspector-strip { grid-template-columns: 1fr; }
 }
 @media (max-width: 540px) {
+  .insert-option-list { grid-template-columns: 1fr; }
   .name-editor-list, .name-editor-list.module-names { grid-template-columns: 1fr; }
   .name-editor-footer { align-items: stretch; flex-direction: column; }
   .name-editor-footer > div { flex-wrap: wrap; }
