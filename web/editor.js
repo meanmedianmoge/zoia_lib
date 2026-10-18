@@ -35,6 +35,36 @@ export function editModuleSettings(buffer, module, { colorId, parameters }) {
   return output;
 }
 
+export function editModuleConfigurations(buffer, patch, configurations) {
+  if (!Array.isArray(configurations) || configurations.length !== patch.modules.length) throw new Error("The module configuration list is incomplete.");
+  const records = patch.modules.map((module, index) => {
+    const config = configurations[index];
+    if (!Number.isInteger(config.colorId) || config.colorId < 1 || config.colorId > 15) throw new Error(`Module ${index + 1} has an invalid color.`);
+    if (!Number.isInteger(config.page) || config.page < 0 || config.page > 63 || !Number.isInteger(config.position) || config.position < 0 || config.position > 39) throw new Error(`Module ${index + 1} has an invalid placement.`);
+    if (!Array.isArray(config.parameters) || config.parameters.some((value) => !Number.isInteger(value) || value < 0 || value > 65535)) throw new Error(`Module ${index + 1} has invalid parameter values.`);
+    const savedLength = module.savedDataLength || 0; const sizeWords = 14 + config.parameters.length + savedLength / 4;
+    const record = new ArrayBuffer(sizeWords * 4); const bytes = new Uint8Array(record); const view = new DataView(record);
+    bytes.set(new Uint8Array(buffer, module.recordOffset, Math.min(40, module.recordLength)), 0);
+    view.setInt32(0, sizeWords, true); view.setInt32(12, config.page, true); view.setInt32(16, config.headerColorId ?? config.colorId, true); view.setInt32(20, config.position, true); view.setInt32(24, config.parameters.length, true);
+    bytes.fill(0, 32, 40); (config.optionIndices || []).slice(0, 8).forEach((value, optionIndex) => { bytes[32 + optionIndex] = Number(value) || 0; });
+    config.parameters.forEach((value, parameterIndex) => view.setInt32((10 + parameterIndex) * 4, value, true));
+    if (savedLength) bytes.set(new Uint8Array(buffer, module.savedDataOffset, savedLength), (10 + config.parameters.length) * 4);
+    writeFixedText(bytes, record.byteLength - 16, config.name || module.customName || "");
+    return record;
+  });
+  const moduleBytes = records.reduce((sum, record) => sum + record.byteLength, 0);
+  const oldModuleBytes = patch.sections.connectionCountOffset - 24; const delta = moduleBytes - oldModuleBytes;
+  const newEnd = patch.sections.dataEndOffset + delta;
+  if (newEnd > buffer.byteLength) throw new Error("This patch has no remaining binary space for those module options.");
+  const output = new ArrayBuffer(buffer.byteLength); const bytes = new Uint8Array(output); const view = new DataView(output);
+  bytes.set(new Uint8Array(buffer, 0, 24), 0); let cursor = 24;
+  records.forEach((record) => { bytes.set(new Uint8Array(record), cursor); cursor += record.byteLength; });
+  bytes.set(new Uint8Array(buffer, patch.sections.connectionCountOffset, patch.sections.dataEndOffset - patch.sections.connectionCountOffset), cursor);
+  if (patch.sections.hasTrailingColors) configurations.forEach((config, index) => view.setInt32(patch.sections.colorStartOffset + delta + index * 4, config.colorId, true));
+  view.setInt32(0, newEnd / 4, true);
+  return output;
+}
+
 export function insertModule(buffer, patch, { typeId, definition, page, position, colorId = 1, optionIndices = [], blocks, parameters }) {
   if (!Number.isInteger(typeId) || typeId < 0) throw new Error("Choose a valid module type.");
   if (!definition || typeof definition !== "object") throw new Error("That module definition is unavailable.");

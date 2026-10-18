@@ -1,11 +1,11 @@
-import { parsePatch } from "./parser.js?v=0.16.0";
-import { editLayoutAndRoutes, editModuleSettings, editPatchNames, insertModule } from "./editor.js?v=0.16.0";
-import { getPatch, getRevision, listBanks, listPatches, listRevisions, patchId, removeBank, removePatch, removeRevision, saveBank, savePatch, saveRevision } from "./library.js?v=0.16.0";
-import { configuredBlocks, defaultParameterRaw } from "./moduleconfig.js?v=0.16.0";
-import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.16.0";
-import { createZip, readZip } from "./zip.js?v=0.16.0";
+import { parsePatch } from "./parser.js?v=0.17.0";
+import { editLayoutAndRoutes, editModuleConfigurations, editModuleSettings, editPatchNames, insertModule } from "./editor.js?v=0.17.0";
+import { getPatch, getRevision, listBanks, listPatches, listRevisions, patchId, removeBank, removePatch, removeRevision, saveBank, savePatch, saveRevision } from "./library.js?v=0.17.0";
+import { configuredBlocks, defaultParameterRaw } from "./moduleconfig.js?v=0.17.0";
+import { browsePatches, downloadPatchFile, getPatchDetails } from "./patchstorage.js?v=0.17.0";
+import { createZip, readZip } from "./zip.js?v=0.17.0";
 
-const ASSET_VERSION = "0.16.0";
+const ASSET_VERSION = "0.17.0";
 
 const $ = (selector) => document.querySelector(selector);
 const elements = {
@@ -568,7 +568,7 @@ function createFullEditorDraft() {
   return {
     patchName: currentPatch.name,
     names: currentPatch.modules.map((module) => module.customName),
-    settings: currentPatch.modules.map((module) => ({ colorId: module.colorId, parameters: module.parameters.map((parameter) => parameter.raw) })),
+    settings: currentPatch.modules.map((module) => ({ colorId: module.colorId, headerColorId: module.headerColorId, optionIndices: [...module.optionIndices], parameterValues: Object.fromEntries(module.parameters.map((parameter) => [parameter.name, parameter.raw])) })),
     layouts: currentPatch.modules.map((module) => ({ page: module.page, position: module.position })),
     connections: currentPatch.connections.map(({ sourceModule, sourceBlock, destinationModule, destinationBlock, strengthRaw }) => ({ sourceModule, sourceBlock, destinationModule, destinationBlock, strengthRaw }))
   };
@@ -635,15 +635,23 @@ function openModuleInsert(typeId, definition) {
 function materializeFullEditorDraft() {
   captureFullInspector(); fullEditorDraft.patchName = $("#full-editor-patch-name").value;
   let editedBuffer = editPatchNames(currentBuffer, currentPatch, { patchName: fullEditorDraft.patchName, pages: currentPatch.pages.map((page) => page.name), modules: fullEditorDraft.names });
-  currentPatch.modules.forEach((module, index) => { editedBuffer = editModuleSettings(editedBuffer, module, fullEditorDraft.settings[index]); });
-  return editLayoutAndRoutes(editedBuffer, currentPatch, { modules: fullEditorDraft.layouts, connections: fullEditorDraft.connections });
+  const configurations = currentPatch.modules.map((module, index) => {
+    const definition = moduleIndex[String(module.typeId)] || {}; const setting = fullEditorDraft.settings[index];
+    const blocks = configuredBlocks(module.typeId, definition, setting.optionIndices);
+    const defaults = defaultParameterRaw(definition, blocks);
+    return { name: fullEditorDraft.names[index], colorId: setting.colorId, headerColorId: setting.colorId === module.colorId ? setting.headerColorId : setting.colorId, optionIndices: setting.optionIndices, page: fullEditorDraft.layouts[index].page, position: fullEditorDraft.layouts[index].position, parameters: blocks.filter((block) => block.isParam).map((block, parameterIndex) => setting.parameterValues[block.name] ?? defaults[parameterIndex]) };
+  });
+  editedBuffer = editModuleConfigurations(editedBuffer, currentPatch, configurations);
+  const configuredPatch = parsePatch(editedBuffer, moduleIndex);
+  return editLayoutAndRoutes(editedBuffer, configuredPatch, { modules: fullEditorDraft.layouts, connections: fullEditorDraft.connections });
 }
 
 function nextModulePlacement(footprint) {
   const occupied = new Set();
   currentPatch.modules.forEach((module, index) => {
     const layout = fullEditorDraft.layouts[index];
-    for (let cell = 0; cell < Math.max(1, module.footprint); cell += 1) if (layout.position + cell < 40) occupied.add(`${layout.page}:${layout.position + cell}`);
+    const definition = moduleIndex[String(module.typeId)] || {}; const footprint = configuredBlocks(module.typeId, definition, fullEditorDraft.settings[index].optionIndices).length;
+    for (let cell = 0; cell < Math.max(1, footprint); cell += 1) if (layout.position + cell < 40) occupied.add(`${layout.page}:${layout.position + cell}`);
   });
   const width = Math.max(1, Math.min(40, Number(footprint) || 1));
   for (let page = 0; page < 64; page += 1) for (let position = 0; position <= 40 - width; position += 1) {
@@ -674,9 +682,12 @@ async function addCatalogModule(typeId, definition, optionIndices = []) {
 function captureFullInspector() {
   if (!fullEditorDraft || !currentPatch.modules[fullEditorSelected] || $("#full-editor-details").hidden) return;
   fullEditorDraft.names[fullEditorSelected] = $("#full-editor-module-name").value;
+  const previous = fullEditorDraft.settings[fullEditorSelected];
   fullEditorDraft.settings[fullEditorSelected] = {
     colorId: Number($("#full-editor-color").value),
-    parameters: [...$("#full-editor-parameters").querySelectorAll(".parameter-raw")].map((input) => Number(input.value))
+    headerColorId: previous.headerColorId,
+    optionIndices: [...$("#full-editor-options").querySelectorAll("select")].map((select) => Number(select.value)),
+    parameterValues: { ...previous.parameterValues, ...Object.fromEntries([...$("#full-editor-parameters").querySelectorAll(".parameter-raw")].map((input) => [input.dataset.name, Number(input.value)])) }
   };
   fullEditorDraft.layouts[fullEditorSelected] = { page: Number($("#full-editor-page").value) - 1, position: Number($("#full-editor-position").value) - 1 };
 }
@@ -704,17 +715,26 @@ function renderFullInspector() {
   $("#full-editor-color").replaceChildren(...EDITOR_COLORS.map(([id, name]) => { const option = document.createElement("option"); option.value = id; option.textContent = name; option.selected = id === fullEditorDraft.settings[fullEditorSelected].colorId; return option; }));
   $("#full-editor-page").value = fullEditorDraft.layouts[fullEditorSelected].page + 1;
   $("#full-editor-position").value = fullEditorDraft.layouts[fullEditorSelected].position + 1;
-  const values = fullEditorDraft.settings[fullEditorSelected].parameters;
-  const parameterRows = module.parameters.map((parameter, index) => {
+  const definition = moduleIndex[String(module.typeId)] || {}; const setting = fullEditorDraft.settings[fullEditorSelected];
+  const optionRows = Object.entries(definition.options || {}).map(([name, values], optionIndex) => {
+    const label = document.createElement("label"); label.className = "insert-option-field"; label.innerHTML = `<span></span><select></select>`; label.querySelector("span").textContent = name.replaceAll("_", " ");
+    const select = label.querySelector("select"); select.replaceChildren(...values.map((value, index) => { const option = document.createElement("option"); option.value = index; option.textContent = String(value).replaceAll("_", " "); option.selected = index === setting.optionIndices[optionIndex]; return option; }));
+    select.addEventListener("change", () => { captureFullInspector(); renderFullInspector(); $("#full-editor-status").textContent = "Module options changed · review parameters, then save to commit"; }); return label;
+  });
+  if (!optionRows.length) { const empty = document.createElement("p"); empty.className = "insert-options-empty"; empty.textContent = "This module has no configurable options."; optionRows.push(empty); }
+  $("#full-editor-options").replaceChildren(...optionRows); $("#full-editor-option-count").textContent = `${Object.keys(definition.options || {}).length} options`;
+  const blocks = configuredBlocks(module.typeId, definition, setting.optionIndices); const parameterBlocks = blocks.filter((block) => block.isParam); const defaults = defaultParameterRaw(definition, blocks);
+  const parameterRows = parameterBlocks.map((parameter, index) => {
     const row = document.createElement("label"); row.className = "module-parameter-control";
     row.innerHTML = `<span></span><input class="parameter-slider" type="range" min="0" max="65535"><input class="parameter-raw" type="number" min="0" max="65535" step="1"><output></output>`;
     row.querySelector("span").textContent = parameter.name.replaceAll("_", " ");
     const slider = row.querySelector(".parameter-slider"); const raw = row.querySelector(".parameter-raw"); const output = row.querySelector("output");
+    raw.dataset.name = parameter.name;
     const sync = (value) => { const safe = Math.max(0, Math.min(65535, Number(value) || 0)); slider.value = raw.value = String(Math.round(safe)); output.value = (safe / 65535).toFixed(3); };
-    slider.addEventListener("input", () => sync(slider.value)); raw.addEventListener("input", () => sync(raw.value)); sync(values[index]); return row;
+    slider.addEventListener("input", () => sync(slider.value)); raw.addEventListener("input", () => sync(raw.value)); sync(setting.parameterValues[parameter.name] ?? defaults[index]); return row;
   });
   if (!parameterRows.length) { const empty = document.createElement("p"); empty.className = "no-parameters"; empty.textContent = "This module has no saved parameters."; parameterRows.push(empty); }
-  $("#full-editor-parameters").replaceChildren(...parameterRows); $("#full-editor-parameter-count").textContent = `${module.parameters.length} values`;
+  $("#full-editor-parameters").replaceChildren(...parameterRows); $("#full-editor-parameter-count").textContent = `${parameterBlocks.length} values`;
   $("#full-route-other").replaceChildren(...currentPatch.modules.filter((_, index) => index !== fullEditorSelected).map((item) => { const option = document.createElement("option"); option.value = item.number; option.textContent = `${item.number + 1} · ${fullEditorDraft.names[item.number] || item.type}`; return option; }));
   renderFullRoutes();
 }

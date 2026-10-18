@@ -1,4 +1,4 @@
-import { configuredBlocks, optionValues } from "./moduleconfig.js?v=0.16.0";
+import { configuredBlocks, optionValues } from "./moduleconfig.js?v=0.17.0";
 
 const COLORS = {
   1: ["Blue", "#4f6dff"], 2: ["Green", "#56a55d"], 3: ["Red", "#ef4c4c"],
@@ -70,6 +70,8 @@ export function parsePatch(buffer, moduleIndex) {
         label: block.name.replaceAll("_", " ")
       })),
       version,
+      recordOffset: cursor * 4,
+      recordLength: size * 4,
       page: Math.max(0, Math.min(63, pageRaw)),
       pageOffset: (cursor + 3) * 4,
       position,
@@ -85,12 +87,15 @@ export function parsePatch(buffer, moduleIndex) {
         offset: (cursor + 10 + index) * 4
       })),
       cpu: Number(definition.cpu) || 0,
+      headerColorId,
       colorId: headerColorId,
       color: COLORS[headerColorId]?.[0] || "Unknown",
       colorHex: COLORS[headerColorId]?.[1] || "#8b887d",
       headerColorOffset: (cursor + 4) * 4,
       colorOffset: null,
-      nameOffset: size >= 14 && nameStart >= (cursor + 10 + parameterCount) * 4 ? nameStart : null
+      nameOffset: size >= 14 && nameStart >= (cursor + 10 + parameterCount) * 4 ? nameStart : null,
+      savedDataOffset: (cursor + 10 + parameterCount) * 4,
+      savedDataLength: Math.max(0, nameStart - (cursor + 10 + parameterCount) * 4)
     });
     cursor += size;
   }

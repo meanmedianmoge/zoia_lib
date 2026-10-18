@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=0.16.0">
+    <link rel="stylesheet" href="styles.css?v=0.17.0">
   </head>
   <body>
     <header class="topbar">
@@ -26,7 +26,7 @@
 
     <main>
       <section class="hero" id="hero">
-        <div class="eyebrow">Browser experiment · v0.16</div>
+        <div class="eyebrow">Browser experiment · v0.17</div>
         <h1>See what’s inside<br><em>your sound.</em></h1>
         <p class="hero-copy">A lightweight patch inspector for the Empress Effects ZOIA. No install, no account, and your files never leave this browser.</p>
 
@@ -289,6 +289,7 @@
                 <label><span>Page</span><input id="full-editor-page" type="number" min="1" max="64"></label>
                 <label><span>Grid position</span><input id="full-editor-position" type="number" min="1" max="40"></label>
               </div>
+              <section class="editor-detail-section"><div class="parameter-title"><span class="section-label">Module options</span><span id="full-editor-option-count"></span></div><div class="insert-option-list full-editor-options" id="full-editor-options"></div></section>
               <section class="editor-detail-section"><div class="parameter-title"><span class="section-label">Saved parameters</span><span id="full-editor-parameter-count"></span></div><div class="module-parameter-editor" id="full-editor-parameters"></div></section>
               <section class="editor-detail-section"><div class="parameter-title"><span class="section-label">Connections</span><span id="full-editor-route-count"></span></div><div class="full-route-builder"><select id="full-route-direction" aria-label="Route direction"><option value="out">This module →</option><option value="in">→ This module</option></select><select id="full-route-other" aria-label="Other module"></select><input id="full-route-source-block" type="number" min="0" max="255" value="0" aria-label="Source block"><input id="full-route-destination-block" type="number" min="0" max="255" value="0" aria-label="Destination block"><input id="full-route-strength" type="number" min="-200" max="200" step="0.01" value="100" aria-label="Strength percent"><button class="button secondary" id="full-add-route" type="button">Add</button></div><div class="full-route-list" id="full-editor-routes"></div></section>
             </div>
@@ -467,6 +468,6 @@
       <span>Experimental web companion to ZOIA Librarian.</span>
       <span>Not affiliated with Empress Effects.</span>
     </footer>
-    <script type="module" src="app.js?v=0.16.0"></script>
+    <script type="module" src="app.js?v=0.17.0"></script>
   </body>
 </html>
