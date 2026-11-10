@@ -118,8 +118,9 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/app-store-entitlements.plist";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 9;
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = 3Q42J7962C;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -130,6 +131,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.zoialibrarian.desktop;
 				PRODUCT_NAME = "ZOIA Librarian";
 				SDKROOT = macosx;
+				ZOIA_APP_STORE = YES;
 			};
 			name = Debug;
 		};
@@ -140,8 +142,9 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/app-store-entitlements.plist";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 9;
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = 3Q42J7962C;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -152,6 +155,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.zoialibrarian.desktop;
 				PRODUCT_NAME = "ZOIA Librarian";
 				SDKROOT = macosx;
+				ZOIA_APP_STORE = YES;
 			};
 			name = Release;
 		};

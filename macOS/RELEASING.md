@@ -48,11 +48,32 @@ export as an application. The archive's `Info.plist` should include
 `ApplicationProperties` and its `Products/Applications` directory should contain
 only `ZOIA Librarian.app`.
 
-The current project disables Xcode signing and targets Developer ID distribution.
-An unsigned `mac-application` export can validate archive structure locally;
-Cloud development and App Store exports still require their signing setup.
-App Store distribution additionally requires App Sandbox support, which this
-Developer ID workflow does not enable.
+The Xcode target sets `ZOIA_APP_STORE=YES` and uses
+`app-store-entitlements.plist`. PyInstaller embeds the sandbox entitlements in
+its signature even though the target disables Xcode's separate signing step.
+Xcode Cloud handles distribution signing during export. The sandbox allows
+outgoing network requests, user-selected files/folders, and Downloads access.
+The staged App Store sources use native file panels to grant access to selected
+locations. Saved SD card and export paths may need to be selected again after
+relaunch; persistent security-scoped bookmarks are not implemented.
+
+The generated plist includes `LSMinimumSystemVersion`, using the target's
+`MACOSX_DEPLOYMENT_TARGET` (15.6 by default). Cloud supplies the build number
+through `CI_BUILD_NUMBER`; use a new build number for every upload. Local Xcode
+archives use `CURRENT_PROJECT_VERSION`.
+
+Before uploading, inspect the archived app's signature with
+`codesign -d --entitlements :- '/path/to/ZOIA Librarian.app'` and its plist with
+`plutil -p '/path/to/ZOIA Librarian.app/Contents/Info.plist'`. Test startup,
+PatchStorage, file import/export, and SD card selection in the sandboxed app.
+The command-line Developer ID workflow below does not enable `ZOIA_APP_STORE`
+and retains its existing entitlements. Run it outside an Xcode build environment.
+
+Cloud currently packages the worker Python environment's architecture. Choosing
+Standard Architectures in Xcode does not make the embedded Python/Qt universal;
+that requires a universal2 Python and compatible universal dependencies, or
+separate architecture builds. An Intel-only upload may produce Apple's
+nonblocking missing-arm64 warning.
 
 ## Build a release
 

@@ -34,6 +34,7 @@ fi
 mkdir -p "$ROOT/build/releases"
 RELEASE_DIR="$(mktemp -d "$ROOT/build/releases/$VERSION.XXXXXX")"
 export ZOIA_CODESIGN_IDENTITY="$IDENTITY" ZOIA_VERSION="$VERSION"
+export ZOIA_APP_STORE=NO
 export TEMP_DIR="$RELEASE_DIR/work" BUILT_PRODUCTS_DIR="$RELEASE_DIR/products"
 bash "$ROOT/macOS/build-app.sh"
 APP="$BUILT_PRODUCTS_DIR/ZOIA Librarian.app"

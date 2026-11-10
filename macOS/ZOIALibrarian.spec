@@ -7,9 +7,22 @@ source = Path(os.environ['ZOIA_STAGING'])
 identity = os.environ.get('ZOIA_CODESIGN_IDENTITY') or None
 version = os.environ.get('ZOIA_VERSION', '2.1')
 build_number = os.environ.get('CI_BUILD_NUMBER') or os.environ.get('CURRENT_PROJECT_VERSION', '1')
+minimum_macos = os.environ.get('MACOSX_DEPLOYMENT_TARGET', '15.6')
+app_store = os.environ.get('ZOIA_APP_STORE', 'NO') == 'YES'
 target_arch = os.environ.get('ZOIA_TARGET_ARCH') or None
 entitlements = None
-if identity and (target_arch or platform.machine()) in ('x86_64', 'universal2'):
+if app_store:
+    entitlements = str(Path(SPECPATH) / 'app-store-entitlements.plist')
+    # Sandbox file access is granted by native macOS open/save panels. Change
+    # only the flattened staging copy, leaving local and Developer ID code alone.
+    for staged_module in source.glob('*.py'):
+        text = staged_module.read_text(encoding='utf-8')
+        if 'QFileDialog.DontUseNativeDialog' in text:
+            staged_module.write_text(
+                text.replace('QFileDialog.DontUseNativeDialog', 'QFileDialog.Option(0)'),
+                encoding='utf-8',
+            )
+elif identity and (target_arch or platform.machine()) in ('x86_64', 'universal2'):
     entitlements = str(Path(SPECPATH) / 'intel-entitlements.plist')
 a = Analysis(
     [str(source / 'startup.py')],
@@ -28,5 +41,6 @@ app = BUNDLE(collection, name='ZOIA Librarian.app',
              icon=str(source / 'logo.icns'), bundle_identifier='com.zoialibrarian.desktop',
              version=version, info_plist={'NSHighResolutionCapable': True,
                                        'CFBundleVersion': build_number,
+                                       'LSMinimumSystemVersion': minimum_macos,
                                        'LSApplicationCategoryType': 'public.app-category.music',
                                        'NSPrincipalClass': 'NSApplication'})
