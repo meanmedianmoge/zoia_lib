@@ -24,9 +24,19 @@ if [[ ! -x "$VENV/bin/python" ]]; then
     export UV_PYTHON_INSTALL_DIR="$ROOT/build/cloud-python"
     export UV_CACHE_DIR="$ROOT/build/cloud-uv-cache"
     PYTHON_REQUEST=cpython-3.11-macos-aarch64-none
-    uv python install "$PYTHON_REQUEST"
-    BOOTSTRAP_PYTHON="$(uv python find --managed-python "$PYTHON_REQUEST")"
-    "$BOOTSTRAP_PYTHON" -c 'import platform; assert platform.machine() == "arm64", "Downloaded Python must execute as ARM64"'
+    uv python install "$PYTHON_REQUEST" --no-bin
+    # Discovery can filter by the uv process's architecture (Homebrew uv may
+    # be Intel). Select the ARM installation directly, then test its runtime.
+    ARM_PYTHONS=("$UV_PYTHON_INSTALL_DIR"/cpython-3.11.*-macos-aarch64-none/bin/python3.11)
+    if [[ ${#ARM_PYTHONS[@]} != 1 || ! -x "${ARM_PYTHONS[0]}" ]]; then
+        echo "error: Expected one downloaded ARM64 Python under $UV_PYTHON_INSTALL_DIR."
+        exit 1
+    fi
+    BOOTSTRAP_PYTHON="${ARM_PYTHONS[0]}"
+    if ! /usr/bin/arch -arm64 "$BOOTSTRAP_PYTHON" -c 'import platform; assert platform.machine() == "arm64", "Downloaded Python must execute as ARM64"'; then
+        echo "error: ARM64 Python was downloaded to $BOOTSTRAP_PYTHON but cannot run on this worker."
+        exit 1
+    fi
     "$BOOTSTRAP_PYTHON" -m venv "$VENV"
 fi
 "$VENV/bin/python" -c 'import platform, sys; print("Build Python:", sys.executable, "base:", sys.base_prefix, "architecture:", platform.machine()); assert platform.machine() == "arm64" and sys.version_info >= (3, 11), "venv must use ARM64 Python 3.11+"'
