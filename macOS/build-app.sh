@@ -11,7 +11,10 @@ fi
     exit 1
 }
 WORK="${TEMP_DIR:-$ROOT/build/xcode}/zoia-packaging"
-PRODUCTS="${BUILT_PRODUCTS_DIR:-$ROOT/build/xcode/Products}"
+# During archive, BUILT_PRODUCTS_DIR contains an Xcode-owned app symlink.
+# Package into its actual installation directory so PyInstaller does not try
+# to replace that symlink with a bundle directory.
+PRODUCTS="${TARGET_BUILD_DIR:-${BUILT_PRODUCTS_DIR:-$ROOT/build/xcode/Products}}"
 mkdir -p "$WORK" "$PRODUCTS"
 "$PYTHON" "$ROOT/tools/make_distro.py" --source "$ROOT/zoia_lib" --dest "$WORK/source"
 cd "$WORK/source"
