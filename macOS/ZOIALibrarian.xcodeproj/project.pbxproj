@@ -116,6 +116,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = /Users/hpc/Python/zoia_lib/zoia_lib/interface/resources/logo.icns;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				CODE_SIGNING_ALLOWED = NO;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CURRENT_PROJECT_VERSION = 1;
@@ -137,6 +138,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = /Users/hpc/Python/zoia_lib/zoia_lib/interface/resources/logo.icns;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				CODE_SIGNING_ALLOWED = NO;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CURRENT_PROJECT_VERSION = 1;

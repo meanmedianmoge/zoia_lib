@@ -41,6 +41,19 @@ that points to a path on your local Mac so the build uses the default environmen
 The hook prepares dependencies; Developer ID signing and notarization still
 use the release workflow below.
 
+PyInstaller builds under the temporary packaging directory. Only the finished
+`.app` is copied into Xcode's target directory: installing PyInstaller's
+intermediate collection beside it produces a generic archive that Xcode cannot
+export as an application. The archive's `Info.plist` should include
+`ApplicationProperties` and its `Products/Applications` directory should contain
+only `ZOIA Librarian.app`.
+
+The current project disables Xcode signing and targets Developer ID distribution.
+An unsigned `mac-application` export can validate archive structure locally;
+Cloud development and App Store exports still require their signing setup.
+App Store distribution additionally requires App Sandbox support, which this
+Developer ID workflow does not enable.
+
 ## Build a release
 
 From the repository root, replacing the identity below with yours:

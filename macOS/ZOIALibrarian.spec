@@ -6,6 +6,7 @@ from pathlib import Path
 source = Path(os.environ['ZOIA_STAGING'])
 identity = os.environ.get('ZOIA_CODESIGN_IDENTITY') or None
 version = os.environ.get('ZOIA_VERSION', '2.1')
+build_number = os.environ.get('CI_BUILD_NUMBER') or os.environ.get('CURRENT_PROJECT_VERSION', '1')
 target_arch = os.environ.get('ZOIA_TARGET_ARCH') or None
 entitlements = None
 if identity and (target_arch or platform.machine()) in ('x86_64', 'universal2'):
@@ -26,4 +27,6 @@ collection = COLLECT(exe, a.binaries, a.datas, name='ZOIA Librarian', strip=Fals
 app = BUNDLE(collection, name='ZOIA Librarian.app',
              icon=str(source / 'logo.icns'), bundle_identifier='com.zoialibrarian.desktop',
              version=version, info_plist={'NSHighResolutionCapable': True,
+                                       'CFBundleVersion': build_number,
+                                       'LSApplicationCategoryType': 'public.app-category.music',
                                        'NSPrincipalClass': 'NSApplication'})
