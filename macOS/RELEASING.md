@@ -28,6 +28,19 @@ not publish a GitHub release or upload to your website automatically.
    bash tools/env.sh
    ```
 
+## Xcode Cloud dependency setup
+
+`ci_scripts/ci_post_clone.sh`, beside the Xcode project, runs `macOS/tools.sh`
+after checkout to install Homebrew Python 3.11 and dependencies. It creates the ignored
+`venv` directory used by `build-app.sh`, including PyInstaller and the bundled
+NodeGraphQt wheel. The Cloud setup is contained in `macOS`; the local
+`tools/env.sh` workflow is unchanged. Commit the hook and `macOS/tools.sh`, then start
+a new Cloud build from that commit. Remove any Cloud `ZOIA_PYTHON` override
+that points to a path on your local Mac so the build uses the default environment.
+
+The hook prepares dependencies; Developer ID signing and notarization still
+use the release workflow below.
+
 ## Build a release
 
 From the repository root, replacing the identity below with yours:
