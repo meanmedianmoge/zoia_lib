@@ -1,12 +1,51 @@
 import json
 import os
 import re
+import shutil
 import sys
+import uuid
+from pathlib import Path
 # import signal
 import _thread as thread
 import threading
 
 from zoia_lib.common import errors
+
+
+def import_library(source, destination):
+    """Replace the sandbox library with a user-selected existing library."""
+    source = Path(source).resolve()
+    destination = Path(destination).resolve()
+    if not source.is_dir() or source.name != ".ZoiaLibraryApp":
+        raise ValueError("Select the .ZoiaLibraryApp library folder.")
+    if source == destination or source in destination.parents or destination in source.parents:
+        raise ValueError("Select a different library folder.")
+    if not any((source / name).exists() for name in ("Folders", "Samples", "Editor", "data.json")):
+        raise ValueError("The selected folder does not look like a ZOIA Librarian library.")
+
+    for root, dirs, files in os.walk(source, followlinks=False):
+        for name in dirs + files:
+            if (Path(root) / name).is_symlink():
+                raise ValueError("The selected library contains symbolic links and cannot be imported safely.")
+
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    staged = destination.parent / (".zoia-import-" + uuid.uuid4().hex)
+    backup = destination.parent / (".zoia-backup-" + uuid.uuid4().hex)
+    try:
+        shutil.copytree(source, staged)
+        if destination.exists():
+            destination.rename(backup)
+        try:
+            staged.rename(destination)
+        except Exception:
+            if backup.exists():
+                backup.rename(destination)
+            raise
+    finally:
+        if staged.exists():
+            shutil.rmtree(staged)
+    if backup.exists():
+        shutil.rmtree(backup)
 
 
 def sort_metadata(mode, data, rev):

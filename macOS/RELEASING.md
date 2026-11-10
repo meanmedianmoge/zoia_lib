@@ -56,6 +56,11 @@ outgoing network requests, user-selected files/folders, and Downloads access.
 The staged App Store sources use native file panels to grant access to selected
 locations. Saved SD card and export paths may need to be selected again after
 relaunch; persistent security-scoped bookmarks are not implemented.
+On first launch, the sandboxed app offers to import an existing
+`.ZoiaLibraryApp` folder. The user selects it through the native folder picker
+and confirms replacement of the sandbox library. The source folder is preserved;
+the app closes after import so it can load the imported data on relaunch.
+The action remains available under **File → Import Existing Library**.
 
 The generated plist includes `LSMinimumSystemVersion`, using the target's
 `MACOSX_DEPLOYMENT_TARGET` (15.6 by default). Cloud supplies the build number

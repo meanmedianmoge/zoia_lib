@@ -1,6 +1,7 @@
 import platform
 
-from PySide6.QtGui import QFont
+from PySide6.QtCore import QUrl
+from PySide6.QtGui import QDesktopServices, QFont
 from PySide6.QtWidgets import QFontDialog, QApplication, QFileDialog
 import os
 import json
@@ -313,12 +314,9 @@ class ZOIALibrarianUtil:
         self.font = f
 
     def open_local_backend(self):
-        """Opens a FileBrowser showing the app's local backend."""
+        """Reveal the backend directory that this app instance uses."""
 
-        QFileDialog.getExistingDirectory(
-            None, "Local Backend", self.window.path,
-            options=QFileDialog.DontUseNativeDialog
-        )
+        QDesktopServices.openUrl(QUrl.fromLocalFile(self.window.path))
 
     def reset_api_token(self):
         """Resets the saved API token."""

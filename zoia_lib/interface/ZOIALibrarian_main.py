@@ -6,10 +6,11 @@ import hashlib
 import re
 from difflib import SequenceMatcher
 from os.path import expanduser
+from pathlib import Path
 
 from PySide6 import QtCore
 from PySide6.QtCore import QEvent, Qt, QThread, QTimer
-from PySide6.QtGui import QIcon, QFont, QScreen
+from PySide6.QtGui import QAction, QIcon, QFont, QScreen
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -75,6 +76,12 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui = ui_main.Ui_MainWindow()
         self.ui.setupUi(self)
         self.path = save.get_backend_path()
+        self._library_imported = False
+        self._legacy_import_prompted = Path(self.path).parent / ".zoia-legacy-import-prompted"
+        self._sandbox_library = (
+            platform.system() == "Darwin"
+            and "/Library/Containers/com.zoialibrarian.desktop/Data/" in self.path
+        )
 
         # Message box init
         self.icon = QIcon(
@@ -315,6 +322,12 @@ class ZOIALibrarianMain(QMainWindow):
             self.import_version_menu
         )
         self.ui.actionNavigate_to_local_backend.triggered.connect(self.util.open_local_backend)
+        self.import_library_action = QAction("Import Existing Library…", self)
+        self.ui.menuFile.insertAction(
+            self.ui.actionNavigate_to_local_backend, self.import_library_action
+        )
+        self.import_library_action.triggered.connect(self.import_existing_library)
+        self.import_library_action.setVisible(self._sandbox_library)
         self.ui.actionReset_API_Token.triggered.connect(self.util.reset_api_token)
         self.ui.refresh_pch_btn.clicked.connect(self.ps.reload_ps_thread)
         self.ui.update_patch_notes.clicked.connect(self.local.update_patch_notes)
@@ -445,6 +458,55 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Check for any app updates
         self.check_for_updates()
+        if self._sandbox_library and not self._legacy_import_prompted.exists():
+            QTimer.singleShot(0, self._offer_existing_library)
+
+    def _offer_existing_library(self):
+        self._legacy_import_prompted.touch()
+        choice = QMessageBox.question(
+            self,
+            "Import existing library?",
+            "Would you like to import your existing ZOIA Librarian library? "
+            "This will replace the library in this app's sandbox. "
+            "You can do this later from File > Import Existing Library.",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+        if choice == QMessageBox.Yes:
+            self.import_existing_library()
+
+    def import_existing_library(self):
+        import pwd
+
+        legacy_home = Path(pwd.getpwuid(os.getuid()).pw_dir)
+        suggested = legacy_home / "Library" / "Application Support" / ".ZoiaLibraryApp"
+        source = QFileDialog.getExistingDirectory(
+            self,
+            "Select existing .ZoiaLibraryApp folder",
+            str(suggested),
+        )
+        if not source:
+            return
+        if QMessageBox.question(
+            self,
+            "Replace sandbox library?",
+            "Replace all patches, folders, metadata, and preferences in this "
+            "app's sandbox with the contents of the selected library? "
+            "The selected library will not be changed.",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        ) != QMessageBox.Yes:
+            return
+        try:
+            util.import_library(source, self.path)
+        except (OSError, ValueError) as error:
+            QMessageBox.critical(self, "Import failed", str(error))
+            return
+        self._library_imported = True
+        QMessageBox.information(
+            self, "Import complete", "The library was imported. Relaunch the app to load it."
+        )
+        self.close()
 
     def tab_switch(self):
         """Actions performed whenever a tab is switched to within the
@@ -1931,9 +1993,10 @@ class ZOIALibrarianMain(QMainWindow):
         settings can be saved.
         """
 
-        self.util.save_pref(
-            self.width(), self.height(), self.sd.get_sd_root(), self.sd.get_export_path(), self.path
-        )
+        if not self._library_imported:
+            self.util.save_pref(
+                self.width(), self.height(), self.sd.get_sd_root(), self.sd.get_export_path(), self.path
+            )
 
     def _try_quit(self):
         """Forces the application to close.
