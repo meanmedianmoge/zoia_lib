@@ -1,0 +1,180 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXFileReference section */
+		000000000000000000000004 /* ZOIA Librarian.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ZOIA Librarian.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		00000000000000000000000D /* ../zoia_lib */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ../zoia_lib; sourceTree = "<group>"; };
+		00000000000000000000000E /* build-app.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-app.sh"; sourceTree = "<group>"; };
+		00000000000000000000000F /* ZOIALibrarian.spec */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = ZOIALibrarian.spec; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		000000000000000000000002 = {
+			isa = PBXGroup;
+			children = (
+				00000000000000000000000D /* ../zoia_lib */,
+				00000000000000000000000E /* build-app.sh */,
+				00000000000000000000000F /* ZOIALibrarian.spec */,
+				000000000000000000000003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		000000000000000000000003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000000004 /* ZOIA Librarian.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		000000000000000000000005 /* ZOIA Librarian */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 000000000000000000000008 /* Build configuration list for PBXNativeTarget "ZOIA Librarian" */;
+			buildPhases = (
+				000000000000000000000006 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "ZOIA Librarian";
+			productName = "ZOIA Librarian";
+			productReference = 000000000000000000000004 /* ZOIA Librarian.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		000000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+			};
+			buildConfigurationList = 000000000000000000000007 /* Build configuration list for PBXProject "ZOIALibrarian" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 000000000000000000000002;
+			productRefGroup = 000000000000000000000003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				000000000000000000000005 /* ZOIA Librarian */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		000000000000000000000006 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(PRODUCT_NAME).app/Contents/Info.plist",
+				"$(BUILT_PRODUCTS_DIR)/$(PRODUCT_NAME).app/Contents/MacOS/$(PRODUCT_NAME)",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "bash \"$SRCROOT/build-app.sh\"";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		000000000000000000000009 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		00000000000000000000000A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		00000000000000000000000B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = /Users/hpc/Python/zoia_lib/zoia_lib/interface/resources/logo.icns;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CURRENT_PROJECT_VERSION = 1;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 3Q42J7962C;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_KEY_CFBundleDisplayName = "ZOIA Librarian";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 2.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.zoialibrarian.desktop;
+				PRODUCT_NAME = "ZOIA Librarian";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		00000000000000000000000C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = /Users/hpc/Python/zoia_lib/zoia_lib/interface/resources/logo.icns;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CURRENT_PROJECT_VERSION = 1;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 3Q42J7962C;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_KEY_CFBundleDisplayName = "ZOIA Librarian";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 2.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.zoialibrarian.desktop;
+				PRODUCT_NAME = "ZOIA Librarian";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		000000000000000000000007 /* Build configuration list for PBXProject "ZOIALibrarian" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				000000000000000000000009 /* Debug */,
+				00000000000000000000000A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		000000000000000000000008 /* Build configuration list for PBXNativeTarget "ZOIA Librarian" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				00000000000000000000000B /* Debug */,
+				00000000000000000000000C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 000000000000000000000001 /* Project object */;
+}

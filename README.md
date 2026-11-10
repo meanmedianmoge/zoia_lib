@@ -37,6 +37,45 @@ https://github.com/meanmedianmoge/zoia_lib/releases/latest.
     ```
 
 ## Documentation
+### Build the Python/Qt desktop app in Xcode (macOS)
+
+1. Install the desktop dependencies once from the repository root with
+   `bash tools/env.sh` (Python 3.11+ and Xcode are required).
+2. Open `macOS/ZOIALibrarian.xcodeproj` in Xcode.
+3. Select the **ZOIA Librarian** scheme and **My Mac**, then press **Run**.
+
+Xcode packages the original Python/PySide6 desktop app with PyInstaller. The
+result includes Python, Qt, and the desktop resources; it does not use the web
+app or require a separate Python installation to run. The first build can take
+several minutes. Find the app under **Products → ZOIA Librarian.app → Show in
+Finder**. Packaging uses Derived Data without modifying `distro` or the source
+version. Builds use the architecture of the selected Python environment.
+
+The default interpreter is `venv/bin/python`. To use another environment, add a
+user-defined target build setting named `ZOIA_PYTHON` with its absolute Python
+path (for example, the interpreter in `venv_x86` for an Intel build).
+Install the same dependencies into that environment first.
+
+For a command-line build:
+
+```sh
+xcodebuild -project macOS/ZOIALibrarian.xcodeproj \
+  -scheme 'ZOIA Librarian' -configuration Debug \
+  -destination 'platform=macOS' -derivedDataPath /tmp/zoia-xcode-build build
+```
+
+This target is for local testing and uses PyInstaller's ad-hoc signing. It does
+not configure Developer ID distribution or notarization. Xcode launches the
+packaged application without LLDB; use a Python debugger when debugging Python
+code. Existing desktop preferences and library locations are shared with other
+desktop builds.
+
+### Signed and notarized macOS releases
+
+See [macOS release setup](macOS/RELEASING.md) for Developer ID signing,
+Apple notarization, and creating a distributable ZIP. Run
+`bash macOS/release.sh --check` to check release credentials before building.
+
 - Version 1.0 video: https://www.youtube.com/watch?v=JLOUrWtG1Pk
 - Version 1.1 video: https://www.youtube.com/watch?v=nP9oRLtXMUE
 - Version 1.2 video: https://www.youtube.com/watch?v=zR8XSI_Unlk

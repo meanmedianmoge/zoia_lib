@@ -137,6 +137,8 @@ dmypy.json
 
 # Mac stuff
 **/.DS_Store
+**/xcuserdata/
+**/*.xcuserstate
 
 # Editable files
 .docx
