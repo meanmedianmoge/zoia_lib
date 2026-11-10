@@ -31,7 +31,7 @@ not publish a GitHub release or upload to your website automatically.
 ## Xcode Cloud dependency setup
 
 `ci_scripts/ci_post_clone.sh`, beside the Xcode project, runs `macOS/tools.sh`
-after checkout to install Homebrew Python 3.11 and dependencies. It creates the ignored
+after checkout to install ARM64 Python 3.11 using uv and dependencies. It creates the ignored
 `venv` directory used by `build-app.sh`, including PyInstaller and the bundled
 NodeGraphQt wheel. The Cloud setup is contained in `macOS`; the local
 `tools/env.sh` workflow is unchanged. Commit the hook and `macOS/tools.sh`, then start
@@ -70,10 +70,13 @@ The command-line Developer ID workflow below does not enable `ZOIA_APP_STORE`
 and retains its existing entitlements. Run it outside an Xcode build environment.
 
 App Store builds target ARM64 only (`ARCHS=arm64` and `ZOIA_TARGET_ARCH=arm64`).
-The Cloud setup requires an Apple Silicon host and native ARM Homebrew Python;
+The Cloud setup requires an Apple Silicon host and native ARM Python;
 it stops immediately on an Intel host instead of producing an Intel upload.
-If the Cloud workflow still uses the Intel environment from Build 9, it must
-move to an Apple Silicon build environment before this setup can run. The
+An existing ARM64 `venv` is reused. Fresh checkouts download an explicitly ARM64
+interpreter with uv instead of selecting Python from an Intel Homebrew prefix.
+The local `venv` is ignored by Git and is not copied to Cloud. Setup and packaging
+print the interpreter path, base environment, and runtime architecture in logs.
+If the worker cannot execute ARM64 at all, use an Apple Silicon build host. The
 packaging script verifies the finished executable with `lipo -archs` before
 installing it. Xcode settings alone cannot convert Intel Python/Qt binaries.
 Developer ID builds via `release.sh` retain their architecture selection and

@@ -12,18 +12,24 @@ fi
 if [[ "$(uname -m)" != arm64 ]]; then
     exec /usr/bin/arch -arm64 /bin/bash "$0" "$@"
 fi
-if [[ -x /opt/homebrew/bin/brew ]]; then
-    export PATH="/opt/homebrew/bin:$PATH"
-fi
-
-# Use a managed Python instead of the older interpreter supplied with Xcode.
-export HOMEBREW_NO_AUTO_UPDATE=1
-brew install python@3.11
-BOOTSTRAP_PYTHON="$(brew --prefix python@3.11)/bin/python3.11"
-"$BOOTSTRAP_PYTHON" -c 'import platform; assert platform.machine() == "arm64", "App Store setup requires native ARM64 Python; check the Homebrew installation"'
 # build-app.sh defaults to this environment for the ARM64 App Store build.
 VENV="$ROOT/venv"
-"$BOOTSTRAP_PYTHON" -m venv "$VENV"
+if [[ ! -x "$VENV/bin/python" ]]; then
+    # Homebrew under /usr/local may supply Intel Python even on an ARM host.
+    # Use an explicit architecture request, independent of Homebrew's prefix.
+    if ! command -v uv >/dev/null 2>&1; then
+        export HOMEBREW_NO_AUTO_UPDATE=1
+        brew install uv
+    fi
+    export UV_PYTHON_INSTALL_DIR="$ROOT/build/cloud-python"
+    export UV_CACHE_DIR="$ROOT/build/cloud-uv-cache"
+    PYTHON_REQUEST=cpython-3.11-macos-aarch64-none
+    uv python install "$PYTHON_REQUEST"
+    BOOTSTRAP_PYTHON="$(uv python find --managed-python "$PYTHON_REQUEST")"
+    "$BOOTSTRAP_PYTHON" -c 'import platform; assert platform.machine() == "arm64", "Downloaded Python must execute as ARM64"'
+    "$BOOTSTRAP_PYTHON" -m venv "$VENV"
+fi
+"$VENV/bin/python" -c 'import platform, sys; print("Build Python:", sys.executable, "base:", sys.base_prefix, "architecture:", platform.machine()); assert platform.machine() == "arm64" and sys.version_info >= (3, 11), "venv must use ARM64 Python 3.11+"'
 "$VENV/bin/python" -m pip install --upgrade pip
 "$VENV/bin/python" -m pip install -r "$ROOT/requirements.txt"
 "$VENV/bin/python" -m pip install pyinstaller pillow

@@ -11,7 +11,7 @@ fi
     exit 1
 }
 if [[ "${ZOIA_APP_STORE:-NO}" == YES ]]; then
-    "$PYTHON" -c 'import platform; assert platform.machine() == "arm64", "App Store builds require an ARM64 Python environment on Apple Silicon"'
+    "$PYTHON" -c 'import platform, sys; print("Packaging Python:", sys.executable, "base:", sys.base_prefix, "architecture:", platform.machine()); assert platform.machine() == "arm64", "App Store builds require an ARM64 Python environment on Apple Silicon"'
 fi
 WORK="${TEMP_DIR:-$ROOT/build/xcode}/zoia-packaging"
 # Install only the app in Xcode's target directory. PyInstaller also emits a
