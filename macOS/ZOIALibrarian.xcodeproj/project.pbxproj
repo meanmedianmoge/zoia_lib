@@ -98,7 +98,7 @@
 		000000000000000000000009 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -106,7 +106,7 @@
 		00000000000000000000000A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -114,9 +114,10 @@
 		00000000000000000000000B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = /Users/hpc/Python/zoia_lib/zoia_lib/interface/resources/logo.icns;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/app-store-entitlements.plist";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
@@ -132,15 +133,17 @@
 				PRODUCT_NAME = "ZOIA Librarian";
 				SDKROOT = macosx;
 				ZOIA_APP_STORE = YES;
+				ZOIA_TARGET_ARCH = arm64;
 			};
 			name = Debug;
 		};
 		00000000000000000000000C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = /Users/hpc/Python/zoia_lib/zoia_lib/interface/resources/logo.icns;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/app-store-entitlements.plist";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
@@ -156,6 +159,7 @@
 				PRODUCT_NAME = "ZOIA Librarian";
 				SDKROOT = macosx;
 				ZOIA_APP_STORE = YES;
+				ZOIA_TARGET_ARCH = arm64;
 			};
 			name = Release;
 		};

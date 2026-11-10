@@ -12,6 +12,9 @@ app_store = os.environ.get('ZOIA_APP_STORE', 'NO') == 'YES'
 target_arch = os.environ.get('ZOIA_TARGET_ARCH') or None
 entitlements = None
 if app_store:
+    if target_arch not in (None, 'arm64'):
+        raise SystemExit('App Store builds require ZOIA_TARGET_ARCH=arm64')
+    target_arch = 'arm64'
     entitlements = str(Path(SPECPATH) / 'app-store-entitlements.plist')
     # Sandbox file access is granted by native macOS open/save panels. Change
     # only the flattened staging copy, leaving local and Developer ID code alone.

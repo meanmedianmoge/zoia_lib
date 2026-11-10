@@ -69,11 +69,15 @@ PatchStorage, file import/export, and SD card selection in the sandboxed app.
 The command-line Developer ID workflow below does not enable `ZOIA_APP_STORE`
 and retains its existing entitlements. Run it outside an Xcode build environment.
 
-Cloud currently packages the worker Python environment's architecture. Choosing
-Standard Architectures in Xcode does not make the embedded Python/Qt universal;
-that requires a universal2 Python and compatible universal dependencies, or
-separate architecture builds. An Intel-only upload may produce Apple's
-nonblocking missing-arm64 warning.
+App Store builds target ARM64 only (`ARCHS=arm64` and `ZOIA_TARGET_ARCH=arm64`).
+The Cloud setup requires an Apple Silicon host and native ARM Homebrew Python;
+it stops immediately on an Intel host instead of producing an Intel upload.
+If the Cloud workflow still uses the Intel environment from Build 9, it must
+move to an Apple Silicon build environment before this setup can run. The
+packaging script verifies the finished executable with `lipo -archs` before
+installing it. Xcode settings alone cannot convert Intel Python/Qt binaries.
+Developer ID builds via `release.sh` retain their architecture selection and
+can still target Intel for GitHub distribution.
 
 ## Build a release
 
