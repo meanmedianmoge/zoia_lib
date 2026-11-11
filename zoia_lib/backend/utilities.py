@@ -12,8 +12,20 @@ import threading
 from zoia_lib.common import errors
 
 
+def legacy_library_path():
+    """Return the pre-sandbox library path, even from a sandboxed process."""
+    import pwd
+
+    return (
+        Path(pwd.getpwuid(os.getuid()).pw_dir)
+        / "Library"
+        / "Application Support"
+        / ".ZoiaLibraryApp"
+    )
+
+
 def import_library(source, destination):
-    """Replace the sandbox library with a user-selected existing library."""
+    """Replace the sandbox library with an existing local library."""
     source = Path(source).resolve()
     destination = Path(destination).resolve()
     if not source.is_dir() or source.name != ".ZoiaLibraryApp":

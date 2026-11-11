@@ -56,16 +56,43 @@ outgoing network requests, user-selected files/folders, and Downloads access.
 The staged App Store sources use native file panels to grant access to selected
 locations. Saved SD card and export paths may need to be selected again after
 relaunch; persistent security-scoped bookmarks are not implemented.
-On first launch, the sandboxed app offers to import an existing
-`.ZoiaLibraryApp` folder. The user selects it through the native folder picker
-and confirms replacement of the sandbox library. The source folder is preserved;
-the app closes after import so it can load the imported data on relaunch.
+On first launch, the sandboxed app offers to import the existing
+`~/Library/Application Support/.ZoiaLibraryApp` folder. A read-only
+temporary sandbox exception requests access only to this legacy folder, so
+the app can check and copy it without a file picker. Verify this in a signed
+App Store build; plist validation alone does not prove access. The app checks
+access before asking for confirmation and preserves the source folder. It
+closes after import so it can load the imported data on relaunch.
 The action remains available under **File → Import Existing Library**.
+Apple's temporary-exception guide asks developers to report the need for an
+exception and include the issue number in App Store Connect. When submitting
+the build, provide App Store Connect's App Sandbox usage
+information for `com.apple.security.temporary-exception.files.home-relative-path.read-only`:
+"Reads only `/Library/Application Support/.ZoiaLibraryApp/` relative to the
+user's home directory so people upgrading from the unsandboxed ZOIA Librarian
+can copy their existing library into the sandbox after confirming the import.
+To assess it, place a library at that path and choose File → Import Existing
+Library. The original files are left in place. Feedback Assistant issue:
+<issue number>." Apple reviews the entitlement; its presence in the plist
+does not guarantee approval.
 
 The generated plist includes `LSMinimumSystemVersion`, using the target's
 `MACOSX_DEPLOYMENT_TARGET` (15.6 by default). Cloud supplies the build number
 through `CI_BUILD_NUMBER`; use a new build number for every upload. Local Xcode
 archives use `CURRENT_PROJECT_VERSION`.
+
+Export compliance: the app uses HTTPS for PatchStorage login and API requests
+through Python's OpenSSL-backed TLS stack. It does not implement a separate
+feature for encrypting user data. Do not answer "no encryption" in App Store
+Connect solely because the app has no custom encryption algorithm. Based on
+the app's current use of HTTPS/TLS, the App Store build sets
+`ITSAppUsesNonExemptEncryption=NO` in its generated `Info.plist`, declaring
+exempt encryption. Review the packaged Python and third-party libraries, and
+revisit the export classification if the app's encryption use or distribution
+regions change. Set `ZOIA_USES_NONEXEMPT_ENCRYPTION=YES` in Xcode Build
+Settings if a future App Store build uses non-exempt encryption and has the
+required declaration.
+The local and Developer ID builds do not use this setting.
 
 Before uploading, inspect the archived app's signature with
 `codesign -d --entitlements :- '/path/to/ZOIA Librarian.app'` and its plist with

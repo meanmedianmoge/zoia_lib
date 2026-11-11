@@ -1,6 +1,7 @@
 import json
 import os
 import platform
+import stat
 import requests
 import hashlib
 import re
@@ -463,6 +464,15 @@ class ZOIALibrarianMain(QMainWindow):
 
     def _offer_existing_library(self):
         self._legacy_import_prompted.touch()
+        source = util.legacy_library_path()
+        try:
+            if not stat.S_ISDIR(source.stat().st_mode):
+                return
+        except FileNotFoundError:
+            return
+        except OSError as error:
+            QMessageBox.critical(self, "Cannot read existing library", str(error))
+            return
         choice = QMessageBox.question(
             self,
             "Import existing library?",
@@ -476,23 +486,24 @@ class ZOIALibrarianMain(QMainWindow):
             self.import_existing_library()
 
     def import_existing_library(self):
-        import pwd
-
-        legacy_home = Path(pwd.getpwuid(os.getuid()).pw_dir)
-        suggested = legacy_home / "Library" / "Application Support" / ".ZoiaLibraryApp"
-        source = QFileDialog.getExistingDirectory(
-            self,
-            "Select existing .ZoiaLibraryApp folder",
-            str(suggested),
-        )
-        if not source:
+        source = util.legacy_library_path()
+        try:
+            if not stat.S_ISDIR(source.stat().st_mode):
+                raise FileNotFoundError(f"No existing library was found at {source}.")
+            next(source.iterdir(), None)
+        except OSError as error:
+            QMessageBox.critical(
+                self,
+                "Cannot read existing library",
+                f"Cannot read the existing library at {source}: {error}",
+            )
             return
         if QMessageBox.question(
             self,
             "Replace sandbox library?",
-            "Replace all patches, folders, metadata, and preferences in this "
-            "app's sandbox with the contents of the selected library? "
-            "The selected library will not be changed.",
+            "Copy the existing local library into this app's sandbox, replacing "
+            "its patches, folders, metadata, and preferences? "
+            "The existing local library will not be changed.",
             QMessageBox.Yes | QMessageBox.No,
             QMessageBox.No,
         ) != QMessageBox.Yes:

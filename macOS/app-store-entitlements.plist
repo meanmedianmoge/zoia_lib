@@ -10,6 +10,11 @@
     <true/>
     <key>com.apple.security.files.downloads.read-write</key>
     <true/>
+    <!-- Read the pre-sandbox library during migration. -->
+    <key>com.apple.security.temporary-exception.files.home-relative-path.read-only</key>
+    <array>
+        <string>/Library/Application Support/.ZoiaLibraryApp/</string>
+    </array>
     <!-- Required by Intel Python ctypes/libffi callbacks. -->
     <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
     <true/>

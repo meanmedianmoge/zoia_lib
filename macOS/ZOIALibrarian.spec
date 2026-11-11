@@ -9,6 +9,9 @@ version = os.environ.get('ZOIA_VERSION', '2.1')
 build_number = os.environ.get('CI_BUILD_NUMBER') or os.environ.get('CURRENT_PROJECT_VERSION', '1')
 minimum_macos = os.environ.get('MACOSX_DEPLOYMENT_TARGET', '15.6')
 app_store = os.environ.get('ZOIA_APP_STORE', 'NO') == 'YES'
+nonexempt_encryption = os.environ.get('ZOIA_USES_NONEXEMPT_ENCRYPTION') or 'NO'
+if nonexempt_encryption not in ('YES', 'NO'):
+    raise SystemExit('ZOIA_USES_NONEXEMPT_ENCRYPTION must be YES or NO')
 target_arch = os.environ.get('ZOIA_TARGET_ARCH') or None
 entitlements = None
 if app_store:
@@ -40,10 +43,13 @@ exe = EXE(pyz, a.scripts, [], exclude_binaries=True, name='ZOIA Librarian',
           console=False, strip=False, upx=False, codesign_identity=identity,
           target_arch=target_arch, entitlements_file=entitlements)
 collection = COLLECT(exe, a.binaries, a.datas, name='ZOIA Librarian', strip=False, upx=False)
+bundle_info = {'NSHighResolutionCapable': True,
+               'CFBundleVersion': build_number,
+               'LSMinimumSystemVersion': minimum_macos,
+               'LSApplicationCategoryType': 'public.app-category.music',
+               'NSPrincipalClass': 'NSApplication'}
+if app_store:
+    bundle_info['ITSAppUsesNonExemptEncryption'] = nonexempt_encryption == 'YES'
 app = BUNDLE(collection, name='ZOIA Librarian.app',
              icon=str(source / 'logo.icns'), bundle_identifier='com.zoialibrarian.desktop',
-             version=version, info_plist={'NSHighResolutionCapable': True,
-                                       'CFBundleVersion': build_number,
-                                       'LSMinimumSystemVersion': minimum_macos,
-                                       'LSApplicationCategoryType': 'public.app-category.music',
-                                       'NSPrincipalClass': 'NSApplication'})
+             version=version, info_plist=bundle_info)
