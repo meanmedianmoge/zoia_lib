@@ -5,7 +5,7 @@ from pathlib import Path
 
 source = Path(os.environ['ZOIA_STAGING'])
 identity = os.environ.get('ZOIA_CODESIGN_IDENTITY') or None
-version = os.environ.get('ZOIA_VERSION', '2.1')
+version = os.environ.get('ZOIA_VERSION', '2.2')
 build_number = os.environ.get('CI_BUILD_NUMBER') or os.environ.get('CURRENT_PROJECT_VERSION', '1')
 minimum_macos = os.environ.get('MACOSX_DEPLOYMENT_TARGET', '15.6')
 app_store = os.environ.get('ZOIA_APP_STORE', 'NO') == 'YES'

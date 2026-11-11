@@ -1,4 +1,7 @@
 import json
+import io
+import zipfile
+import rarfile
 import math
 import os
 import re
@@ -426,8 +429,15 @@ class PatchStorage:
         Used as a reference input for the patch upload."""
 
         if file_type == 0:
-            assert path.endswith(tuple([".jpg", ".jpeg", ".gif", ".png", ".bmp"]))
+            artwork_types = {
+                ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
+                ".gif": "image/gif", ".png": "image/png", ".bmp": "image/bmp",
+            }
+            content_type = artwork_types.get(os.path.splitext(path)[1].lower())
+            if content_type is None:
+                raise ValueError("Unsupported artwork format")
         elif file_type == 1:
+            content_type = "application/octet-stream"
             # Need a ZOIA-readable filename
             with open(path + '.json', 'rb') as f:
                 meta = json.load(f)
@@ -446,7 +456,11 @@ class PatchStorage:
         r = http.request(
             "POST",
             self.url + 'files',
-            fields={"file": (path, data)},
+            # Avoid MIME guessing, which reads system files inaccessible
+            # inside the macOS app sandbox (including /etc/apache2/mime.types).
+            fields={"file": (os.path.basename(path), data, content_type)},
+            timeout=urllib3.Timeout(connect=10, read=60),
+            retries=False,
             headers={
                 'Authorization': 'Bearer ' + self.api_token,
             }
@@ -456,6 +470,81 @@ class PatchStorage:
         # if r.status == 201:
         #     idx = json.loads(r.data)['id']
         #     return idx
+
+    @staticmethod
+    def next_revision(revision):
+        """Increment the final numeric component without float conversion."""
+        match = re.fullmatch(r"(v?)([0-9]+(?:\.[0-9]+)*)", str(revision).strip())
+        if not match:
+            raise ValueError(f"Cannot increment revision {revision!r}; use a numeric dotted revision.")
+        parts = match[2].split('.')
+        parts[-1] = str(int(parts[-1]) + 1)
+        return match[1] + '.'.join(parts)
+
+    @staticmethod
+    def _editable_metadata(meta):
+        return (
+            meta.get('title', '').strip(), meta.get('content', '').strip(),
+            sorted(x['name'] for x in meta.get('categories', [])),
+            sorted(x['name'].lower().replace(' ', '-') for x in meta.get('tags', [])),
+            meta.get('license', {}).get('id') if meta.get('license') else None,
+        )
+
+    def prepare_patch_update(self, idx, path):
+        """Compare local data with the current server version without writing."""
+        remote = self.get_patch_meta(idx)
+        with open(path + '.json', 'r') as source:
+            local = json.load(source)
+        with open(path + '.bin', 'rb') as source:
+            binary = source.read()
+        filename = os.path.basename(local['files'][0]['filename'])
+        files = remote['files']
+        matches = [f for f in files if os.path.basename(f['filename']) == filename]
+        if len(matches) == 1:
+            remote_file = matches[0]
+        elif len(files) == 1:
+            remote_file = files[0]
+        else:
+            raise ValueError("Cannot identify the published file to compare.")
+        response = http.request(
+            "GET", remote_file['url'],
+            timeout=urllib3.Timeout(connect=10, read=60), retries=False,
+        )
+        if response.status != 200:
+            raise ValueError(f"Could not check published binary (HTTP {response.status}).")
+        extension = os.path.splitext(remote_file['filename'])[1].lower()
+        bundled_binaries = 1
+        if extension == '.bin':
+            published = response.data
+        elif extension in ('.zip', '.rar'):
+            archive_type = zipfile.ZipFile if extension == '.zip' else rarfile.RarFile
+            with archive_type(io.BytesIO(response.data)) as archive:
+                candidates = [info for info in archive.infolist()
+                              if info.filename.lower().endswith('.bin')]
+                bundled_binaries = len(candidates)
+                matching = [info for info in candidates
+                            if os.path.basename(info.filename) == filename]
+                if len(matching) == 1:
+                    candidate = matching[0]
+                elif len(candidates) == 1:
+                    candidate = candidates[0]
+                else:
+                    raise ValueError("Cannot identify the patch binary inside the published archive.")
+                if candidate.file_size > 64 * 1024 * 1024:
+                    raise ValueError("Published patch binary exceeds the comparison size limit.")
+                published = archive.read(candidate)
+        else:
+            raise ValueError("Unsupported published patch file format.")
+        if binary != published and (len(files) > 1 or bundled_binaries > 1):
+            raise ValueError("This patch contains multiple published files or binaries. Update the complete bundle on PatchStorage to preserve its other files.")
+        return {
+            'remote': remote,
+            'binary_changed': binary != published,
+            'metadata_changed': self._editable_metadata(local) != self._editable_metadata(remote),
+        }
+
+    def patch_binary_changed(self, idx, path):
+        return self.prepare_patch_update(idx, path)['binary_changed']
 
     def upload_patch(self, path: str, artwork_file_id: int, patch_file_id: int, lic_id: int):
 
@@ -498,7 +587,7 @@ class PatchStorage:
         # else:
         #     return vars(r)
 
-    def update_patch(self, idx: str, path: str, artwork_id=None, patch_id=None, license_id=None):
+    def update_patch(self, idx: str, path: str, artwork_id=None, patch_id=None, license_id=None, remote_meta=None):
 
         if self.api_token is None:
             raise ValueError('Not authenticated')
@@ -511,19 +600,20 @@ class PatchStorage:
             if "id" not in cat.keys():
                 cat['id'] = [x['id'] for x in self.categories if x['name'] == cat['name']][0]
 
-        # Revision nonsense
-        ver = max(re.findall(r'\d+', meta['revision']))
-        new_ver = str(float(ver) + 1)
+        remote = remote_meta if remote_meta is not None else self.get_patch_meta(idx)
+        new_ver = self.next_revision(remote['revision']) if patch_id is not None else remote['revision']
 
         # Get list of id's to update with
         art_id = artwork_id if 'id' not in meta['artwork'] else meta['artwork']['id']
-        pch_id = [patch_id] if patch_id else [meta['files'][0]['id']]
+        pch_id = [patch_id] if patch_id is not None else [f['id'] for f in remote['files']]
         lic_id = license_id if not meta['license'] else meta['license']['id']
 
         # Patch upload, combines previous POSTs into final request
         r = http.request(
             "PUT",
             self.url + 'patches/{}'.format(idx),
+            timeout=urllib3.Timeout(connect=10, read=60),
+            retries=False,
             body=json.dumps({
                 "title": meta['title'].ljust(5),
                 "content": meta['content'],

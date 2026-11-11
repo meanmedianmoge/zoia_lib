@@ -36,6 +36,18 @@ def update_once(
 def update_version(new_version: str, dry_run: bool = False) -> list[str]:
     updates = [
         (
+            Path("macOS/ZOIALibrarian.spec"),
+            re.compile(r"(?m)^version = os\.environ\.get\('ZOIA_VERSION', '[^']+'\)$"),
+            f"version = os.environ.get('ZOIA_VERSION', '{new_version}')",
+            "macOS bundle version",
+        ),
+        (
+            Path("zoia_lib/interface/ZOIALibrarian.ui"),
+            re.compile(r'ZOIA Librarian - Version [0-9]+(?:\.[0-9]+)?'),
+            f"ZOIA Librarian - Version {new_version}",
+            "ui source title version",
+        ),
+        (
             Path("tools/zoia_lib_windows.spec"),
             re.compile(r"(?m)^(version[ \t]*=[ \t]*['\"])[^'\"]+(['\"][ \t]*)$"),
             f"version = '{new_version}'",
@@ -106,6 +118,15 @@ def update_version(new_version: str, dry_run: bool = False) -> list[str]:
             changed.append(str(rel_path))
             if not dry_run:
                 path.write_text(updated, encoding="utf-8")
+    project = ROOT / "macOS/ZOIALibrarian.xcodeproj/project.pbxproj"
+    text = project.read_text(encoding="utf-8")
+    updated, count = re.subn(r"MARKETING_VERSION = [0-9.]+;", f"MARKETING_VERSION = {new_version};", text)
+    if count != 2:
+        raise RuntimeError(f"Expected 2 Xcode marketing versions, found {count}.")
+    if updated != text:
+        changed.append(str(project.relative_to(ROOT)))
+        if not dry_run:
+            project.write_text(updated, encoding="utf-8")
     return changed
 
 def main() -> int:

@@ -37,6 +37,18 @@ https://github.com/meanmedianmoge/zoia_lib/releases/latest.
     ```
 
 ## Documentation
+### Version 2.2
+
+- Fixed new PatchStorage uploads being rejected by local author checks.
+- Fixed sandboxed macOS image uploads and improved upload error details.
+- Updates compare published binaries before uploading. Notes, tags, and category
+  edits preserve the published revision; changed binaries increment its final
+  numeric component. Failed requests no longer report success.
+- Archive imports preserve patch order and route WAV files to the patch's Samples
+  folder using safe temporary staging and cleanup.
+- Fixed a startup migration crash caused by unrelated or incomplete folders.
+- Updated HTTP dependencies and synchronized desktop and macOS bundle versions.
+
 ### Build the Python/Qt desktop app in Xcode (macOS)
 
 1. Install the desktop dependencies once from the repository root with

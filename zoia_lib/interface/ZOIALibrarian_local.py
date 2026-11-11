@@ -1,5 +1,7 @@
 import glob
 import json
+import zipfile
+import rarfile
 import os
 import shutil
 from os.path import expanduser
@@ -138,17 +140,23 @@ class ZOIALibrarianLocal(QMainWindow):
                 and patch != "temp"
                 and patch != "Samples"
                 and len(patch) == 6
+                and patch.isdecimal()
             ):
                 # All json files.
                 flag = False
                 versions = glob.glob(os.path.join(self.path, patch, "*json"))
+                if not versions:
+                    continue
                 with open(versions[0], "r") as f:
                     # Check the first patch.
                     temp = json.loads(f.read())
-                if 'url' not in temp['files'][0]:
+                files = temp.get('files')
+                if not isinstance(files, list) or not files or not isinstance(files[0], dict):
+                    continue
+                if 'url' not in files[0]:
                     flag = True
                 else:
-                    if 'alpha' in temp['files'][0]['url']:
+                    if 'alpha' in files[0].get('url', ''):
                         flag = True
                 if flag:
                     # Still has alpha data, overwrite with the newest content.
@@ -744,7 +752,7 @@ class ZOIALibrarianLocal(QMainWindow):
             self.msg.setDetailedText(str(e))
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-            self.msg.setDetailedText(None)
+            self.msg.setDetailedText("")
             return
 
         remaining_versions = self._count_version_files(self.curr_ver)
@@ -892,6 +900,31 @@ class ZOIALibrarianLocal(QMainWindow):
             "Successfully updated patch tags/cats.", timeout=5000
         )
 
+    def _upload_patch_file(self, path, file_type):
+        """Upload one file and surface failures in the desktop app."""
+        label = "artwork" if file_type == 0 else "patch file"
+        self.ui.statusbar.showMessage(f"Uploading {label}...")
+        try:
+            response = self.api.upload_file(path, file_type=file_type)
+            if response.status == 201:
+                return json.loads(response.data)['id']
+            try:
+                detail = json.dumps(json.loads(response.data), indent=2)
+            except (ValueError, AttributeError):
+                detail = f"HTTP {response.status}: {response.data!r}"
+        except (errors.UploadError, OSError, ValueError, KeyError, IndexError,
+                urllib3.exceptions.HTTPError) as exc:
+            detail = str(exc)
+        self.ui.statusbar.showMessage("Upload failed.", timeout=5000)
+        self.msg.setWindowTitle("Upload Failed")
+        self.msg.setIcon(QMessageBox.Warning)
+        self.msg.setText(f"Could not upload the {label} to the PS API.")
+        self.msg.setDetailedText(str(detail))
+        self.msg.setStandardButtons(QMessageBox.Ok)
+        self.msg.exec_()
+        self.msg.setDetailedText("")
+        return None
+
     def upload_patch(self):
         """"""
 
@@ -905,24 +938,25 @@ class ZOIALibrarianLocal(QMainWindow):
         file_id = None
         pch_id = None
 
-        usr = self.usr_pwd()
+        # New local patches have no PatchStorage author yet. Authenticate
+        # the uploader; ownership checks only apply to existing PS patches.
+        self.usr_pwd()
 
         file = os.path.join(self.path, self.local_selected, self.local_selected)
         with open(file + ".json", "r") as f:
             data = json.loads(f.read())
-        author = data['author']['name']
-
-        if usr != author:
-            self.ui.statusbar.showMessage(
-                "Invalid User.", timeout=5000
-            )
-            self.msg.setWindowTitle("Upload Failed")
+        missing = []
+        if not data.get('content', '').strip():
+            missing.append("a description")
+        if not data.get('categories'):
+            missing.append("at least one category")
+        if missing:
+            self.msg.setWindowTitle("Patch Details Required")
             self.msg.setIcon(QMessageBox.Warning)
-            self.msg.setText("You can only modify patches you created.")
+            self.msg.setText("Before uploading, add " + " and ".join(missing) + " to the patch.")
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
             return
-
         # Now start the upload process
         # First we need artwork
         art, ok = QFileDialog.getOpenFileName(
@@ -932,60 +966,16 @@ class ZOIALibrarianLocal(QMainWindow):
             filter="Images (*.jpg *.jpeg *.gif *.png *.bmp)",
             options=QFileDialog.DontUseNativeDialog
         )
-        if ok:
-            try:
-                r = self.api.upload_file(art, file_type=0)
-                if r.status == 201:
-                    art_id = json.loads(r.data)['id']
-                else:
-                    e = json.loads(r._body)['message']
-                    self.ui.statusbar.showMessage(
-                        "Upload failed.", timeout=5000
-                    )
-                    self.msg.setWindowTitle("Upload Failed")
-                    self.msg.setIcon(QMessageBox.Warning)
-                    self.msg.setText("Could not upload the artwork to the PS API.")
-                    self.msg.setDetailedText(str(e))
-                    self.msg.setStandardButtons(QMessageBox.Ok)
-                    self.msg.exec_()
-                    self.msg.setDetailedText(None)
-            except errors.UploadError(art, 1101):
-                self.ui.statusbar.showMessage(
-                    "Upload failed.", timeout=5000
-                )
-                self.msg.setWindowTitle("Upload Failed")
-                self.msg.setIcon(QMessageBox.Warning)
-                self.msg.setText("Could not upload the patch to the PS API.")
-                self.msg.setStandardButtons(QMessageBox.Ok)
-                self.msg.exec_()
+        if not art:
+            return
+        art_id = self._upload_patch_file(art, file_type=0)
+        if art_id is None:
+            return
 
-        # Next is the patch file, which is retrieved from the backend
-        file = os.path.join(self.path, self.local_selected, self.local_selected)
-        try:
-            r = self.api.upload_file(file, file_type=1)
-            if r.status == 201:
-                file_id = json.loads(r.data)['id']
-            else:
-                e = json.loads(r._body)['message']
-                self.ui.statusbar.showMessage(
-                    "Upload failed.", timeout=5000
-                )
-                self.msg.setWindowTitle("Upload Failed")
-                self.msg.setIcon(QMessageBox.Warning)
-                self.msg.setText("Could not upload the file to the PS API.")
-                self.msg.setDetailedText(str(e))
-                self.msg.setStandardButtons(QMessageBox.Ok)
-                self.msg.exec_()
-                self.msg.setDetailedText(None)
-        except errors.UploadError(file, 1101):
-            self.ui.statusbar.showMessage(
-                "Upload failed.", timeout=5000
-            )
-            self.msg.setWindowTitle("Upload Failed")
-            self.msg.setIcon(QMessageBox.Warning)
-            self.msg.setText("Could not upload the patch to the PS API.")
-            self.msg.setStandardButtons(QMessageBox.Ok)
-            self.msg.exec_()
+        # Next upload the local patch binary before selecting its license.
+        file_id = self._upload_patch_file(file, file_type=1)
+        if file_id is None:
+            return
 
         # We also need a license
         lic = self.license()
@@ -1004,7 +994,7 @@ class ZOIALibrarianLocal(QMainWindow):
                     json.dump(meta, f)
                 self.get_local_patches()
             else:
-                e = json.loads(r._body)['message']
+                e = r.data.decode('utf-8', errors='replace')
                 self.ui.statusbar.showMessage(
                     "Upload failed.", timeout=5000
                 )
@@ -1014,154 +1004,84 @@ class ZOIALibrarianLocal(QMainWindow):
                 self.msg.setDetailedText(str(e))
                 self.msg.setStandardButtons(QMessageBox.Ok)
                 self.msg.exec_()
-                self.msg.setDetailedText(None)
-        except errors.UploadError((art_id, file_id, lic_id), 1102):
+                self.msg.setDetailedText("")
+        except (errors.UploadError, OSError, ValueError, KeyError, IndexError,
+                urllib3.exceptions.HTTPError) as exc:
             self.ui.statusbar.showMessage(
                 "Upload failed.", timeout=5000
             )
             self.msg.setWindowTitle("Upload Failed")
             self.msg.setIcon(QMessageBox.Warning)
             self.msg.setText("Could not upload the patch to the PS API.")
+            self.msg.setDetailedText(str(exc))
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
 
     def update_patch(self):
-        """"""
-
-        art_id = None
-        file_id = None
-        lic_id = None
-        pch_id = None
-
-        usr = self.usr_pwd()
-
-        # For updates, only allow if username matches the author.
+        """Publish metadata edits or a changed binary using the live revision."""
+        self.usr_pwd()
         file = os.path.join(self.path, self.local_selected, self.local_selected)
-        with open(file + ".json", "r") as f:
-            data = json.loads(f.read())
-        author = data['author']['name']
-
-        if usr != author:
-            self.ui.statusbar.showMessage(
-                "Invalid User.", timeout=5000
+        try:
+            with open(file + '.json', 'r') as source:
+                data = json.load(source)
+            plan = self.api.prepare_patch_update(self.local_selected, file)
+            if not plan['binary_changed'] and not plan['metadata_changed']:
+                self.ui.statusbar.showMessage("Patch is unchanged; no update uploaded.", timeout=5000)
+                return
+            # Validate the next revision before uploading any files.
+            if plan['binary_changed']:
+                self.api.next_revision(plan['remote']['revision'])
+            art_id = None
+            if not data.get('artwork', {}).get('id'):
+                art, _ = QFileDialog.getOpenFileName(
+                    self, "Select an artwork file for this patch", expanduser("~"),
+                    filter="Images (*.jpg *.jpeg *.gif *.png *.bmp)",
+                    options=QFileDialog.DontUseNativeDialog,
+                )
+                if not art:
+                    return
+                art_id = self._upload_patch_file(art, file_type=0)
+                if art_id is None:
+                    return
+            file_id = None
+            if plan['binary_changed']:
+                file_id = self._upload_patch_file(file, file_type=1)
+                if file_id is None:
+                    return
+            lic_id = None
+            if not data.get('license', {}).get('id'):
+                lic = self.license()
+                lic_id = next(x['id'] for x in self.api.licenses if x['name'] == lic)
+            response = self.api.update_patch(
+                self.local_selected, file, art_id, file_id, lic_id,
+                remote_meta=plan['remote'],
             )
-            self.msg.setWindowTitle("Upload Failed")
+            if response.status not in (200, 201):
+                raise ValueError(response.data.decode('utf-8', errors='replace'))
+        except (errors.UploadError, OSError, ValueError, KeyError, IndexError,
+                StopIteration, zipfile.BadZipFile, rarfile.Error,
+                urllib3.exceptions.HTTPError) as exc:
+            self.ui.statusbar.showMessage("Update not confirmed.", timeout=5000)
+            self.msg.setWindowTitle("Update Not Confirmed")
             self.msg.setIcon(QMessageBox.Warning)
-            self.msg.setText("You can only modify patches you created.")
+            self.msg.setText("The update could not be confirmed. Check PatchStorage before retrying.")
+            self.msg.setDetailedText(str(exc))
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
             return
 
-        # Check for artwork file
-        if 'id' not in data['artwork']:
-            art, ok = QFileDialog.getOpenFileName(
-                self,
-                "Select an artwork file for this patch",
-                expanduser("~"),
-                filter="Images (*.jpg *.jpeg *.gif *.png *.bmp)",
-                options=QFileDialog.DontUseNativeDialog
-            )
-            if ok:
-                try:
-                    r = self.api.upload_file(art, file_type=0)
-                    if r.status == 201:
-                        art_id = json.loads(r.data)['id']
-                    else:
-                        e = json.loads(r._body)['message']
-                        self.ui.statusbar.showMessage(
-                            "Upload failed.", timeout=5000
-                        )
-                        self.msg.setWindowTitle("Upload Failed")
-                        self.msg.setIcon(QMessageBox.Warning)
-                        self.msg.setText("Could not upload the artwork to the PS API.")
-                        self.msg.setDetailedText(str(e))
-                        self.msg.setStandardButtons(QMessageBox.Ok)
-                        self.msg.exec_()
-                        self.msg.setDetailedText(None)
-                except errors.UploadError(art, 1101):
-                    self.ui.statusbar.showMessage(
-                        "Upload failed.", timeout=5000
-                    )
-                    self.msg.setWindowTitle("Upload Failed")
-                    self.msg.setIcon(QMessageBox.Warning)
-                    self.msg.setText("Could not upload the patch to the PS API.")
-                    self.msg.setStandardButtons(QMessageBox.Ok)
-                    self.msg.exec_()
-
-        # Upload the new file.
+        # The write succeeded; a refresh failure must not suggest retrying it.
         try:
-            r = self.api.upload_file(file, file_type=1)
-            if r.status == 201:
-                file_id = json.loads(r.data)['id']
-            else:
-                e = json.loads(r._body)['message']
-                self.ui.statusbar.showMessage(
-                    "Upload failed.", timeout=5000
-                )
-                self.msg.setWindowTitle("Upload Failed")
-                self.msg.setIcon(QMessageBox.Warning)
-                self.msg.setText("Could not upload the file to the PS API.")
-                self.msg.setDetailedText(str(e))
-                self.msg.setStandardButtons(QMessageBox.Ok)
-                self.msg.exec_()
-                self.msg.setDetailedText(None)
-        except errors.UploadError(file, 1101):
+            meta = self.api.get_patch_meta(self.local_selected)
+            for key in ('rating', 'downloaded_at'):
+                if key in data:
+                    meta[key] = data[key]
+            with open(file + '.json', 'w') as target:
+                json.dump(meta, target)
+            self.ui.statusbar.showMessage("Update complete.", timeout=5000)
+        except (OSError, ValueError, KeyError, urllib3.exceptions.HTTPError):
             self.ui.statusbar.showMessage(
-                "Upload failed.", timeout=5000
-            )
-            self.msg.setWindowTitle("Upload Failed")
-            self.msg.setIcon(QMessageBox.Warning)
-            self.msg.setText("Could not upload the patch to the PS API.")
-            self.msg.setStandardButtons(QMessageBox.Ok)
-            self.msg.exec_()
-
-        # Missing license info, need to pick one
-        if not data['license']:
-            # We also need a license
-            lic = self.license()
-            lic_id = [x["id"] for x in self.api.licenses if x["name"] == lic][0]
-
-        # Finally, we update the patch, referencing the art and file IDs
-        try:
-            r = self.api.update_patch(self.local_selected, file, art_id, file_id, lic_id)
-            if r.status == 201:
-                pch_id = json.loads(r.data)['id']
-                # Get the new meta
-                meta = self.api.get_patch_meta(pch_id)
-                with open(os.path.join(self.path, pch_id, "{}.json".format(pch_id)), "w") as f:
-                    meta["rating"] = data["rating"]
-                    meta["downloaded_at"] = data["downloaded_at"]
-                    json.dump(meta, f)
-            else:
-                e = json.loads(r._body)['message']
-                self.ui.statusbar.showMessage(
-                    "Update failed.", timeout=5000
-                )
-                self.msg.setWindowTitle("Update Failed")
-                self.msg.setIcon(QMessageBox.Warning)
-                self.msg.setText("Could not update the patch to the PS API.")
-                self.msg.setDetailedText(str(e))
-                self.msg.setStandardButtons(QMessageBox.Ok)
-                self.msg.exec_()
-                self.msg.setDetailedText(None)
-        except urllib3.exceptions.MaxRetryError:
-            self.ui.statusbar.showMessage(
-                "Update complete.", timeout=5000
-            )
-            self.msg.setWindowTitle("Update Complete")
-            self.msg.setIcon(QMessageBox.Information)
-            self.msg.setText("Patch was updated in PatchStorage.")
-            self.msg.setStandardButtons(QMessageBox.Ok)
-            self.msg.exec_()
-        except errors.UploadError((art_id, file_id, lic_id), 1102):
-            self.ui.statusbar.showMessage(
-                "Update failed.", timeout=5000
-            )
-            self.msg.setWindowTitle("Upload Failed")
-            self.msg.setIcon(QMessageBox.Warning)
-            self.msg.setText("Could not upload the patch to the PS API.")
-            self.msg.setStandardButtons(QMessageBox.Ok)
-            self.msg.exec_()
+                "PatchStorage update succeeded; local metadata could not be refreshed.", timeout=5000)
 
     def usr_pwd(self):
         usr = QLineEdit()

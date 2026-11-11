@@ -6,7 +6,7 @@ spec_root = os.path.abspath(SPECPATH)
 block_cipher = None
 app_name = 'ZOIA Librarian'
 icon = os.path.join(spec_root, 'logo.ico')
-version = '2.1'
+version = '2.2'
 
 a = Analysis(
     ['startup.py'],

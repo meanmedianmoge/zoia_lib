@@ -121,7 +121,7 @@ From the repository root, replacing the identity below with yours:
 ```sh
 export ZOIA_CODESIGN_IDENTITY='Developer ID Application: Your Name (TEAMID)'
 export ZOIA_NOTARY_PROFILE='ZOIA-notary'
-export ZOIA_VERSION='2.1.1'
+export ZOIA_VERSION='2.2'
 bash macOS/release.sh --check
 bash macOS/release.sh --release
 ```

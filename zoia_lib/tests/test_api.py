@@ -173,3 +173,33 @@ class TestAPI(unittest.TestCase):
 
     def test_check_for_updates(self):
         pass
+
+    def test_upload_does_not_read_system_mime_database(self):
+        from urllib3.filepost import encode_multipart_formdata
+
+        client = api.PatchStorage.__new__(api.PatchStorage)
+        client.api_token = "test-token"
+        client.url = "https://example.invalid/"
+
+        def encode_request(method, url, **kwargs):
+            body, _ = encode_multipart_formdata(kwargs['fields'])
+            return body
+
+        cases = [
+            ("/images/art.jpeg", 0, b"image/jpeg"),
+            ("/images/art.JPG", 0, b"image/jpeg"),
+            ("/images/art.png", 0, b"image/png"),
+            ("/library/10000", 1, b"application/octet-stream"),
+        ]
+        for path, file_type, expected_type in cases:
+            with self.subTest(path=path), mock.patch(
+                'builtins.open', mock.mock_open(
+                    read_data=b'{"files": [{"filename": "patch.bin"}]}'
+                )
+            ), mock.patch(
+                'mimetypes.guess_type',
+                side_effect=PermissionError(1, "Operation not permitted", "/etc/apache2/mime.types"),
+            ) as guess, mock.patch.object(api.http, 'request', side_effect=encode_request):
+                body = client.upload_file(path, file_type)
+                self.assertIn(b"Content-Type: " + expected_type, body)
+                guess.assert_not_called()
