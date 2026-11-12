@@ -3222,7 +3222,7 @@ module_index = {
             new waveform, or blend a few sequencers to create a unique melody!
         """,
         "default_blocks": 5,
-        "min_blocks": 5,
+        "min_blocks": 3,
         "max_blocks": 17,
         "params": 16,
         "param_defaults": {

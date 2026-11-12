@@ -57,7 +57,7 @@ class PatchDelete(Patch):
                                 ),
                             ),
                         )
-                    except FileNotFoundError or FileExistsError:
+                    except (FileNotFoundError, FileExistsError):
                         raise errors.RenamingError(left_files, 601)
             elif new_path is not None and len(os.listdir(new_path)) == 0:
                 # Special case: There are no more patches left in the

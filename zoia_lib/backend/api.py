@@ -1,4 +1,7 @@
 import json
+import io
+import zipfile
+import rarfile
 import math
 import os
 import re
@@ -7,7 +10,13 @@ import certifi
 import urllib3
 from furl import furl
 
-http = urllib3.PoolManager(cert_reqs="CERT_REQUIRED", ca_certs=certifi.where())
+http = urllib3.PoolManager(
+    cert_reqs="CERT_REQUIRED", ca_certs=certifi.where(),
+    timeout=urllib3.Timeout(connect=5, read=30),
+    retries=urllib3.Retry(total=2, backoff_factor=0.5,
+                         allowed_methods=frozenset(['GET', 'HEAD']),
+                         status_forcelist=(500, 502, 503, 504)),
+)
 
 
 class PatchStorage:
@@ -29,11 +38,8 @@ class PatchStorage:
         self.api_usr = None
         self.licenses = self._get_license_data()
         self.categories = self._get_categories_data()
-        try:
-            self.patch_count = self._patch_count()
-        except Exception:
-            # No internet connection.
-            pass
+        self.patch_count = None
+        # Resolve the count on first use; importing backend modules is offline.
 
     def _search(self, more_params=None):
         """Make a query to the PS API.
@@ -74,7 +80,7 @@ class PatchStorage:
 
         if more_params is None:
             more_params = {}
-        endpoint = os.path.join(self.url, "patches/")
+        endpoint = self.url + "patches/"
 
         # get param dict
         default_params = {
@@ -91,7 +97,12 @@ class PatchStorage:
         url = str(furl(endpoint).add(params))
         r = http.request("GET", url)
 
-        return json.loads(r.data) if r.status == 200 else []
+        if r.status != 200:
+            raise urllib3.exceptions.HTTPError(f"Patch search returned HTTP {r.status}")
+        result = json.loads(r.data)
+        if not isinstance(result, list):
+            raise ValueError("PatchStorage returned an invalid patch list.")
+        return result
 
     def get_patch_meta(self, idx: str):
         """Get the metadata associated with a specific
@@ -102,7 +113,7 @@ class PatchStorage:
         return: The metadata for the patch, in a MetadataSchema
                  compliant form.
         """
-        endpoint = os.path.join(self.url, "patches/{}/".format(idx))
+        endpoint = self.url + "patches/{}/".format(idx)
 
         # Make the request
         raw_data = json.loads(http.request("GET", endpoint).data)
@@ -124,9 +135,11 @@ class PatchStorage:
 
         try:
             body = self.get_patch_meta(idx)
-            f = http.request("GET", str(body["files"][0]["url"])).data, body
-            return f
-        except KeyError:
+            response = http.request("GET", str(body["files"][0]["url"]))
+            if response.status != 200:
+                raise urllib3.exceptions.HTTPError(f"Patch download returned HTTP {response.status}")
+            return response.data, body
+        except (KeyError, IndexError):
             # No patch with the supplied id was found.
             return None
 
@@ -405,10 +418,13 @@ class PatchStorage:
         if r.status == 200:
             self.api_token = json.loads(r.data)['token']
             self.api_usr = username
+            return True
+        return False
 
     def auth_token(self):
         """Checks if current token is still valid."""
-        assert self.api_token is not None
+        if self.api_token is None:
+            raise ValueError('Not authenticated')
 
         r = http.request(
             "POST",
@@ -426,8 +442,15 @@ class PatchStorage:
         Used as a reference input for the patch upload."""
 
         if file_type == 0:
-            assert path.endswith(tuple([".jpg", ".jpeg", ".gif", ".png", ".bmp"]))
+            artwork_types = {
+                ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
+                ".gif": "image/gif", ".png": "image/png", ".bmp": "image/bmp",
+            }
+            content_type = artwork_types.get(os.path.splitext(path)[1].lower())
+            if content_type is None:
+                raise ValueError("Unsupported artwork format")
         elif file_type == 1:
+            content_type = "application/octet-stream"
             # Need a ZOIA-readable filename
             with open(path + '.json', 'rb') as f:
                 meta = json.load(f)
@@ -446,7 +469,11 @@ class PatchStorage:
         r = http.request(
             "POST",
             self.url + 'files',
-            fields={"file": (path, data)},
+            # Avoid MIME guessing, which reads system files inaccessible
+            # inside the macOS app sandbox (including /etc/apache2/mime.types).
+            fields={"file": (os.path.basename(path), data, content_type)},
+            timeout=urllib3.Timeout(connect=10, read=60),
+            retries=False,
             headers={
                 'Authorization': 'Bearer ' + self.api_token,
             }
@@ -456,6 +483,81 @@ class PatchStorage:
         # if r.status == 201:
         #     idx = json.loads(r.data)['id']
         #     return idx
+
+    @staticmethod
+    def next_revision(revision):
+        """Increment the final numeric component without float conversion."""
+        match = re.fullmatch(r"(v?)([0-9]+(?:\.[0-9]+)*)", str(revision).strip())
+        if not match:
+            raise ValueError(f"Cannot increment revision {revision!r}; use a numeric dotted revision.")
+        parts = match[2].split('.')
+        parts[-1] = str(int(parts[-1]) + 1)
+        return match[1] + '.'.join(parts)
+
+    @staticmethod
+    def _editable_metadata(meta):
+        return (
+            meta.get('title', '').strip(), meta.get('content', '').strip(),
+            sorted(x['name'] for x in meta.get('categories', [])),
+            sorted(x['name'].lower().replace(' ', '-') for x in meta.get('tags', [])),
+            meta.get('license', {}).get('id') if meta.get('license') else None,
+        )
+
+    def prepare_patch_update(self, idx, path):
+        """Compare local data with the current server version without writing."""
+        remote = self.get_patch_meta(idx)
+        with open(path + '.json', 'r') as source:
+            local = json.load(source)
+        with open(path + '.bin', 'rb') as source:
+            binary = source.read()
+        filename = os.path.basename(local['files'][0]['filename'])
+        files = remote['files']
+        matches = [f for f in files if os.path.basename(f['filename']) == filename]
+        if len(matches) == 1:
+            remote_file = matches[0]
+        elif len(files) == 1:
+            remote_file = files[0]
+        else:
+            raise ValueError("Cannot identify the published file to compare.")
+        response = http.request(
+            "GET", remote_file['url'],
+            timeout=urllib3.Timeout(connect=10, read=60), retries=False,
+        )
+        if response.status != 200:
+            raise ValueError(f"Could not check published binary (HTTP {response.status}).")
+        extension = os.path.splitext(remote_file['filename'])[1].lower()
+        bundled_binaries = 1
+        if extension == '.bin':
+            published = response.data
+        elif extension in ('.zip', '.rar'):
+            archive_type = zipfile.ZipFile if extension == '.zip' else rarfile.RarFile
+            with archive_type(io.BytesIO(response.data)) as archive:
+                candidates = [info for info in archive.infolist()
+                              if info.filename.lower().endswith('.bin')]
+                bundled_binaries = len(candidates)
+                matching = [info for info in candidates
+                            if os.path.basename(info.filename) == filename]
+                if len(matching) == 1:
+                    candidate = matching[0]
+                elif len(candidates) == 1:
+                    candidate = candidates[0]
+                else:
+                    raise ValueError("Cannot identify the patch binary inside the published archive.")
+                if candidate.file_size > 64 * 1024 * 1024:
+                    raise ValueError("Published patch binary exceeds the comparison size limit.")
+                published = archive.read(candidate)
+        else:
+            raise ValueError("Unsupported published patch file format.")
+        if binary != published and (len(files) > 1 or bundled_binaries > 1):
+            raise ValueError("This patch contains multiple published files or binaries. Update the complete bundle on PatchStorage to preserve its other files.")
+        return {
+            'remote': remote,
+            'binary_changed': binary != published,
+            'metadata_changed': self._editable_metadata(local) != self._editable_metadata(remote),
+        }
+
+    def patch_binary_changed(self, idx, path):
+        return self.prepare_patch_update(idx, path)['binary_changed']
 
     def upload_patch(self, path: str, artwork_file_id: int, patch_file_id: int, lic_id: int):
 
@@ -498,7 +600,7 @@ class PatchStorage:
         # else:
         #     return vars(r)
 
-    def update_patch(self, idx: str, path: str, artwork_id=None, patch_id=None, license_id=None):
+    def update_patch(self, idx: str, path: str, artwork_id=None, patch_id=None, license_id=None, remote_meta=None):
 
         if self.api_token is None:
             raise ValueError('Not authenticated')
@@ -511,19 +613,20 @@ class PatchStorage:
             if "id" not in cat.keys():
                 cat['id'] = [x['id'] for x in self.categories if x['name'] == cat['name']][0]
 
-        # Revision nonsense
-        ver = max(re.findall(r'\d+', meta['revision']))
-        new_ver = str(float(ver) + 1)
+        remote = remote_meta if remote_meta is not None else self.get_patch_meta(idx)
+        new_ver = self.next_revision(remote['revision']) if patch_id is not None else remote['revision']
 
         # Get list of id's to update with
         art_id = artwork_id if 'id' not in meta['artwork'] else meta['artwork']['id']
-        pch_id = [patch_id] if patch_id else [meta['files'][0]['id']]
+        pch_id = [patch_id] if patch_id is not None else [f['id'] for f in remote['files']]
         lic_id = license_id if not meta['license'] else meta['license']['id']
 
         # Patch upload, combines previous POSTs into final request
         r = http.request(
             "PUT",
             self.url + 'patches/{}'.format(idx),
+            timeout=urllib3.Timeout(connect=10, read=60),
+            retries=False,
             body=json.dumps({
                 "title": meta['title'].ljust(5),
                 "content": meta['content'],
@@ -561,7 +664,7 @@ class PatchStorage:
 
         all_patches = []
 
-        for page in range(1, math.ceil(self.patch_count / per_page) + 1):
+        for page in range(1, math.ceil(self.refresh_patch_count() / per_page) + 1):
             # Get all the patches on the current page.
             all_patches.extend(self._search({**search, **{"page": page}}))
 
@@ -604,7 +707,7 @@ class PatchStorage:
         """
 
         # Max on per_page is 100, so we can't go over that.
-        per_page = self.patch_count - pch_num
+        per_page = self.refresh_patch_count() - pch_num
         if per_page > 100:
             per_page = 100
         search = {"per_page": per_page}
@@ -624,7 +727,15 @@ class PatchStorage:
             return new_patches
 
     def _patch_count(self):
-        endpoint = os.path.join(self.url, "patches/")
+        """Queries the PS API for the number of ZOIA patches it hosts.
+
+        raise: urllib3.exceptions.HTTPError if PatchStorage did not
+               answer with a usable count.
+
+        return: The patch count as an int.
+        """
+
+        endpoint = self.url + "patches/"
 
         # get param dict
         params = {
@@ -639,8 +750,21 @@ class PatchStorage:
         url = str(furl(endpoint).add(params))
         r = http.request("GET", url)
 
-        # int(r.headers['X-WP-TotalPages'])
-        return int(r.headers['X-WP-Total'])
+        # A 5xx page, a login redirect or any other non-patch response
+        # completes the request but carries no count. Report that as an
+        # HTTP failure rather than letting a KeyError escape, so callers
+        # can treat every unreachable-API case the same way.
+        if r.status != 200:
+            raise urllib3.exceptions.HTTPError(
+                "PatchStorage returned HTTP {}".format(r.status)
+            )
+        try:
+            # int(r.headers['X-WP-TotalPages'])
+            return int(r.headers["X-WP-Total"])
+        except (KeyError, TypeError, ValueError):
+            raise urllib3.exceptions.HTTPError(
+                "PatchStorage response carried no usable patch count"
+            )
 
     # @staticmethod
     # def _determine_patch_count():
@@ -692,3 +816,18 @@ class PatchStorage:
     #
     #     # Return the total minus the number of questions found.
     #     return int(zoia.split("<")[0]) - len(soup_ques.find_all(class_="card"))
+
+    def refresh_patch_count(self):
+        """Returns the number of ZOIA patches on PatchStorage,
+        querying the API again if the count could not be retrieved
+        previously (e.g., the application started while offline).
+
+        raise: urllib3.exceptions.HTTPError if PatchStorage cannot
+               be reached.
+
+        return: The patch count as an int.
+        """
+
+        if self.patch_count is None:
+            self.patch_count = self._patch_count()
+        return self.patch_count

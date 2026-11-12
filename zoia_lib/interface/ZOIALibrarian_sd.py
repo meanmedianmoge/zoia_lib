@@ -1,5 +1,4 @@
 import os
-import platform
 from os.path import expanduser
 
 from PySide6.QtCore import QEvent
@@ -14,6 +13,7 @@ from PySide6.QtWidgets import (
 )
 
 from zoia_lib.common import errors
+from zoia_lib.backend.utilities import path_basename
 
 
 class ZOIALibrarianSD(QMainWindow):
@@ -67,24 +67,21 @@ class ZOIALibrarianSD(QMainWindow):
                 None, "Select an SD Card:", expanduser("~"),
                 # options=QFileDialog.DontUseNativeDialog
             )
+            if not input_dir:
+                return
             if input_dir != "" and os.path.isdir(input_dir):
-                if "/" in input_dir and platform.system().lower() == "windows":
-                    # This is (no longer needed) for Windows.
-                    # This comes from a bug with QFileDialog returning the
-                    # wrong path separator on Windows for some odd reason.
-                    input_dir = input_dir.split("/")[0]
-                    # pass
-                elif "/" in input_dir:
-                    # OSX case.
-                    pass
-                else:
-                    input_dir = input_dir.split(os.path.sep)[0]
+                input_dir = os.path.normpath(input_dir)
                 self.sd_root = str(input_dir)
                 self.export_dir = os.path.join(self.sd_root, "to_zoia")
                 self.ui.tab_sd.setEnabled(True)
             else:
                 self.ui.tab_sd.setEnabled(False)
                 self.ui.tabs.setCurrentIndex(1)
+                return
+
+        if not self.sd_root or not os.path.isdir(self.sd_root):
+            self.ui.tab_sd.setEnabled(False)
+            return
 
         # Setup the SD card tree view for the SD Card tab.
         self.ui.statusbar.showMessage("SD card location successfully set.", timeout=5000)
@@ -103,17 +100,10 @@ class ZOIALibrarianSD(QMainWindow):
 
         self.ui.import_all_btn.setEnabled(False)
         self.ui.import_all_ver_btn.setEnabled(False)
-        path = self.ui.sd_tree.currentIndex().data()
-        temp = self.ui.sd_tree.currentIndex()
-        # Get the top directory for a specified path.
-        while True:
-            temp = temp.parent()
-            if temp.data() is not None and self.sd_root not in temp.data():
-                path = os.path.join(temp.data(), path)
-                continue
-            break
-
-        self.sd_path_full = os.path.join(self.sd_root, path)
+        index = self.ui.sd_tree.currentIndex()
+        if not index.isValid():
+            return
+        self.sd_path_full = self.ui.sd_tree.model().filePath(index)
 
         # Setup the tree widget.
         self._set_data_sd()
@@ -193,20 +183,10 @@ class ZOIALibrarianSD(QMainWindow):
             options=QFileDialog.DontUseNativeDialog
         )
         if input_dir != "" and os.path.isdir(input_dir):
-            if "/" in input_dir and platform.system().lower() == "windows":
-                # THIS IS NEEDED FOR WINDOWS.
-                # This comes from a bug with QFileDialog returning the
-                # wrong path separator on Windows for some odd reason.
-                # input_dir = input_dir.split("/")[0]
-                pass
-            elif "/" in input_dir:
-                # OSX case.
-                pass
-            else:
-                input_dir = input_dir.split(os.path.sep)[0]
+            input_dir = os.path.normpath(input_dir)
             self.export_dir = str(input_dir)
 
-            e = self.export_dir.split("/")[-1]
+            e = path_basename(self.export_dir)
             self.ui.statusbar.showMessage("Export directory successfully set.", timeout=5000)
             self.msg.setWindowTitle("Export Directory Has Been Set")
             self.msg.setIcon(QMessageBox.Information)
@@ -253,23 +233,11 @@ class ZOIALibrarianSD(QMainWindow):
                         # self.msg.exec_()
                         return
                     except errors.SavingError as e:
-                        # Prep the error message
-                        e = (
-                            str(e)
-                            .split("(")[1]
-                            .split(")")[0]
-                            .split(",")[0]
-                            .replace("'", "")
-                        )
                         self.ui.statusbar.showMessage("Import failed.", timeout=5000)
-                        self.msg.setWindowTitle("Patch Already In Library")
-                        self.msg.setIcon(QMessageBox.Information)
-                        self.msg.setText(
-                            "That patch exists within your locally "
-                            "saved patches as {}. \nNo importing has occurred.".format(
-                                e
-                            )
-                        )
+                        self.msg.setWindowTitle("Import Failed")
+                        self.msg.setIcon(QMessageBox.Warning)
+                        self.msg.setText("Could not import the selected patch.")
+                        self.msg.setDetailedText(str(e))
                         self.msg.setStandardButtons(QMessageBox.Ok)
                         self.msg.exec_()
                         return
@@ -279,24 +247,30 @@ class ZOIALibrarianSD(QMainWindow):
         Currently triggered via a button press.
         """
 
-        # Give the user a chance to cancel if they hit the button by
-        # mistake.
-        if os.path.isdir(self.sd_path_full):
-            self.msg.setWindowTitle("Warning")
-            self.msg.setIcon(QMessageBox.Warning)
-            self.msg.setText(
-                "This will delete everything contained within the "
-                "selected folder. This includes any files or "
-                "additional folders contained within.\n\n"
-                "Do you wish to continue?"
-            )
-            self.msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-            val = self.msg.exec_()
-            if val == QMessageBox.Yes:
-                self.delete.delete_full_patch_directory(self.sd_path_full)
-                self.ui.statusbar.showMessage("Selected SD folder has been deleted.", timeout=5000)
-        else:
-            self.delete.delete_file(self.get_sd_path())
+        path = self.sd_path_full
+        if not path or not os.path.exists(path):
+            return
+        self.msg.setWindowTitle("Delete SD Item")
+        self.msg.setIcon(QMessageBox.Warning)
+        self.msg.setText(f"Delete {path}? Folder contents will also be deleted. This cannot be undone.")
+        self.msg.setDetailedText("")
+        self.msg.setInformativeText("")
+        self.msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        if self.msg.exec_() != QMessageBox.Yes:
+            return
+        try:
+            if os.path.isdir(path):
+                self.delete.delete_full_patch_directory(path)
+            else:
+                self.delete.delete_file(path)
+        except (OSError, errors.ZoiaLibError) as exc:
+            self.msg.setWindowTitle("Delete Failed")
+            self.msg.setText("Could not delete the selected SD item.")
+            self.msg.setDetailedText(str(exc))
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+            return
+        self.ui.statusbar.showMessage("Selected SD item deleted.", timeout=5000)
 
         # Reload the tree view.
         self._set_data_sd()

@@ -1,7 +1,11 @@
 import platform
+import re
+from html import escape
+from pathlib import Path
 
-from PySide6.QtGui import QFont
-from PySide6.QtWidgets import QFontDialog, QApplication, QFileDialog
+from PySide6.QtCore import QUrl
+from PySide6.QtGui import QDesktopServices, QFont
+from PySide6.QtWidgets import QFontDialog, QApplication, QFileDialog, QRadioButton
 import os
 import json
 
@@ -29,6 +33,40 @@ class ZOIALibrarianUtil:
         self.dark = True
         self.row_inversion = False
         self.font = QFont("Verdana", 10)
+
+    @staticmethod
+    def welcome_html(changelog, version, image_url):
+        """Wrap the current release's HTML section with the welcome header."""
+        section = re.search(
+            r'<section id="version-' + re.escape(version) + r'">(.*?)</section>',
+            changelog, re.DOTALL,
+        )
+        content = section[1] if section else '<p>Select a patch to view its details.</p>'
+        return (
+            '<html><body style="margin: 24px;">'
+            f'<p align="center"><img src="{escape(image_url, quote=True)}" width="180" height="180"></p>'
+            '<h1 align="center">Welcome to ZOIA Librarian!</h1>'
+            + content + '</body></html>'
+        )
+
+    def show_welcome(self):
+        """Show startup content in the PatchStorage detail pane."""
+        self.ui.tabs.setCurrentIndex(0)
+        self.ui.table_PS.clearSelection()
+        for button in self.ui.table_PS.findChildren(QRadioButton):
+            button.setAutoExclusive(False)
+            button.setChecked(False)
+            button.setAutoExclusive(True)
+        root = Path(__file__).resolve().parents[2]
+        try:
+            changelog = Path(meipass(root / 'documentation' / 'resources' / 'welcome-changelog.html')).read_text(encoding='utf-8')
+        except OSError:
+            changelog = ''
+        image_path = meipass(root / 'zoia_lib' / 'interface' / 'resources' / 'splash.png')
+        self.ui.text_browser_PS.setHtml(self.welcome_html(
+            changelog, self.window._version, QUrl.fromLocalFile(str(image_path)).toString()
+        ))
+        self.ui.text_browser_PS.verticalScrollBar().setValue(0)
 
     def change_font(self, name):
         """Changes the font used throughout the application.
@@ -313,12 +351,9 @@ class ZOIALibrarianUtil:
         self.font = f
 
     def open_local_backend(self):
-        """Opens a FileBrowser showing the app's local backend."""
+        """Reveal the backend directory that this app instance uses."""
 
-        QFileDialog.getExistingDirectory(
-            None, "Local Backend", self.window.path,
-            options=QFileDialog.DontUseNativeDialog
-        )
+        QDesktopServices.openUrl(QUrl.fromLocalFile(self.window.path))
 
     def reset_api_token(self):
         """Resets the saved API token."""

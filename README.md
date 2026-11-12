@@ -15,6 +15,8 @@ Please familiarize yourself with the Terms & Conditions of copyleft licenses lik
 https://www.gnu.org/licenses/gpl-3.0.en.html.
 ZOIA and its patch binary format are a trademark of Empress Effects, Inc. and are used with permission.
 
+This app does not collect or transmit personal data or usage information to its developers. The developers do not receive data from your use of the app.
+
 Neither the developers nor Empress Effects, Inc. are liable for any issues caused or raised by the use or
 modification of this application. By installing the application you agree to these terms.
 
@@ -44,6 +46,7 @@ https://github.com/meanmedianmoge/zoia_lib/releases/latest.
 - Version 1.4 video: https://www.youtube.com/watch?v=ymLvRhC1GmI
 - Version 2.0 video: https://www.youtube.com/watch?v=j6mz4DIdEpU
 - Version 2.1 video: https://www.youtube.com/watch?v=VkhidyALOXM
+- Version 2.2 video: 
 - You'll find the following in `documentation`: <br>
     - Current version of the user manual
     - Overall changelog - lists new features, bug fixes, and known issues for each release

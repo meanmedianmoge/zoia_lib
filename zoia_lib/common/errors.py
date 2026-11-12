@@ -12,6 +12,8 @@ class BinaryError(ZoiaLibError):
     """
 
     def __init__(self, patch, error_code_zoia=0):
+        self.info = patch
+        self.error_code = error_code_zoia
         if patch is None:
             error_msg = f"Expected a patch object but got None instead."
         else:
@@ -24,7 +26,7 @@ class BinaryError(ZoiaLibError):
                     f"Could not decode the binary file {patch} due "
                     f"to an unexpected error."
                 )
-        print(error_msg)
+        super().__init__(error_msg)
 
 
 class UpdateError(ZoiaLibError):
@@ -35,13 +37,15 @@ class UpdateError(ZoiaLibError):
     """
 
     def __init__(self, idx, error_code_zoia=0):
+        self.info = idx
+        self.error_code = error_code_zoia
         if idx is None:
-            print(f"Expected a patch index but got None instead.")
+            super().__init__(f"Expected a patch index but got None instead.")
         elif error_code_zoia == 201:
-            print(f"Patch {idx} has multiple versions.")
+            super().__init__(f"Patch {idx} has multiple versions.")
         else:
             # Default case. We do not want to get here.
-            print(
+            super().__init__(
                 f"Could not update the patch {idx} correctly "
                 f"due to an unexpected error."
             )
@@ -55,13 +59,15 @@ class BadPathError(ZoiaLibError):
     """
 
     def __init__(self, path, error_code_zoia=0):
+        self.info = path
+        self.error_code = error_code_zoia
         if path is None:
-            print(f"Expected a file path but got None instead.")
+            super().__init__(f"Expected a file path but got None instead.")
         elif error_code_zoia == 301:
-            print(f"Path {path} did not lead to a file or directory.")
+            super().__init__(f"Path {path} did not lead to a file or directory.")
         else:
             # Default case. We don't want to see this.
-            print(
+            super().__init__(
                 f"An unexpected error occurred when trying to use {path} "
                 f"as a file path."
             )
@@ -78,6 +84,8 @@ class DeletionError(ZoiaLibError):
     """
 
     def __init__(self, patch, error_code_zoia=0):
+        self.info = patch
+        self.error_code = error_code_zoia
         if patch is None:
             error_msg = f"Expected a patch name but got None instead."
         else:
@@ -98,7 +106,7 @@ class DeletionError(ZoiaLibError):
                     f"backend ZoiaLibraryApp directory due to an "
                     f"unexpected error."
                 )
-        print(error_msg)
+        super().__init__(error_msg)
 
 
 class SavingError(ZoiaLibError):
@@ -120,6 +128,8 @@ class SavingError(ZoiaLibError):
     """
 
     def __init__(self, patch, error_code_zoia=0):
+        self.info = patch
+        self.error_code = error_code_zoia
         if patch is None:
             error_msg = f"Expected a patch name but got None instead."
         else:
@@ -144,7 +154,7 @@ class SavingError(ZoiaLibError):
                     f"Could not save the file {patch} from the "
                     f"backend due to an unexpected error."
                 )
-        print(error_msg)
+        super().__init__(error_msg)
 
 
 class RenamingError(ZoiaLibError):
@@ -155,16 +165,18 @@ class RenamingError(ZoiaLibError):
     """
 
     def __init__(self, patch, error_code=0):
+        self.info = patch
+        self.error_code = error_code
         if patch is None:
-            print(f"Expected a patch name but got None instead.")
+            super().__init__(f"Expected a patch name but got None instead.")
         elif error_code == 601:
-            print(
+            super().__init__(
                 f"Could not rename the file {patch} correctly "
                 f"due to the target name containing an illegal character."
             )
         else:
             # Default case. We do not want to get here.
-            print(
+            super().__init__(
                 f"Could not rename the file {patch} correctly "
                 f"due to an unexpected error."
             )
@@ -179,6 +191,8 @@ class ExportingError(ZoiaLibError):
     """
 
     def __init__(self, patch, slot=-1, error_code_zoia=0):
+        self.info = patch
+        self.error_code = error_code_zoia
         if patch is None:
             error_msg = f"Expected a patch name but got None instead."
         else:
@@ -197,7 +211,7 @@ class ExportingError(ZoiaLibError):
                     f"Could not export the file {patch} correctly "
                     f"due to an unexpected error."
                 )
-        print(error_msg)
+        super().__init__(error_msg)
 
 
 class JSONError(ZoiaLibError):
@@ -208,16 +222,18 @@ class JSONError(ZoiaLibError):
     """
 
     def __init__(self, data, error_code_zoia=0):
+        self.info = data
+        self.error_code = error_code_zoia
         if data is None:
-            print(f"Expected a JSON data but got None instead.")
+            super().__init__(f"Expected a JSON data but got None instead.")
         elif error_code_zoia == 801:
-            print(
+            super().__init__(
                 f"Could not process {data} because the JSON data "
                 f"was mal-formatted (i.e., it was not JSON compliant)."
             )
         else:
             # Default case. We do not want to get here.
-            print(f"Could not process {data} correctly " f"due to an unexpected error.")
+            super().__init__(f"Could not process {data} correctly " f"due to an unexpected error.")
 
 
 class SortingError(ZoiaLibError):
@@ -230,6 +246,8 @@ class SortingError(ZoiaLibError):
     """
 
     def __init__(self, info, error_code_zoia=0):
+        self.info = info
+        self.error_code = error_code_zoia
         if info is None:
             error_msg = f"Expected information but got None instead."
         else:
@@ -247,7 +265,7 @@ class SortingError(ZoiaLibError):
                     f"Could not process {info} correctly due to an "
                     f"unexpected error."
                 )
-        print(error_msg)
+        super().__init__(error_msg)
 
 
 class SearchingError(ZoiaLibError):
@@ -260,6 +278,8 @@ class SearchingError(ZoiaLibError):
     """
 
     def __init__(self, info, error_code_zoia=0):
+        self.info = info
+        self.error_code = error_code_zoia
         if info is None:
             error_msg = f"Expected information but got None instead."
         else:
@@ -275,7 +295,7 @@ class SearchingError(ZoiaLibError):
                     f"Could not process {info} correctly due to an "
                     f"unexpected error."
                 )
-        print(error_msg)
+        super().__init__(error_msg)
 
 
 class UploadError(ZoiaLibError):
@@ -288,6 +308,8 @@ class UploadError(ZoiaLibError):
     """
 
     def __init__(self, info, error_code_zoia=0):
+        self.info = info
+        self.error_code = error_code_zoia
         if info is None:
             error_msg = f"Expected information but got None instead."
         else:
@@ -301,4 +323,4 @@ class UploadError(ZoiaLibError):
                     f"Could not process {info} correctly due to an "
                     f"unexpected error."
                 )
-        print(error_msg)
+        super().__init__(error_msg)

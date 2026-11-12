@@ -1,6 +1,8 @@
 import json
 import os
 import shutil
+import tempfile
+from pathlib import Path
 import unittest
 
 from zoia_lib.backend.patch_save import PatchSave
@@ -225,95 +227,42 @@ class TestSaving(unittest.TestCase):
 
         self.tearDown()
 
-    @unittest.skip("Function not implemented")
-    def test_save_patch_local_bin(self):
-        """Attempts to save a regular binary patch to the
-        backend ZoiaLibraryApp directory. This requires the
-        creation of a patch directory to store the patch within,
-        along with the accompanying metadata. This simulates a
-        patch that originates from a user's machine or from an SD card.
-        """
+    def test_import_patch_local_bin(self):
+        """Import a local/SD binary, generate metadata, and reject duplicates."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            library = root / "library"
+            library.mkdir()
+            source = root / "019_zoia_testpatch.bin"
+            original_bytes = (Path(test_path) / "sample_files" / "input_test.bin").read_bytes()
+            source.write_bytes(original_bytes)
+            self.save.back_path = str(library)
 
-        self.setUp()
+            self.save.import_to_backend(str(source), disable_auto_ps_link=True)
 
-        # Try to break the method.
-        exc = (FileNotFoundError, errors.SavingError)
-        self.assertRaises(exc, self.save.save_to_backend, None)
-        self.assertRaises(exc, self.save.save_to_backend, "I am not a patch")
+            patches = list(library.iterdir())
+            self.assertEqual(len(patches), 1)
+            patch_dir = patches[0]
+            patch_id = patch_dir.name
+            self.assertTrue(patch_id.isdigit())
+            self.assertEqual(len(patch_id), 5)
+            self.assertEqual(
+                {file.name for file in patch_dir.iterdir()},
+                {patch_id + ".bin", patch_id + ".json"},
+            )
+            self.assertEqual((patch_dir / (patch_id + ".bin")).read_bytes(), original_bytes)
+            metadata = json.loads((patch_dir / (patch_id + ".json")).read_text())
+            self.assertEqual(str(metadata["id"]), patch_id)
+            self.assertEqual(metadata["title"], "testpatch")
+            self.assertEqual(metadata["files"][0]["filename"], source.name)
+            self.assertEqual(metadata["revision"], "1")
+            for key in ("created_at", "updated_at", "downloaded_at"):
+                self.assertIsInstance(metadata[key], str)
+                self.assertTrue(metadata[key])
 
-        # Try to save an imported patch.
-        with open(os.path.join(test_path, "sample_files", "019_zoia_testpatch.bin"), "rb") as f:
-            sample_bytes = f.read()
-        sample_json = {"title": "test", "id": 12345, "files": [{"filename": "019_zoia_testpatch.bin"}]}
-        self.save.save_to_backend((sample_bytes, sample_json))
-
-        # Try to import it again (should fail, since it is already saved).
-        self.assertRaises(
-            exc,
-            self.save.save_to_backend,
-            (sample_bytes, sample_json),
-        )
-
-        # Unfortunately, the id is random, so we need to find it to remove it.
-        count = 0
-        for file in os.listdir(test_path):
-            if len(file) == 5:
-                count += 1
-                self.assertTrue(
-                    len(os.listdir(os.path.join(test_path, file))) == 2,
-                    "The locally imported patch did not "
-                    "successfully create the two expected files "
-                    "(.bin and .json).",
-                )
-                with open(
-                    os.path.join(test_path, file, "{}.json".format(file)), "r"
-                ) as f:
-                    meta_check = json.loads(f.read())
-
-                self.assertTrue(
-                    "id" in meta_check, "JSON data didn't contain the id attribute."
-                )
-                self.assertTrue(
-                    "created_at" in meta_check,
-                    "JSON data didn't contain the created_at " "attribute.",
-                )
-                self.assertTrue(
-                    "files" in meta_check,
-                    "JSON data didn't contain the files " "attribute.",
-                )
-                self.assertTrue(
-                    meta_check["files"][0]["filename"] == "019_zoia_testpatch.bin",
-                    "The filename attribute did not match the " "expected file name.",
-                )
-                self.assertTrue(
-                    "updated_at" in meta_check,
-                    "JSON data didn't contain the updated_at " "attribute.",
-                )
-                self.assertTrue(
-                    "title" in meta_check,
-                    "JSON data didn't contain the title " "attribute.",
-                )
-                self.assertTrue(
-                    "revision" in meta_check,
-                    "JSON data didn't contain the revision " "attribute.",
-                )
-                # Cleanup
-                shutil.rmtree(os.path.join(test_path, file))
-                break
-
-        self.assertTrue(
-            count == 1,
-            "Did not find exactly 1 patch directory"
-            "with a 5-digit identification number.",
-        )
-
-        self.tearDown()
-
-    def test_save_patch_local_compressed(self):
-        """Attempts to save a regular compressed patch to the
-        backend ZoiaLibraryApp directory. This requires the
-        creation of a patch directory to store the patch within,
-        along with the accompanying metadata. This simulates a
-        patch that originates from a user's machine or from an SD card.
-        """
-        pass
+            with self.assertRaises(errors.SavingError) as duplicate:
+                self.save.import_to_backend(str(source), disable_auto_ps_link=True)
+            self.assertEqual(duplicate.exception.error_code, 503)
+            self.assertEqual(list(library.iterdir()), patches)
+            self.assertEqual(source.read_bytes(), original_bytes)
+            self.assertEqual((patch_dir / (patch_id + ".bin")).read_bytes(), original_bytes)

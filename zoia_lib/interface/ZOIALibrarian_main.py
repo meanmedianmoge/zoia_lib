@@ -1,15 +1,17 @@
 import json
 import os
 import platform
+import stat
 import requests
 import hashlib
 import re
 from difflib import SequenceMatcher
 from os.path import expanduser
+from pathlib import Path
 
 from PySide6 import QtCore
 from PySide6.QtCore import QEvent, Qt, QThread, QTimer
-from PySide6.QtGui import QIcon, QFont, QScreen
+from PySide6.QtGui import QAction, QIcon, QFont, QScreen
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -75,6 +77,12 @@ class ZOIALibrarianMain(QMainWindow):
         self.ui = ui_main.Ui_MainWindow()
         self.ui.setupUi(self)
         self.path = save.get_backend_path()
+        self._library_imported = False
+        self._legacy_import_prompted = Path(self.path).parent / ".zoia-legacy-import-prompted"
+        self._sandbox_library = (
+            platform.system() == "Darwin"
+            and "/Library/Containers/com.zoialibrarian.desktop/Data/" in self.path
+        )
 
         # Message box init
         self.icon = QIcon(
@@ -136,7 +144,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.tab_3 = -1
         # self.add_rating = None
         # self.add_download_date = None
-        self._version = '2.1'
+        self._version = '2.2'
 
         # Threads
         self.worker_mass = ImportMassWorker(self)
@@ -315,6 +323,17 @@ class ZOIALibrarianMain(QMainWindow):
             self.import_version_menu
         )
         self.ui.actionNavigate_to_local_backend.triggered.connect(self.util.open_local_backend)
+        self.import_library_action = QAction("Import Existing Library", self)
+        self.import_library_action.setShortcut("Ctrl+L")
+        self.ui.menuFile.insertAction(
+            self.ui.actionNavigate_to_local_backend, self.import_library_action
+        )
+        self.import_library_action.triggered.connect(self.import_existing_library)
+        self.import_library_action.setVisible(self._sandbox_library)
+        self.welcome_action = QAction("Welcome", self)
+        self.welcome_action.setShortcut("Ctrl+W")
+        self.ui.menuHelp.insertAction(self.ui.actionDocumentation, self.welcome_action)
+        self.welcome_action.triggered.connect(self.util.show_welcome)
         self.ui.actionReset_API_Token.triggered.connect(self.util.reset_api_token)
         self.ui.refresh_pch_btn.clicked.connect(self.ps.reload_ps_thread)
         self.ui.update_patch_notes.clicked.connect(self.local.update_patch_notes)
@@ -438,6 +457,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.sort_and_set()
 
         # Center the application on launch.
+        self.util.show_welcome()
         frame = self.frameGeometry()
         center = QScreen.availableGeometry(QApplication.primaryScreen()).center()
         frame.moveCenter(center)
@@ -445,6 +465,65 @@ class ZOIALibrarianMain(QMainWindow):
 
         # Check for any app updates
         self.check_for_updates()
+        if self._sandbox_library and not self._legacy_import_prompted.exists():
+            QTimer.singleShot(0, self._offer_existing_library)
+
+    def _offer_existing_library(self):
+        self._legacy_import_prompted.touch()
+        source = util.legacy_library_path()
+        try:
+            if not stat.S_ISDIR(source.stat().st_mode):
+                return
+        except FileNotFoundError:
+            return
+        except OSError as error:
+            QMessageBox.critical(self, "Cannot read existing library", str(error))
+            return
+        choice = QMessageBox.question(
+            self,
+            "Import existing library?",
+            "Would you like to import your existing ZOIA Librarian library? "
+            "This will replace the library in this app's sandbox. "
+            "You can do this later from File > Import Existing Library.",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+        if choice == QMessageBox.Yes:
+            self.import_existing_library()
+
+    def import_existing_library(self):
+        source = util.legacy_library_path()
+        try:
+            if not stat.S_ISDIR(source.stat().st_mode):
+                raise FileNotFoundError(f"No existing library was found at {source}.")
+            next(source.iterdir(), None)
+        except OSError as error:
+            QMessageBox.critical(
+                self,
+                "Cannot read existing library",
+                f"Cannot read the existing library at {source}: {error}",
+            )
+            return
+        if QMessageBox.question(
+            self,
+            "Replace sandbox library?",
+            "Copy the existing local library into this app's sandbox, replacing "
+            "its patches, folders, metadata, and preferences? "
+            "The existing local library will not be changed.",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        ) != QMessageBox.Yes:
+            return
+        try:
+            util.import_library(source, self.path)
+        except (OSError, ValueError) as error:
+            QMessageBox.critical(self, "Import failed", str(error))
+            return
+        self._library_imported = True
+        QMessageBox.information(
+            self, "Import complete", "The library was imported. Relaunch the app to load it."
+        )
+        self.close()
 
     def tab_switch(self):
         """Actions performed whenever a tab is switched to within the
@@ -931,7 +1010,7 @@ class ZOIALibrarianMain(QMainWindow):
                         self.msg.setDetailedText(str(e))
                         self.msg.setStandardButtons(QMessageBox.Ok)
                         self.msg.exec_()
-                        self.msg.setDetailedText(None)
+                        self.msg.setDetailedText("")
             else:
                 # Get the context.
                 viz_browser = None
@@ -983,6 +1062,7 @@ class ZOIALibrarianMain(QMainWindow):
                     content = json.loads(f.read())
                 # We are on the Local Storage View, so set the viz up.
                 if viz_browser is not None:
+                    self.local.clear_viz()
                     bin_path = os.path.join(patch_dir, patch_stem + ".bin")
                     if not os.path.isfile(bin_path):
                         fallback_bin = os.path.join(patch_dir, name + ".bin")
@@ -993,10 +1073,12 @@ class ZOIALibrarianMain(QMainWindow):
                             viz = binary.parse_data(f.read())
                         self.local.setup_viz(viz)
                         self.ui.btn_show_routing.setEnabled(True)
-                    except Exception:
+                    except Exception as exc:
                         # Leave info view usable even if a binary is malformed.
-                        self.ui.btn_show_routing.setEnabled(False)
-                        self.ui.text_browser_viz.setText("")
+                        self.local.clear_viz()
+                        self.ui.text_browser_viz.setPlainText(
+                            f"Could not visualize this patch: {exc}"
+                        )
 
             # HTML code for the patch preview.
             if not skip:
@@ -1552,7 +1634,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setDetailedText(str(e))
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-            self.msg.setDetailedText(None)
+            self.msg.setDetailedText("")
 
         curr_os = platform.system().lower()
         choices = {"windows": "Windows", "darwin": "Mac", "linux": "Linux"}
@@ -1681,8 +1763,8 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setDetailedText(temp.strip("\n"))
         self.msg.setStandardButtons(QMessageBox.Ok)
         self.msg.exec_()
-        self.msg.setInformativeText(None)
-        self.msg.setDetailedText(None)
+        self.msg.setInformativeText("")
+        self.msg.setDetailedText("")
         self.tab_switch()
         # if (
         #     self.ui.tabs.currentIndex() == 1 and not self.ui.back_btn_local.isEnabled()
@@ -1753,8 +1835,8 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setIcon(QMessageBox.Warning)
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-            self.msg.setInformativeText(None)
-            self.msg.setDetailedText(None)
+            self.msg.setInformativeText("")
+            self.msg.setDetailedText("")
         else:
             self.ui.statusbar.showMessage("Import failed.", timeout=5000)
             self.msg.setWindowTitle("Warning")
@@ -1779,8 +1861,8 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setIcon(QMessageBox.Warning)
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-            self.msg.setInformativeText(None)
-            self.msg.setDetailedText(None)
+            self.msg.setInformativeText("")
+            self.msg.setDetailedText("")
         if self.last_folder_json:
             self.ui.statusbar.showMessage(
                 "Folder saved as {}.".format(self.last_folder_json), timeout=5000
@@ -1931,9 +2013,10 @@ class ZOIALibrarianMain(QMainWindow):
         settings can be saved.
         """
 
-        self.util.save_pref(
-            self.width(), self.height(), self.sd.get_sd_root(), self.sd.get_export_path(), self.path
-        )
+        if not self._library_imported:
+            self.util.save_pref(
+                self.width(), self.height(), self.sd.get_sd_root(), self.sd.get_export_path(), self.path
+            )
 
     def _try_quit(self):
         """Forces the application to close.

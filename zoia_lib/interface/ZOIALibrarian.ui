@@ -14,7 +14,7 @@
    <enum>Qt::StrongFocus</enum>
   </property>
   <property name="windowTitle">
-   <string>ZOIA Librarian - Version 2.1</string>
+   <string>ZOIA Librarian - Version 2.2</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -3284,7 +3284,7 @@
     <string>Import a Patch (.bin)</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+I</string>
+    <string>Ctrl+Shift+I</string>
    </property>
    <property name="shortcutVisibleInContextMenu" stdset="0">
     <bool>true</bool>

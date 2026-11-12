@@ -1,6 +1,7 @@
 import json
 import os
-import platform
+
+from zoia_lib.backend.utilities import path_basename
 
 from PySide6.QtCore import QEvent
 from PySide6.QtWidgets import (
@@ -194,16 +195,7 @@ class ZOIALibrarianBank(QMainWindow):
             filter="JSON (*.json)", options=QFileDialog.DontUseNativeDialog
         )[0]
         if bnk_file != "":
-            if "/" in bnk_file and platform.system().lower() == "windows":
-                bnk_file = bnk_file.split("/")[-1]
-            elif "\\" in bnk_file:
-                bnk_file = bnk_file.split("\\")[-1]
-            elif "//" in bnk_file:
-                bnk_file = bnk_file.split("//")[-1]
-            elif "\\\\" in bnk_file:
-                bnk_file = bnk_file.split("\\\\")[-1]
-            else:
-                bnk_file = bnk_file.split(os.path.sep)[-1]
+            bnk_file = path_basename(bnk_file)
         else:
             return
 
@@ -227,7 +219,7 @@ class ZOIALibrarianBank(QMainWindow):
             value = self.msg.exec_()
             if value != QMessageBox.Yes:
                 return
-            self.msg.setInformativeText(None)
+            self.msg.setInformativeText("")
 
         # Keep track of patches that fail to load (because they have been
         # deleted from the backend by the user).
@@ -262,7 +254,7 @@ class ZOIALibrarianBank(QMainWindow):
             )
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-            self.msg.setInformativeText(None)
+            self.msg.setInformativeText("")
 
         # Prepare the bank tables.
         self._set_data_bank()
@@ -293,7 +285,7 @@ class ZOIALibrarianBank(QMainWindow):
                 value = self.msg.exec_()
                 if value == QMessageBox.No:
                     return
-                self.msg.setInformativeText(None)
+                self.msg.setInformativeText("")
 
             # Save the bank
             with open(
@@ -346,7 +338,7 @@ class ZOIALibrarianBank(QMainWindow):
                 self.msg.setInformativeText("Would you like to overwrite it?")
                 self.msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
                 value = self.msg.exec_()
-                self.msg.setInformativeText(None)
+                self.msg.setInformativeText("")
                 if value == QMessageBox.Yes:
                     self.ui.statusbar.showMessage("Exporting patches.", timeout=5000)
                     self._get_bank_data()
@@ -404,8 +396,8 @@ class ZOIALibrarianBank(QMainWindow):
                     self.msg.setDetailedText(temp.strip("\n"))
                 self.msg.setStandardButtons(QMessageBox.Ok)
                 self.msg.exec_()
-                self.msg.setDetailedText(None)
-                self.msg.setInformativeText(None)
+                self.msg.setDetailedText("")
+                self.msg.setInformativeText("")
 
     def _get_bank_data(self):
         """Gets the data from the current bank tables."""

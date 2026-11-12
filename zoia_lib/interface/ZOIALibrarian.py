@@ -1584,7 +1584,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"ZOIA Librarian - Version 2.1", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"ZOIA Librarian - Version 2.2", None))
         self.actionSpecify_SD_Card_Location.setText(QCoreApplication.translate("MainWindow", u"Specify SD Card Location", None))
 #if QT_CONFIG(shortcut)
         self.actionSpecify_SD_Card_Location.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+S", None))
@@ -1640,7 +1640,7 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(shortcut)
         self.actionImport_A_Patch.setText(QCoreApplication.translate("MainWindow", u"Import a Patch (.bin)", None))
 #if QT_CONFIG(shortcut)
-        self.actionImport_A_Patch.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+I", None))
+        self.actionImport_A_Patch.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+Shift+I", None))
 #endif // QT_CONFIG(shortcut)
         self.actionToggle_Dark_Mode.setText(QCoreApplication.translate("MainWindow", u"Toggle Dark Mode", None))
         self.actionImport_Multiple_Patches.setText(QCoreApplication.translate("MainWindow", u"Import Multiple Patches (directory)", None))
