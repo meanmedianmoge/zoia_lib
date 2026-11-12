@@ -15,6 +15,8 @@ Please familiarize yourself with the Terms & Conditions of copyleft licenses lik
 https://www.gnu.org/licenses/gpl-3.0.en.html.
 ZOIA and its patch binary format are a trademark of Empress Effects, Inc. and are used with permission.
 
+This app does not collect or transmit personal data or usage information to its developers. The developers do not receive data from your use of the app.
+
 Neither the developers nor Empress Effects, Inc. are liable for any issues caused or raised by the use or
 modification of this application. By installing the application you agree to these terms.
 
