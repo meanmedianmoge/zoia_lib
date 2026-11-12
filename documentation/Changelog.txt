@@ -2,7 +2,6 @@ Version 2.2 (November 2026)
 
 New Features
 - Added signed and notarized macOS builds for Apple Silicon and Intel.
-  - No more com.apple.quarantine edits necessary to authorize the application.
 - Mac App Store version is currently in TestFlight!
   - Please reach out if you'd like to be included in the beta, full release coming soon.
   - If you've used the app before, this new version will ask if you'd like to import your local storage on first init.

@@ -330,6 +330,10 @@ class ZOIALibrarianMain(QMainWindow):
         )
         self.import_library_action.triggered.connect(self.import_existing_library)
         self.import_library_action.setVisible(self._sandbox_library)
+        self.welcome_action = QAction("Welcome", self)
+        self.welcome_action.setShortcut("Ctrl+W")
+        self.ui.menuHelp.insertAction(self.ui.actionDocumentation, self.welcome_action)
+        self.welcome_action.triggered.connect(self.util.show_welcome)
         self.ui.actionReset_API_Token.triggered.connect(self.util.reset_api_token)
         self.ui.refresh_pch_btn.clicked.connect(self.ps.reload_ps_thread)
         self.ui.update_patch_notes.clicked.connect(self.local.update_patch_notes)
@@ -453,6 +457,7 @@ class ZOIALibrarianMain(QMainWindow):
         self.sort_and_set()
 
         # Center the application on launch.
+        self.util.show_welcome()
         frame = self.frameGeometry()
         center = QScreen.availableGeometry(QApplication.primaryScreen()).center()
         frame.moveCenter(center)
