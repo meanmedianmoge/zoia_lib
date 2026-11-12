@@ -1,4 +1,5 @@
 import json
+import os
 import unittest
 from types import SimpleNamespace
 from unittest.mock import Mock, mock_open, patch
@@ -10,7 +11,7 @@ class TestUploadOwnership(unittest.TestCase):
     def setUp(self):
         self.local = SimpleNamespace(
             local_selected="10000",
-            path="/library",
+            path=os.path.abspath("library"),
             usr_pwd=Mock(return_value="patchstorage-user"),
             update_patch=Mock(),
             ui=Mock(),
@@ -49,9 +50,10 @@ class TestUploadOwnership(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "update reached"):
                 ZOIALibrarianLocal.update_patch(self.local)
         self.local.usr_pwd.assert_called_once_with()
-        self.local.api.upload_file.assert_called_once_with("/library/123456/123456", file_type=1)
+        expected_path = os.path.join(self.local.path, "123456", "123456")
+        self.local.api.upload_file.assert_called_once_with(expected_path, file_type=1)
         self.local.api.update_patch.assert_called_once_with(
-            "123456", "/library/123456/123456", None, 42, None, remote_meta={"revision": "1.0"}
+            "123456", expected_path, None, 42, None, remote_meta={"revision": "1.0"}
         )
         self.local.msg.exec_.assert_not_called()
 
@@ -83,7 +85,7 @@ class TestUploadOwnership(unittest.TestCase):
                 ZOIALibrarianLocal.upload_patch(self.local)
         self.assertEqual(self.local._upload_patch_file.call_args_list, [
             unittest.mock.call("/art.JPG", file_type=0),
-            unittest.mock.call("/library/10000/10000", file_type=1),
+            unittest.mock.call(os.path.join(self.local.path, "10000", "10000"), file_type=1),
         ])
 
     def test_file_errors_show_dialog(self):

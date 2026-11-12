@@ -18,6 +18,7 @@ Fixes
 - Improved authentication, cancellation, network timeouts, and offline recovery.
 - Improved error messages and batch-operation summaries; failed requests no longer report success.
 - Failed patch-list refreshes now preserve cached data.
+- Fixed pathing issues, universally.
 - Bumped minor dependency versions.
 
 Plans

@@ -17,7 +17,7 @@ from zoia_lib.backend.patch import Patch
 from zoia_lib.common import errors
 from zoia_lib.backend.api import PatchStorage
 from zoia_lib.backend.patch_binary import PatchBinary
-from zoia_lib.backend.utilities import hide_dotted_files, natural_key, remove_empty_patches
+from zoia_lib.backend.utilities import hide_dotted_files, natural_key, remove_empty_patches, path_basename
 
 pb = PatchBinary()
 ps = PatchStorage()
@@ -265,12 +265,10 @@ class PatchSave(Patch):
             patch_name, ext = path.rsplit(".", 1)
         else:
             patch_name = path
-            if patch_name[1] == ":":
-                patch_name = patch_name.split(":")[-1]
             ext = "bin"
 
         # Get rid of any separators
-        patch_name = patch_name.split(os.path.sep)[-1]
+        patch_name = path_basename(patch_name)
         title = patch_name
 
         # Strip ### if it exists.
@@ -393,7 +391,7 @@ class PatchSave(Patch):
                 js_data["updated_at"] = "{:%Y-%m-%dT%H:%M:%S+00:00}".format(
                     datetime.datetime.now()
                 )
-                js_data["files"][0]["filename"] = files[i].split(os.path.sep)[-1]
+                js_data["files"][0]["filename"] = path_basename(files[i])
 
             # Try to save the patch.
             if not version:

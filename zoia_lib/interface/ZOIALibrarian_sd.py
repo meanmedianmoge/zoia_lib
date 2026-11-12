@@ -1,5 +1,4 @@
 import os
-import platform
 from os.path import expanduser
 
 from PySide6.QtCore import QEvent
@@ -14,6 +13,7 @@ from PySide6.QtWidgets import (
 )
 
 from zoia_lib.common import errors
+from zoia_lib.backend.utilities import path_basename
 
 
 class ZOIALibrarianSD(QMainWindow):
@@ -70,17 +70,7 @@ class ZOIALibrarianSD(QMainWindow):
             if not input_dir:
                 return
             if input_dir != "" and os.path.isdir(input_dir):
-                if "/" in input_dir and platform.system().lower() == "windows":
-                    # This is (no longer needed) for Windows.
-                    # This comes from a bug with QFileDialog returning the
-                    # wrong path separator on Windows for some odd reason.
-                    input_dir = input_dir.split("/")[0]
-                    # pass
-                elif "/" in input_dir:
-                    # OSX case.
-                    pass
-                else:
-                    input_dir = input_dir.split(os.path.sep)[0]
+                input_dir = os.path.normpath(input_dir)
                 self.sd_root = str(input_dir)
                 self.export_dir = os.path.join(self.sd_root, "to_zoia")
                 self.ui.tab_sd.setEnabled(True)
@@ -110,17 +100,10 @@ class ZOIALibrarianSD(QMainWindow):
 
         self.ui.import_all_btn.setEnabled(False)
         self.ui.import_all_ver_btn.setEnabled(False)
-        path = self.ui.sd_tree.currentIndex().data()
-        temp = self.ui.sd_tree.currentIndex()
-        # Get the top directory for a specified path.
-        while True:
-            temp = temp.parent()
-            if temp.data() is not None and self.sd_root not in temp.data():
-                path = os.path.join(temp.data(), path)
-                continue
-            break
-
-        self.sd_path_full = os.path.join(self.sd_root, path)
+        index = self.ui.sd_tree.currentIndex()
+        if not index.isValid():
+            return
+        self.sd_path_full = self.ui.sd_tree.model().filePath(index)
 
         # Setup the tree widget.
         self._set_data_sd()
@@ -200,20 +183,10 @@ class ZOIALibrarianSD(QMainWindow):
             options=QFileDialog.DontUseNativeDialog
         )
         if input_dir != "" and os.path.isdir(input_dir):
-            if "/" in input_dir and platform.system().lower() == "windows":
-                # THIS IS NEEDED FOR WINDOWS.
-                # This comes from a bug with QFileDialog returning the
-                # wrong path separator on Windows for some odd reason.
-                # input_dir = input_dir.split("/")[0]
-                pass
-            elif "/" in input_dir:
-                # OSX case.
-                pass
-            else:
-                input_dir = input_dir.split(os.path.sep)[0]
+            input_dir = os.path.normpath(input_dir)
             self.export_dir = str(input_dir)
 
-            e = self.export_dir.split("/")[-1]
+            e = path_basename(self.export_dir)
             self.ui.statusbar.showMessage("Export directory successfully set.", timeout=5000)
             self.msg.setWindowTitle("Export Directory Has Been Set")
             self.msg.setIcon(QMessageBox.Information)

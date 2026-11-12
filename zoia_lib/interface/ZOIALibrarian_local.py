@@ -29,7 +29,7 @@ from PySide6.QtWidgets import (
 )
 
 from zoia_lib.backend.patch_update import PatchUpdate
-from zoia_lib.backend.utilities import hide_dotted_files, exit_after, search_patches
+from zoia_lib.backend.utilities import hide_dotted_files, exit_after, search_patches, path_basename
 from zoia_lib.common import errors
 
 update = PatchUpdate()
@@ -358,12 +358,9 @@ class ZOIALibrarianLocal(QMainWindow):
             self.sd.sd_path(False, self.window.width())
         else:
             export_path = self.sd.get_export_path()
-            export_dir = self.sd.get_export_path().split("/")[-1]
+            export_dir = path_basename(self.sd.get_export_path())
 
-            if export_dir not in os.listdir(self.sd.get_sd_root()):
-                os.makedirs(
-                    os.path.join(self.sd.get_sd_root(), export_dir), exist_ok=True
-                )
+            os.makedirs(export_path, exist_ok=True)
 
             # Get the patch(es) which we're exporting
             idx = self.sender().objectName()

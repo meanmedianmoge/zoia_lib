@@ -1,4 +1,5 @@
 import json
+import ntpath
 import os
 import re
 import shutil
@@ -297,11 +298,16 @@ def merge_patch_metadata(new_patches, known):
     return list(merged.values())
 
 
+def path_basename(path):
+    """Accept native paths and Qt paths using either separator."""
+    return ntpath.basename(str(path))
+
+
 def meipass(resource, is_ui=False):
     """Helper function for the UI to find resource files."""
 
     if is_ui:
-        resource = str(resource).split("/")[-1]
+        resource = path_basename(resource)
         bundle_dir = getattr(
             sys, "_MEIPASS", os.path.abspath(os.path.dirname(__file__))
         )

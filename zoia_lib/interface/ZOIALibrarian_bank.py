@@ -1,6 +1,7 @@
 import json
 import os
-import platform
+
+from zoia_lib.backend.utilities import path_basename
 
 from PySide6.QtCore import QEvent
 from PySide6.QtWidgets import (
@@ -194,16 +195,7 @@ class ZOIALibrarianBank(QMainWindow):
             filter="JSON (*.json)", options=QFileDialog.DontUseNativeDialog
         )[0]
         if bnk_file != "":
-            if "/" in bnk_file and platform.system().lower() == "windows":
-                bnk_file = bnk_file.split("/")[-1]
-            elif "\\" in bnk_file:
-                bnk_file = bnk_file.split("\\")[-1]
-            elif "//" in bnk_file:
-                bnk_file = bnk_file.split("//")[-1]
-            elif "\\\\" in bnk_file:
-                bnk_file = bnk_file.split("\\\\")[-1]
-            else:
-                bnk_file = bnk_file.split(os.path.sep)[-1]
+            bnk_file = path_basename(bnk_file)
         else:
             return
 
