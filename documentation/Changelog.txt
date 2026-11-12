@@ -8,7 +8,7 @@ New Features
     - Added a menu item to manually trigger the local file copy to the new app.
 
 Fixes
-- VH splitting now shows the split-off patch(es) immediately in local storage without needing a manually.
+- VH splitting now shows the split-off patch(es) immediately in local storage without needing a manual refresh.
 - Fixed the module index minimum block counts and construction to fix patch viz errors.
 - Patch updates will compare published binaries before uploading.
   - Metadata-only edits preserve the current version, and binary changes increment.
