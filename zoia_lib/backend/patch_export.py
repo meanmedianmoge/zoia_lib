@@ -112,7 +112,7 @@ class PatchExport(Patch):
             else:
                 # Incorrect slot number provided.
                 raise errors.ExportingError(slot, 701)
-        except FileNotFoundError or FileExistsError:
+        except (FileNotFoundError, FileExistsError):
             pass
 
         # Add the file extension if need be.
@@ -133,7 +133,7 @@ class PatchExport(Patch):
                     os.path.join(self.back_path, "Samples", idx), os.path.join(os.path.dirname(dest), idx),
                     dirs_exist_ok=True
                 )
-        except FileNotFoundError or FileExistsError:
+        except (FileNotFoundError, FileExistsError):
             raise errors.ExportingError(patch)
 
     def export_bank(self, bank, dest, name, overwrite=False):
@@ -193,7 +193,7 @@ class PatchExport(Patch):
                         else:
                             # Incorrect slot number provided.
                             raise errors.ExportingError(slot, 701)
-                    except FileNotFoundError or FileExistsError:
+                    except (FileNotFoundError, FileExistsError):
                         pass
 
                     with open(os.path.join(dest, name, blank_name), "wb") as f:

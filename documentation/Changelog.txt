@@ -1,3 +1,31 @@
+Version 2.2 (November 2026)
+
+New Features
+- Added signed and notarized macOS builds for Apple Silicon and Intel.
+  - No more com.apple.quarantine edits necessary to authorize the application.
+- Mac App Store version is currently in TestFlight!
+  - Please reach out if you'd like to be included in the beta, full release coming soon.
+  - If you've used the app before, this new version will ask if you'd like to import your local storage on first init.
+    - Added a menu item to manually trigger the local file copy to the new app.
+
+Fixes
+- VH splitting now shows the split-off patch(es) immediately in local storage without needing a manually.
+- Fixed the module index minimum block counts and construction to fix patch viz errors.
+- Patch updates will compare published binaries before uploading.
+  - Metadata-only edits preserve the current version, and binary changes increment.
+- Fixed new PatchStorage uploads being rejected by local author checks.
+- Fixed a startup migration crash caused by unrelated or incomplete folders.
+- Improved search performance and prevented duplicate cached patch entries.
+- Improved authentication, cancellation, network timeouts, and offline recovery.
+- Improved error messages and batch-operation summaries; failed requests no longer report success.
+- Failed patch-list refreshes now preserve cached data.
+- Bumped minor dependency versions.
+
+Plans
+- iPad version (for real this time), with emphasis on touch capabilities for editing.
+
+_________________________________________
+
 Version 2.1 (March 2026)
 
 New Features

@@ -10,7 +10,13 @@ import certifi
 import urllib3
 from furl import furl
 
-http = urllib3.PoolManager(cert_reqs="CERT_REQUIRED", ca_certs=certifi.where())
+http = urllib3.PoolManager(
+    cert_reqs="CERT_REQUIRED", ca_certs=certifi.where(),
+    timeout=urllib3.Timeout(connect=5, read=30),
+    retries=urllib3.Retry(total=2, backoff_factor=0.5,
+                         allowed_methods=frozenset(['GET', 'HEAD']),
+                         status_forcelist=(500, 502, 503, 504)),
+)
 
 
 class PatchStorage:
@@ -32,11 +38,8 @@ class PatchStorage:
         self.api_usr = None
         self.licenses = self._get_license_data()
         self.categories = self._get_categories_data()
-        try:
-            self.patch_count = self._patch_count()
-        except Exception:
-            # No internet connection.
-            pass
+        self.patch_count = None
+        # Resolve the count on first use; importing backend modules is offline.
 
     def _search(self, more_params=None):
         """Make a query to the PS API.
@@ -77,7 +80,7 @@ class PatchStorage:
 
         if more_params is None:
             more_params = {}
-        endpoint = os.path.join(self.url, "patches/")
+        endpoint = self.url + "patches/"
 
         # get param dict
         default_params = {
@@ -94,7 +97,12 @@ class PatchStorage:
         url = str(furl(endpoint).add(params))
         r = http.request("GET", url)
 
-        return json.loads(r.data) if r.status == 200 else []
+        if r.status != 200:
+            raise urllib3.exceptions.HTTPError(f"Patch search returned HTTP {r.status}")
+        result = json.loads(r.data)
+        if not isinstance(result, list):
+            raise ValueError("PatchStorage returned an invalid patch list.")
+        return result
 
     def get_patch_meta(self, idx: str):
         """Get the metadata associated with a specific
@@ -105,7 +113,7 @@ class PatchStorage:
         return: The metadata for the patch, in a MetadataSchema
                  compliant form.
         """
-        endpoint = os.path.join(self.url, "patches/{}/".format(idx))
+        endpoint = self.url + "patches/{}/".format(idx)
 
         # Make the request
         raw_data = json.loads(http.request("GET", endpoint).data)
@@ -127,9 +135,11 @@ class PatchStorage:
 
         try:
             body = self.get_patch_meta(idx)
-            f = http.request("GET", str(body["files"][0]["url"])).data, body
-            return f
-        except KeyError:
+            response = http.request("GET", str(body["files"][0]["url"]))
+            if response.status != 200:
+                raise urllib3.exceptions.HTTPError(f"Patch download returned HTTP {response.status}")
+            return response.data, body
+        except (KeyError, IndexError):
             # No patch with the supplied id was found.
             return None
 
@@ -408,10 +418,13 @@ class PatchStorage:
         if r.status == 200:
             self.api_token = json.loads(r.data)['token']
             self.api_usr = username
+            return True
+        return False
 
     def auth_token(self):
         """Checks if current token is still valid."""
-        assert self.api_token is not None
+        if self.api_token is None:
+            raise ValueError('Not authenticated')
 
         r = http.request(
             "POST",
@@ -651,7 +664,7 @@ class PatchStorage:
 
         all_patches = []
 
-        for page in range(1, math.ceil(self.patch_count / per_page) + 1):
+        for page in range(1, math.ceil(self.refresh_patch_count() / per_page) + 1):
             # Get all the patches on the current page.
             all_patches.extend(self._search({**search, **{"page": page}}))
 
@@ -694,7 +707,7 @@ class PatchStorage:
         """
 
         # Max on per_page is 100, so we can't go over that.
-        per_page = self.patch_count - pch_num
+        per_page = self.refresh_patch_count() - pch_num
         if per_page > 100:
             per_page = 100
         search = {"per_page": per_page}
@@ -714,7 +727,15 @@ class PatchStorage:
             return new_patches
 
     def _patch_count(self):
-        endpoint = os.path.join(self.url, "patches/")
+        """Queries the PS API for the number of ZOIA patches it hosts.
+
+        raise: urllib3.exceptions.HTTPError if PatchStorage did not
+               answer with a usable count.
+
+        return: The patch count as an int.
+        """
+
+        endpoint = self.url + "patches/"
 
         # get param dict
         params = {
@@ -729,8 +750,21 @@ class PatchStorage:
         url = str(furl(endpoint).add(params))
         r = http.request("GET", url)
 
-        # int(r.headers['X-WP-TotalPages'])
-        return int(r.headers['X-WP-Total'])
+        # A 5xx page, a login redirect or any other non-patch response
+        # completes the request but carries no count. Report that as an
+        # HTTP failure rather than letting a KeyError escape, so callers
+        # can treat every unreachable-API case the same way.
+        if r.status != 200:
+            raise urllib3.exceptions.HTTPError(
+                "PatchStorage returned HTTP {}".format(r.status)
+            )
+        try:
+            # int(r.headers['X-WP-TotalPages'])
+            return int(r.headers["X-WP-Total"])
+        except (KeyError, TypeError, ValueError):
+            raise urllib3.exceptions.HTTPError(
+                "PatchStorage response carried no usable patch count"
+            )
 
     # @staticmethod
     # def _determine_patch_count():
@@ -782,3 +816,18 @@ class PatchStorage:
     #
     #     # Return the total minus the number of questions found.
     #     return int(zoia.split("<")[0]) - len(soup_ques.find_all(class_="card"))
+
+    def refresh_patch_count(self):
+        """Returns the number of ZOIA patches on PatchStorage,
+        querying the API again if the count could not be retrieved
+        previously (e.g., the application started while offline).
+
+        raise: urllib3.exceptions.HTTPError if PatchStorage cannot
+               be reached.
+
+        return: The patch count as an int.
+        """
+
+        if self.patch_count is None:
+            self.patch_count = self._patch_count()
+        return self.patch_count

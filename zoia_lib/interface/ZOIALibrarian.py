@@ -1640,7 +1640,7 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(shortcut)
         self.actionImport_A_Patch.setText(QCoreApplication.translate("MainWindow", u"Import a Patch (.bin)", None))
 #if QT_CONFIG(shortcut)
-        self.actionImport_A_Patch.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+I", None))
+        self.actionImport_A_Patch.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+Shift+I", None))
 #endif // QT_CONFIG(shortcut)
         self.actionToggle_Dark_Mode.setText(QCoreApplication.translate("MainWindow", u"Toggle Dark Mode", None))
         self.actionImport_Multiple_Patches.setText(QCoreApplication.translate("MainWindow", u"Import Multiple Patches (directory)", None))

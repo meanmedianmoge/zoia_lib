@@ -168,70 +168,69 @@ def search_patches(data, query):
 
     query = query.lower()
 
-    hits = []
+    if not query:
+        # Every patch matches an empty query, so there is nothing to
+        # rank; return them in their existing order.
+        return list(data)
 
-    # Special case, searching for a category. Since there are a known # of
-    # categories, we prioritize these first.
-    if (
-        query in "composition"
-        or query in "effect"
-        or query in "game"
-        or query in "other"
-        or query in "sampler"
-        or query in "sequencer"
-        or query in "sound"
-        or query in "synthesizer"
-        or query in "utility"
-        or query in "video"
-    ):
-        for curr in data:
-            if "categories" in curr:
-                # Check category tag.
-                for category in curr["categories"]:
-                    if query in category["name"].lower():
-                        hits.insert(0, curr)
-                        break
+    hits = []
+    # Track hits by object identity; comparing whole metadata dicts
+    # against the hit list made the search quadratic.
+    seen = set()
+
+    def add_hit(entry):
+        hits.append(entry)
+        seen.add(id(entry))
+
+    # Category matches are prioritized. Note the direction of the
+    # match: the category has to start with the query, so "synt" ranks
+    # Synthesizer patches first, but a query merely contained in a
+    # category name (e.g. "o") no longer reorders the results. The
+    # names are read from the patches themselves, so a category added
+    # on PatchStorage is picked up without editing this file.
+    for curr in data:
+        # Check category tag.
+        for category in curr.get("categories", []):
+            if category["name"].lower().startswith(query):
+                add_hit(curr)
+                break
 
     for curr in data:
+        if id(curr) in seen:
+            continue
         # Check the patch title.
-        if query in curr["title"].lower() and curr not in hits:
-            hits.append(curr)
+        if query in curr["title"].lower():
+            add_hit(curr)
             continue
         # Check the version title (local and folders tab only).
         if "files" in curr:
             try:
-                if (
-                    query
-                    in curr["files"][0]["filename"]
+                version = (
+                    curr["files"][0]["filename"]
                     .split(".")[0]
                     .split("_zoia_")[-1]
                     .replace("_", " ")
                     .lower()
-                ) and curr not in hits:
-                    hits.append(curr)
-                    continue
-            except KeyError:
+                )
+            except (KeyError, IndexError):
+                version = None
+            if version is not None and query in version:
+                add_hit(curr)
                 continue
         # Check the author.
-        if (
-            "author" in curr
-            and query in curr["author"]["name"].lower()
-            and curr not in hits
-        ):
-            hits.append(curr)
+        if "author" in curr and query in curr["author"]["name"].lower():
+            add_hit(curr)
             continue
         # Check every tag.
-        if "tags" in curr:
-            for tag in curr["tags"]:
-                if query in tag["name"].lower() and curr not in hits:
-                    hits.append(curr)
-                    continue
-        # Check dates.
-        if "updated_at" in curr and query in curr["updated_at"].lower() and curr not in hits:
-            hits.append(curr)
+        if any(query in tag["name"].lower() for tag in curr.get("tags", [])):
+            add_hit(curr)
             continue
-        if "created_at" in curr and query in curr["created_at"].lower() and curr not in hits:
-            hits.append(curr)
+        # Check dates.
+        if "updated_at" in curr and query in curr["updated_at"].lower():
+            add_hit(curr)
+            continue
+        if "created_at" in curr and query in curr["created_at"].lower():
+            add_hit(curr)
 
     return hits
 
@@ -288,6 +287,14 @@ def generate_blank_patch():
     """
 
     return b"\t" + b"\x00" * 32767
+
+
+def merge_patch_metadata(new_patches, known):
+    """Keep one copy per patch ID, preferring freshly retrieved metadata."""
+    merged = {}
+    for entry in new_patches + known:
+        merged.setdefault(entry["id"], entry)
+    return list(merged.values())
 
 
 def meipass(resource, is_ui=False):

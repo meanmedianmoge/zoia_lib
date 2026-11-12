@@ -29,7 +29,7 @@ from PySide6.QtWidgets import (
 )
 
 from zoia_lib.backend.patch_update import PatchUpdate
-from zoia_lib.backend.utilities import hide_dotted_files, exit_after
+from zoia_lib.backend.utilities import hide_dotted_files, exit_after, search_patches
 from zoia_lib.common import errors
 
 update = PatchUpdate()
@@ -239,7 +239,7 @@ class ZOIALibrarianLocal(QMainWindow):
     def has_multiple_versions(self, patch_id):
         return self._count_patch_versions(patch_id) > 1
 
-    def get_local_patches(self):
+    def get_local_patches(self, *, render=True):
         """Retrieves the metadata for patches that a user has previously
         downloaded and saved to their machine's backend.
         """
@@ -275,7 +275,8 @@ class ZOIALibrarianLocal(QMainWindow):
                         curr_data.append(temp)
                         break
 
-        self.sort_and_set()
+        if render:
+            self.sort_and_set()
 
     def initiate_delete(self):
         """Attempts to delete a patch that is stored on a user's local
@@ -422,13 +423,7 @@ class ZOIALibrarianLocal(QMainWindow):
                         except errors.ExportingError as e:
                             # There was already a patch in that slot.
                             # Find its name and display to the user to confirm.
-                            e = (
-                                str(e)
-                                .split("(")[1]
-                                .split(")")[0]
-                                .split(",")[0]
-                                .replace("'", "")
-                            )
+                            e = e.info
                             self.msg.setWindowTitle("Slot Exists")
                             self.msg.setIcon(QMessageBox.Warning)
                             self.msg.setText(
@@ -755,11 +750,16 @@ class ZOIALibrarianLocal(QMainWindow):
             self.msg.setDetailedText("")
             return
 
-        remaining_versions = self._count_version_files(self.curr_ver)
-        if remaining_versions <= 1:
+        # Refresh the parent table's data and search results without leaving
+        # the history. Back will render these fresh results when requested.
+        self.clear_viz()
+        self.local_selected = None
+        self.get_local_patches(render=False)
+        self.window.search_data_local = (
+            search_patches(self.data_local, self.prev_search) if self.prev_search else None
+        )
+        if self._count_version_files(self.curr_ver) <= 1:
             self.go_back()
-            self.get_local_patches()
-            self.ui.searchbar_local.setText("")
         else:
             self.get_version_patches(True, self.curr_ver)
         self.ui.statusbar.showMessage("Successfully split version history.", timeout=5000)
@@ -940,7 +940,8 @@ class ZOIALibrarianLocal(QMainWindow):
 
         # New local patches have no PatchStorage author yet. Authenticate
         # the uploader; ownership checks only apply to existing PS patches.
-        self.usr_pwd()
+        if self.usr_pwd() is None:
+            return
 
         file = os.path.join(self.path, self.local_selected, self.local_selected)
         with open(file + ".json", "r") as f:
@@ -979,12 +980,16 @@ class ZOIALibrarianLocal(QMainWindow):
 
         # We also need a license
         lic = self.license()
+        if lic is None:
+            return
         lic_id = [x["id"] for x in self.api.licenses if x["name"] == lic][0]
 
         # Finally, we upload the whole patch, referencing the art and file IDs
+        published = False
         try:
             r = self.api.upload_patch(file, art_id, file_id, lic_id)
             if r.status == 201:
+                published = True
                 pch_id = str(json.loads(r.data)['id'])
                 # Convert the upload to a 6-digit PS patch
                 meta = update.convert_local_to_ps(self.local_selected, pch_id)
@@ -1012,14 +1017,15 @@ class ZOIALibrarianLocal(QMainWindow):
             )
             self.msg.setWindowTitle("Upload Failed")
             self.msg.setIcon(QMessageBox.Warning)
-            self.msg.setText("Could not upload the patch to the PS API.")
+            self.msg.setText("The patch was uploaded, but local metadata could not be refreshed. Check PatchStorage before retrying." if published else "Upload not confirmed. Check PatchStorage before retrying.")
             self.msg.setDetailedText(str(exc))
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
 
     def update_patch(self):
         """Publish metadata edits or a changed binary using the live revision."""
-        self.usr_pwd()
+        if self.usr_pwd() is None:
+            return
         file = os.path.join(self.path, self.local_selected, self.local_selected)
         try:
             with open(file + '.json', 'r') as source:
@@ -1051,6 +1057,8 @@ class ZOIALibrarianLocal(QMainWindow):
             lic_id = None
             if not data.get('license', {}).get('id'):
                 lic = self.license()
+                if lic is None:
+                    return
                 lic_id = next(x['id'] for x in self.api.licenses if x['name'] == lic)
             response = self.api.update_patch(
                 self.local_selected, file, art_id, file_id, lic_id,
@@ -1106,28 +1114,25 @@ class ZOIALibrarianLocal(QMainWindow):
         self.userpass.resize(300, 100)
         self.userpass.setWindowTitle("PatchStorage Credentials")
 
-        if self.api.api_token is None:
-            # No token exists, create it.
-            self.userpass.exec_()
-            self.api.generate_token(usr.text(), pwd.text())
-            assert self.api.api_token is not None
-            assert self.api.auth_token() == 200
-            usr = usr.text()
-        else:
-            # Token is no longer authenticated, create another.
+        try:
+            if self.api.api_token is not None and self.api.auth_token() == 200:
+                return self.api.api_usr or "authenticated"
+            if self.userpass.exec_() != QDialog.Accepted:
+                return None
+            if not self.api.generate_token(usr.text(), pwd.text()):
+                raise ValueError("PatchStorage rejected the username or password.")
             if self.api.auth_token() != 200:
-                self.userpass.exec_()
-                self.api.generate_token(usr.text(), pwd.text())
-                assert self.api.api_token is not None
-                assert self.api.auth_token() == 200
-                usr = usr.text()
-            # Token exists and is valid, need to get the username from prefs.
-            else:
-                with open(os.path.join(self.path, 'pref.json'), 'r') as f:
-                    prefs = json.loads(f.read())
-                usr = prefs[0]['api_user']
-
-        return usr
+                raise ValueError("PatchStorage could not validate the login token.")
+            return usr.text()
+        except (ValueError, KeyError, OSError, urllib3.exceptions.HTTPError) as exc:
+            self.msg.setWindowTitle("Authentication Failed")
+            self.msg.setIcon(QMessageBox.Warning)
+            self.msg.setText("Could not sign in to PatchStorage. Check your credentials and connection.")
+            self.msg.setDetailedText(str(exc))
+            self.msg.setStandardButtons(QMessageBox.Ok)
+            self.msg.exec_()
+            self.msg.setDetailedText("")
+            return None
 
     def license(self):
         cb = QComboBox()
@@ -1150,15 +1155,15 @@ class ZOIALibrarianLocal(QMainWindow):
         self.container.setLayout(layout)
         self.container.resize(300, 100)
         self.container.setWindowTitle("License Selection")
-        self.container.exec_()
-
+        if self.container.exec_() != QDialog.Accepted:
+            return None
         return cb.currentText()
 
     def exit_usr_pwd(self):
-        self.userpass.close()
+        self.userpass.accept()
 
     def exit_dropdown(self):
-        self.container.close()
+        self.container.accept()
 
     def events(self, e):
         """Handles events that relate updating the tags/categories
@@ -1324,6 +1329,17 @@ class ZOIALibrarianLocal(QMainWindow):
                     updated = True
         if not updated:
             _update_meta_file(os.path.join(self.path, base, "{}.json".format(idx)))
+
+    def clear_viz(self):
+        """Discard the previous selection before loading another binary."""
+        self.curr_viz = None
+        self.curr_page_viz = 0
+        self.ui.page_label.setText("")
+        self.ui.text_browser_viz.setText("")
+        for button in (self.ui.back_btn, self.ui.btn_next_page,
+                       self.ui.btn_prev_page, self.ui.btn_show_routing):
+            button.setEnabled(False)
+        self.viz_disable()
 
     def setup_viz(self, viz):
         """Prepares the patch visualizer once a patch has been
@@ -1788,7 +1804,8 @@ class ZOIALibrarianLocal(QMainWindow):
 
     def get_ps_api_token(self):
         """"Gets the API token."""
-        assert self.api.api_token is not None
+        if self.api.api_token is None:
+            raise ValueError("Not authenticated")
         return self.api.api_token
 
     def get_prev_tag_cat(self):

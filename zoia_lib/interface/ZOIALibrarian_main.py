@@ -323,7 +323,8 @@ class ZOIALibrarianMain(QMainWindow):
             self.import_version_menu
         )
         self.ui.actionNavigate_to_local_backend.triggered.connect(self.util.open_local_backend)
-        self.import_library_action = QAction("Import Existing Library…", self)
+        self.import_library_action = QAction("Import Existing Library", self)
+        self.import_library_action.setShortcut("Ctrl+L")
         self.ui.menuFile.insertAction(
             self.ui.actionNavigate_to_local_backend, self.import_library_action
         )
@@ -1004,7 +1005,7 @@ class ZOIALibrarianMain(QMainWindow):
                         self.msg.setDetailedText(str(e))
                         self.msg.setStandardButtons(QMessageBox.Ok)
                         self.msg.exec_()
-                        self.msg.setDetailedText(None)
+                        self.msg.setDetailedText("")
             else:
                 # Get the context.
                 viz_browser = None
@@ -1056,6 +1057,7 @@ class ZOIALibrarianMain(QMainWindow):
                     content = json.loads(f.read())
                 # We are on the Local Storage View, so set the viz up.
                 if viz_browser is not None:
+                    self.local.clear_viz()
                     bin_path = os.path.join(patch_dir, patch_stem + ".bin")
                     if not os.path.isfile(bin_path):
                         fallback_bin = os.path.join(patch_dir, name + ".bin")
@@ -1066,10 +1068,12 @@ class ZOIALibrarianMain(QMainWindow):
                             viz = binary.parse_data(f.read())
                         self.local.setup_viz(viz)
                         self.ui.btn_show_routing.setEnabled(True)
-                    except Exception:
+                    except Exception as exc:
                         # Leave info view usable even if a binary is malformed.
-                        self.ui.btn_show_routing.setEnabled(False)
-                        self.ui.text_browser_viz.setText("")
+                        self.local.clear_viz()
+                        self.ui.text_browser_viz.setPlainText(
+                            f"Could not visualize this patch: {exc}"
+                        )
 
             # HTML code for the patch preview.
             if not skip:
@@ -1625,7 +1629,7 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setDetailedText(str(e))
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-            self.msg.setDetailedText(None)
+            self.msg.setDetailedText("")
 
         curr_os = platform.system().lower()
         choices = {"windows": "Windows", "darwin": "Mac", "linux": "Linux"}
@@ -1754,8 +1758,8 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setDetailedText(temp.strip("\n"))
         self.msg.setStandardButtons(QMessageBox.Ok)
         self.msg.exec_()
-        self.msg.setInformativeText(None)
-        self.msg.setDetailedText(None)
+        self.msg.setInformativeText("")
+        self.msg.setDetailedText("")
         self.tab_switch()
         # if (
         #     self.ui.tabs.currentIndex() == 1 and not self.ui.back_btn_local.isEnabled()
@@ -1826,8 +1830,8 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setIcon(QMessageBox.Warning)
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-            self.msg.setInformativeText(None)
-            self.msg.setDetailedText(None)
+            self.msg.setInformativeText("")
+            self.msg.setDetailedText("")
         else:
             self.ui.statusbar.showMessage("Import failed.", timeout=5000)
             self.msg.setWindowTitle("Warning")
@@ -1852,8 +1856,8 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setIcon(QMessageBox.Warning)
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-            self.msg.setInformativeText(None)
-            self.msg.setDetailedText(None)
+            self.msg.setInformativeText("")
+            self.msg.setDetailedText("")
         if self.last_folder_json:
             self.ui.statusbar.showMessage(
                 "Folder saved as {}.".format(self.last_folder_json), timeout=5000

@@ -6,6 +6,7 @@ from PySide6.QtCore import QThread
 from PySide6.QtWidgets import QMainWindow, QMessageBox, QPushButton
 
 from zoia_lib.common import errors
+from zoia_lib.backend.utilities import merge_patch_metadata
 
 
 class ZOIALibrarianPS(QMainWindow):
@@ -40,15 +41,38 @@ class ZOIALibrarianPS(QMainWindow):
         # Threads
         self.worker_dwn = DownloadAllWorker(self.ui, self.save, self.api)
         self.worker_dwn.signal.connect(self._download_all_done)
+        self.worker_dwn.failed.connect(self._operation_failed)
+        self.worker_dwn.downloaded.connect(self._patch_downloaded)
         self.worker_dwn.signal_2.connect(self._download_all_progress)
 
         self.worker_ps = ReloadPSWorker(self.path, self.api)
         self.worker_ps.signal.connect(self._reload_ps_done)
+        self.worker_ps.failed.connect(self._operation_failed)
+
+    def _operation_failed(self, detail):
+        self.ui.btn_dwn_all.setEnabled(True)
+        self.ui.refresh_pch_btn.setEnabled(True)
+        self.ui.check_for_updates_btn.setEnabled(True)
+        self.ui.searchbar_PS.setEnabled(True)
+        self.ui.statusbar.showMessage("Operation failed.", timeout=5000)
+        self.msg.setWindowTitle("PatchStorage Error")
+        self.msg.setIcon(QMessageBox.Warning)
+        self.msg.setText("Could not complete the PatchStorage operation. Your cached patch list has been preserved.")
+        self.msg.setDetailedText(detail)
+        self.msg.setStandardButtons(QMessageBox.Ok)
+        self.msg.exec_()
+        self.msg.setDetailedText("")
+
+    def _patch_downloaded(self, row):
+        button = self.ui.table_PS.cellWidget(row, 4)
+        button.setEnabled(False)
+        button.setText("Downloaded")
 
     def metadata_init(self):
         """Retrieves all PS metadata via API calls."""
 
         try:
+            self.api.refresh_patch_count()
             # Check for metadata in the user's backend.
             if "data.json" not in os.listdir(self.path):
                 ps_data = self.api.get_all_patch_data_init()
@@ -71,7 +95,7 @@ class ZOIALibrarianPS(QMainWindow):
                 else:
                     # Get the new patch metadata that we don't have.
                     new_patches = self.api.get_newest_patches(len(data))
-                    ps_data = new_patches + data
+                    ps_data = merge_patch_metadata(new_patches, data)
 
             # Create/update the data file with the new data.
             with open(os.path.join(self.path, "data.json"), "w") as f:
@@ -109,7 +133,7 @@ class ZOIALibrarianPS(QMainWindow):
             self.msg.setDetailedText(str(e))
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-            self.msg.setDetailedText(None)
+            self.msg.setDetailedText("")
             self.ui.tabs.setCurrentIndex(1)
 
     def reload_ps_thread(self):
@@ -137,11 +161,6 @@ class ZOIALibrarianPS(QMainWindow):
         self.ui.btn_dwn_all.setEnabled(True)
         self.ui.refresh_pch_btn.setEnabled(True)
         self.ui.statusbar.showMessage("Patch list refreshed.", timeout=5000)
-        self.msg.setWindowTitle("Patches Refreshed")
-        self.msg.setText("The PatchStorage patch list has been refreshed.")
-        self.msg.setIcon(QMessageBox.Information)
-        self.msg.setStandardButtons(QMessageBox.Ok)
-        self.msg.exec_()
 
     def download_all_thread(self):
         """Initializes a Worker thread to manage the downloading of
@@ -156,6 +175,11 @@ class ZOIALibrarianPS(QMainWindow):
         self.ui.searchbar_PS.setEnabled(False)
 
         # Execute
+        self.worker_dwn.jobs = [
+            (row, self.ui.table_PS.cellWidget(row, 4).objectName())
+            for row in range(self.ui.table_PS.rowCount())
+            if self.ui.table_PS.cellWidget(row, 4).isEnabled()
+        ]
         self.worker_dwn.start()
 
     def _download_all_progress(self, i):
@@ -183,20 +207,20 @@ class ZOIALibrarianPS(QMainWindow):
 
         # Notify the user via a popup.
         self.ui.statusbar.showMessage(
-            "All patches successfully downloaded.", timeout=5000
+            f"Downloaded {cnt} patch(es); {fails} failed.", timeout=5000
         )
         self.msg.setWindowTitle("Download Complete")
         self.msg.setIcon(QMessageBox.Information)
         self.msg.setText("Successfully downloaded {} patch(es)." "".format(cnt))
         self.msg.setInformativeText(
-            "Did not download {} patch(es) because "
-            "they are either .py files or use a "
-            "compression algorithm other than .zip"
-            "".format(fails)
+            f"{fails} patch(es) could not be saved. Failed downloads can be retried; formats, network access, or local file access may be responsible."
+            if fails else ""
         )
+        self.msg.setDetailedText("\n".join(self.worker_dwn.failures))
         self.msg.setStandardButtons(QMessageBox.Ok)
         self.msg.exec_()
-        self.msg.setInformativeText(None)
+        self.msg.setInformativeText("")
+        self.msg.setDetailedText("")
 
         # Re-enable the necessary UI components.
         self.ui.statusbar.showMessage("", timeout=10)
@@ -226,18 +250,8 @@ class ZOIALibrarianPS(QMainWindow):
             self.sender().setEnabled(False)
             self.sender().setText("Downloaded")
             self.ui.statusbar.showMessage("Download complete.", timeout=5000)
-        except errors.SavingError:
-            # .py or .rar and the user doesn't have WinRAR installed.
-            self.ui.statusbar.showMessage("Download failed.", timeout=5000)
-            self.msg.setWindowTitle("Invalid File Type")
-            self.msg.setIcon(QMessageBox.Information)
-            self.msg.setText(
-                "Unfortunately, that patch is not in a " "supported format."
-            )
-            self.msg.setInformativeText("Supported formats are .bin and .zip")
-            self.msg.setStandardButtons(QMessageBox.Ok)
-            self.msg.exec_()
-            self.msg.setInformativeText(None)
+        except errors.SavingError as exc:
+            self._operation_failed(str(exc))
         except Exception as e:
             # Let the user know the API failed.
             self.ui.statusbar.showMessage("API connection failed.", timeout=5000)
@@ -247,7 +261,7 @@ class ZOIALibrarianPS(QMainWindow):
             self.msg.setDetailedText(str(e))
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
-            self.msg.setDetailedText(None)
+            self.msg.setDetailedText("")
 
     def create_dwn_btn(self, i, idx):
         """Creates a download button for patches on the PatchStorage
@@ -286,6 +300,8 @@ class DownloadAllWorker(QThread):
     # UI communication
     signal = QtCore.Signal(int, int)
     signal_2 = QtCore.Signal(int)
+    downloaded = QtCore.Signal(int)
+    failed = QtCore.Signal(str)
 
     def __init__(self, ui, save, api):
         """Initializes the thread.
@@ -309,33 +325,19 @@ class DownloadAllWorker(QThread):
         on to the next patch until it has exhausted the list.
         """
 
-        try:
-            self.fails = 0
-            self.cnt = 0
-
-            for i in range(self.ui.table_PS.rowCount()):
-                btn = self.ui.table_PS.cellWidget(i, 4)
-                if btn.isEnabled():
-                    # Try to download the patch.
-                    try:
-                        self.save.save_to_backend(self.api.download(btn.objectName()))
-                        btn.setEnabled(False)
-                        btn.setText("Downloaded")
-                        self.cnt += 1
-                    except errors.SavingError:
-                        self.fails += 1
-                    self.signal_2.emit(i)
-            self.signal.emit(self.cnt, self.fails)
-        except Exception as e:
-            # Let the user know the API failed.
-            self.ui.statusbar.showMessage("API connection failed.", timeout=5000)
-            self.msg.setWindowTitle("API Error")
-            self.msg.setIcon(QMessageBox.Information)
-            self.msg.setText("Failed to download the patch from PatchStorage.")
-            self.msg.setDetailedText(str(e))
-            self.msg.setStandardButtons(QMessageBox.Ok)
-            self.msg.exec_()
-            self.msg.setDetailedText(None)
+        self.fails = 0
+        self.cnt = 0
+        self.failures = []
+        for row, patch_id in self.jobs:
+            try:
+                self.save.save_to_backend(self.api.download(patch_id))
+                self.downloaded.emit(row)
+                self.cnt += 1
+            except Exception as exc:
+                self.fails += 1
+                self.failures.append(f"Patch {patch_id}: {exc}")
+            self.signal_2.emit(row)
+        self.signal.emit(self.cnt, self.fails)
 
 
 class ReloadPSWorker(QThread):
@@ -346,6 +348,7 @@ class ReloadPSWorker(QThread):
 
     # UI communication
     signal = QtCore.Signal()
+    failed = QtCore.Signal(str)
 
     def __init__(self, path, api):
         """Initializes the thread.
@@ -364,18 +367,16 @@ class ReloadPSWorker(QThread):
         on to the next patch until it has exhausted the list.
         """
 
-        # Try to download the patch.
+        temporary = os.path.join(self.path, "data.json.tmp")
         try:
-            with open(os.path.join(self.path, "data.json"), "w") as f:
-                f.write(json.dumps(self.api.get_all_patch_data_init()))
+            self.api.patch_count = None
+            data = self.api.get_all_patch_data_init()
+            with open(temporary, "w") as target:
+                json.dump(data, target)
+            os.replace(temporary, os.path.join(self.path, "data.json"))
             self.signal.emit()
-        except Exception as e:
-            # Let the user know the API failed.
-            self.ui.statusbar.showMessage("API connection failed.", timeout=5000)
-            self.msg.setWindowTitle("API Error")
-            self.msg.setIcon(QMessageBox.Information)
-            self.msg.setText("Failed to download the patch from PatchStorage.")
-            self.msg.setDetailedText(str(e))
-            self.msg.setStandardButtons(QMessageBox.Ok)
-            self.msg.exec_()
-            self.msg.setDetailedText(None)
+        except Exception as exc:
+            self.failed.emit(str(exc))
+        finally:
+            if os.path.exists(temporary):
+                os.remove(temporary)

@@ -403,13 +403,7 @@ class PatchSave(Patch):
                     self.save_to_backend((temp_data, js_data), version=True)
                 except errors.SavingError as e:
                     fails += 1
-                    e = (
-                        str(e)
-                        .split("(")[1]
-                        .split(")")[0]
-                        .split(",")[0]
-                        .replace("'", "")
-                    )
+                    e = e.info
                     errs.append(e)
                     continue
 
