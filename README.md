@@ -46,7 +46,7 @@ https://github.com/meanmedianmoge/zoia_lib/releases/latest.
 - Version 1.4 video: https://www.youtube.com/watch?v=ymLvRhC1GmI
 - Version 2.0 video: https://www.youtube.com/watch?v=j6mz4DIdEpU
 - Version 2.1 video: https://www.youtube.com/watch?v=VkhidyALOXM
-- Version 2.2 video: 
+- Version 2.2 video: https://www.youtube.com/watch?v=IEwjAuaVA1I
 - You'll find the following in `documentation`: <br>
     - Current version of the user manual
     - Overall changelog - lists new features, bug fixes, and known issues for each release
