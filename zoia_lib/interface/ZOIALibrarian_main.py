@@ -1621,10 +1621,11 @@ class ZOIALibrarianMain(QMainWindow):
 
         try:
             url = 'https://github.com/meanmedianmoge/zoia_lib/releases/latest'
-            r = requests.get(url)
+            r = requests.get(url, timeout=5)
+            r.raise_for_status()
             latest = r.url.split('/')[-1]
-        except Exception as e:
-            # Other unknown API connection error.
+            update_available = float(self._version) < float(latest)
+        except (requests.RequestException, ValueError) as e:
             self.ui.statusbar.showMessage("Github connection failed.", timeout=5000)
             self.msg.setWindowTitle("Github Error")
             self.msg.setIcon(QMessageBox.Information)
@@ -1635,11 +1636,12 @@ class ZOIALibrarianMain(QMainWindow):
             self.msg.setStandardButtons(QMessageBox.Ok)
             self.msg.exec_()
             self.msg.setDetailedText("")
+            return
 
         curr_os = platform.system().lower()
         choices = {"windows": "Windows", "darwin": "Mac", "linux": "Linux"}
 
-        if float(self._version) < float(latest):
+        if update_available:
             self.msg.setWindowTitle("App Update")
             self.msg.setIcon(QMessageBox.Information)
             self.msg.setText(
